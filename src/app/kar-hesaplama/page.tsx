@@ -429,7 +429,7 @@ export default function KarHesaplamaPage() {
                         onClick={() => setShippingMode('weight')}
                         className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all cursor-pointer ${
                           shippingMode === 'weight'
-                            ? 'bg-ink text-white shadow-xs'
+                            ? 'bg-neutral-900 text-white shadow-xs'
                             : 'text-text-secondary hover:text-text-primary'
                         }`}
                       >
@@ -440,7 +440,7 @@ export default function KarHesaplamaPage() {
                         onClick={() => setShippingMode('custom')}
                         className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all cursor-pointer ${
                           shippingMode === 'custom'
-                            ? 'bg-ink text-white shadow-xs'
+                            ? 'bg-neutral-900 text-white shadow-xs'
                             : 'text-text-secondary hover:text-text-primary'
                         }`}
                       >
@@ -487,7 +487,7 @@ export default function KarHesaplamaPage() {
                         onClick={() => setCurrency('EUR')}
                         className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all cursor-pointer ${
                           currency === 'EUR'
-                            ? 'bg-ink text-white shadow-xs'
+                            ? 'bg-neutral-900 text-white shadow-xs'
                             : 'text-text-secondary hover:text-text-primary'
                         }`}
                       >
@@ -498,7 +498,7 @@ export default function KarHesaplamaPage() {
                         onClick={() => setCurrency('USD')}
                         className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all cursor-pointer ${
                           currency === 'USD'
-                            ? 'bg-ink text-white shadow-xs'
+                            ? 'bg-neutral-900 text-white shadow-xs'
                             : 'text-text-secondary hover:text-text-primary'
                         }`}
                       >

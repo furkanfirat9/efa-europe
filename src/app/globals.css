@@ -63,6 +63,16 @@
   --foreground: #EDEFF2;
 }
 
+/* Açık Tema Sayfa Alanları için Ink Token Sıfırlaması */
+.bg-bg-page {
+  --ink: #0E0E10;
+  --ink-foreground: #FFFFFF;
+  --ink-muted: #6B6B78;
+  --ink-subtle: #8A8A96;
+  --ink-faint: #A0A0AC;
+  --foreground: #111114;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
