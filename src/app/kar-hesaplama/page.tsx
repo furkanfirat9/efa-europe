@@ -613,9 +613,9 @@ export default function KarHesaplamaPage() {
                 }
               />
 
-              {/* 4. Net Hakediş (Ozon'dan Bankaya Geçecek Tutar) */}
+              {/* 4. Hakediş (Ozon'dan Bankaya Geçecek Tutar) */}
               <StatCard
-                label="Net Hakediş"
+                label="Hakediş"
                 value={formatCurr(calc.payoutEur)}
                 subValue={formatTL(calc.payoutTry)}
                 badge={
