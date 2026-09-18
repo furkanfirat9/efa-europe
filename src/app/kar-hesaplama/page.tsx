@@ -25,6 +25,131 @@ import { formatTL, formatPercent } from '@/lib/format';
 type Currency = 'EUR' | 'USD';
 type ShippingMode = 'weight' | 'custom';
 
+interface ProfitScenario {
+  name: string;
+  category: string;
+  buyPrice: number;
+  weightG: number;
+  commissionRate: number;
+  currency: Currency;
+  isSplitting?: boolean;
+}
+
+const SAMPLE_SCENARIOS: ProfitScenario[] = [
+  {
+    name: 'Philips OneBlade Pro Tıraş Makinesi',
+    category: 'Kişisel Bakım',
+    buyPrice: 42,
+    weightG: 450,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+  {
+    name: 'Philips Sonicare 5300 Diş Fırçası',
+    category: 'Ağız & Diş Bakımı',
+    buyPrice: 65,
+    weightG: 680,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+  {
+    name: 'Philips Buhar Kazanlı Ütü PerfectCare',
+    category: 'Ütü & Buhar',
+    buyPrice: 145,
+    weightG: 4200,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+  {
+    name: 'WMF Gourmet Karıştırma Kasesi 4 Parça',
+    category: 'Sofra & Mutfak',
+    buyPrice: 38,
+    weightG: 1350,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+  {
+    name: 'Philips Airfryer XXL 5000 Serisi',
+    category: 'Mutfak & Pişirme',
+    buyPrice: 125,
+    weightG: 6800,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+  {
+    name: 'Braun Series 9 Pro Tıraş Makinesi',
+    category: 'Kişisel Bakım',
+    buyPrice: 210,
+    weightG: 1250,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+  {
+    name: 'Oral-B iO Series 8 Şarjlı Diş Fırçası',
+    category: 'Ağız & Diş Bakımı',
+    buyPrice: 130,
+    weightG: 920,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+  {
+    name: 'WMF Kult X Çubuk Blender Seti',
+    category: 'Gıda Hazırlama',
+    buyPrice: 48,
+    weightG: 1950,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+  {
+    name: 'Philips Lumea IPL Epilasyon Cihazı',
+    category: 'Kişisel Bakım',
+    buyPrice: 265,
+    weightG: 1900,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+  {
+    name: 'Tefal OptiGrill Elite Temaslı Izgara',
+    category: 'Mutfak & Pişirme',
+    buyPrice: 155,
+    weightG: 5800,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+  {
+    name: 'DeLonghi Dedica Espresso Makinesi',
+    category: 'Kahve & İçecek',
+    buyPrice: 165,
+    weightG: 4800,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+  {
+    name: 'Braun Silk-épil 9 Flex Epilatör',
+    category: 'Kişisel Bakım',
+    buyPrice: 115,
+    weightG: 850,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+  {
+    name: 'WMF Profi Resist Tava 28cm',
+    category: 'Mutfak & Pişirme',
+    buyPrice: 62,
+    weightG: 1750,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+  {
+    name: 'Philips Saç Düzleştirici Series 7000',
+    category: 'Kişisel Bakım',
+    buyPrice: 52,
+    weightG: 720,
+    commissionRate: 5,
+    currency: 'EUR',
+  },
+];
+
 export default function KarHesaplamaPage() {
   // Para Birimi Seçeneği (EUR / USD - Varsayılan EUR)
   const [currency, setCurrency] = useState<Currency>('EUR');
@@ -38,6 +163,10 @@ export default function KarHesaplamaPage() {
   const [weightG, setWeightG] = useState<string>('1200');
   const [customShipping, setCustomShipping] = useState<string>('15');
   const [commissionRate, setCommissionRate] = useState<string>('5');
+
+  // Son Yüklenen Örnek Senaryo Bilgisi
+  const [sampleIndex, setSampleIndex] = useState<number>(-1);
+  const [sampleProductName, setSampleProductName] = useState<string | null>(null);
 
   // TCMB Kur State'leri
   const [eurRate, setEurRate] = useState<string>('38.45');
@@ -97,19 +226,40 @@ export default function KarHesaplamaPage() {
     setCommissionRate('5');
     setIsIntegrated(true);
     setIsSplitting(false);
+    setSampleProductName(null);
   };
 
-  // Örnek Değerleri Doldur
+  // Mantıklı Rastgele Örnek Değerleri Doldur
   const handleLoadSample = () => {
-    setCurrency('EUR');
+    let nextIndex = Math.floor(Math.random() * SAMPLE_SCENARIOS.length);
+    if (nextIndex === sampleIndex) {
+      nextIndex = (nextIndex + 1) % SAMPLE_SCENARIOS.length;
+    }
+    setSampleIndex(nextIndex);
+    const item = SAMPLE_SCENARIOS[nextIndex];
+
+    // Doğal fiyat varyasyonu (-3 ile +4 arası)
+    const priceVariance = Math.floor(Math.random() * 8) - 3;
+    const finalBuyPrice = Math.max(15, item.buyPrice + priceVariance);
+
+    // Ozon arbitraj satış çarpanı (~2.65x ile ~3.15x arası, tam sayı)
+    const multiplier = 2.65 + Math.random() * 0.5;
+    const finalSellPrice = Math.round(finalBuyPrice * multiplier);
+
+    // Gramaj varyasyonu
+    const weightVariance = (Math.floor(Math.random() * 5) - 2) * 20;
+    const finalWeight = Math.max(200, item.weightG + weightVariance);
+
+    setCurrency(item.currency);
     setShippingMode('weight');
-    setBuyPrice('45');
-    setSellPrice('135');
-    setWeightG('1450');
+    setBuyPrice(finalBuyPrice.toString());
+    setSellPrice(finalSellPrice.toString());
+    setWeightG(finalWeight.toString());
     setCustomShipping('15');
-    setCommissionRate('5');
+    setCommissionRate(item.commissionRate.toString());
     setIsIntegrated(true);
-    setIsSplitting(false);
+    setIsSplitting(item.isSplitting || false);
+    setSampleProductName(`${item.name} · ${item.category}`);
   };
 
   // Saf Hesaplama Motoru
@@ -215,6 +365,15 @@ export default function KarHesaplamaPage() {
               }
             >
               <div className="space-y-4">
+                {sampleProductName && (
+                  <div className="flex items-center justify-between rounded-xl bg-accent-soft/30 border border-accent/20 px-3.5 py-2 text-xs text-text-primary">
+                    <div className="flex items-center gap-2 truncate">
+                      <Sparkles className="h-3.5 w-3.5 text-accent shrink-0" />
+                      <span className="font-medium truncate">{sampleProductName}</span>
+                    </div>
+                    <span className="text-[11px] text-text-muted shrink-0">Örnek Ürün</span>
+                  </div>
+                )}
                 
                 {/* 1. Alış Fiyatı */}
                 <PillInput
