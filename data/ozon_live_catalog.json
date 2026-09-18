@@ -1,0 +1,1209 @@
+[
+  {
+    "productId": 6033488722,
+    "offerId": "NA350/03",
+    "name": "Аэрогриль Philips NA350/03 Dual Basket 3000 Series с двумя чашами 9 л, 2750 Вт",
+    "price": "749.00",
+    "oldPrice": "799.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532328740,
+    "barcodes": [
+      "OZN5532328740"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T19:46:32.026181Z"
+  },
+  {
+    "productId": 6033426335,
+    "offerId": "NA340/00",
+    "name": "Аэрогриль Philips 3000 Series NA340/00 с окном 7.2 л, 2000 Вт, аэрофритюрница",
+    "price": "449.00",
+    "oldPrice": "499.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532273272,
+    "barcodes": [
+      "OZN5532273272"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T19:33:39.462682Z"
+  },
+  {
+    "productId": 6035208888,
+    "offerId": "TB401EU",
+    "name": "Стационарный блендер кухонный комбайн Ninja TB401EU Detect Power Blender & Processor Pro 1200 Вт, кувшин 2.1 л, чаша 1.8 л, 3 стакана",
+    "price": "849.00",
+    "oldPrice": "899.00",
+    "currency": "USD",
+    "categoryId": 17039627,
+    "typeId": 94973,
+    "sku": 5533761433,
+    "barcodes": [
+      "0622356294607"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T01:44:19.495988Z"
+  },
+  {
+    "productId": 6043133223,
+    "offerId": "DST8050/20",
+    "name": "Паровой утюг Philips Azur 8000 Series DST8050/20, темно-синий / золотой",
+    "price": "549.00",
+    "oldPrice": "599.00",
+    "currency": "USD",
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "sku": 5540608561,
+    "barcodes": [
+      "8720389004681"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T09:02:09.751590Z"
+  },
+  {
+    "productId": 6042952261,
+    "offerId": "PSG8200/80",
+    "name": "Парогенератор Philips PSG8200/80 PerfectCare 8000 Series, 9 бар, 3120 Вт, 1.4 л",
+    "price": "849.00",
+    "oldPrice": "899.00",
+    "currency": "USD",
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "sku": 5540447796,
+    "barcodes": [
+      "8720389066528"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T08:52:56.845960Z"
+  },
+  {
+    "productId": 6034093270,
+    "offerId": "SL451EUSD",
+    "name": "Аэрогриль Ninja DoubleStack XL SL451EUSD с термощупом 9.5 л 2470 Вт, серый металлик",
+    "price": "649.00",
+    "oldPrice": "699.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532811773,
+    "barcodes": [
+      "0622356294362"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T23:28:26.062660Z"
+  },
+  {
+    "productId": 6035481482,
+    "offerId": "Philips PSG7300/80",
+    "name": "Парогенератор Philips PSG7300/80 PerfectCare 7000 Series (3120 Вт, 8.5 бар, 1.5 л)",
+    "price": "749.00",
+    "oldPrice": "799.00",
+    "currency": "USD",
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "sku": 5534029221,
+    "barcodes": [
+      "8720389058332"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T01:56:41.187786Z"
+  },
+  {
+    "productId": 6033132365,
+    "offerId": "NA460/00",
+    "name": "Аэрогриль Philips NA460/00 с двумя чашами 10 л, 2750 Вт, сенсорное управление",
+    "price": "749.00",
+    "oldPrice": "799.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532008572,
+    "barcodes": [
+      "8720389033483"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T18:28:40.704514Z"
+  },
+  {
+    "productId": 6042986990,
+    "offerId": "PSG7200/60",
+    "name": "Парогенератор Philips PerfectCare 7000 Series PSG7200/60, 3120 Вт, 8.5 бар, 1.5 л",
+    "price": "849.00",
+    "oldPrice": "899.00",
+    "currency": "USD",
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "sku": 5540478348,
+    "barcodes": [
+      "8720389067662"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T08:54:28.366831Z"
+  },
+  {
+    "productId": 6045543439,
+    "offerId": "NA540/00",
+    "name": "Аэрогриль Philips NA540/00 с функцией пара 7.2 л 2000 Вт черный",
+    "price": "649.00",
+    "oldPrice": "699.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5542679962,
+    "barcodes": [
+      "8720389067082"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T11:31:14.718946Z"
+  },
+  {
+    "productId": 6033986066,
+    "offerId": "EY7528E0",
+    "name": "Аэрогриль Tefal Easy Fry Crispy Stack EY7528E0 с двумя чашами 10 л, 2700 Вт, черный",
+    "price": "649.00",
+    "oldPrice": "699.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532728074,
+    "barcodes": [
+      "3045380406094"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T22:32:35.980102Z"
+  },
+  {
+    "productId": 6033390540,
+    "offerId": "NA330/00",
+    "name": "Аэрогриль Philips NA330/00 3000 Series 6.2 л с окном 1700 Вт, аэрофритюрница мультипечь без масла",
+    "price": "449.00",
+    "oldPrice": "499.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532241040,
+    "barcodes": [
+      "OZN5532241040"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T19:25:26.036471Z"
+  },
+  {
+    "productId": 6034149552,
+    "offerId": "FN101EUGY",
+    "name": "Аэрогриль Ninja Crispi 4-в-1 FN101EUGY со стеклянными чашами 3.8 л, 1700 Вт, синий",
+    "price": "549.00",
+    "oldPrice": "599.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532861892,
+    "barcodes": [
+      "0622356307741"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T23:51:19.191084Z"
+  },
+  {
+    "productId": 6045477636,
+    "offerId": "FV9E50E0",
+    "name": "Паровой утюг Tefal FV9E50E0 Ultimate Power Pro 3200 Вт, черный",
+    "price": "449.00",
+    "oldPrice": "499.00",
+    "currency": "USD",
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "sku": 5542617844,
+    "barcodes": [
+      "3121040089040"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T11:26:34.862227Z"
+  },
+  {
+    "productId": 6033020018,
+    "offerId": "NA552/00",
+    "name": "Аэрогриль Philips NA552/00 Series 5000 Dual Basket 9 л черный",
+    "price": "749.00",
+    "oldPrice": "799.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5531920808,
+    "barcodes": [
+      "8720389035654"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T18:09:19.434512Z"
+  },
+  {
+    "productId": 6033566604,
+    "offerId": "NA154/00",
+    "name": "Аэрогриль Philips NA154/00 Series 1000, 7.1 л, 2450 Вт, аэрофритюрница с сенсорным управлением",
+    "price": "749.00",
+    "oldPrice": "799.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532393002,
+    "barcodes": [
+      "OZN5532393002"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T20:01:49.842774Z"
+  },
+  {
+    "productId": 6034681598,
+    "offerId": "FN101EUSG",
+    "name": "Аэрогриль Ninja CRISPi FN101EUSG 4-в-1 со стеклянными чашами 3.8 л, 1700 Вт, шалфейный зеленый",
+    "price": "649.00",
+    "oldPrice": "699.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5533327844,
+    "barcodes": [
+      "0622356317634"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T01:11:07.322300Z"
+  },
+  {
+    "productId": 6029756418,
+    "offerId": "NA550/00",
+    "name": "Philips Аэрогриль NA550/00 9 л, 2750 Вт",
+    "price": "749.00",
+    "oldPrice": "799.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5529096773,
+    "barcodes": [
+      "8720389035617"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T12:00:08.127998Z"
+  },
+  {
+    "productId": 6033781667,
+    "offerId": "EY8558E0",
+    "name": "Аэрогриль Tefal EY8558E0 Easy Fry & Grill XXL 7.5 л, 2020 Вт, черный",
+    "price": "349.00",
+    "oldPrice": "399.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532570476,
+    "barcodes": [
+      "3045380023642"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T21:16:16.473203Z"
+  },
+  {
+    "productId": 6035497996,
+    "offerId": "Philips PSG6064/80",
+    "name": "Парогенератор Philips PerfectCare 6000 Series PSG6064/80, черный / золотой",
+    "price": "649.00",
+    "oldPrice": "699.00",
+    "currency": "USD",
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "sku": 5534036213,
+    "barcodes": [
+      "8720389004872"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T01:57:15.551158Z"
+  },
+  {
+    "productId": 6033208399,
+    "offerId": "NA229/00",
+    "name": "Аэрогриль Philips NA229/00 Series 2000 со смотровым окном 4.2 л 1500 Вт, аэрофритюрница",
+    "price": "449.00",
+    "oldPrice": "499.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532088291,
+    "barcodes": [
+      "8720389033322"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T18:44:11.571448Z"
+  },
+  {
+    "productId": 6034006146,
+    "offerId": "EY9228",
+    "name": "Аэрогриль Tefal Dual Easy Fry Flex EY9228 черный",
+    "price": "449.00",
+    "oldPrice": "499.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532742788,
+    "barcodes": [
+      "3045380405288"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T22:39:53.075965Z"
+  },
+  {
+    "productId": 6034219128,
+    "offerId": "FN103EUGN",
+    "name": "Аэрогриль Ninja CRISPi 4-в-1 FN103EUGN со стеклянными чашами 3.8 л, 1700 Вт, шалфейный зеленый",
+    "price": "549.00",
+    "oldPrice": "599.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532917044,
+    "barcodes": [
+      "0622356400077"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T00:08:53.680134Z"
+  },
+  {
+    "productId": 6033256088,
+    "offerId": "NA230/00",
+    "name": "Аэрогриль Philips NA230/00 2000 Series 6.2 л 1700 Вт, аэрофритюрница со смотровым окном",
+    "price": "449.00",
+    "oldPrice": "499.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532123249,
+    "barcodes": [
+      "8720389033308"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T18:56:24.648557Z"
+  },
+  {
+    "productId": 6033739472,
+    "offerId": "EY831GE0",
+    "name": "Аэрогриль Tefal EY831GE0 Dual Easy Fry & Grill 7 л с двумя чашами 2200 Вт, аэрофритюрница с антипригарным покрытием",
+    "price": "449.00",
+    "oldPrice": "499.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532535802,
+    "barcodes": [
+      "3045380026216"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T21:01:02.010659Z"
+  },
+  {
+    "productId": 6042921534,
+    "offerId": "GV9567",
+    "name": "Парогенератор Tefal Pro Express Ultimate GV9567 белый с синим 2600 Вт, 7.7 бар",
+    "price": "649.00",
+    "oldPrice": "699.00",
+    "currency": "USD",
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "sku": 5540418354,
+    "barcodes": [
+      "3121040073933"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T08:51:12.083917Z"
+  },
+  {
+    "productId": 6035930484,
+    "offerId": "PSG3000/20",
+    "name": "Парогенератор Philips 3000 Series PSG3000/20, 2400 Вт, 6 бар, синий/белый",
+    "price": "249.00",
+    "oldPrice": "299.00",
+    "currency": "USD",
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "sku": 5534357568,
+    "barcodes": [
+      "8720389029479"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T02:13:04.243877Z"
+  },
+  {
+    "productId": 6033340060,
+    "offerId": "NA320/00",
+    "name": "Аэрогриль Philips NA320/00 Series 3000, 4.2 л, 1500 Вт, аэрофритюрница с антипригарным покрытием, сенсорная",
+    "price": "449.00",
+    "oldPrice": "499.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532196765,
+    "barcodes": [
+      "8720389035319"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T19:14:34.082481Z"
+  },
+  {
+    "productId": 6034039182,
+    "offerId": "EY8018",
+    "name": "Аэрогриль Tefal Easy Fry & Grill XXL EY8018 6.5 л с разделителем FlexCook 1830 Вт, черный",
+    "price": "549.00",
+    "oldPrice": "599.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532768338,
+    "barcodes": [
+      "OZN5532768338"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T22:59:00.422224Z"
+  },
+  {
+    "productId": 6034115622,
+    "offerId": "SL400EUCP",
+    "name": "Аэрогриль Ninja DoubleStack XL SL400EUCP 9.5 л 2470 Вт, двухсекционный вертикальный аэрофритюрница с 2 корзинами Copper/Черный",
+    "price": "649.00",
+    "oldPrice": "699.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532829348,
+    "barcodes": [
+      "0622356280822"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T23:38:06.125917Z"
+  },
+  {
+    "productId": 6033067485,
+    "offerId": "NA555/00",
+    "name": "Аэрогриль Philips NA555/00 Dual Basket 5000 Series 9 л черный",
+    "price": "749.00",
+    "oldPrice": "799.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5531954337,
+    "barcodes": [
+      "8720389035258"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T18:16:20.624478Z"
+  },
+  {
+    "productId": 6035062219,
+    "offerId": "FN101EUSTGD",
+    "name": "Аэрогриль Ninja CRISPi 4-в-1 FN101EUSTGD 3.8 л 1700 Вт со стеклянными чашами",
+    "price": "649.00",
+    "oldPrice": "699.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5533632422,
+    "barcodes": [
+      "0622356328807"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T01:35:44.320488Z"
+  },
+  {
+    "productId": 6033593542,
+    "offerId": "EY2458",
+    "name": "Аэрогриль Tefal Dual Easy Fry EY2458 5 л 1500 Вт, черный",
+    "price": "249.00",
+    "oldPrice": "299.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532415790,
+    "barcodes": [
+      "3045380024588"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T20:11:04.508661Z"
+  },
+  {
+    "productId": 6043428785,
+    "offerId": "DST7020/20",
+    "name": "Паровой утюг Philips 7000 Series DST7020/20 2800 Вт, синий",
+    "price": "229.00",
+    "oldPrice": "259.00",
+    "currency": "USD",
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "sku": 5540859921,
+    "barcodes": [
+      "8720389015557"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T09:16:53.998621Z"
+  },
+  {
+    "productId": 6033542394,
+    "offerId": "NA353/10",
+    "name": "Аэрогриль Philips NA353/10 с двумя чашами 9 л 2750 Вт",
+    "price": "749.00",
+    "oldPrice": "799.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532375976,
+    "barcodes": [
+      "8720389033339"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T19:56:11.216884Z"
+  },
+  {
+    "productId": 6035497828,
+    "offerId": "Philips GC7844/20",
+    "name": "Парогенератор Philips GC7844/20 PerfectCare Compact, 2400 Вт, 6.5 бар, 1.5 л, синий",
+    "price": "549.00",
+    "oldPrice": "599.00",
+    "currency": "USD",
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "sku": 5534033118,
+    "barcodes": [
+      "8710103951049"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T01:57:15.055651Z"
+  },
+  {
+    "productId": 6033995155,
+    "offerId": "EY756HE0",
+    "name": "Аэрогриль Tefal EY756HE0 Easy Fry Crispy Stack 10 л 2700 Вт, темно-серый",
+    "price": "649.00",
+    "oldPrice": "699.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532734802,
+    "barcodes": [
+      "3045380407350"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T22:36:04.996062Z"
+  },
+  {
+    "productId": 6033149311,
+    "offerId": "NA462/70",
+    "name": "Аэрогриль Philips Dual Basket NA462/70 с двумя чашами 10 л, 2750 Вт",
+    "price": "749.00",
+    "oldPrice": "799.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532032879,
+    "barcodes": [
+      "8720389035173"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T18:31:27.541885Z"
+  },
+  {
+    "productId": 6033508650,
+    "offerId": "NA352/00",
+    "name": "Аэрогриль Philips 3000 Series Dual Basket NA352/00 двухзонный 9 л, 2750 Вт",
+    "price": "749.00",
+    "oldPrice": "799.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532345025,
+    "barcodes": [
+      "OZN5532345025"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T19:49:31.216990Z"
+  },
+  {
+    "productId": 6034060194,
+    "offerId": "AF170EU",
+    "name": "Аэрогриль Ninja AF170EU, 6.2 л, 2000 Вт, черный",
+    "price": "449.00",
+    "oldPrice": "499.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532785368,
+    "barcodes": [
+      "0622356354950"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T23:12:04.552906Z"
+  },
+  {
+    "productId": 6034069990,
+    "offerId": "AF180EUCP",
+    "name": "Аэрогриль Ninja AF180EUCP Max Pro Copper 6.2 л 2000 Вт, аэрофритюрница с антипригарной чашей",
+    "price": "549.00",
+    "oldPrice": "599.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532793245,
+    "barcodes": [
+      "0622356297851"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T23:17:31.258629Z"
+  },
+  {
+    "productId": 6033881982,
+    "offerId": "EY9018",
+    "name": "Аэрогриль Tefal Dual Easy Fry EY9018 8.3 л 2700 Вт с двумя чашами, черный",
+    "price": "349.00",
+    "oldPrice": "399.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532649423,
+    "barcodes": [
+      "3045380024472"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T21:49:46.051543Z"
+  },
+  {
+    "productId": 6029615698,
+    "offerId": "EP5447/90",
+    "name": "Автоматическая кофемашина Philips Series 5400 LatteGo EP5447/90, черный",
+    "price": "1049.00",
+    "oldPrice": "1149.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5528973989,
+    "barcodes": [
+      "8710103962625"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T11:45:53.562496Z"
+  },
+  {
+    "productId": 6035170167,
+    "offerId": "FN102EU",
+    "name": "Аэрогриль Ninja CRISPi 4-в-1 FN102EU со стеклянными чашами 3.8 л, 1700 Вт, белый",
+    "price": "649.00",
+    "oldPrice": "699.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5533722481,
+    "barcodes": [
+      "0622356303258"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T01:42:10.025771Z"
+  },
+  {
+    "productId": 6033602574,
+    "offerId": "EY145A",
+    "name": "Аэрогриль Tefal Easy Fry Compact EY145A 3 л 1300 Вт",
+    "price": "249.00",
+    "oldPrice": "299.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532423386,
+    "barcodes": [
+      "3045380025189"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T20:15:20.838980Z"
+  },
+  {
+    "productId": 6033465980,
+    "offerId": "NA350/00",
+    "name": "Аэрогриль Philips 3000 Series Dual Basket NA350/00 двойная чаша 9 л, 2750 Вт, черный",
+    "price": "749.00",
+    "oldPrice": "799.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532308417,
+    "barcodes": [
+      "OZN5532308417"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T19:41:44.776480Z"
+  },
+  {
+    "productId": 6035389139,
+    "offerId": "Philips PSG6022/20",
+    "name": "Парогенератор Philips PSG6022/20 PerfectCare 6000 Series 2400 Вт, 6.5 бар",
+    "price": "549.00",
+    "oldPrice": "599.00",
+    "currency": "USD",
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "sku": 5533920891,
+    "barcodes": [
+      "8720389015274"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T01:52:14.900577Z"
+  },
+  {
+    "productId": 6043312531,
+    "offerId": "FV9844",
+    "name": "Паровой утюг Tefal FV9844 Ultimate Pure 3200 Вт, подошва Durilium Airglide Autoclean, черный/бирюзовый",
+    "price": "449.00",
+    "oldPrice": "499.00",
+    "currency": "USD",
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "sku": 5540761392,
+    "barcodes": [
+      "3121040071441"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T09:10:57.352808Z"
+  },
+  {
+    "productId": 6043112774,
+    "offerId": "DST8030/70",
+    "name": "Паровой утюг Philips DST8030/70 Azur 8000 Series 3000 Вт, паровой удар 240 г/мин, подошва SteamGlide Elite, зеленый",
+    "price": "449.00",
+    "oldPrice": "499.00",
+    "currency": "USD",
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "sku": 5540583529,
+    "barcodes": [
+      "8720389004568"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T09:00:58.467610Z"
+  },
+  {
+    "productId": 6033809271,
+    "offerId": "FW4018E0",
+    "name": "Аэрогриль Tefal FW4018E0 Easy Fry Oven 5 в 1, 4 л, 2200 Вт, черный",
+    "price": "449.00",
+    "oldPrice": "499.00",
+    "currency": "USD",
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "sku": 5532593488,
+    "barcodes": [
+      "OZN5532593488"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-19T21:25:22.562342Z"
+  },
+  {
+    "productId": 6046892860,
+    "offerId": "ECAM292.52.GB",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica Evo ECAM292.52.GB с капучинатором LatteCrema",
+    "price": "949.00",
+    "oldPrice": "999.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5543845070,
+    "barcodes": [
+      "8004399027046"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T13:56:51.715926Z"
+  },
+  {
+    "productId": 6046414656,
+    "offerId": "EP5546/70",
+    "name": "Автоматическая кофемашина Philips Series 5500 LatteGo EP5546/70 серебристо-черный",
+    "price": "1149.00",
+    "oldPrice": "1199.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5543435536,
+    "barcodes": [
+      "8720389032332"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T12:51:30.316283Z"
+  },
+  {
+    "productId": 6046562034,
+    "offerId": "ECAM230.13.B",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica S Smart ECAM230.13.B, 1450 Вт, 15 бар, черный",
+    "price": "949.00",
+    "oldPrice": "999.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5543564227,
+    "barcodes": [
+      "8004399334113"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T13:11:18.499058Z"
+  },
+  {
+    "productId": 6047006428,
+    "offerId": "EP3326/90",
+    "name": "Автоматическая кофемашина Philips Series 3300 EP3326/90 с ручным капучинатором 15 бар черный хром",
+    "price": "849.00",
+    "oldPrice": "899.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5543943822,
+    "barcodes": [
+      "8720389027635"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T14:11:27.807125Z"
+  },
+  {
+    "productId": 6047181364,
+    "offerId": "KT200EU",
+    "name": "Электрический чайник с регулировкой температуры Ninja KT200EU 1.7 л 3000 Вт, черный",
+    "price": "349.00",
+    "oldPrice": "399.00",
+    "currency": "USD",
+    "categoryId": 17039631,
+    "typeId": 94968,
+    "sku": 5544099171,
+    "barcodes": [
+      "0622356243308"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T14:34:27.432396Z"
+  },
+  {
+    "productId": 6045680834,
+    "offerId": "EP2333/40",
+    "name": "Автоматическая кофемашина Philips Series 2300 LatteGo EP2333/40, белая",
+    "price": "849.00",
+    "oldPrice": "899.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5542797703,
+    "barcodes": [
+      "8720389027611"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T11:40:00.075579Z"
+  },
+  {
+    "productId": 6046522020,
+    "offerId": "ECAM22.110.B",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica S ECAM22.110.B, 1450 Вт, 15 бар, ручной капучинатор, черная",
+    "price": "849.00",
+    "oldPrice": "899.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5543532736,
+    "barcodes": [
+      "8004399325050"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T13:05:09.283075Z"
+  },
+  {
+    "productId": 6046546897,
+    "offerId": "ECAM11.112.B",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica S ECAM11.112.B, 1450 Вт, 15 бар, ручной капучинатор, черный",
+    "price": "849.00",
+    "oldPrice": "899.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5543555656,
+    "barcodes": [
+      "8004399022409"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T13:08:42.898968Z"
+  },
+  {
+    "productId": 6047119736,
+    "offerId": "KT201EUSTGD",
+    "name": "Электрический чайник Ninja KT201EUSTGD Perfect Temperature с регулировкой температуры 1.7 л 3000 Вт",
+    "price": "249.00",
+    "oldPrice": "299.00",
+    "currency": "USD",
+    "categoryId": 17039631,
+    "typeId": 94968,
+    "sku": 5544043925,
+    "barcodes": [
+      "0622356328821"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T14:25:38.248993Z"
+  },
+  {
+    "productId": 6047082959,
+    "offerId": "BC151EUBK",
+    "name": "Беспроводной портативный блендер Ninja Blast BC151EUBK, 530 мл, черный",
+    "price": "189.00",
+    "oldPrice": "199.00",
+    "currency": "USD",
+    "categoryId": 17039627,
+    "typeId": 94973,
+    "sku": 5544010332,
+    "barcodes": [
+      "0622356274937"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T14:21:34.444181Z"
+  },
+  {
+    "productId": 6046501680,
+    "offerId": "EP5544/50",
+    "name": "Автоматическая кофемашина Philips Series 5500 LatteGo EP5544/50, 15 бар, капучинатор LatteGo",
+    "price": "1149.00",
+    "oldPrice": "1199.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5543513019,
+    "barcodes": [
+      "8720389032301"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T13:02:16.090151Z"
+  },
+  {
+    "productId": 6046481794,
+    "offerId": "EP2330/10",
+    "name": "Автоматическая кофемашина Philips Series 2300 LatteGo EP2330/10, 1500 Вт, 15 бар, черная",
+    "price": "849.00",
+    "oldPrice": "899.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5543499458,
+    "barcodes": [
+      "8720389030314"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T12:59:49.942714Z"
+  },
+  {
+    "productId": 6046962741,
+    "offerId": "ECAM292.81.SB",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica Evo ECAM292.81.SB, серебристо-черный",
+    "price": "949.00",
+    "oldPrice": "999.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5543916612,
+    "barcodes": [
+      "8699640647632"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T14:05:41.023810Z"
+  },
+  {
+    "productId": 6046670465,
+    "offerId": "EP2220/10",
+    "name": "Автоматическая кофемашина Philips Series 2200 EP2220/10 с ручным капучинатором 1500 Вт, 15 бар",
+    "price": "849.00",
+    "oldPrice": "899.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5543657026,
+    "barcodes": [
+      "8720389007408"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T13:25:53.016412Z"
+  },
+  {
+    "productId": 6047173982,
+    "offerId": "KT201EU",
+    "name": "Электрический чайник Ninja Perfect Temperature KT201EU 1.7 л 3000 Вт, регулировка температуры",
+    "price": "249.00",
+    "oldPrice": "299.00",
+    "currency": "USD",
+    "categoryId": 17039631,
+    "typeId": 94968,
+    "sku": 5544091946,
+    "barcodes": [
+      "0622356250092"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T14:33:40.103776Z"
+  },
+  {
+    "productId": 6047628865,
+    "offerId": "JC151EU",
+    "name": "Шнековая соковыжималка Ninja NeverClog JC151EU холодного отжима, 150 Вт, серый металлик",
+    "price": "349.00",
+    "oldPrice": "399.00",
+    "currency": "USD",
+    "categoryId": 17039644,
+    "typeId": 94989,
+    "sku": 5544492497,
+    "barcodes": [
+      "0622356308694"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T15:44:11.074706Z"
+  },
+  {
+    "productId": 6048641068,
+    "offerId": "0645709990",
+    "name": "Набор кухонных мисок WMF Gourmet 4 предмета из нержавеющей стали Cromargan 18/10",
+    "price": "149.00",
+    "oldPrice": "199.00",
+    "currency": "USD",
+    "categoryId": 17028741,
+    "typeId": 92519,
+    "sku": 5545384197,
+    "barcodes": [
+      "4000530685827"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T18:57:19.885329Z"
+  },
+  {
+    "productId": 6046638134,
+    "offerId": "ECAM292.33.SB",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica Evo ECAM292.33.SB серебристая с ручным капучинатором",
+    "price": "949.00",
+    "oldPrice": "999.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5543630666,
+    "barcodes": [
+      "8004399021716"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T13:21:22.837091Z"
+  },
+  {
+    "productId": 6048807898,
+    "offerId": "0644416030",
+    "name": "Терка четырехгранная WMF 0644416030 Cromargan 24 см из нержавеющей стали 18/10",
+    "price": "94.00",
+    "oldPrice": "99.00",
+    "currency": "USD",
+    "categoryId": 17027907,
+    "typeId": 92417,
+    "sku": 5545519805,
+    "barcodes": [
+      "4000530547910"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T19:37:49.771486Z"
+  },
+  {
+    "productId": 6045610934,
+    "offerId": "EP3347/90",
+    "name": "Автоматическая кофемашина Philips Series 3300 LatteGo EP3347/90, 15 бар, сенсорный дисплей, капучинатор LatteGo, черный хром",
+    "price": "849.00",
+    "oldPrice": "899.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5542755125,
+    "barcodes": [
+      "8720389030222"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T11:35:40.784781Z"
+  },
+  {
+    "productId": 6046753078,
+    "offerId": "ECAM292.81.B",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica Evo ECAM292.81.B с автокапучинатором LatteCrema Hot 1450 Вт 15 бар",
+    "price": "949.00",
+    "oldPrice": "999.00",
+    "currency": "USD",
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "sku": 5543728392,
+    "barcodes": [
+      "8004399021723"
+    ],
+    "status": "Готов к продаже",
+    "isArchived": false,
+    "createdAt": "2026-08-20T13:37:09.554610Z"
+  }
+]

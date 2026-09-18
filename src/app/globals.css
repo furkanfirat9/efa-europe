@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0b0d;
+  --foreground: #edeff2;
+
+  /* Soft UI SaaS Dashboard Design Tokens (AGENTS.md Section 7) */
+  --bg-page: #F3F3F8;
+  --bg-page-gradient: linear-gradient(180deg, #F7F7FB 0%, #ECECF6 100%);
+  --surface: #FFFFFF;
+  --surface-muted: #F6F6FA;
+  --surface-accent: #EEEEFC;
+  --border-subtle: #ECECF3;
+  --text-primary: #111114;
+  --text-secondary: #6B6B78;
+  --text-muted: #A0A0AC;
+  --accent: #6C72E6;
+  --accent-soft: #D9DBFA;
+  --ink: #0E0E10;
+  --ink-foreground: #FFFFFF;
+  --ink-muted: #6B6B78;
+  --ink-subtle: #8A8A96;
+  --ink-faint: #A0A0AC;
+
+  /* Status badge pairs */
+  --status-success-bg: #E5F6EC;
+  --status-success-text: #2E8B57;
+  --status-danger-bg: #FDE7E7;
+  --status-danger-text: #D14343;
+  --status-info-bg: #ECEBFD;
+  --status-info-text: #5856D6;
+  --status-warning-bg: #FDF0E2;
+  --status-warning-text: #C47A2C;
+  --status-pink-bg: #FCE7F2;
+  --status-pink-text: #C2408A;
+  --status-neutral-bg: #F1F1F5;
+  --status-neutral-text: #6B6B78;
+
+  /* Radii */
+  --radius-card: 28px;
+  --radius-inner: 20px;
+  --radius-sm: 12px;
+
+  /* Shadows */
+  --shadow-hairline: 0 1px 2px rgba(20, 20, 40, 0.03);
+  --shadow-float: 0 16px 40px -16px rgba(40, 40, 100, 0.18);
+}
+
+/* Koyu Konsol (Analitik, Fiyat Endeksi, Sidebar) renk token'ları */
+.bg-canvas,
+[class*="console_page"],
+[class*="console_header"],
+[class*="console_dialog"],
+[class*="console_overlay"],
+[class*="console_hairlineCell"] {
+  --ink: #EDEFF2;
+  --ink-foreground: #0A0B0D;
+  --ink-muted: #C5C9D3;
+  --ink-subtle: #949DAA;
+  --ink-faint: #68707E;
+  --foreground: #EDEFF2;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+}
+
+@layer components {
+  /* Yükleniyor iskeleti — nabız yerine soldan sağa geçen tek bir parıltı.
+     Sürekli yanıp sönen bloklardan daha sakin ve daha az dikkat çekicidir. */
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+  }
+
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.055), transparent);
+    animation: skeleton-shimmer 1.4s infinite;
+  }
+
+  /* İnce, üstte yüzen kaydırma çubuğu (panel içi listeler ve tablolar). */
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+  }
+
+  .scroll-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scroll-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.12);
+    background-clip: content-box;
+    border: 2px solid transparent;
+    border-radius: 9999px;
+  }
+
+  .scroll-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.24);
+    background-clip: content-box;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  100% { transform: translateX(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+}
+
+/* Uygulama geneli kaydırma çubuğu. Ton hem koyu konsolda hem de beyaz
+   sayfalarda okunacak şekilde nötr griden seçildi. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 136, 150, 0.35);
+  background-clip: content-box;
+  border: 2px solid transparent;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 136, 150, 0.6);
+  background-clip: content-box;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(128, 136, 150, 0.4) transparent;
+}

@@ -1,0 +1,150 @@
+/* ---------------------------------------------------------------------------
+   Analitik konsolu — sayfaya özel yapısal stiller.
+   Renk/tipografi token'ları tailwind.config.ts içinde tanımlıdır; paylaşılan
+   ilkel sınıflar (.skeleton, .scroll-thin) globals.css içindedir. Burada
+   yalnızca Tailwind ile temiz ifade edilemeyen düzen parçaları var.
+--------------------------------------------------------------------------- */
+
+.page {
+  min-height: 100vh;
+  background-color: #0a0b0d;
+  color: #edeff2;
+  --ink: #edeff2;
+  --ink-foreground: #0a0b0d;
+  --ink-muted: #c5c9d3;
+  --ink-subtle: #949daa;
+  --ink-faint: #68707e;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background-color: #0a0b0d;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.shell {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Hairline ızgara: hücreler arasındaki 1px çizgiler gap ile üretilir, böylece
+   satır kaydığında (responsive) ayırıcılar kendiliğinden doğru yerde durur. */
+.hairlineGrid {
+  display: grid;
+  gap: 1px;
+  background-color: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/**
+ * Aynı hairline dili, ama esnek satır. Izgarada hücre sayısı sütun sayısına
+ * bölünmediğinde son satırda boş slot kalıyor ve kabın hairline zemini oradan
+ * sızıyor. Flex'te son satırdaki hücreler kalan genişliği paylaşır, boşluk
+ * oluşmaz — hücre sayısı kaç olursa olsun.
+ */
+.hairlineRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  background-color: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.hairlineRow > * {
+  flex: 1 1 45%;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .hairlineRow > * {
+    flex-basis: 30%;
+  }
+}
+
+@media (min-width: 1280px) {
+  .hairlineRow > * {
+    flex-basis: 12%;
+  }
+}
+
+.hairlineCell {
+  background-color: #111317;
+  padding: 1rem 1.125rem 1.125rem;
+  transition: background-color 0.15s ease;
+}
+
+.hairlineCell:hover {
+  background-color: #14171c;
+}
+
+@media (min-width: 768px) {
+  .hairlineCell {
+    padding: 1.125rem 1.25rem 1.25rem;
+  }
+}
+
+
+/* Modal */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba(6, 7, 9, 0.72);
+  animation: fadeIn 0.14s ease-out;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 68rem;
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #111317;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 14px;
+  box-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.7);
+  animation: dialogIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  --ink: #edeff2;
+  --ink-foreground: #0a0b0d;
+  --ink-muted: #c5c9d3;
+  --ink-subtle: #949daa;
+  --ink-faint: #68707e;
+}
+
+/* Dar diyalog (form modalı). Tailwind'in max-w-* yardımcısı modül sınıfını
+   ezemediği için genişlik varyantı da modülde tanımlanır. */
+.dialogNarrow {
+  max-width: 28rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dialogIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+

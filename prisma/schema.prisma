@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ArbitrageOrder {
+  id                    String   @id @default(cuid())
+  ozonOrderId           String   @unique
+  amazonTrackingBarcode String
+  productName           String?
+  quantity              Int      @default(1)
+  declaredValue         Float    @default(100)
+  lengthMm              Int      @default(300)
+  widthMm               Int      @default(200)
+  heightMm              Int      @default(150)
+  weightGr              Int      @default(1200)
+  labelPdfUrl           String?
+  labelFileName         String?
+  note                  String?
+  status                String   @default("wait")
+  lsIndocId             String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([ozonOrderId])
+  @@index([amazonTrackingBarcode])
+  @@index([status])
+}
+
+model WarehouseReport {
+  id          String   @id @default(cuid())
+  ozonOrderId String?
+  photoId     Int?
+  outdocId    String?
+  type        String   @default("photo")
+  title       String
+  description String?
+  mediaUrl    String?
+  source      String   @default("warehouse")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([ozonOrderId])
+  @@index([type])
+}
+
+model OzonOrder {
+  id                  String    @id @default(cuid())
+  postingNumber       String    @unique
+  orderId             String
+  storeId             String    @default("store1")
+  status              String
+  statusName          String?
+  inProcessAt         DateTime?
+  shipmentDate        DateTime?
+  totalPrice          Float     @default(0)
+  currency            String    @default("RUB")
+  customerName        String?
+  customerCity        String?
+  customerRegion      String?
+  customerCountry     String?   @default("Россия")
+  customerAddressTail String?
+  latitude            Float?
+  longitude           Float?
+  pvzCode             Int?
+  deliveryType        String?
+  paymentType         String?
+  warehouseName       String?
+  tplProvider         String?
+  deliveryDateBegin   DateTime?
+  deliveryDateEnd     DateTime?
+  productsJson        Json?
+  financialDataJson   Json?
+  rawDataJson         Json?
+  
+  // Tedarik & Arbitraj Bilgileri
+  buyPrice            Float?
+  buyCurrency         String?   @default("EUR")
+  buyPriceTry         Float?
+  purchaseDate        DateTime?
+  paymentCard         String?
+  supplier            String?
+  supplierOrderId     String?
+  supplierTracking    String?
+  productImage        String?
+  productOfferId      String?
+  productTitle        String?
+  netProfit           Float?
+  netProfitTry        Float?
+  notes               String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([postingNumber])
+  @@index([orderId])
+  @@index([storeId])
+  @@index([status])
+  @@index([inProcessAt])
+  @@index([purchaseDate])
+  @@index([customerCity])
+  @@index([customerRegion])
+}

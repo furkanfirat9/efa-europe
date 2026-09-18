@@ -1,0 +1,2544 @@
+{
+  "category_id": 17039624,
+  "type_id": 91687,
+  "category_name_ru": "Электробритвы",
+  "type_name_ru": "Электробритва мужская",
+  "total_attributes": 40,
+  "required_attributes_count": 3,
+  "attributes": [
+    {
+      "id": 85,
+      "name_ru": "Бренд",
+      "name_tr": "Marka",
+      "description": "Наименование бренда, под которым произведен товар. Если товар не имеет бренда, используйте значение \"Нет бренда\".",
+      "type": "String",
+      "is_required": true,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 28732849,
+      "values": [
+        {
+          "id": 5056747,
+          "value": "Hansa",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/739f341e-d5f0-4d50-9037-018cab8e65f5.jpg",
+          "info": "Бытовая техника"
+        },
+        {
+          "id": 5060050,
+          "value": "Samsung",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/70c47164-621f-4c2e-a34c-12f02752d243.jpg",
+          "info": "Электроника, бытовая техника"
+        },
+        {
+          "id": 5060973,
+          "value": "Akenori",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/497dfa00-857c-4eb4-85ab-83fbf7f8b525.jpg",
+          "info": "Автомобильная автоэлектроника"
+        },
+        {
+          "id": 5062359,
+          "value": "iRobot",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/830897f3-9c60-4113-8ec0-8f284930a808.png"
+        },
+        {
+          "id": 5062790,
+          "value": "Kitfort",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/97b4431b-7489-4da0-8117-913d582c54b3.jpg"
+        },
+        {
+          "id": 5063309,
+          "value": "Coolfort",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/cddeec71-2669-46ba-aca7-b6aeda71fcb1.jpg"
+        },
+        {
+          "id": 5063649,
+          "value": "Home Element",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/a25ec74b-17b6-401e-aed1-6a106a0cb8c1.jpg",
+          "info": "Бытовая техника и электроника"
+        },
+        {
+          "id": 5064368,
+          "value": "Великие реки",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/d6eccef8-c0f3-4e5f-86b2-6ee1520408d3.jpg"
+        },
+        {
+          "id": 5064843,
+          "value": "Parlux",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/128e2aa9-9933-4991-b52f-8c87d759d6e6.jpg"
+        },
+        {
+          "id": 5065052,
+          "value": "Panasonic",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/659fc974-28eb-47b4-9884-2301991137bb.jpg",
+          "info": "Бытовая техника, Электроника"
+        },
+        {
+          "id": 5068139,
+          "value": "Coway"
+        },
+        {
+          "id": 5068312,
+          "value": "Merrylock",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/1b593013-4fb6-4610-b122-0526715a628a.jpg"
+        },
+        {
+          "id": 5068632,
+          "value": "Bawi"
+        },
+        {
+          "id": 5069099,
+          "value": "Tristar",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/09c4cf7d-1578-4a2d-bca9-71b0ab2abb1d.jpg"
+        },
+        {
+          "id": 5069147,
+          "value": "Garmin",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/92a17543-c739-4a3c-a400-cb665fe9a30e.jpg"
+        },
+        {
+          "id": 5069835,
+          "value": "Pullman",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/0ac49c73-ec8c-4fd3-892d-1b7ff0bd2b91.jpg"
+        },
+        {
+          "id": 5071003,
+          "value": "Ivo"
+        },
+        {
+          "id": 5071289,
+          "value": "HTC",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/205966dd-9b29-4c78-ae7d-8d673a6c5dee.jpg"
+        },
+        {
+          "id": 5071510,
+          "value": "CASO",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/5691a0af-65fd-4f97-ae58-2eacaef6c5dd.jpg"
+        },
+        {
+          "id": 5073301,
+          "value": "Wacom",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/1c1602fd-5450-4070-bd43-dd898e72c7c4.jpg"
+        },
+        {
+          "id": 5073356,
+          "value": "Ritzenhoff & Breker"
+        },
+        {
+          "id": 5073389,
+          "value": "William Levene"
+        },
+        {
+          "id": 5073986,
+          "value": "JVC",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/9f6fece5-16f5-4c4d-a531-fb17f459c5e1.jpg",
+          "info": "Автотовары, бытовая техника, электроника"
+        },
+        {
+          "id": 5074417,
+          "value": "KEF",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/6621bcfb-4204-4f5f-b37a-cb62e9ff76dd.jpg"
+        },
+        {
+          "id": 5074515,
+          "value": "Manfrotto"
+        },
+        {
+          "id": 5074684,
+          "value": "Cutipol",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/6c20f672-894e-4efe-82b9-71b66b42e1f6.jpg"
+        },
+        {
+          "id": 5075889,
+          "value": "Jacob Zeidler & Co"
+        },
+        {
+          "id": 5076255,
+          "value": "The Original Book Works Limited"
+        },
+        {
+          "id": 5076787,
+          "value": "Ocean Extreme"
+        },
+        {
+          "id": 5077287,
+          "value": "Народное искусство"
+        },
+        {
+          "id": 5077379,
+          "value": "Zyliss"
+        },
+        {
+          "id": 5077697,
+          "value": "Fujitsu",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/06c12aaa-5490-437c-9bd0-d04dcdd195b3.jpg",
+          "info": "Электроника, Кондиционеры, Ремонт и стройка"
+        },
+        {
+          "id": 5078091,
+          "value": "VITEK",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/57f95e0b-f35d-4f69-9e0c-cc5792df84b1.jpg",
+          "info": "Бытовая техника, Электроника"
+        },
+        {
+          "id": 5078102,
+          "value": "Федоскино",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/13b5475e-c0f0-4f6a-8761-8871c4bbdc4b.jpg"
+        },
+        {
+          "id": 5078351,
+          "value": "Euro Album"
+        },
+        {
+          "id": 5079090,
+          "value": "Vitesse",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/1cd4184a-9a70-46f0-8df7-c4c4439ec8c1.jpg"
+        },
+        {
+          "id": 5079141,
+          "value": "Coca-Cola",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/bff0775c-cb5e-4240-9f0d-7f5bc7e89984.jpg",
+          "info": "Напитки"
+        },
+        {
+          "id": 5079161,
+          "value": "Raphael Tuck & Sons \"Oilette\""
+        },
+        {
+          "id": 5079395,
+          "value": "Dormann"
+        },
+        {
+          "id": 5079944,
+          "value": "Blaupunkt",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/034f46e8-9b34-4186-b13d-b3c41047a249.jpg"
+        },
+        {
+          "id": 5080743,
+          "value": "Маэста"
+        },
+        {
+          "id": 5081104,
+          "value": "Moranduzzo"
+        },
+        {
+          "id": 5081589,
+          "value": "Fellowes"
+        },
+        {
+          "id": 5082023,
+          "value": "Tavola Swiss"
+        },
+        {
+          "id": 5082109,
+          "value": "Polti"
+        },
+        {
+          "id": 5082500,
+          "value": "Красный монетный двор"
+        },
+        {
+          "id": 5082508,
+          "value": "Аннинский монетный двор"
+        },
+        {
+          "id": 5082729,
+          "value": "Dream Girlfriend"
+        },
+        {
+          "id": 5083016,
+          "value": "Silampos",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/6849f95e-25de-4d4d-b297-e3c6fef4df4f.jpg"
+        },
+        {
+          "id": 5083091,
+          "value": "Binatone",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/b6d1ca7a-a329-42ac-b413-b10fe20e017a.jpg",
+          "info": "Бытовая техника и электроника"
+        },
+        {
+          "id": 5083102,
+          "value": "Спектр-Прибор",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/ed26be6e-83cb-49bd-a637-5839286fc0e7.jpg"
+        },
+        {
+          "id": 5083158,
+          "value": "IconBIT",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/9d8eb505-8932-4ab5-be24-1ec7645732f9.jpg"
+        },
+        {
+          "id": 5083233,
+          "value": "Dyson",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/2b31a13f-8b84-486e-9bf5-2e8782d174a7.jpg",
+          "info": "Бытовая техника"
+        },
+        {
+          "id": 5083282,
+          "value": "Интурист"
+        },
+        {
+          "id": 5084553,
+          "value": "Rombica",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/8123fa66-0baa-47fa-b702-238e11243bfc.jpg"
+        },
+        {
+          "id": 5084917,
+          "value": "Ritmix",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/fea2264e-c092-48a2-bada-1f339ddbfc17.jpg",
+          "info": "Техника, электроника"
+        },
+        {
+          "id": 5085054,
+          "value": "Zobele Holding Spa"
+        },
+        {
+          "id": 5085496,
+          "value": "Enzo professional",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/ff2c0c76-201b-48b8-b74c-5c9bec143b7d.jpg",
+          "info": "Техника для красоты и здоровья"
+        },
+        {
+          "id": 5085630,
+          "value": "ЛинкГрупп Трейд"
+        },
+        {
+          "id": 5086049,
+          "value": "Siemens",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/9c676547-b321-47ce-8339-c565e39fb303.jpg",
+          "info": "Бытовая техника, Строительство и ремонт"
+        },
+        {
+          "id": 5086235,
+          "value": "Rohaus",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/a0d0bfe8-ba37-48ed-b101-c86058f607fb.jpg"
+        },
+        {
+          "id": 5086246,
+          "value": "La Chaise Longue"
+        },
+        {
+          "id": 5086249,
+          "value": "Cooler Master",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/dea83b38-2e62-4799-80a5-d25b670e1392.jpg"
+        },
+        {
+          "id": 5086955,
+          "value": "Bodum AG"
+        },
+        {
+          "id": 5087452,
+          "value": "Interno Stile"
+        },
+        {
+          "id": 5087545,
+          "value": "БелОМО",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/90ae0ae9-f4e1-44b4-9e0c-b4c9a65c2793.jpg"
+        },
+        {
+          "id": 5087587,
+          "value": "Le Vele"
+        },
+        {
+          "id": 5087591,
+          "value": "GreenPan"
+        },
+        {
+          "id": 5087758,
+          "value": "Peleg Design",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/12a1ca71-0cac-42e2-a307-d91b670054e9.jpg"
+        },
+        {
+          "id": 5087958,
+          "value": "EuroNOVA"
+        },
+        {
+          "id": 5088485,
+          "value": "Janome",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/e6f656ba-9bd1-4768-bafa-ccf908e60b46.jpg",
+          "info": "Швейное оборудование"
+        },
+        {
+          "id": 5088576,
+          "value": "Montiss",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/ede30e5b-5b4a-407c-a741-8a81799f5538.jpg"
+        },
+        {
+          "id": 5088659,
+          "value": "Brabantia",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/700b6143-345b-4426-b0bd-943f28b8e66c.jpg",
+          "info": "Товары для дома"
+        },
+        {
+          "id": 5089612,
+          "value": "Till"
+        },
+        {
+          "id": 5089809,
+          "value": "Pittards"
+        },
+        {
+          "id": 5089915,
+          "value": "Evolution",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/52756356-9330-46bc-9764-57692651589a.jpg",
+          "info": "Бытовая техника, Электроника"
+        },
+        {
+          "id": 5090064,
+          "value": "Karcher",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/fed6226f-934b-4aeb-907f-f6ebbc49e700.jpg",
+          "info": "Техника для уборки"
+        },
+        {
+          "id": 5090109,
+          "value": "Ziver",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/b9d081d7-52d1-4289-9915-03f276586a29.jpg"
+        },
+        {
+          "id": 5090180,
+          "value": "Scarlett",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/29df26b0-3958-4a27-a85a-e9fa0058cabc.jpg",
+          "info": "Бытовая техника"
+        },
+        {
+          "id": 5090219,
+          "value": "Diax"
+        },
+        {
+          "id": 5090370,
+          "value": "Melitta",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/6a7fd45f-703b-44de-913d-7c9a27cf9aa1.jpg"
+        },
+        {
+          "id": 5090669,
+          "value": "BLOCH"
+        },
+        {
+          "id": 5090698,
+          "value": "Elmonte"
+        },
+        {
+          "id": 5090713,
+          "value": "Wapiti"
+        },
+        {
+          "id": 5090749,
+          "value": "COXX Borba"
+        },
+        {
+          "id": 5090799,
+          "value": "Dicarra"
+        },
+        {
+          "id": 5090824,
+          "value": "Eliza di Venezia"
+        },
+        {
+          "id": 5090865,
+          "value": "Paul & Betty"
+        },
+        {
+          "id": 5090935,
+          "value": "Popushier"
+        },
+        {
+          "id": 5090956,
+          "value": "Rieker",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/68775c01-5dd1-487a-a76e-d8c64f285b90.jpg"
+        },
+        {
+          "id": 5090965,
+          "value": "Alex Mazurin"
+        },
+        {
+          "id": 5090972,
+          "value": "Shepherd's Life"
+        },
+        {
+          "id": 5090982,
+          "value": "S. Velani"
+        },
+        {
+          "id": 5091004,
+          "value": "Lacal"
+        },
+        {
+          "id": 5091014,
+          "value": "Paul Green",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/798abb59-472c-4ce5-b771-51e0b86d9bfa.jpg"
+        },
+        {
+          "id": 5091018,
+          "value": "Cosy Image"
+        },
+        {
+          "id": 5091019,
+          "value": "Jana A+W"
+        },
+        {
+          "id": 5091127,
+          "value": "Unit",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/131676e0-13a0-4cb1-ae58-43fb56171f07.jpg",
+          "info": "Бытовая техника"
+        },
+        {
+          "id": 5091179,
+          "value": "Rondell",
+          "picture": "https://cdn1.ozonusercontent.com/s3/product-service-meta-media/9a0eddc0-d550-49a6-b77e-9245d5f6e8e7.jpg",
+          "info": "Кухонная посуда, бытовая техника"
+        },
+        {
+          "id": 5092086,
+          "value": "Ko san yo"
+        }
+      ]
+    },
+    {
+      "id": 8229,
+      "name_ru": "Тип",
+      "name_tr": "Tür",
+      "description": "Выберите из списка наиболее подходящий тип товара. Типы участвуют в распределении товаров по категориям на сайте Ozon. Чтобы правильно указать тип, найдите на сайте Ozon товары, похожие на ваш, и укажите в этом поле такой же тип.",
+      "type": "String",
+      "is_required": true,
+      "is_collection": false,
+      "group_name": "Общие",
+      "group_id": 1,
+      "dictionary_id": 1960,
+      "values": [
+        {
+          "id": 91687,
+          "value": "Электробритва"
+        }
+      ]
+    },
+    {
+      "id": 9048,
+      "name_ru": "Название модели (для объединения в одну карточку)",
+      "name_tr": "Model adı (tek bir karta birleştirmek için)",
+      "description": "Заполните данное поле любым одинаковым значением на товарах, которые хотите объединить. И по разному, если товары нужно разъединить. Объединение произойдет при условии, что товары имеют одинаковый Тип и Бренд, и хотя бы одна вариативная характеристика заполнена по разному на всех товарах в объединении",
+      "type": "String",
+      "is_required": true,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 4389,
+      "name_ru": "Страна-изготовитель",
+      "name_tr": "Üretim ülkesi",
+      "description": "Страна, в которой изготовлен/собран товар и которая указана на упаковке. Может отличаться от страны бренда. Выберите из списка или укажите вручную. Можно добавить несколько значений через точку с запятой.",
+      "type": "String",
+      "is_required": false,
+      "is_collection": true,
+      "group_name": "Общие",
+      "group_id": 1,
+      "dictionary_id": 1935,
+      "values": [
+        {
+          "id": 90295,
+          "value": "Россия"
+        },
+        {
+          "id": 90296,
+          "value": "Китай"
+        },
+        {
+          "id": 90297,
+          "value": "Не указана"
+        },
+        {
+          "id": 90298,
+          "value": "Италия"
+        },
+        {
+          "id": 90299,
+          "value": "США"
+        },
+        {
+          "id": 90300,
+          "value": "Германия"
+        },
+        {
+          "id": 90302,
+          "value": "Великобритания"
+        },
+        {
+          "id": 90303,
+          "value": "Европейский Союз"
+        },
+        {
+          "id": 90304,
+          "value": "Франция"
+        },
+        {
+          "id": 90305,
+          "value": "Турция"
+        },
+        {
+          "id": 90306,
+          "value": "Япония"
+        },
+        {
+          "id": 90307,
+          "value": "Австрия"
+        },
+        {
+          "id": 90308,
+          "value": "СССР"
+        },
+        {
+          "id": 90309,
+          "value": "Испания"
+        },
+        {
+          "id": 90310,
+          "value": "Польша"
+        },
+        {
+          "id": 90311,
+          "value": "Корея"
+        },
+        {
+          "id": 90312,
+          "value": "Индия"
+        },
+        {
+          "id": 90313,
+          "value": "Молдова"
+        },
+        {
+          "id": 90314,
+          "value": "Канада"
+        },
+        {
+          "id": 90315,
+          "value": "Бразилия"
+        },
+        {
+          "id": 90316,
+          "value": "Дания"
+        },
+        {
+          "id": 90317,
+          "value": "Китай (Тайвань)"
+        },
+        {
+          "id": 90318,
+          "value": "Бельгия"
+        },
+        {
+          "id": 90319,
+          "value": "Украина"
+        },
+        {
+          "id": 90320,
+          "value": "Китай (Гонконг)"
+        },
+        {
+          "id": 90321,
+          "value": "Чехия"
+        },
+        {
+          "id": 90322,
+          "value": "Швеция"
+        },
+        {
+          "id": 90323,
+          "value": "Швейцария"
+        },
+        {
+          "id": 90324,
+          "value": "Беларусь"
+        },
+        {
+          "id": 90325,
+          "value": "Нидерланды"
+        },
+        {
+          "id": 90326,
+          "value": "Венгрия"
+        },
+        {
+          "id": 90327,
+          "value": "Финляндия"
+        },
+        {
+          "id": 90328,
+          "value": "Таиланд"
+        },
+        {
+          "id": 90329,
+          "value": "Австралия"
+        },
+        {
+          "id": 90330,
+          "value": "Португалия"
+        },
+        {
+          "id": 90331,
+          "value": "Вьетнам"
+        },
+        {
+          "id": 90332,
+          "value": "Голландия"
+        },
+        {
+          "id": 90333,
+          "value": "Южная Корея"
+        },
+        {
+          "id": 90334,
+          "value": "Бангладеш"
+        },
+        {
+          "id": 90335,
+          "value": "Словения"
+        },
+        {
+          "id": 90336,
+          "value": "Норвегия"
+        },
+        {
+          "id": 90337,
+          "value": "Индонезия"
+        },
+        {
+          "id": 90338,
+          "value": "Ирландия"
+        },
+        {
+          "id": 90339,
+          "value": "Малайзия"
+        },
+        {
+          "id": 90340,
+          "value": "Израиль"
+        },
+        {
+          "id": 90341,
+          "value": "Румыния"
+        },
+        {
+          "id": 90342,
+          "value": "Болгария"
+        },
+        {
+          "id": 90343,
+          "value": "Сербия"
+        },
+        {
+          "id": 90344,
+          "value": "Греция"
+        },
+        {
+          "id": 90345,
+          "value": "Мексика"
+        },
+        {
+          "id": 90346,
+          "value": "Пакистан"
+        },
+        {
+          "id": 90347,
+          "value": "Филиппины"
+        },
+        {
+          "id": 90348,
+          "value": "Аргентина"
+        },
+        {
+          "id": 90349,
+          "value": "Узбекистан"
+        },
+        {
+          "id": 90350,
+          "value": "Новая Зеландия"
+        },
+        {
+          "id": 90351,
+          "value": "Латвия"
+        },
+        {
+          "id": 90352,
+          "value": "Чад"
+        },
+        {
+          "id": 90353,
+          "value": "Иордания"
+        },
+        {
+          "id": 90354,
+          "value": "Колумбия"
+        },
+        {
+          "id": 90355,
+          "value": "Чехословакия"
+        },
+        {
+          "id": 90356,
+          "value": "ФРГ"
+        },
+        {
+          "id": 90357,
+          "value": "Иран"
+        },
+        {
+          "id": 90358,
+          "value": "Кот-д' Ивуар"
+        },
+        {
+          "id": 90359,
+          "value": "Македония"
+        },
+        {
+          "id": 90360,
+          "value": "Югославия"
+        },
+        {
+          "id": 90361,
+          "value": "Эстония"
+        },
+        {
+          "id": 90362,
+          "value": "Словакия"
+        },
+        {
+          "id": 90363,
+          "value": "Мадагаскар"
+        },
+        {
+          "id": 90364,
+          "value": "Казахстан"
+        },
+        {
+          "id": 90365,
+          "value": "Тунис"
+        },
+        {
+          "id": 90366,
+          "value": "Мали"
+        },
+        {
+          "id": 90367,
+          "value": "Джибути"
+        },
+        {
+          "id": 90368,
+          "value": "Бенин"
+        },
+        {
+          "id": 90369,
+          "value": "Камбоджа"
+        },
+        {
+          "id": 90370,
+          "value": "Литва"
+        },
+        {
+          "id": 90371,
+          "value": "Мозамбик"
+        },
+        {
+          "id": 90372,
+          "value": "Исландия"
+        },
+        {
+          "id": 90373,
+          "value": "Куба"
+        },
+        {
+          "id": 90374,
+          "value": "ГДР"
+        },
+        {
+          "id": 90375,
+          "value": "Ямайка"
+        },
+        {
+          "id": 90376,
+          "value": "Сингапур"
+        },
+        {
+          "id": 90377,
+          "value": "ЮАР"
+        },
+        {
+          "id": 90378,
+          "value": "Люксембург"
+        },
+        {
+          "id": 90379,
+          "value": "Египет"
+        },
+        {
+          "id": 90380,
+          "value": "ОАЭ"
+        },
+        {
+          "id": 90381,
+          "value": "Грузия"
+        },
+        {
+          "id": 90382,
+          "value": "Гвинейская Р-ка"
+        },
+        {
+          "id": 90383,
+          "value": "Перу"
+        },
+        {
+          "id": 90384,
+          "value": "Коморские о-ва"
+        },
+        {
+          "id": 90385,
+          "value": "Шри-Ланка"
+        },
+        {
+          "id": 90386,
+          "value": "Кипр"
+        },
+        {
+          "id": 90387,
+          "value": "Руанда"
+        },
+        {
+          "id": 90388,
+          "value": "Марокко"
+        },
+        {
+          "id": 90389,
+          "value": "Хорватия"
+        },
+        {
+          "id": 90390,
+          "value": "Монако"
+        },
+        {
+          "id": 90391,
+          "value": "Монголия"
+        },
+        {
+          "id": 90392,
+          "value": "Габон"
+        },
+        {
+          "id": 90393,
+          "value": "Конго"
+        },
+        {
+          "id": 90394,
+          "value": "Непал"
+        },
+        {
+          "id": 90395,
+          "value": "Армения"
+        }
+      ]
+    },
+    {
+      "id": 4480,
+      "name_ru": "Тип аккумулятора",
+      "name_tr": "Pil Türü",
+      "description": "Выберите из списка или укажите вручную. Можно добавить несколько значений через точку с запятой. Если точка с запятой есть в значении атрибута, поместите знак в кавычки \";\".",
+      "type": "String",
+      "is_required": false,
+      "is_collection": true,
+      "group_name": "Технические характеристики",
+      "group_id": 181,
+      "dictionary_id": 43,
+      "values": [
+        {
+          "id": 970601660,
+          "value": "AGM"
+        },
+        {
+          "id": 970601661,
+          "value": "LiFePo4 (литий-железо-фосфатный)"
+        },
+        {
+          "id": 970601662,
+          "value": "LiIon (литий-ионный)"
+        },
+        {
+          "id": 970601663,
+          "value": "LiPol (литий-полимерный)"
+        },
+        {
+          "id": 970601664,
+          "value": "NiCd (никель-кадмиевый)"
+        },
+        {
+          "id": 970601665,
+          "value": "NiMH (никель-металлогидридный)"
+        },
+        {
+          "id": 970601666,
+          "value": "GEL (гелевый)"
+        },
+        {
+          "id": 970601667,
+          "value": "Hybrid (гибридный)"
+        },
+        {
+          "id": 970601668,
+          "value": "Ca/Ca (кальциевый)"
+        },
+        {
+          "id": 970601669,
+          "value": "Li (литиевый)"
+        },
+        {
+          "id": 970601670,
+          "value": "Sb <5% (малосурьмянистый)"
+        },
+        {
+          "id": 970601671,
+          "value": "Pb (свинцово-кислотный)"
+        },
+        {
+          "id": 970601672,
+          "value": "R (солевой)"
+        },
+        {
+          "id": 970601673,
+          "value": "Sb (сурьмянистый)"
+        },
+        {
+          "id": 970601674,
+          "value": "L (щелочной)"
+        },
+        {
+          "id": 970749978,
+          "value": "AgZn (серебряно-цинковый)"
+        },
+        {
+          "id": 970891269,
+          "value": "LiSOCl2 (литий-тионилхлоридный)"
+        },
+        {
+          "id": 970941351,
+          "value": "ZincAir (воздушно-цинковый)"
+        },
+        {
+          "id": 970941352,
+          "value": "MnO2 (диоксид-марганцевый)"
+        },
+        {
+          "id": 970941353,
+          "value": "LiMn (литий-марганцевый)"
+        },
+        {
+          "id": 970941355,
+          "value": "Ag2O (оксид-серебряный)"
+        },
+        {
+          "id": 970981007,
+          "value": "Dry Cell"
+        },
+        {
+          "id": 971004623,
+          "value": "NiZn (никель-цинковый)"
+        },
+        {
+          "id": 971079483,
+          "value": "LTO (литий-титанатный)"
+        },
+        {
+          "id": 971288689,
+          "value": "EFB"
+        },
+        {
+          "id": 971296023,
+          "value": "LiMn2O4 (литий-манганатно-оксидный)"
+        },
+        {
+          "id": 971394378,
+          "value": "LiNMC (литий-никель-марганец-кобальт-оксидный)"
+        },
+        {
+          "id": 971420574,
+          "value": "LiCoO2 (литий-кобальтовый)"
+        },
+        {
+          "id": 971772108,
+          "value": "LiMnO2 (литий-диоксидмарганцевый)"
+        },
+        {
+          "id": 971809224,
+          "value": "ZnMnO2 (марганцево-цинковый)"
+        },
+        {
+          "id": 972149201,
+          "value": "NaIon (натрий-ионный)"
+        }
+      ]
+    },
+    {
+      "id": 4868,
+      "name_ru": "Тип бритвы",
+      "name_tr": "Jilet Tipi",
+      "description": "Выберите из списка. Можно указать только одно значение.",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Особенности",
+      "group_id": 130,
+      "dictionary_id": 984,
+      "values": [
+        {
+          "id": 40068,
+          "value": "Сеточная"
+        },
+        {
+          "id": 40069,
+          "value": "Роторная"
+        }
+      ]
+    },
+    {
+      "id": 4869,
+      "name_ru": "Количество бритвенных головок",
+      "name_tr": "Tıraş başlığı sayısı",
+      "description": "Выберите из списка. Можно указать только одно значение.",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Технические характеристики",
+      "group_id": 181,
+      "dictionary_id": 1079,
+      "values": [
+        {
+          "id": 41834,
+          "value": "1"
+        },
+        {
+          "id": 41840,
+          "value": "2"
+        },
+        {
+          "id": 41843,
+          "value": "3"
+        },
+        {
+          "id": 41844,
+          "value": "4"
+        },
+        {
+          "id": 41845,
+          "value": "5"
+        },
+        {
+          "id": 41846,
+          "value": "6"
+        },
+        {
+          "id": 41847,
+          "value": "7"
+        },
+        {
+          "id": 41848,
+          "value": "8"
+        }
+      ]
+    },
+    {
+      "id": 4870,
+      "name_ru": "Способ бритья",
+      "name_tr": "Tıraş yöntemi",
+      "description": "Выберите из списка или укажите вручную. Можно добавить несколько значений через точку с запятой. Если точка с запятой есть в значении атрибута, поместите знак в кавычки \";\".",
+      "type": "String",
+      "is_required": false,
+      "is_collection": true,
+      "group_name": "Особенности",
+      "group_id": 130,
+      "dictionary_id": 1870,
+      "values": [
+        {
+          "id": 84249,
+          "value": "Влажное бритье"
+        },
+        {
+          "id": 84250,
+          "value": "Сухое бритье"
+        }
+      ]
+    },
+    {
+      "id": 4871,
+      "name_ru": "Триммер",
+      "name_tr": "Trimmer",
+      "description": "Выберите из списка. Можно указать только одно значение.",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Особенности",
+      "group_id": 130,
+      "dictionary_id": 1433,
+      "values": [
+        {
+          "id": 58052,
+          "value": "Выдвижной"
+        },
+        {
+          "id": 58053,
+          "value": "Интегрируемый"
+        },
+        {
+          "id": 58054,
+          "value": "Откидной"
+        },
+        {
+          "id": 58055,
+          "value": "Плавающий"
+        }
+      ]
+    },
+    {
+      "id": 4883,
+      "name_ru": "Индикация",
+      "name_tr": "Gösterge",
+      "description": "Выберите из списка или укажите вручную. Можно добавить несколько значений через точку с запятой. Если точка с запятой есть в значении атрибута, поместите знак в кавычки \";\".",
+      "type": "String",
+      "is_required": false,
+      "is_collection": true,
+      "group_name": "Особенности",
+      "group_id": 130,
+      "dictionary_id": 1943,
+      "values": [
+        {
+          "id": 90844,
+          "value": "Индикатор дорожной блокировки"
+        },
+        {
+          "id": 90845,
+          "value": "Индикатор замены ножей"
+        },
+        {
+          "id": 90846,
+          "value": "Индикатор замены чистящего катриджа"
+        },
+        {
+          "id": 90847,
+          "value": "Индикатор зарядки аккумулятора"
+        },
+        {
+          "id": 90848,
+          "value": "Индикатор низкого заряда аккумулятора"
+        },
+        {
+          "id": 90849,
+          "value": "Индикатор очистки"
+        },
+        {
+          "id": 90850,
+          "value": "Индикатор текущего уровня зарядки"
+        },
+        {
+          "id": 90851,
+          "value": "Индикатор установки длины"
+        },
+        {
+          "id": 90852,
+          "value": "Индикация времени работы"
+        },
+        {
+          "id": 90853,
+          "value": "Индикация необходимости замены бреющих головок"
+        }
+      ]
+    },
+    {
+      "id": 4885,
+      "name_ru": "Особенности бритв, триммеров, эпиляторов",
+      "name_tr": "Jiletler, kesiciler, epilatörlerin özellikleri",
+      "description": "Выберите из списка или укажите вручную. Можно добавить несколько значений через точку с запятой. Если точка с запятой есть в значении атрибута, поместите знак в кавычки \";\".",
+      "type": "String",
+      "is_required": false,
+      "is_collection": true,
+      "group_name": "Особенности",
+      "group_id": 130,
+      "dictionary_id": 1957,
+      "values": [
+        {
+          "id": 91135,
+          "value": "Быстрая зарядка"
+        },
+        {
+          "id": 91138,
+          "value": "Нескользящая вставка на рукоятке"
+        },
+        {
+          "id": 91139,
+          "value": "Ножи из нержавеющей стали"
+        },
+        {
+          "id": 91144,
+          "value": "Плавающие головки"
+        },
+        {
+          "id": 91145,
+          "value": "Независимая подвеска бритвенных элементов"
+        },
+        {
+          "id": 91146,
+          "value": "Подсветка"
+        },
+        {
+          "id": 91147,
+          "value": "Самозатачивающиеся ножи"
+        },
+        {
+          "id": 91148,
+          "value": "Съемная моющаяся головка"
+        },
+        {
+          "id": 91149,
+          "value": "Чистка под струей воды"
+        },
+        {
+          "id": 970857706,
+          "value": "Влагозащищенный корпус"
+        },
+        {
+          "id": 970857707,
+          "value": "Регулируемый нож"
+        },
+        {
+          "id": 970857708,
+          "value": "Филировка"
+        },
+        {
+          "id": 970857709,
+          "value": "Турборежим"
+        },
+        {
+          "id": 970857711,
+          "value": "Переключение напряжения"
+        },
+        {
+          "id": 970857713,
+          "value": "Зарядка от USB-порта"
+        },
+        {
+          "id": 970857714,
+          "value": "Петля для подвешивания"
+        },
+        {
+          "id": 970857715,
+          "value": "Лазерный указатель"
+        },
+        {
+          "id": 970857716,
+          "value": "Дисплей"
+        },
+        {
+          "id": 971060314,
+          "value": "Поддержка мобильного приложения"
+        }
+      ]
+    },
+    {
+      "id": 10096,
+      "name_ru": "Цвет товара",
+      "name_tr": "Ürün rengi",
+      "description": "Основной или доминирующий цвет товара. Если точного соответствия нет, используйте ближайшие цвета. Сложные цвета нужно описывать перечислением простых цветов. Например, если в товаре преобладают черный, желтый и белый цвета, то укажите их все простым перечислением. Атрибут \"Цвет товара\" — это основной цвет. Все остальные цвета можно перечислить в атрибуте \"Название цвета\", если он доступен в категории",
+      "type": "String",
+      "is_required": false,
+      "is_collection": true,
+      "group_name": "Общие",
+      "group_id": 1,
+      "dictionary_id": 1494,
+      "values": [
+        {
+          "id": 61571,
+          "value": "белый"
+        },
+        {
+          "id": 61572,
+          "value": "прозрачный"
+        },
+        {
+          "id": 61573,
+          "value": "бежевый"
+        },
+        {
+          "id": 61574,
+          "value": "черный"
+        },
+        {
+          "id": 61575,
+          "value": "коричневый"
+        },
+        {
+          "id": 61576,
+          "value": "серый"
+        },
+        {
+          "id": 61577,
+          "value": "серый металлик"
+        },
+        {
+          "id": 61578,
+          "value": "желтый"
+        },
+        {
+          "id": 61579,
+          "value": "красный"
+        },
+        {
+          "id": 61580,
+          "value": "розовый"
+        },
+        {
+          "id": 61581,
+          "value": "синий"
+        },
+        {
+          "id": 61582,
+          "value": "золотой"
+        },
+        {
+          "id": 61583,
+          "value": "зеленый"
+        },
+        {
+          "id": 61584,
+          "value": "голубой"
+        },
+        {
+          "id": 61585,
+          "value": "оранжевый"
+        },
+        {
+          "id": 61586,
+          "value": "фиолетовый"
+        },
+        {
+          "id": 61587,
+          "value": "бронза"
+        },
+        {
+          "id": 61588,
+          "value": "сиреневый"
+        },
+        {
+          "id": 61589,
+          "value": "светло-зеленый"
+        },
+        {
+          "id": 61590,
+          "value": "бордовый"
+        },
+        {
+          "id": 61591,
+          "value": "светло-коричневый"
+        },
+        {
+          "id": 61592,
+          "value": "темно-синий"
+        },
+        {
+          "id": 61593,
+          "value": "светло-бежевый"
+        },
+        {
+          "id": 61594,
+          "value": "светло-серый"
+        },
+        {
+          "id": 61595,
+          "value": "бирюзовый"
+        },
+        {
+          "id": 61596,
+          "value": "светло-розовый"
+        },
+        {
+          "id": 61597,
+          "value": "слоновая кость"
+        },
+        {
+          "id": 61598,
+          "value": "темно-коричневый"
+        },
+        {
+          "id": 61599,
+          "value": "фуксия"
+        },
+        {
+          "id": 61600,
+          "value": "темно-серый"
+        },
+        {
+          "id": 61601,
+          "value": "коралловый"
+        },
+        {
+          "id": 61602,
+          "value": "темно-зеленый"
+        },
+        {
+          "id": 61603,
+          "value": "коричнево-красный"
+        },
+        {
+          "id": 61604,
+          "value": "темно-бежевый"
+        },
+        {
+          "id": 61605,
+          "value": "оливковый"
+        },
+        {
+          "id": 61606,
+          "value": "шоколадный"
+        },
+        {
+          "id": 61607,
+          "value": "черно-серый"
+        },
+        {
+          "id": 61609,
+          "value": "медь"
+        },
+        {
+          "id": 61610,
+          "value": "серебристый"
+        },
+        {
+          "id": 61611,
+          "value": "темно-розовый"
+        },
+        {
+          "id": 258411643,
+          "value": "лазурный"
+        },
+        {
+          "id": 258411648,
+          "value": "кремовый"
+        },
+        {
+          "id": 258411654,
+          "value": "хаки"
+        },
+        {
+          "id": 258411659,
+          "value": "салатовый"
+        },
+        {
+          "id": 258411664,
+          "value": "горчичный"
+        },
+        {
+          "id": 369939085,
+          "value": "разноцветный"
+        },
+        {
+          "id": 970628491,
+          "value": "пурпурный"
+        },
+        {
+          "id": 970671251,
+          "value": "черный матовый"
+        },
+        {
+          "id": 970671252,
+          "value": "малиновый"
+        },
+        {
+          "id": 970673967,
+          "value": "светло-желтый"
+        },
+        {
+          "id": 970693003,
+          "value": "зеркальный"
+        },
+        {
+          "id": 970726613,
+          "value": "хром"
+        },
+        {
+          "id": 970832145,
+          "value": "темно-бордовый"
+        },
+        {
+          "id": 971001201,
+          "value": "светло-синий"
+        },
+        {
+          "id": 971039568,
+          "value": "перламутровый"
+        },
+        {
+          "id": 971039569,
+          "value": "лиловый"
+        }
+      ]
+    },
+    {
+      "id": 10388,
+      "name_ru": "Питание",
+      "name_tr": "Beslenme",
+      "description": "Выберите из списка или укажите вручную. Можно добавить несколько значений через точку с запятой. Если точка с запятой есть в значении атрибута, поместите знак в кавычки \";\".",
+      "type": "String",
+      "is_required": false,
+      "is_collection": true,
+      "group_name": "Технические характеристики",
+      "group_id": 181,
+      "dictionary_id": 38875214,
+      "values": [
+        {
+          "id": 970681147,
+          "value": "От аккумулятора"
+        },
+        {
+          "id": 970681148,
+          "value": "От сети"
+        },
+        {
+          "id": 970777573,
+          "value": "От батареек"
+        }
+      ]
+    },
+    {
+      "id": 10400,
+      "name_ru": "Гарантия",
+      "name_tr": "Garanti",
+      "description": "Период, в течение которого производитель отвечает за качество товара. А покупатель может оформить заявку на возврат по гарантийному случаю. Выберите одно значение из выпадающего списка.",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 46700526,
+      "values": [
+        {
+          "id": 970716397,
+          "value": "1 год"
+        },
+        {
+          "id": 970716398,
+          "value": "2 года"
+        },
+        {
+          "id": 970716399,
+          "value": "3 года"
+        },
+        {
+          "id": 970716400,
+          "value": "5 лет"
+        },
+        {
+          "id": 970716401,
+          "value": "Ограниченная пожизненная"
+        },
+        {
+          "id": 970724779,
+          "value": "4 года"
+        },
+        {
+          "id": 970724780,
+          "value": "7 лет"
+        },
+        {
+          "id": 970731993,
+          "value": "10 лет"
+        },
+        {
+          "id": 970748445,
+          "value": "15 лет"
+        },
+        {
+          "id": 970749588,
+          "value": "25 лет"
+        },
+        {
+          "id": 970856055,
+          "value": "6 месяцев"
+        },
+        {
+          "id": 970868729,
+          "value": "20 лет"
+        },
+        {
+          "id": 970874872,
+          "value": "3 месяца"
+        },
+        {
+          "id": 970878197,
+          "value": "6 лет"
+        },
+        {
+          "id": 970892977,
+          "value": "14 дней"
+        },
+        {
+          "id": 970960202,
+          "value": "7 дней"
+        },
+        {
+          "id": 970960203,
+          "value": "Без гарантии"
+        },
+        {
+          "id": 970982038,
+          "value": "42 месяца"
+        },
+        {
+          "id": 970984654,
+          "value": "8 лет"
+        },
+        {
+          "id": 971078639,
+          "value": "18 месяцев"
+        },
+        {
+          "id": 971114717,
+          "value": "2 месяца"
+        },
+        {
+          "id": 971148068,
+          "value": "30 лет"
+        },
+        {
+          "id": 971157940,
+          "value": "50 лет"
+        },
+        {
+          "id": 971224805,
+          "value": "9 месяцев"
+        },
+        {
+          "id": 971283756,
+          "value": "30 месяцев"
+        },
+        {
+          "id": 971295615,
+          "value": "1 месяц"
+        },
+        {
+          "id": 971298510,
+          "value": "14 месяцев"
+        },
+        {
+          "id": 971362564,
+          "value": "12 лет"
+        },
+        {
+          "id": 971404055,
+          "value": "4 месяца"
+        },
+        {
+          "id": 971453994,
+          "value": "25 месяцев"
+        },
+        {
+          "id": 971984601,
+          "value": "5 месяцев"
+        },
+        {
+          "id": 971985482,
+          "value": "40 лет"
+        },
+        {
+          "id": 972036681,
+          "value": "17 лет"
+        },
+        {
+          "id": 972099157,
+          "value": "11 лет"
+        },
+        {
+          "id": 972099709,
+          "value": "15 месяцев"
+        },
+        {
+          "id": 972120538,
+          "value": "10 дней"
+        },
+        {
+          "id": 972120540,
+          "value": "12 месяцев"
+        },
+        {
+          "id": 972120544,
+          "value": "12 дней"
+        },
+        {
+          "id": 972120553,
+          "value": "5 дней"
+        },
+        {
+          "id": 972120558,
+          "value": "9 лет"
+        },
+        {
+          "id": 972120562,
+          "value": "13 лет"
+        },
+        {
+          "id": 972120565,
+          "value": "14 лет"
+        },
+        {
+          "id": 972120566,
+          "value": "15 дней"
+        },
+        {
+          "id": 972120567,
+          "value": "16 месяцев"
+        },
+        {
+          "id": 972120568,
+          "value": "16 лет"
+        },
+        {
+          "id": 972120569,
+          "value": "18 лет"
+        },
+        {
+          "id": 972120571,
+          "value": "19 лет"
+        },
+        {
+          "id": 972891014,
+          "value": "34 года"
+        },
+        {
+          "id": 972929840,
+          "value": "1 день"
+        },
+        {
+          "id": 972929846,
+          "value": "1,5 месяца"
+        },
+        {
+          "id": 972930174,
+          "value": "2,5 месяца"
+        },
+        {
+          "id": 972930179,
+          "value": "21 день"
+        },
+        {
+          "id": 972930182,
+          "value": "28 дней"
+        },
+        {
+          "id": 972930185,
+          "value": "29 дней"
+        },
+        {
+          "id": 972930186,
+          "value": "3 дня"
+        },
+        {
+          "id": 972931458,
+          "value": "11 дней"
+        },
+        {
+          "id": 972931459,
+          "value": "13 дней"
+        },
+        {
+          "id": 972931468,
+          "value": "10 месяцев"
+        },
+        {
+          "id": 972931890,
+          "value": "7 месяцев"
+        },
+        {
+          "id": 972931891,
+          "value": "17 месяцев"
+        },
+        {
+          "id": 972931896,
+          "value": "20 дней"
+        },
+        {
+          "id": 972931897,
+          "value": "16 дней"
+        },
+        {
+          "id": 972931899,
+          "value": "17 дней"
+        },
+        {
+          "id": 973015833,
+          "value": "100 дней"
+        },
+        {
+          "id": 973015834,
+          "value": "1000 дней"
+        },
+        {
+          "id": 973015858,
+          "value": "1090 дней"
+        },
+        {
+          "id": 973015905,
+          "value": "11 месяцев"
+        },
+        {
+          "id": 973016745,
+          "value": "19 месяцев"
+        },
+        {
+          "id": 973017274,
+          "value": "8 дней"
+        },
+        {
+          "id": 973017324,
+          "value": "8 месяцев"
+        },
+        {
+          "id": 973017325,
+          "value": "9 дней"
+        },
+        {
+          "id": 973017831,
+          "value": "22 дня"
+        },
+        {
+          "id": 973018540,
+          "value": "20 месяцев"
+        },
+        {
+          "id": 973018542,
+          "value": "22 месяца"
+        },
+        {
+          "id": 973019455,
+          "value": "31 месяц"
+        },
+        {
+          "id": 973019456,
+          "value": "32 месяца"
+        },
+        {
+          "id": 973019457,
+          "value": "33 месяца"
+        },
+        {
+          "id": 973019458,
+          "value": "35 дней"
+        },
+        {
+          "id": 973019459,
+          "value": "35 месяцев"
+        },
+        {
+          "id": 973021493,
+          "value": "37 месяцев"
+        },
+        {
+          "id": 973021494,
+          "value": "38 дней"
+        },
+        {
+          "id": 973021514,
+          "value": "39 дней"
+        },
+        {
+          "id": 973021516,
+          "value": "39 месяцев"
+        },
+        {
+          "id": 973021632,
+          "value": "78 месяцев"
+        },
+        {
+          "id": 973021936,
+          "value": "4 дня"
+        },
+        {
+          "id": 973021938,
+          "value": "40 дней"
+        },
+        {
+          "id": 973021939,
+          "value": "40 месяцев"
+        },
+        {
+          "id": 973021940,
+          "value": "41 день"
+        },
+        {
+          "id": 973021941,
+          "value": "41 месяц"
+        },
+        {
+          "id": 973021943,
+          "value": "70 дней"
+        },
+        {
+          "id": 973021944,
+          "value": "48 лет"
+        },
+        {
+          "id": 973022630,
+          "value": "540 дней"
+        },
+        {
+          "id": 973022631,
+          "value": "55 дней"
+        },
+        {
+          "id": 973022734,
+          "value": "6 недель"
+        },
+        {
+          "id": 973023244,
+          "value": "50 дней"
+        },
+        {
+          "id": 973023643,
+          "value": "66 месяцев"
+        },
+        {
+          "id": 973023719,
+          "value": "61 месяц"
+        },
+        {
+          "id": 973026830,
+          "value": "45 лет"
+        },
+        {
+          "id": 973028254,
+          "value": "6 дней"
+        }
+      ]
+    },
+    {
+      "id": 22232,
+      "name_ru": "ТН ВЭД коды ЕАЭС",
+      "name_tr": "AEB'nin GTİP kodları",
+      "description": "Выберите одно значение из списка. Если вы не знаете, какой код нужно указать, то вам необходимо обратиться к таможенной службе или таможенному представителю",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 124412395,
+      "values": [
+        {
+          "id": 971397767,
+          "value": "3402500000 - Средства поверхностно-активные органические, расфасованные для розничной продажи"
+        },
+        {
+          "id": 971397772,
+          "value": "3403199000 - Прочие материалы смазочные, содержащие нефть или нефтепродукты, полученные из битуминозных пород, прочие"
+        },
+        {
+          "id": 971397774,
+          "value": "3403990000 - Прочие материалы смазочные (включая смазочно-охлаждающие эмульсии для режущих инструментов, средства для облегчения вывинчивания болтов или гаек, средства для удаления ржавчины или антикоррозионные средства и препараты для"
+        },
+        {
+          "id": 971397965,
+          "value": "3924900009 - Прочие приборы столовые и кухонные принадлежности, прочие предметы домашнего обихода и предметы гигиены или туалета, из пластмасс"
+        },
+        {
+          "id": 971397978,
+          "value": "3926909200 - Изделия прочие из пластмасс и изделия изготовленные из листового материала из прочих материалов товарных позиций 3901 - 3914"
+        },
+        {
+          "id": 971397981,
+          "value": "3926909707 - Цилиндры высотой не менее 5 мм, но не более 30 мм, диаметром не менее 30 мм, но не более 150 мм, без оптической обработки, с выпуклыми и/или вогнутыми и/или плоскими торцевыми поверхностями, для производства линз для очков субпозиции 9001 50"
+        },
+        {
+          "id": 971397982,
+          "value": "3926909709 - Изделия прочие из пластмасс и изделия из прочих материалов товарных позиций 3901 - 3914, прочие, прочие, прочие, прочие"
+        },
+        {
+          "id": 971398076,
+          "value": "4202921900 - Прочие портфели, футляры для очков, биноклей, фотоаппаратов, ружей, кобура и аналогичные изделия, с лицевой поверхностью из листов полимерных материалов"
+        },
+        {
+          "id": 971398079,
+          "value": "4202990000 - Прочие чемоданы, портфели, футляры для очков, биноклей, фотоаппаратов,ружей, кобура, сумки хозяйственные, портмоне, кошельки..., изготовленные из прочих материалов"
+        },
+        {
+          "id": 971398889,
+          "value": "6804229000 - Прочие жернова, камни точильные, круги шлифовальные и аналогичные изделия, из прочих агломерированных абразивов или из керамики"
+        },
+        {
+          "id": 971399187,
+          "value": "7326200009 - Изделия из проволоки, изготовленной из черных металлов, прочие"
+        },
+        {
+          "id": 971399244,
+          "value": "7616999008 - Изделия из алюминия прочие"
+        },
+        {
+          "id": 971399254,
+          "value": "8201500000 - Секаторы и аналогичные ножницы для работы одной рукой (включая ножницы для разделки птицы)"
+        },
+        {
+          "id": 971399314,
+          "value": "8212101000 - Безопасные бритвы с несменяемыми лезвиями"
+        },
+        {
+          "id": 971399315,
+          "value": "8212109000 - Прочие бритвы"
+        },
+        {
+          "id": 971399316,
+          "value": "8212200000 - Лезвия для безопасных бритв, включая полосовые заготовки для лезвий"
+        },
+        {
+          "id": 971399317,
+          "value": "8212900000 - Прочие части бритв и лезвий для них (включая полосовые заготовки для лезвий)"
+        },
+        {
+          "id": 971399318,
+          "value": "8213000000 - Ножницы, портновские ножницы и аналогичные ножницы, и лезвия для них"
+        },
+        {
+          "id": 971399321,
+          "value": "8214900000 - Прочие изделия режущие (например, машинки для стрижки волос, специальные ножи для мясников или специальные кухонные ножи и сечки)"
+        },
+        {
+          "id": 971399523,
+          "value": "8422300008 - Оборудование для заполнения, закупорки бутылок, банок, закрывания ящиков,или др.емкостей, для опечатывания...;для герметичной укупорки колпаками или крышками бутылок, банок,и аналогичных емкостей;для газирования напитков, прочее"
+        },
+        {
+          "id": 971399735,
+          "value": "8467298000 - Машины для подрезки живой изгороди и стрижки газонов"
+        },
+        {
+          "id": 971399739,
+          "value": "8467890000 - Прочие инструменты"
+        },
+        {
+          "id": 971399743,
+          "value": "8467990009 - Прочие части инструментов"
+        },
+        {
+          "id": 971399947,
+          "value": "8509800000 - Прочие машины электромеханические бытовые со встроенными электродвигателелями"
+        },
+        {
+          "id": 971399949,
+          "value": "8510100000 - Электробритвы"
+        },
+        {
+          "id": 971399950,
+          "value": "8510200000 - Машинки для стрижки волос"
+        },
+        {
+          "id": 971399951,
+          "value": "8510300000 - Приспособления для удаления волос"
+        },
+        {
+          "id": 971399952,
+          "value": "8510900000 - Части электробритв, машинок для стрижки волос и приспособлений для удаления волос со встроенным электродвигателям"
+        },
+        {
+          "id": 971400233,
+          "value": "8544429007 - Проводники электрические на напряжение не более 80 в прочие, оснащенные соединительными приспособлениями, прочие"
+        },
+        {
+          "id": 972124924,
+          "value": "2811191000 - Кислоты неорганические прочие и соединения неметаллов с кислородом неорганические прочие: кислоты неорганические прочие: прочие: бромид водорода (бромистоводородная кислота)"
+        },
+        {
+          "id": 972124925,
+          "value": "2811290500 - Кислоты неорганические прочие и соединения неметаллов с кислородом неорганические прочие: соединения неметаллов с кислородом неорганические прочие: прочие: диоксид серы"
+        },
+        {
+          "id": 972124926,
+          "value": "2811291000 - Кислоты неорганические прочие и соединения неметаллов с кислородом неорганические прочие: соединения неметаллов с кислородом неорганические прочие: прочие: триоксид серы (серный ангидрид); триоксид димышьяка"
+        },
+        {
+          "id": 972125505,
+          "value": "3926909702 - Изделия прочие из пластмасс и изделия из прочих материалов товарных позиций 3901 – 3914: прочие: прочие: прочие: цилиндры высотой не менее 5 мм, но не более 8 мм, диаметром не менее 12 мм, но не более 15 мм, без оптической обработки, со сферической лункой на одном торце, для производства контактных линз субпозиции 9001 30 000 0"
+        },
+        {
+          "id": 972125507,
+          "value": "3926909704 - Изделия прочие из пластмасс и изделия из прочих материалов товарных позиций 3901 – 3914: прочие: прочие: прочие: емкости для природного газа, рассчитанные на рабочее давление 20 МПа или более, предназначенные для установки на транспортные средства, использующие природный газ в качестве моторного топлива5)"
+        },
+        {
+          "id": 972126453,
+          "value": "7320901000 - Пружины, рессоры и листы для них, из черных металлов: прочие: плоские спиральные пружины"
+        },
+        {
+          "id": 972126685,
+          "value": "8422200001 - Машины посудомоечные; оборудование для мойки или сушки бутылок или других емкостей; оборудование для заполнения, закупорки бутылок, банок, закрывания ящиков, мешков или других емкостей, для опечатывания их или этикетирования; оборудование для герметичной укупорки колпаками или крышками бутылок, банок, туб и аналогичных емкостей; оборудование для упаковки или обертки (включая оборудование, обертывающее товар с термоусадкой упаковочного материала) прочее; оборудование для газирования напитков: оборудование для мойки или сушки бутылок или других емкостей: для медицинской промышленности5)"
+        },
+        {
+          "id": 972126686,
+          "value": "8422300001 - Машины посудомоечные; оборудование для мойки или сушки бутылок или других емкостей; оборудование для заполнения, закупорки бутылок, банок, закрывания ящиков, мешков или других емкостей, для опечатывания их или этикетирования; оборудование для герметичной укупорки колпаками или крышками бутылок, банок, туб и аналогичных емкостей; оборудование для упаковки или обертки (включая оборудование, обертывающее товар с термоусадкой упаковочного материала) прочее; оборудование для газирования напитков: оборудование для заполнения, закупорки бутылок, банок, закрывания ящиков, мешков или других емкостей, для опечатывания их или этикетирования; оборудование для герметичной укупорки колпаками или крышками бутылок, банок, туб и аналогичных емкостей; оборудование для газирования напитков: для медицинской промышленности5)"
+        },
+        {
+          "id": 972126687,
+          "value": "8422400001 - Машины посудомоечные; оборудование для мойки или сушки бутылок или других емкостей; оборудование для заполнения, закупорки бутылок, банок, закрывания ящиков, мешков или других емкостей, для опечатывания их или этикетирования; оборудование для герметичной укупорки колпаками или крышками бутылок, банок, туб и аналогичных емкостей; оборудование для упаковки или обертки (включая оборудование, обертывающее товар с термоусадкой упаковочного материала) прочее; оборудование для газирования напитков: оборудование для упаковки или обертки (включая оборудование, обертывающее товар с термоусадкой упаковочного материала) прочее: для медицинской промышленности5)"
+        },
+        {
+          "id": 972126688,
+          "value": "8422400005 - Оборудование для упаковки рулонов, имеющих диаметр не менее 600 мм, но не более 1500 мм и ширину не менее 300 мм, но не более 3200 мм"
+        },
+        {
+          "id": 972126689,
+          "value": "8422400006 - Машины посудомоечные; оборудование для мойки или сушки бутылок или других емкостей; оборудование для заполнения, закупорки бутылок, банок, закрывания ящиков, мешков или других емкостей, для опечатывания их или этикетирования; оборудование для герметичной укупорки колпаками или крышками бутылок, банок, туб и аналогичных емкостей; оборудование для упаковки или обертки (включая оборудование, обертывающее товар с термоусадкой упаковочного материала) прочее; оборудование для газирования напитков: оборудование для упаковки или обертки (включая оборудование, обертывающее товар с термоусадкой упаковочного материала) прочее: прочее: оборудование для упаковки пустых бумажных мешков на поддонах пластмассовой лентой шириной не более 16 мм, количеством не более 3500 шт на одном поддоне"
+        },
+        {
+          "id": 972760463,
+          "value": "3403199000 - Прочие материалы смазочные, содержащие нефть или нефтепродукты, полученные из битуминозных пород, прочие."
+        },
+        {
+          "id": 972760464,
+          "value": "3403990000 - Прочие материалы смазочные (включая смазочно-охлаждающие эмульсии для режущих инструментов, средства для облегчения вывинчивания болтов или гаек, средства для удаления ржавчины или антикоррозионные средства и препараты для."
+        },
+        {
+          "id": 972880250,
+          "value": "8212101000 - Безопасные бритвы с несменяемыми лезвиями."
+        },
+        {
+          "id": 972880259,
+          "value": "8212109000 - Прочие бритвы."
+        },
+        {
+          "id": 972880263,
+          "value": "8212200000 - Лезвия для безопасных бритв, включая полосовые заготовки для лезвий."
+        },
+        {
+          "id": 972880266,
+          "value": "8212900000 - Прочие части бритв и лезвий для них (включая полосовые заготовки для лезвий)."
+        },
+        {
+          "id": 973029709,
+          "value": "3910000009 - Прочие силиконы в первичных формах"
+        }
+      ]
+    },
+    {
+      "id": 4180,
+      "name_ru": "Название",
+      "name_tr": "Adı",
+      "description": "Название пишется по принципу: Тип + Бренд + Модель (серия + пояснение) + Артикул производителя + , (запятая) + Атрибут Название не пишется большими буквами (не используем caps lock). Перед атрибутом ставится запятая. Если атрибутов несколько, они так же разделяются запятыми. Если какой-то составной части названия нет - пропускаем её. Атрибутом может быть: цвет, вес, объём, количество штук в упаковке и т.д. Цвет пишется с маленькой буквы, в мужском роде, единственном числе. Слово цвет в названии не пишем. Точка в конце не ставится. Никаких знаков препинания, кроме запятой, не используем. Кавычки используем только для названий на русском языке. Примеры корректных названий: Смартфон Apple iPhone XS MT572RU/A, space black Кеды Dr. Martens Киноклассика, бело-черные, размер 43 Стиральный порошок Ariel Магия белого с мерной ложкой, 15 кг Соус Heinz Xtreme Tabasco суперострый, 10 мл Игрушка для животных Четыре лапы \"Бегающая мышка\" БММ, белый",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 4191,
+      "name_ru": "Аннотация",
+      "name_tr": "Kısa bilgi",
+      "description": "Описание товара, маркетинговый текст",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 4381,
+      "name_ru": "Партномер",
+      "name_tr": "Parça numarası",
+      "description": "Уникальный код, однозначно идентифицирующий изделие или деталь. Можно добавить номер детали по каталогу фирмы-производителя для не оригинальных запчастей. Если деталь не имеет такого артикула  — укажите здесь код продавца. ",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Общие",
+      "group_id": 1,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 4382,
+      "name_ru": "Размеры, мм",
+      "name_tr": "Boyutlar, mm",
+      "description": "Размеры сторон товара без упаковки в миллиметрах. Формат заполнения: ДхШхВ, где Д - длина, Ш - ширина, В - высота. Без единиц измерения. Пример: 70х60х15.",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Габариты и вес",
+      "group_id": 2,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 4383,
+      "name_ru": "Вес товара, г",
+      "name_tr": "Ürün ağırlığı, g",
+      "description": "Вес товара без упаковки (нетто) в граммах в расчете на 1 SKU. Можно указать только целое число или десятичную дробь. Разделитель — точка",
+      "type": "Decimal",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 4384,
+      "name_ru": "Комплектация",
+      "name_tr": "Ekipman",
+      "description": "Перечислите, что входит в комплект вместе с товаром: инструкция, чехол, комплект проводов и т.п. Не дублируйте сюда значения других характеристик (аннотацию, тип или количество в упаковке). Если вы поставляете товар без дополнительной комплектации, не заполняйте эту характеристику. ",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Общие",
+      "group_id": 1,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 4497,
+      "name_ru": "Вес с упаковкой, г",
+      "name_tr": "Paketle birlikte ağırlık, gr",
+      "description": "Можно указать только целое число или десятичную дробь. Разделитель — точка.",
+      "type": "Decimal",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 4866,
+      "name_ru": "Время работы от аккумулятора, мин",
+      "name_tr": "Pil ömrü, en az",
+      "description": "Можно указать только целое число или десятичную дробь. Разделитель — точка.",
+      "type": "Decimal",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Питание",
+      "group_id": 6,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 6036,
+      "name_ru": "Срок службы, лет",
+      "name_tr": "Hizmet ömrü, yıl",
+      "description": "Максимальный период времени, в течение которого товар может быть использован в соответствии со своими функциональными возможностями без ухудшения качества и безопасности для потребителя. Можно указать только целое число или десятичную дробь. Разделитель — точка.",
+      "type": "Decimal",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Общие",
+      "group_id": 1,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 8789,
+      "name_ru": "Название файла PDF",
+      "name_tr": "PDF dosyasının adı",
+      "description": "",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 8790,
+      "name_ru": "Документ PDF",
+      "name_tr": "PDF belgesi",
+      "description": "",
+      "type": "URL",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 9024,
+      "name_ru": "Код продавца",
+      "name_tr": "Satıcı kodu",
+      "description": "Цифро-буквенный код товара для его учета, является уникальным среди товаров. Не является EAN/серийным номером/штрихкодом, не равен названию модели товара - для этих параметров есть отдельные характеристики. Код продавца не выводится в карточке товара на сайте. Может использоваться при автоматическом формировании названия товара.",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 9650,
+      "name_ru": "Время зарядки аккумулятора, ч",
+      "name_tr": "Pil şarj süresi, h",
+      "description": "Можно указать только целое число или десятичную дробь. Разделитель — точка.",
+      "type": "Decimal",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Технические характеристики",
+      "group_id": 181,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 11254,
+      "name_ru": "Rich-контент JSON",
+      "name_tr": "Rich-içerik JSON",
+      "description": "Добавьте расширенное описание товара с фото и видео по шаблону в формате JSON. Подробнее о заполнении этой характеристики можно узнать в статье \"Rich-контент\" в \"Базе знаний\".",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 11650,
+      "name_ru": "Количество заводских упаковок",
+      "name_tr": "Fabrika paketlerinin sayısı",
+      "description": "Сколько заводских упаковок продаёте под этим SKU. Пример: 24 банки детского пюре запаяны в 1 упаковку на заводе и в таком же виде продаются в других магазинах — укажите значение 1. \nДругой пример: завод выпускает лампочки в упаковках по 1 или 10 штук, а вы решили продавать по 3 лампочки и запаяли их в одну упаковку — значение атрибута будет 3",
+      "type": "Integer",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 12141,
+      "name_ru": "Название модели для шаблона наименования",
+      "name_tr": "Adlandırma şablonu için model adı",
+      "description": "Только краткое название модели, без типа, бренда и характеристик товара. Будет использовано в шаблонизаторе для составления названия карточки для сайта.",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 21837,
+      "name_ru": "Озон.Видео: название",
+      "name_tr": "Ozone.Video: isim",
+      "description": "Укажите название для видео",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 21841,
+      "name_ru": "Озон.Видео: ссылка",
+      "name_tr": "Ozone.Video: bağlantı",
+      "description": "Укажите ссылку на видео (MP4, MOV). Продолжительность от 8 сек до 5 минут, размер файла не более 2ГБ",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 21845,
+      "name_ru": "Озон.Видеообложка: ссылка",
+      "name_tr": "Ozone.Video kapak: link",
+      "description": "Укажите ссылку на видео (MP4, MOV). Продолжительность от 8 до 30 секунд, размер файла не более 20МБ",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 22273,
+      "name_ru": "Озон.Видео: товары на видео",
+      "name_tr": "Ozone.Video: videoda ürünler",
+      "description": "Укажите товары, которые демонстрируются в вашем видео. Перечислите SKU через запятую (не более 5).",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 22390,
+      "name_ru": "Объединить в похожие товары",
+      "name_tr": "Benzer ürünlerle birleşme",
+      "description": "Введите одинаковое значение в этом атрибуте для объединения товаров в группу \"Похожие\". Обратите внимание, что товары в группе собираются в рамках одной категории второго уровня в личном кабинете. Если у товаров будет указано одно Название группы, но они находятся в разных категориях — вы получите несколько объединений товаров. Подробнее об объединении в Похожие можно прочитать в статье \"Похожие товары\" в \"Базе знаний\"",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 22992,
+      "name_ru": "HS-код",
+      "name_tr": "GTİP Kodu",
+      "description": "HS-код - это международная гармонизированная система кодирования товаров. Код состоит из набора цифр длиной от 6 до 12 знаков. Подробнее про HS-коды и для чего они нужны можно узнать здесь https://docs.ozon.ru/global/fulfillment/rfbs/logistic-settings/selling-from-turkey/?country=TR",
+      "type": "Integer",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 23171,
+      "name_ru": "#Хештеги",
+      "name_tr": "#Hashtag'ler",
+      "description": "Хештеги работают так же, как в соцсетях: покупатели могут нажать на них в карточке или написать в поиске. Укажите тут тренд, стиль или тематику. Например, для одежды #oldmoney #kpop #бохо, для мебели #скандинавский_стиль #минимализм #лофт. Не добавляйте бренды, параметры или название товара.  Хештег должен начинаться со знака # и содержать только буквы и цифры. Если хештег состоит из 2+ слов, соедините их нижним подчеркиванием. Длина — не более 30 символов. Укажите не больше 30 хештегов, разделяйте пробелом",
+      "type": "String",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 23249,
+      "name_ru": "Количество товара в УЕИ",
+      "name_tr": "UEI'deki mal miktarı",
+      "description": "УЕИ – унифицированная единица измерения. Необходимо указывать для продажи товаров на территории Республики Беларусь согласно локальному законодательству. Указывается количество ШТУК в одной SKU. Можно указать только целое число.",
+      "type": "Decimal",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    },
+    {
+      "id": 23536,
+      "name_ru": "Нужен код маркировки",
+      "name_tr": "İşaretleme kodu gerekli",
+      "description": "Выберите «Да», если товар имеет код маркировки (КИЗ). Будем проверять его у каждой отгрузки или поставки. При интеграции через Seller API передавайте параметр как \"true\" ",
+      "type": "Boolean",
+      "is_required": false,
+      "is_collection": false,
+      "group_name": "Genel",
+      "group_id": 0,
+      "dictionary_id": 0,
+      "values": []
+    }
+  ]
+}

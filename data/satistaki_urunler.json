@@ -1,0 +1,5781 @@
+[
+  {
+    "sira": 1,
+    "productId": 6033881982,
+    "offerId": "EY9018",
+    "name": "Аэрогриль Tefal Dual Easy Fry EY9018 8.3 л 2700 Вт с двумя чашами, черный",
+    "price": "401.00 USD",
+    "oldPrice": "459.00 USD",
+    "sku": 5532649423,
+    "barcodes": [
+      "3045380024472"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T21:49:46.051543Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 2,
+    "productId": 6033426335,
+    "offerId": "NA340/00",
+    "name": "Аэрогриль Philips 3000 Series NA340/00 с окном 7.2 л, 2000 Вт, аэрофритюрница",
+    "price": "516.00 USD",
+    "oldPrice": "574.00 USD",
+    "sku": 5532273272,
+    "barcodes": [
+      "OZN5532273272"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T19:33:39.462682Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 3,
+    "productId": 6035062219,
+    "offerId": "FN101EUSTGD",
+    "name": "Аэрогриль Ninja CRISPi 4-в-1 FN101EUSTGD 3.8 л 1700 Вт со стеклянными чашами",
+    "price": "746.00 USD",
+    "oldPrice": "804.00 USD",
+    "sku": 5533632422,
+    "barcodes": [
+      "0622356328807"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-20T01:35:44.320488Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 4,
+    "productId": 6033542394,
+    "offerId": "NA353/10",
+    "name": "Аэрогриль Philips NA353/10 с двумя чашами 9 л 2750 Вт",
+    "price": "861.00 USD",
+    "oldPrice": "919.00 USD",
+    "sku": 5532375976,
+    "barcodes": [
+      "8720389033339"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T19:56:11.216884Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 5,
+    "productId": 6034149552,
+    "offerId": "FN101EUGY",
+    "name": "Аэрогриль Ninja Crispi 4-в-1 FN101EUGY со стеклянными чашами 3.8 л, 1700 Вт, синий",
+    "price": "631.00 USD",
+    "oldPrice": "689.00 USD",
+    "sku": 5532861892,
+    "barcodes": [
+      "0622356307741"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T23:51:19.191084Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 6,
+    "productId": 6043312531,
+    "offerId": "FV9844",
+    "name": "Паровой утюг Tefal FV9844 Ultimate Pure 3200 Вт, подошва Durilium Airglide Autoclean, черный/бирюзовый",
+    "price": "516.00 USD",
+    "oldPrice": "574.00 USD",
+    "sku": 5540761392,
+    "barcodes": [
+      "3121040071441"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "createdAt": "2026-08-20T09:10:57.352808Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 7,
+    "productId": 6033208399,
+    "offerId": "NA229/00",
+    "name": "Аэрогриль Philips NA229/00 Series 2000 со смотровым окном 4.2 л 1500 Вт, аэрофритюрница",
+    "price": "516.00 USD",
+    "oldPrice": "574.00 USD",
+    "sku": 5532088291,
+    "barcodes": [
+      "8720389033322"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T18:44:11.571448Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 8,
+    "productId": 6029756418,
+    "offerId": "NA550/00",
+    "name": "Philips Аэрогриль NA550/00 9 л, 2750 Вт",
+    "price": "861.00 USD",
+    "oldPrice": "919.00 USD",
+    "sku": 5529096773,
+    "barcodes": [
+      "8720389035617"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T12:00:08.127998Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 9,
+    "productId": 6033809271,
+    "offerId": "FW4018E0",
+    "name": "Аэрогриль Tefal Easy Fry XL Surface FW4018E0 4 л со смотровым окном 2200 Вт черный",
+    "price": "516.00 USD",
+    "oldPrice": "574.00 USD",
+    "sku": 5532593488,
+    "barcodes": [
+      "OZN5532593488"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T21:25:22.562342Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 10,
+    "productId": 6034006146,
+    "offerId": "EY9228",
+    "name": "Аэрогриль Tefal Dual Easy Fry Flex EY9228 черный",
+    "price": "516.00 USD",
+    "oldPrice": "574.00 USD",
+    "sku": 5532742788,
+    "barcodes": [
+      "3045380405288"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T22:39:53.075965Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 11,
+    "productId": 6033508650,
+    "offerId": "NA352/00",
+    "name": "Аэрогриль Philips 3000 Series Dual Basket NA352/00 двухзонный 9 л, 2750 Вт",
+    "price": "861.00 USD",
+    "oldPrice": "919.00 USD",
+    "sku": 5532345025,
+    "barcodes": [
+      "OZN5532345025"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T19:49:31.216990Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 12,
+    "productId": 6033739472,
+    "offerId": "EY831GE0",
+    "name": "Аэрогриль Tefal Easy Fry Infrared EY831GE0 7 л с инфракрасным нагревом и смотровым окном 2020 Вт",
+    "price": "516.00 USD",
+    "oldPrice": "574.00 USD",
+    "sku": 5532535802,
+    "barcodes": [
+      "3045380026216"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T21:01:02.010659Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 13,
+    "productId": 6035208888,
+    "offerId": "TB401EU",
+    "name": "Стационарный блендер кухонный комбайн Ninja TB401EU Detect Power Blender & Processor Pro 1200 Вт, кувшин 2.1 л, чаша 1.8 л, 3 стакана",
+    "price": "976.00 USD",
+    "oldPrice": "1034.00 USD",
+    "sku": 5533761433,
+    "barcodes": [
+      "0622356294607"
+    ],
+    "categoryId": 17039627,
+    "typeId": 94973,
+    "createdAt": "2026-08-20T01:44:19.495988Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 14,
+    "productId": 6033020018,
+    "offerId": "NA552/00",
+    "name": "Аэрогриль Philips NA552/00 Series 5000 Dual Basket 9 л черный",
+    "price": "861.00 USD",
+    "oldPrice": "919.00 USD",
+    "sku": 5531920808,
+    "barcodes": [
+      "8720389035654"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T18:09:19.434512Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 15,
+    "productId": 6035497996,
+    "offerId": "Philips PSG6064/80",
+    "name": "Парогенератор Philips PerfectCare 6000 Series PSG6064/80, черный / золотой",
+    "price": "746.00 USD",
+    "oldPrice": "804.00 USD",
+    "sku": 5534036213,
+    "barcodes": [
+      "8720389004872"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-20T01:57:15.551158Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 16,
+    "productId": 6033067485,
+    "offerId": "NA555/00",
+    "name": "Аэрогриль Philips NA555/00 Dual Basket 5000 Series 9 л черный",
+    "price": "861.00 USD",
+    "oldPrice": "919.00 USD",
+    "sku": 5531954337,
+    "barcodes": [
+      "8720389035258"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T18:16:20.624478Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 17,
+    "productId": 6033149311,
+    "offerId": "NA462/70",
+    "name": "Аэрогриль Philips Dual Basket NA462/70 с двумя чашами 10 л, 2750 Вт",
+    "price": "861.00 USD",
+    "oldPrice": "919.00 USD",
+    "sku": 5532032879,
+    "barcodes": [
+      "8720389035173"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T18:31:27.541885Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 18,
+    "productId": 6034060194,
+    "offerId": "AF170EU",
+    "name": "Аэрогриль Ninja AF170EU, 6.2 л, 2000 Вт, черный",
+    "price": "516.00 USD",
+    "oldPrice": "574.00 USD",
+    "sku": 5532785368,
+    "barcodes": [
+      "0622356354950"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T23:12:04.552906Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 19,
+    "productId": 6034039182,
+    "offerId": "EY8018",
+    "name": "Аэрогриль Tefal Easy Fry & Grill XXL EY8018 6.5 л с разделителем FlexCook 1830 Вт, черный",
+    "price": "631.00 USD",
+    "oldPrice": "689.00 USD",
+    "sku": 5532768338,
+    "barcodes": [
+      "OZN5532768338"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T22:59:00.422224Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 20,
+    "productId": 6034681598,
+    "offerId": "FN101EUSG",
+    "name": "Аэрогриль Ninja CRISPi FN101EUSG 4-в-1 со стеклянными чашами 3.8 л, 1700 Вт, шалфейный зеленый",
+    "price": "746.00 USD",
+    "oldPrice": "804.00 USD",
+    "sku": 5533327844,
+    "barcodes": [
+      "0622356317634"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-20T01:11:07.322300Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 21,
+    "productId": 6034219128,
+    "offerId": "FN103EUGN",
+    "name": "Аэрогриль Ninja CRISPi 4-в-1 FN103EUGN со стеклянными чашами 3.8 л, 1700 Вт, шалфейный зеленый",
+    "price": "631.00 USD",
+    "oldPrice": "689.00 USD",
+    "sku": 5532917044,
+    "barcodes": [
+      "0622356400077"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-20T00:08:53.680134Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 22,
+    "productId": 6043112774,
+    "offerId": "DST8030/70",
+    "name": "Паровой утюг Philips DST8030/70 Azur 8000 Series 3000 Вт, паровой удар 240 г/мин, подошва SteamGlide Elite, зеленый",
+    "price": "516.00 USD",
+    "oldPrice": "574.00 USD",
+    "sku": 5540583529,
+    "barcodes": [
+      "8720389004568"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "createdAt": "2026-08-20T09:00:58.467610Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 23,
+    "productId": 6034069990,
+    "offerId": "AF180EUCP",
+    "name": "Аэрогриль Ninja AF180EUCP Max Pro Copper 6.2 л 2000 Вт, аэрофритюрница с антипригарной чашей",
+    "price": "631.00 USD",
+    "oldPrice": "689.00 USD",
+    "sku": 5532793245,
+    "barcodes": [
+      "0622356297851"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T23:17:31.258629Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 24,
+    "productId": 6045477636,
+    "offerId": "FV9E50E0",
+    "name": "Паровой утюг Tefal FV9E50E0 Ultimate Power Pro 3200 Вт, черный",
+    "price": "516.00 USD",
+    "oldPrice": "574.00 USD",
+    "sku": 5542617844,
+    "barcodes": [
+      "3121040089040"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "createdAt": "2026-08-20T11:26:34.862227Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 25,
+    "productId": 6034093270,
+    "offerId": "SL451EUSD",
+    "name": "Аэрогриль Ninja DoubleStack XL SL451EUSD с термощупом 9.5 л 2470 Вт, серый металлик",
+    "price": "746.00 USD",
+    "oldPrice": "804.00 USD",
+    "sku": 5532811773,
+    "barcodes": [
+      "0622356294362"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T23:28:26.062660Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 26,
+    "productId": 6035930484,
+    "offerId": "PSG3000/20",
+    "name": "Парогенератор Philips 3000 Series PSG3000/20, 2400 Вт, 6 бар, синий/белый",
+    "price": "286.00 USD",
+    "oldPrice": "344.00 USD",
+    "sku": 5534357568,
+    "barcodes": [
+      "8720389029479"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-20T02:13:04.243877Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 27,
+    "productId": 6029615698,
+    "offerId": "EP5447/90",
+    "name": "Автоматическая кофемашина Philips Series 5400 LatteGo EP5447/90, черный",
+    "price": "1206.00 USD",
+    "oldPrice": "1321.00 USD",
+    "sku": 5528973989,
+    "barcodes": [
+      "8710103962625"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-19T11:45:53.562496Z",
+    "status": "Продается",
+    "moderation": ""
+  },
+  {
+    "sira": 28,
+    "productId": 6042952261,
+    "offerId": "PSG8200/80",
+    "name": "Парогенератор Philips PSG8200/80 PerfectCare 8000 Series, 9 бар, 3120 Вт, 1.4 л",
+    "price": "976.00 USD",
+    "oldPrice": "1034.00 USD",
+    "sku": 5540447796,
+    "barcodes": [
+      "8720389066528"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-20T08:52:56.845960Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 29,
+    "productId": 6033593542,
+    "offerId": "EY2458",
+    "name": "Аэрогриль Tefal Easy Fry Max EY2458 5 л 1500 Вт, черный",
+    "price": "286.00 USD",
+    "oldPrice": "344.00 USD",
+    "sku": 5532415790,
+    "barcodes": [
+      "3045380024588"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T20:11:04.508661Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 30,
+    "productId": 6035389139,
+    "offerId": "Philips PSG6022/20",
+    "name": "Парогенератор Philips PSG6022/20 PerfectCare 6000 Series 2400 Вт, 6.5 бар",
+    "price": "631.00 USD",
+    "oldPrice": "689.00 USD",
+    "sku": 5533920891,
+    "barcodes": [
+      "8720389015274"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-20T01:52:14.900577Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 31,
+    "productId": 6033995155,
+    "offerId": "EY756HE0",
+    "name": "Аэрогриль Tefal EY756HE0 Easy Fry Crispy Stack 10 л 2700 Вт, темно-серый",
+    "price": "746.00 USD",
+    "oldPrice": "804.00 USD",
+    "sku": 5532734802,
+    "barcodes": [
+      "3045380407350"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T22:36:04.996062Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 32,
+    "productId": 6033340060,
+    "offerId": "NA320/00",
+    "name": "Аэрогриль Philips NA320/00 Series 3000, 4.2 л, 1500 Вт, аэрофритюрница с антипригарным покрытием, сенсорная",
+    "price": "516.00 USD",
+    "oldPrice": "574.00 USD",
+    "sku": 5532196765,
+    "barcodes": [
+      "8720389035319"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T19:14:34.082481Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 33,
+    "productId": 6045543439,
+    "offerId": "NA540/00",
+    "name": "Аэрогриль Philips NA540/00 с функцией пара 7.2 л 2000 Вт черный",
+    "price": "746.00 USD",
+    "oldPrice": "804.00 USD",
+    "sku": 5542679962,
+    "barcodes": [
+      "8720389067082"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-20T11:31:14.718946Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 34,
+    "productId": 6035170167,
+    "offerId": "FN102EU",
+    "name": "Аэрогриль Ninja CRISPi 4-в-1 FN102EU со стеклянными чашами 3.8 л, 1700 Вт, белый",
+    "price": "746.00 USD",
+    "oldPrice": "804.00 USD",
+    "sku": 5533722481,
+    "barcodes": [
+      "0622356303258"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-20T01:42:10.025771Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 35,
+    "productId": 6033566604,
+    "offerId": "NA154/00",
+    "name": "Аэрогриль Philips NA154/00 Series 1000, 7.1 л, 2450 Вт, аэрофритюрница с сенсорным управлением",
+    "price": "861.00 USD",
+    "oldPrice": "919.00 USD",
+    "sku": 5532393002,
+    "barcodes": [
+      "OZN5532393002"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T20:01:49.842774Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 36,
+    "productId": 6042921534,
+    "offerId": "GV9567",
+    "name": "Парогенератор Tefal Pro Express Ultimate GV9567 белый с синим 2600 Вт, 7.7 бар",
+    "price": "746.00 USD",
+    "oldPrice": "804.00 USD",
+    "sku": 5540418354,
+    "barcodes": [
+      "3121040073933"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-20T08:51:12.083917Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 37,
+    "productId": 6033602574,
+    "offerId": "EY145A",
+    "name": "Аэрогриль Tefal Easy Fry Compact EY145A 3 л 1300 Вт",
+    "price": "286.00 USD",
+    "oldPrice": "344.00 USD",
+    "sku": 5532423386,
+    "barcodes": [
+      "3045380025189"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T20:15:20.838980Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 38,
+    "productId": 6033390540,
+    "offerId": "NA330/00",
+    "name": "Аэрогриль Philips NA330/00 3000 Series 6.2 л с окном 1700 Вт, аэрофритюрница мультипечь без масла",
+    "price": "516.00 USD",
+    "oldPrice": "574.00 USD",
+    "sku": 5532241040,
+    "barcodes": [
+      "OZN5532241040"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T19:25:26.036471Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 39,
+    "productId": 6035497828,
+    "offerId": "Philips GC7844/20",
+    "name": "Парогенератор Philips GC7844/20 PerfectCare Compact, 2400 Вт, 6.5 бар, 1.5 л, синий",
+    "price": "631.00 USD",
+    "oldPrice": "689.00 USD",
+    "sku": 5534033118,
+    "barcodes": [
+      "8710103951049"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-20T01:57:15.055651Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 40,
+    "productId": 6033488722,
+    "offerId": "NA350/03",
+    "name": "Аэрогриль Philips NA350/03 Dual Basket 3000 Series с двумя чашами 9 л, 2750 Вт",
+    "price": "861.00 USD",
+    "oldPrice": "919.00 USD",
+    "sku": 5532328740,
+    "barcodes": [
+      "OZN5532328740"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T19:46:32.026181Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 41,
+    "productId": 6033781667,
+    "offerId": "EY8558E0",
+    "name": "Аэрогриль Tefal Easy Fry Mega EY8558E0 7.5 л 2020 Вт черный",
+    "price": "401.00 USD",
+    "oldPrice": "459.00 USD",
+    "sku": 5532570476,
+    "barcodes": [
+      "3045380023642"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T21:16:16.473203Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 42,
+    "productId": 6042986990,
+    "offerId": "PSG7200/60",
+    "name": "Парогенератор Philips PerfectCare 7000 Series PSG7200/60, 3120 Вт, 8.5 бар, 1.5 л",
+    "price": "976.00 USD",
+    "oldPrice": "1034.00 USD",
+    "sku": 5540478348,
+    "barcodes": [
+      "8720389067662"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-20T08:54:28.366831Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 43,
+    "productId": 6043428785,
+    "offerId": "DST7020/20",
+    "name": "Паровой утюг Philips 7000 Series DST7020/20 2800 Вт, синий",
+    "price": "263.00 USD",
+    "oldPrice": "298.00 USD",
+    "sku": 5540859921,
+    "barcodes": [
+      "8720389015557"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "createdAt": "2026-08-20T09:16:53.998621Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 44,
+    "productId": 6033132365,
+    "offerId": "NA460/00",
+    "name": "Аэрогриль Philips NA460/00 с двумя чашами 10 л, 2750 Вт, сенсорное управление",
+    "price": "861.00 USD",
+    "oldPrice": "919.00 USD",
+    "sku": 5532008572,
+    "barcodes": [
+      "8720389033483"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T18:28:40.704514Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 45,
+    "productId": 6035481482,
+    "offerId": "Philips PSG7300/80",
+    "name": "Парогенератор Philips PSG7300/80 PerfectCare 7000 Series (3120 Вт, 8.5 бар, 1.5 л)",
+    "price": "861.00 USD",
+    "oldPrice": "919.00 USD",
+    "sku": 5534029221,
+    "barcodes": [
+      "8720389058332"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-20T01:56:41.187786Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 46,
+    "productId": 6033256088,
+    "offerId": "NA230/00",
+    "name": "Аэрогриль Philips NA230/00 2000 Series 6.2 л 1700 Вт, аэрофритюрница со смотровым окном",
+    "price": "516.00 USD",
+    "oldPrice": "574.00 USD",
+    "sku": 5532123249,
+    "barcodes": [
+      "8720389033308"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T18:56:24.648557Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 47,
+    "productId": 6033986066,
+    "offerId": "EY7528E0",
+    "name": "Аэрогриль Tefal Easy Fry Crispy Stack EY7528E0 с двумя чашами 10 л, 2700 Вт, черный",
+    "price": "746.00 USD",
+    "oldPrice": "804.00 USD",
+    "sku": 5532728074,
+    "barcodes": [
+      "3045380406094"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T22:32:35.980102Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 48,
+    "productId": 6033465980,
+    "offerId": "NA350/00",
+    "name": "Аэрогриль Philips 3000 Series Dual Basket NA350/00 двойная чаша 9 л, 2750 Вт, черный",
+    "price": "861.00 USD",
+    "oldPrice": "919.00 USD",
+    "sku": 5532308417,
+    "barcodes": [
+      "OZN5532308417"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T19:41:44.776480Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 49,
+    "productId": 6034115622,
+    "offerId": "SL400EUCP",
+    "name": "Аэрогриль Ninja DoubleStack XL SL400EUCP 9.5 л 2470 Вт, двухсекционный вертикальный аэрофритюрница с 2 корзинами Copper/Черный",
+    "price": "746.00 USD",
+    "oldPrice": "804.00 USD",
+    "sku": 5532829348,
+    "barcodes": [
+      "0622356280822"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-19T23:38:06.125917Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 50,
+    "productId": 6043133223,
+    "offerId": "DST8050/20",
+    "name": "Паровой утюг Philips Azur 8000 Series DST8050/20, темно-синий / золотой",
+    "price": "631.00 USD",
+    "oldPrice": "689.00 USD",
+    "sku": 5540608561,
+    "barcodes": [
+      "8720389004681"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "createdAt": "2026-08-20T09:02:09.751590Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 51,
+    "productId": 6063701773,
+    "offerId": "1871556030",
+    "name": "Овощечистка WMF Profi Plus 19 см",
+    "price": "28.00 USD",
+    "oldPrice": "33.00 USD",
+    "sku": 5558386578,
+    "barcodes": [
+      "4000530547835"
+    ],
+    "categoryId": 17027907,
+    "typeId": 92436,
+    "createdAt": "2026-08-21T20:04:58.858355Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 52,
+    "productId": 6064148943,
+    "offerId": "0416950071",
+    "name": "Бутылка для смузи WMF Kult X Mix & Go / K chenminis 600 мл из тритана",
+    "price": "33.00 USD",
+    "oldPrice": "40.00 USD",
+    "sku": 5558748242,
+    "barcodes": [
+      "4211129110129"
+    ],
+    "categoryId": 17027926,
+    "typeId": 92477,
+    "createdAt": "2026-08-21T22:00:31.026562Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 53,
+    "productId": 6046562034,
+    "offerId": "ECAM230.13.B",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica S Smart ECAM230.13.B, 1450 Вт, 15 бар, черный",
+    "price": "1091.00 USD",
+    "oldPrice": "1149.00 USD",
+    "sku": 5543564227,
+    "barcodes": [
+      "8004399334113"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T13:11:18.499058Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 54,
+    "productId": 6046414656,
+    "offerId": "EP5546/70",
+    "name": "Автоматическая кофемашина Philips Series 5500 LatteGo EP5546/70 серебристо-черный",
+    "price": "1321.00 USD",
+    "oldPrice": "1379.00 USD",
+    "sku": 5543435536,
+    "barcodes": [
+      "8720389032332"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T12:51:30.316283Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 55,
+    "productId": 6064153109,
+    "offerId": "0413020012",
+    "name": "Электрический чайник WMF Stelio 1.7 л 2400 Вт из стали Cromargan",
+    "price": "143.00 USD",
+    "oldPrice": "171.00 USD",
+    "sku": 5558752223,
+    "barcodes": [
+      "4211129057905"
+    ],
+    "categoryId": 17039631,
+    "typeId": 94968,
+    "createdAt": "2026-08-21T22:02:08.341572Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 56,
+    "productId": 6064334492,
+    "offerId": "QP2824/31",
+    "name": "Триммер PHILIPS OneBlade 360 Face & Body QP2824/31 для лица и тела",
+    "price": "132.00 USD",
+    "oldPrice": "159.00 USD",
+    "sku": 5558891255,
+    "barcodes": [
+      "8720689040099"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:07.408662Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 57,
+    "productId": 6064148904,
+    "offerId": "0761406380",
+    "name": "Сотейник WMF Devil 28 см 5 л с крышкой для индукции",
+    "price": "171.00 USD",
+    "oldPrice": "206.00 USD",
+    "sku": 5558748625,
+    "barcodes": [
+      "4000530683939"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92466,
+    "createdAt": "2026-08-21T22:00:30.085209Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 58,
+    "productId": 6064148967,
+    "offerId": "18.7998.4500",
+    "name": "Разделочная доска WMF 40x32 см из массива акации нескользящая",
+    "price": "129.00 USD",
+    "oldPrice": "154.00 USD",
+    "sku": 5558747925,
+    "barcodes": [
+      "4000530709219"
+    ],
+    "categoryId": 17027907,
+    "typeId": 92402,
+    "createdAt": "2026-08-21T22:00:31.513266Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 59,
+    "productId": 6064148898,
+    "offerId": "18.7670.9990",
+    "name": "Набор кухонных принадлежностей WMF Profi Plus 7 предметов с подставкой из стали Cromargan",
+    "price": "208.00 USD",
+    "oldPrice": "250.00 USD",
+    "sku": 5558748494,
+    "barcodes": [
+      "4000530684172"
+    ],
+    "categoryId": 17027907,
+    "typeId": 92374,
+    "createdAt": "2026-08-21T22:00:29.517415Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 60,
+    "productId": 6046501680,
+    "offerId": "EP5544/50",
+    "name": "Автоматическая кофемашина Philips Series 5500 LatteGo EP5544/50, 15 бар, капучинатор LatteGo",
+    "price": "1321.00 USD",
+    "oldPrice": "1379.00 USD",
+    "sku": 5543513019,
+    "barcodes": [
+      "8720389032301"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T13:02:16.090151Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 61,
+    "productId": 6046670465,
+    "offerId": "EP2220/10",
+    "name": "Автоматическая кофемашина Philips Series 2200 EP2220/10 с ручным капучинатором 1500 Вт, 15 бар",
+    "price": "976.00 USD",
+    "oldPrice": "1034.00 USD",
+    "sku": 5543657026,
+    "barcodes": [
+      "8720389007408"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T13:25:53.016412Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 62,
+    "productId": 6064148949,
+    "offerId": "12.7291.9991",
+    "name": "Набор столовых приборов WMF Palma 60 предм. на 12 персон из стали Cromargan",
+    "price": "357.00 USD",
+    "oldPrice": "428.00 USD",
+    "sku": 5558747967,
+    "barcodes": [
+      "4000530620934"
+    ],
+    "categoryId": 17028742,
+    "typeId": 92561,
+    "createdAt": "2026-08-21T22:00:31.051881Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 63,
+    "productId": 6046638134,
+    "offerId": "ECAM292.33.SB",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica Evo ECAM292.33.SB серебристая с ручным капучинатором",
+    "price": "1091.00 USD",
+    "oldPrice": "1149.00 USD",
+    "sku": 5543630666,
+    "barcodes": [
+      "8004399021716"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T13:21:22.837091Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 64,
+    "productId": 6064148939,
+    "offerId": "0617706040",
+    "name": "Графин для воды WMF Basic 1 л со стеклянным корпусом и крышкой CloseUp",
+    "price": "89.00 USD",
+    "oldPrice": "106.00 USD",
+    "sku": 5558747872,
+    "barcodes": [
+      "4000530643599"
+    ],
+    "categoryId": 17027926,
+    "typeId": 92479,
+    "createdAt": "2026-08-21T22:00:30.969280Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 65,
+    "productId": 6064172779,
+    "offerId": "18.7108.6030",
+    "name": "Ложка кулинарная для спагетти WMF Profi Plus 32 см из нержавеющей стали Cromargan",
+    "price": "58.00 USD",
+    "oldPrice": "69.00 USD",
+    "sku": 5558766144,
+    "barcodes": [
+      "4000530534958"
+    ],
+    "categoryId": 17027907,
+    "typeId": 92375,
+    "createdAt": "2026-08-21T22:07:58.189545Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 66,
+    "productId": 6064148905,
+    "offerId": "18.7332.9990",
+    "name": "Набор кухонных венчиков WMF Profi Plus 3 предм. из стали Cromargan",
+    "price": "68.00 USD",
+    "oldPrice": "82.00 USD",
+    "sku": 5558748397,
+    "barcodes": [
+      "4000530598936"
+    ],
+    "categoryId": 17027907,
+    "typeId": 92355,
+    "createdAt": "2026-08-21T22:00:30.216014Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 67,
+    "productId": 6064149009,
+    "offerId": "0760556380",
+    "name": "Набор кастрюль WMF Function 4 5 предм.",
+    "price": "995.00 USD",
+    "oldPrice": "1194.00 USD",
+    "sku": 5558748799,
+    "barcodes": [
+      "4000530720153"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-21T22:00:32.885902Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 68,
+    "productId": 6064170158,
+    "offerId": "WMF Function Bowls Rührschüssel Edelstahl mit Deck",
+    "name": "Миска для смешивания WMF Function Bowls 2.5 л с крышкой против брызг из стали Cromargan 18.5 см",
+    "price": "107.00 USD",
+    "oldPrice": "129.00 USD",
+    "sku": 5558764936,
+    "barcodes": [
+      "4000530647788"
+    ],
+    "categoryId": 17028741,
+    "typeId": 92506,
+    "createdAt": "2026-08-21T22:07:14.263654Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 69,
+    "productId": 6047082959,
+    "offerId": "BC151EUBK",
+    "name": "Беспроводной портативный блендер Ninja Blast BC151EUBK, 530 мл, черный",
+    "price": "217.00 USD",
+    "oldPrice": "229.00 USD",
+    "sku": 5544010332,
+    "barcodes": [
+      "0622356274937"
+    ],
+    "categoryId": 17039627,
+    "typeId": 94973,
+    "createdAt": "2026-08-20T14:21:34.444181Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 70,
+    "productId": 6046962741,
+    "offerId": "ECAM292.81.SB",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica Evo ECAM292.81.SB, серебристо-черный",
+    "price": "1091.00 USD",
+    "oldPrice": "1149.00 USD",
+    "sku": 5543916612,
+    "barcodes": [
+      "8699640647632"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T14:05:41.023810Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 71,
+    "productId": 6064172860,
+    "offerId": "Profi Resist 28 cm",
+    "name": "Сковорода WMF Profi Resist 28 см для индукции с антипригарным покрытием и сотовой структурой из стали Cromargan",
+    "price": "244.00 USD",
+    "oldPrice": "292.00 USD",
+    "sku": 5558766154,
+    "barcodes": [
+      "4000530680136"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-21T22:07:58.885218Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 72,
+    "productId": 6046753078,
+    "offerId": "ECAM292.81.B",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica Evo ECAM292.81.B с автокапучинатором LatteCrema Hot 1450 Вт 15 бар",
+    "price": "1091.00 USD",
+    "oldPrice": "1149.00 USD",
+    "sku": 5543728392,
+    "barcodes": [
+      "8004399021723"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T13:37:09.554610Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 73,
+    "productId": 6063701742,
+    "offerId": "Profi 28 cm (0794689991)",
+    "name": "Сковорода WMF Profi 28 см из нержавеющей стали Cromargan 18/10 без покрытия, для всех типов плит и духовки",
+    "price": "139.00 USD",
+    "oldPrice": "167.00 USD",
+    "sku": 5558386851,
+    "barcodes": [
+      "4000530516824"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-21T20:04:58.268371Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 74,
+    "productId": 6063701743,
+    "offerId": "11.2000.9002",
+    "name": "Набор столовых приборов WMF Boston 60 предметов на 12 персон из нержавеющей стали Cromargan 18/10",
+    "price": "445.00 USD",
+    "oldPrice": "534.00 USD",
+    "sku": 5558386338,
+    "barcodes": [
+      "4000530659569"
+    ],
+    "categoryId": 17028742,
+    "typeId": 92561,
+    "createdAt": "2026-08-21T20:04:58.278515Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 75,
+    "productId": 6064148956,
+    "offerId": "1871016030",
+    "name": "Половник кухонный WMF Profi Plus 30 см из нержавеющей стали Cromargan",
+    "price": "40.00 USD",
+    "oldPrice": "48.00 USD",
+    "sku": 5558748307,
+    "barcodes": [
+      "4000530534880"
+    ],
+    "categoryId": 17027907,
+    "typeId": 92555,
+    "createdAt": "2026-08-21T22:00:31.328266Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 76,
+    "productId": 6047006428,
+    "offerId": "EP3326/90",
+    "name": "Автоматическая кофемашина Philips Series 3300 EP3326/90 с ручным капучинатором 15 бар черный хром",
+    "price": "976.00 USD",
+    "oldPrice": "1034.00 USD",
+    "sku": 5543943822,
+    "barcodes": [
+      "8720389027635"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T14:11:27.807125Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 77,
+    "productId": 6063701827,
+    "offerId": "Profi 24 cm",
+    "name": "Сковорода WMF Profi 24 см без покрытия из нержавеющей стали Cromargan для индукционных плит",
+    "price": "125.00 USD",
+    "oldPrice": "151.00 USD",
+    "sku": 5558386326,
+    "barcodes": [
+      "4000530516817"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-21T20:04:59.371638Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 78,
+    "productId": 6045610934,
+    "offerId": "EP3347/90",
+    "name": "Автоматическая кофемашина Philips Series 3300 LatteGo EP3347/90, 15 бар, сенсорный дисплей, капучинатор LatteGo, черный хром",
+    "price": "976.00 USD",
+    "oldPrice": "1034.00 USD",
+    "sku": 5542755125,
+    "barcodes": [
+      "8720389030222"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T11:35:40.784781Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 79,
+    "productId": 6047173982,
+    "offerId": "KT201EU",
+    "name": "Электрический чайник Ninja Perfect Temperature KT201EU 1.7 л 3000 Вт, регулировка температуры",
+    "price": "286.00 USD",
+    "oldPrice": "344.00 USD",
+    "sku": 5544091946,
+    "barcodes": [
+      "0622356250092"
+    ],
+    "categoryId": 17039631,
+    "typeId": 94968,
+    "createdAt": "2026-08-20T14:33:40.103776Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 80,
+    "productId": 6064172786,
+    "offerId": "WMF Nuova Kuchenheber Tortenheber Edelstahl 23 cm,",
+    "name": "Лопатка для торта WMF Nuova 23 см из нержавеющей стали Cromargan",
+    "price": "24.00 USD",
+    "oldPrice": "29.00 USD",
+    "sku": 5558766381,
+    "barcodes": [
+      "4000530675262"
+    ],
+    "categoryId": 17027907,
+    "typeId": 92376,
+    "createdAt": "2026-08-21T22:07:58.218065Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 81,
+    "productId": 6063701794,
+    "offerId": "18.7920.6100",
+    "name": "Ножницы кухонные WMF Touch 21 см универсальные с зубчатым лезвием и открывалкой, черные",
+    "price": "29.00 USD",
+    "oldPrice": "35.00 USD",
+    "sku": 5558386613,
+    "barcodes": [
+      "4000530677617"
+    ],
+    "categoryId": 17027907,
+    "typeId": 92374,
+    "createdAt": "2026-08-21T20:04:59.009708Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 82,
+    "productId": 6064148891,
+    "offerId": "0733556040",
+    "name": "Набор кастрюль WMF Diadem Plus 5 предм.",
+    "price": "426.00 USD",
+    "oldPrice": "511.00 USD",
+    "sku": 5558748550,
+    "barcodes": [
+      "4000530736482"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-21T22:00:29.415765Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 83,
+    "productId": 6064148916,
+    "offerId": "06.4689.9990",
+    "name": "Ручная соковыжималка WMF Gourmet для цитрусовых 9 см из стали Cromargan",
+    "price": "64.00 USD",
+    "oldPrice": "77.00 USD",
+    "sku": 5558748035,
+    "barcodes": [
+      "4000530538840"
+    ],
+    "categoryId": 17027907,
+    "typeId": 92410,
+    "createdAt": "2026-08-21T22:00:30.550410Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 84,
+    "productId": 6064148955,
+    "offerId": "0733706299",
+    "name": "Набор сковород WMF Devil 3 предм. (20, 24, 28 см) из стали Cromargan с антипригарным покрытием",
+    "price": "260.00 USD",
+    "oldPrice": "312.00 USD",
+    "sku": 5558747991,
+    "barcodes": [
+      "4000530686602"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-21T22:00:31.309061Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 85,
+    "productId": 6064148999,
+    "offerId": "0741426040",
+    "name": "Набор сковород WMF Devil 2 предм. (24 см, 28 см) с антипригарным покрытием для индукции",
+    "price": "219.00 USD",
+    "oldPrice": "262.00 USD",
+    "sku": 5558748666,
+    "barcodes": [
+      "4000530659743"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-21T22:00:32.596574Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 86,
+    "productId": 6047181364,
+    "offerId": "KT200EU",
+    "name": "Электрический чайник с регулировкой температуры Ninja KT200EU 1.7 л 3000 Вт, черный",
+    "price": "401.00 USD",
+    "oldPrice": "459.00 USD",
+    "sku": 5544099171,
+    "barcodes": [
+      "0622356243308"
+    ],
+    "categoryId": 17039631,
+    "typeId": 94968,
+    "createdAt": "2026-08-20T14:34:27.432396Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 87,
+    "productId": 6064153080,
+    "offerId": "0580774291",
+    "name": "Сковорода блинная WMF Devil 27 см с лопаткой и распределителем для индукции",
+    "price": "107.00 USD",
+    "oldPrice": "129.00 USD",
+    "sku": 5558752328,
+    "barcodes": [
+      "4000530684875"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-21T22:02:07.072824Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 88,
+    "productId": 6064148962,
+    "offerId": "0658776040",
+    "name": "Губка для мытья посуды WMF Gourmet Gl nzerkissen 3 шт. металлизированная",
+    "price": "17.00 USD",
+    "oldPrice": "21.00 USD",
+    "sku": 5558748201,
+    "barcodes": [
+      "4000530700070"
+    ],
+    "categoryId": 17028718,
+    "typeId": 96009,
+    "createdAt": "2026-08-21T22:00:31.493533Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 89,
+    "productId": 6064334545,
+    "offerId": "MG9561/30",
+    "name": "Триммер PHILIPS Multigroom Series 9000 MG9561/30 для бороды, волос и тела 23 в 1 с OneBlade",
+    "price": "321.00 USD",
+    "oldPrice": "385.00 USD",
+    "sku": 5558891615,
+    "barcodes": [
+      "8720689046114"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:08.913445Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 90,
+    "productId": 6045680834,
+    "offerId": "EP2333/40",
+    "name": "Автоматическая кофемашина Philips Series 2300 LatteGo EP2333/40, белая",
+    "price": "976.00 USD",
+    "oldPrice": "1034.00 USD",
+    "sku": 5542797703,
+    "barcodes": [
+      "8720389027611"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T11:40:00.075579Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 91,
+    "productId": 6064172774,
+    "offerId": "WMF Nuova Salatbesteck Edelstahl 25 cm, klein, Sal",
+    "name": "Набор столовых приборов WMF Nuova для салата 2 предм. из стали Cromargan 25 см",
+    "price": "49.00 USD",
+    "oldPrice": "60.00 USD",
+    "sku": 5558765998,
+    "barcodes": [
+      "4000530669230"
+    ],
+    "categoryId": 17028742,
+    "typeId": 92561,
+    "createdAt": "2026-08-21T22:07:58.164118Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 92,
+    "productId": 6046481794,
+    "offerId": "EP2330/10",
+    "name": "Автоматическая кофемашина Philips Series 2300 LatteGo EP2330/10, 1500 Вт, 15 бар, черная",
+    "price": "976.00 USD",
+    "oldPrice": "1034.00 USD",
+    "sku": 5543499458,
+    "barcodes": [
+      "8720389030314"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T12:59:49.942714Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 93,
+    "productId": 6048807898,
+    "offerId": "0644416030",
+    "name": "Терка четырехгранная WMF 0644416030 Cromargan 24 см из нержавеющей стали 18/10",
+    "price": "108.00 USD",
+    "oldPrice": "114.00 USD",
+    "sku": 5545519805,
+    "barcodes": [
+      "4000530547910"
+    ],
+    "categoryId": 17027907,
+    "typeId": 92417,
+    "createdAt": "2026-08-20T19:37:49.771486Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 94,
+    "productId": 6062473958,
+    "offerId": "MAFD661B0",
+    "name": "Аэрогриль Bosch Series 6 MAFD661B0 Double Stack 12 л 2800 Вт, черный",
+    "price": "631.00 USD",
+    "oldPrice": "689.00 USD",
+    "sku": 5557373615,
+    "barcodes": [
+      "4242005579723"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94726,
+    "createdAt": "2026-08-21T16:35:43.034476Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 95,
+    "productId": 6046892860,
+    "offerId": "ECAM292.52.GB",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica Evo ECAM292.52.GB с капучинатором LatteCrema",
+    "price": "1091.00 USD",
+    "oldPrice": "1149.00 USD",
+    "sku": 5543845070,
+    "barcodes": [
+      "8004399027046"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T13:56:51.715926Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 96,
+    "productId": 6046546897,
+    "offerId": "ECAM11.112.B",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica S ECAM11.112.B, 1450 Вт, 15 бар, ручной капучинатор, черный",
+    "price": "976.00 USD",
+    "oldPrice": "1034.00 USD",
+    "sku": 5543555656,
+    "barcodes": [
+      "8004399022409"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T13:08:42.898968Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 97,
+    "productId": 6047119736,
+    "offerId": "KT201EUSTGD",
+    "name": "Электрический чайник Ninja KT201EUSTGD Perfect Temperature с регулировкой температуры 1.7 л 3000 Вт",
+    "price": "286.00 USD",
+    "oldPrice": "344.00 USD",
+    "sku": 5544043925,
+    "barcodes": [
+      "0622356328821"
+    ],
+    "categoryId": 17039631,
+    "typeId": 94968,
+    "createdAt": "2026-08-20T14:25:38.248993Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 98,
+    "productId": 6046522020,
+    "offerId": "ECAM22.110.B",
+    "name": "Автоматическая кофемашина De'Longhi Magnifica S ECAM22.110.B, 1450 Вт, 15 бар, ручной капучинатор, черная",
+    "price": "976.00 USD",
+    "oldPrice": "1034.00 USD",
+    "sku": 5543532736,
+    "barcodes": [
+      "8004399325050"
+    ],
+    "categoryId": 17039628,
+    "typeId": 94971,
+    "createdAt": "2026-08-20T13:05:09.283075Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 99,
+    "productId": 6063701826,
+    "offerId": "11.2091.6040",
+    "name": "Набор столовых приборов WMF Boston 30 предметов на 6 персон, нержавеющая сталь Cromargan 18/10",
+    "price": "229.00 USD",
+    "oldPrice": "275.00 USD",
+    "sku": 5558386626,
+    "barcodes": [
+      "4000530321985"
+    ],
+    "categoryId": 17028742,
+    "typeId": 92561,
+    "createdAt": "2026-08-21T20:04:59.371720Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 100,
+    "productId": 6047628865,
+    "offerId": "JC151EU",
+    "name": "Шнековая соковыжималка Ninja NeverClog JC151EU холодного отжима, 150 Вт, серый металлик",
+    "price": "401.00 USD",
+    "oldPrice": "459.00 USD",
+    "sku": 5544492497,
+    "barcodes": [
+      "0622356308694"
+    ],
+    "categoryId": 17039644,
+    "typeId": 94989,
+    "createdAt": "2026-08-20T15:44:11.074706Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 101,
+    "productId": 6064334647,
+    "offerId": "QP2834/31",
+    "name": "Триммер PHILIPS OneBlade 360 Face & Body QP2834/31 для лица и тела с 3 лезвиями 360",
+    "price": "194.00 USD",
+    "oldPrice": "233.00 USD",
+    "sku": 5558891143,
+    "barcodes": [
+      "8720689033299"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:10.831462Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 102,
+    "productId": 6064334873,
+    "offerId": "HX6064/88",
+    "name": "Насадка для электрической зубной щетки Philips Sonicare W2 Optimal White HX6064/88, 4 шт., черная",
+    "price": "105.00 USD",
+    "oldPrice": "125.00 USD",
+    "sku": 5558903359,
+    "barcodes": [],
+    "categoryId": 17028937,
+    "typeId": 94700,
+    "createdAt": "2026-08-21T23:06:14.665353Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 103,
+    "productId": 6064334557,
+    "offerId": "MG7962/30",
+    "name": "Триммер PHILIPS Multigroom Series 7000 MG7962/30 19 в 1 универсальный",
+    "price": "232.00 USD",
+    "oldPrice": "278.00 USD",
+    "sku": 5558891613,
+    "barcodes": [
+      "8720689045346"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:09.091231Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 104,
+    "productId": 6064335040,
+    "offerId": "XP9405/31",
+    "name": "Электробритва Philips i9000 Prestige Ultra XP9405/31 роторная для влажного и сухого бритья, черная",
+    "price": "1240.00 USD",
+    "oldPrice": "1488.00 USD",
+    "sku": 5558891463,
+    "barcodes": [
+      "8720689030380"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-21T23:06:18.147376Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 105,
+    "productId": 6064335048,
+    "offerId": "HX7110/01",
+    "name": "Звуковая электрическая зубная щетка Philips Sonicare 5500 HX7110/01 белая",
+    "price": "250.00 USD",
+    "oldPrice": "299.00 USD",
+    "sku": 5558891870,
+    "barcodes": [
+      "8720689021562"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-21T23:06:18.353324Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 106,
+    "productId": 6064334755,
+    "offerId": "QP440/50",
+    "name": "Сменные лезвия для триммера Philips OneBlade 360 QP440/50, 4 шт.",
+    "price": "128.00 USD",
+    "oldPrice": "153.00 USD",
+    "sku": 5558892015,
+    "barcodes": [
+      "8720689016148"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91675,
+    "createdAt": "2026-08-21T23:06:12.335449Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 107,
+    "productId": 6064334555,
+    "offerId": "HS9980/15",
+    "name": "Электробритва для головы PHILIPS Head Shaver Pro Series 9000 HS9980/15",
+    "price": "357.00 USD",
+    "oldPrice": "428.00 USD",
+    "sku": 5558891571,
+    "barcodes": [
+      "8720689044271"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-21T23:06:09.060685Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 108,
+    "productId": 6064334980,
+    "offerId": "HX9046/87",
+    "name": "Насадка для электрической зубной щетки Philips Sonicare C3 Premium Plaque Defense HX9046/87, белая, 6 шт",
+    "price": "143.00 USD",
+    "oldPrice": "171.00 USD",
+    "sku": 5558901896,
+    "barcodes": [],
+    "categoryId": 17028937,
+    "typeId": 94700,
+    "createdAt": "2026-08-21T23:06:16.660075Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 109,
+    "productId": 6064334566,
+    "offerId": "HX6068/88",
+    "name": "Насадки для электрической зубной щетки Philips Sonicare W2 Optimal White HX6068/88 8 шт. черные",
+    "price": "124.00 USD",
+    "oldPrice": "150.00 USD",
+    "sku": 5558905407,
+    "barcodes": [],
+    "categoryId": 17028937,
+    "typeId": 94700,
+    "createdAt": "2026-08-21T23:06:09.364257Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 110,
+    "productId": 6064334901,
+    "offerId": "QP6652/30",
+    "name": "Триммер PHILIPS OneBlade Pro 360 QP6652/30 для лица и тела",
+    "price": "267.00 USD",
+    "oldPrice": "320.00 USD",
+    "sku": 5558891525,
+    "barcodes": [
+      "8720689027359"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:15.255882Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 111,
+    "productId": 6064334962,
+    "offerId": "MG7931/15",
+    "name": "Триммер PHILIPS Multigroom Series 7000 MG7931/15 для бороды, волос и тела 16 в 1",
+    "price": "207.00 USD",
+    "oldPrice": "248.00 USD",
+    "sku": 5558891488,
+    "barcodes": [
+      "8720689045186"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:16.451409Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 112,
+    "productId": 6064334943,
+    "offerId": "BRI949/00",
+    "name": "Фотоэпилятор Philips Lumea IPL 8000 Series BRI949/00 с 4 насадками и триммером",
+    "price": "173.00 USD",
+    "oldPrice": "207.00 USD",
+    "sku": 5558891730,
+    "barcodes": [
+      "8720689016339"
+    ],
+    "categoryId": 77868900,
+    "typeId": 91686,
+    "createdAt": "2026-08-21T23:06:15.937189Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 113,
+    "productId": 6064334559,
+    "offerId": "STH3020/10",
+    "name": "Отпариватель для одежды ручной Philips 3000 Series STH3020/10 складной, 1000 Вт, 120 мл, белый",
+    "price": "124.00 USD",
+    "oldPrice": "150.00 USD",
+    "sku": 5558891451,
+    "barcodes": [
+      "8710103982005"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91426,
+    "createdAt": "2026-08-21T23:06:09.142956Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 114,
+    "productId": 6064334804,
+    "offerId": "AC3210/12",
+    "name": "Очиститель воздуха Philips PureProtect 3200 Series AC3210/12 бежевый",
+    "price": "856.00 USD",
+    "oldPrice": "1027.00 USD",
+    "sku": 5558891323,
+    "barcodes": [
+      "8720389039300"
+    ],
+    "categoryId": 17039635,
+    "typeId": 91451,
+    "createdAt": "2026-08-21T23:06:13.164420Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 115,
+    "productId": 6064335104,
+    "offerId": "AC0951/13",
+    "name": "Очиститель воздуха Philips Series 900 PureProtect Mini AC0951/13",
+    "price": "460.00 USD",
+    "oldPrice": "552.00 USD",
+    "sku": 5558892051,
+    "barcodes": [
+      "8720389040641"
+    ],
+    "categoryId": 17039635,
+    "typeId": 91451,
+    "createdAt": "2026-08-21T23:06:20.310377Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 116,
+    "productId": 6064334851,
+    "offerId": "BHD510/20",
+    "name": "Фен для волос Philips Series 5000 BHD510/20 2300 Вт синий",
+    "price": "167.00 USD",
+    "oldPrice": "200.00 USD",
+    "sku": 5558891346,
+    "barcodes": [
+      "8720689010665"
+    ],
+    "categoryId": 17039639,
+    "typeId": 91730,
+    "createdAt": "2026-08-21T23:06:14.036095Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 117,
+    "productId": 6064334708,
+    "offerId": "MG9556/15",
+    "name": "Триммер PHILIPS Multigroom Series 9000 MG9556/15 с OneBlade 19 в 1",
+    "price": "304.00 USD",
+    "oldPrice": "365.00 USD",
+    "sku": 5558891559,
+    "barcodes": [
+      "8720689046107"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:11.546944Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 118,
+    "productId": 6064334685,
+    "offerId": "Philips Sonicare DiamondClean 9000",
+    "name": "Звуковая электрическая зубная щетка Philips Sonicare DiamondClean 9000 62000 пульс/мин с дорожным футляром",
+    "price": "620.00 USD",
+    "oldPrice": "744.00 USD",
+    "sku": 5558891618,
+    "barcodes": [
+      "8710103978336"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-21T23:06:11.204538Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 119,
+    "productId": 6064334802,
+    "offerId": "HD9350/90",
+    "name": "Электрический чайник Philips Daily Collection HD9350/90 1.7 л 2200 Вт из нержавеющей стали",
+    "price": "110.00 USD",
+    "oldPrice": "132.00 USD",
+    "sku": 5558891756,
+    "barcodes": [
+      "8710103817253"
+    ],
+    "categoryId": 17039631,
+    "typeId": 94968,
+    "createdAt": "2026-08-21T23:06:13.155335Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 120,
+    "productId": 6064334565,
+    "offerId": "BRI951/00",
+    "name": "Фотоэпилятор Philips Lumea IPL Series 9900 BRI951/00 с 4 насадками SenseIQ беспроводной",
+    "price": "173.00 USD",
+    "oldPrice": "207.00 USD",
+    "sku": 5558891183,
+    "barcodes": [
+      "8720689021570"
+    ],
+    "categoryId": 77868900,
+    "typeId": 91686,
+    "createdAt": "2026-08-21T23:06:09.359220Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 121,
+    "productId": 6064334731,
+    "offerId": "HX9911/89",
+    "name": "Электрическая зубная щетка Philips Sonicare DiamondClean 9000 HX9911/89 звуковая с 4 насадками C3 и чехлом, цвет аквамарин",
+    "price": "528.00 USD",
+    "oldPrice": "634.00 USD",
+    "sku": 5558891285,
+    "barcodes": [
+      "8720689000987"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-21T23:06:11.984131Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 122,
+    "productId": 6064334596,
+    "offerId": "QP1924/30",
+    "name": "Триммер Philips OneBlade Intimate QP1924/30 для тела и интимных зон",
+    "price": "114.00 USD",
+    "oldPrice": "137.00 USD",
+    "sku": 5558891462,
+    "barcodes": [
+      "8720689031868"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:10.117901Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 123,
+    "productId": 6064334697,
+    "offerId": "CA6903/22",
+    "name": "Фильтр для воды для кофемашины Philips Saeco AquaClean CA6903/22, комплект 2 шт.",
+    "price": "71.00 USD",
+    "oldPrice": "85.00 USD",
+    "sku": 5558904933,
+    "barcodes": [],
+    "categoryId": 53968796,
+    "typeId": 95805,
+    "createdAt": "2026-08-21T23:06:11.314246Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 124,
+    "productId": 6064334869,
+    "offerId": "AC4221/11",
+    "name": "Очиститель воздуха Philips PureProtect 4200 Series AC4221/11, черный",
+    "price": "1244.00 USD",
+    "oldPrice": "1493.00 USD",
+    "sku": 5558891621,
+    "barcodes": [
+      "8720389040689"
+    ],
+    "categoryId": 17039635,
+    "typeId": 91451,
+    "createdAt": "2026-08-21T23:06:14.436250Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 125,
+    "productId": 6064334583,
+    "offerId": "Philips Sonicare DiamondClean Prestige 9900 elektr",
+    "name": "Электрическая зубная щетка Philips Sonicare DiamondClean Prestige 9900 SenseIQ звуковая",
+    "price": "586.00 USD",
+    "oldPrice": "703.00 USD",
+    "sku": 5558891788,
+    "barcodes": [
+      "8710103964179"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-21T23:06:09.948142Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 126,
+    "productId": 6064335026,
+    "offerId": "XP9204/10",
+    "name": "Электробритва мужская Philips i9000 Prestige XP9204/10 роторная для влажного и сухого бритья",
+    "price": "820.00 USD",
+    "oldPrice": "984.00 USD",
+    "sku": 5558891702,
+    "barcodes": [
+      "8720689030175"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-21T23:06:17.821786Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 127,
+    "productId": 6064334797,
+    "offerId": "HX3826/33",
+    "name": "Ирригатор для полости рта Philips Sonicare Cordless Power Flosser 3000 HX3826/33, черный",
+    "price": "250.00 USD",
+    "oldPrice": "299.00 USD",
+    "sku": 5558891363,
+    "barcodes": [
+      "8720689011136"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91903,
+    "createdAt": "2026-08-21T23:06:13.031346Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 128,
+    "productId": 6064335053,
+    "offerId": "BG7485/30",
+    "name": "Триммер для тела Philips Body Groomer Series 7000 BG7485/30",
+    "price": "344.00 USD",
+    "oldPrice": "413.00 USD",
+    "sku": 5558891367,
+    "barcodes": [
+      "8720689042789"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:18.443088Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 129,
+    "productId": 6064334975,
+    "offerId": "NT5650/16",
+    "name": "Триммер для носа, ушей и бровей Philips Series 5000 NT5650/16",
+    "price": "71.00 USD",
+    "oldPrice": "85.00 USD",
+    "sku": 5558891516,
+    "barcodes": [
+      "8710103923961"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:16.623841Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 130,
+    "productId": 6064334710,
+    "offerId": "BRR454/00",
+    "name": "Электробритва женская Philips 5000 Series BRR454/00 для лица с подсветкой и зеркалом",
+    "price": "71.00 USD",
+    "oldPrice": "85.00 USD",
+    "sku": 5558891733,
+    "barcodes": [
+      "8720689004503"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-21T23:06:11.609093Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 131,
+    "productId": 6064334859,
+    "offerId": "TT2000/43",
+    "name": "Сменная бритвенная сетка Philips TT2000/43 для триммеров Bodygroom Series 3000, 5000, 7000",
+    "price": "54.00 USD",
+    "oldPrice": "64.00 USD",
+    "sku": 5558892012,
+    "barcodes": [
+      "8710103534655"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91675,
+    "createdAt": "2026-08-21T23:06:14.180277Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 132,
+    "productId": 6064334757,
+    "offerId": "QP6652/35",
+    "name": "Триммер PHILIPS OneBlade Pro 360 Face & Body QP6652/35 с 3 лезвиями и чехлом",
+    "price": "268.00 USD",
+    "oldPrice": "322.00 USD",
+    "sku": 5558891326,
+    "barcodes": [
+      "8720689029063"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:12.337804Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 133,
+    "productId": 6064334923,
+    "offerId": "AWP175/10",
+    "name": "Сменный картридж для проточного фильтра для душа Philips Water AWP175/10, ресурс 50 000 л, 8 л/мин",
+    "price": "84.00 USD",
+    "oldPrice": "101.00 USD",
+    "sku": 5558891778,
+    "barcodes": [
+      "4897099302117"
+    ],
+    "categoryId": 17027931,
+    "typeId": 94593,
+    "createdAt": "2026-08-21T23:06:15.689378Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 134,
+    "productId": 6064335099,
+    "offerId": "HX9046/88",
+    "name": "Насадки для электрической зубной щетки Philips Sonicare C3 Premium Plaque Defence HX9046/88, черные, 6 шт",
+    "price": "143.00 USD",
+    "oldPrice": "171.00 USD",
+    "sku": 5558899623,
+    "barcodes": [],
+    "categoryId": 17028937,
+    "typeId": 94700,
+    "createdAt": "2026-08-21T23:06:19.922088Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 135,
+    "productId": 6064334880,
+    "offerId": "BRI946/00",
+    "name": "Фотоэпилятор Philips Lumea IPL 8000 Series BRI946/00 с технологией SenseIQ и 3 насадками",
+    "price": "1283.00 USD",
+    "oldPrice": "1540.00 USD",
+    "sku": 5558891332,
+    "barcodes": [
+      "8720689027724"
+    ],
+    "categoryId": 77868900,
+    "typeId": 91686,
+    "createdAt": "2026-08-21T23:06:14.725666Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 136,
+    "productId": 6064334929,
+    "offerId": "HX3675/13",
+    "name": "Электрическая зубная щетка Philips Sonicare 3100 HX3675/13 звуковая, комплект 2 шт., белый",
+    "price": "231.00 USD",
+    "oldPrice": "277.00 USD",
+    "sku": 5558891626,
+    "barcodes": [
+      "8710103985683"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-21T23:06:15.764277Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 137,
+    "productId": 6064335102,
+    "offerId": "MG1100/16",
+    "name": "Триммер Philips Multigroom Series 1000 MG1100/16 для бороды и усов",
+    "price": "72.00 USD",
+    "oldPrice": "87.00 USD",
+    "sku": 5558891784,
+    "barcodes": [
+      "8710103701583"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:20.286425Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 138,
+    "productId": 6064334884,
+    "offerId": "STH3010/70",
+    "name": "Ручной отпариватель для одежды Philips 3000 Series STH3010/70, 1000 Вт, зеленый",
+    "price": "124.00 USD",
+    "oldPrice": "150.00 USD",
+    "sku": 5558891677,
+    "barcodes": [
+      "8710103970873"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91426,
+    "createdAt": "2026-08-21T23:06:14.781347Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 139,
+    "productId": 6064334866,
+    "offerId": "AC0651/10",
+    "name": "Очиститель воздуха Philips Series 600 AC0651/10 до 44 м с HEPA NanoProtect и Wi-Fi",
+    "price": "357.00 USD",
+    "oldPrice": "428.00 USD",
+    "sku": 5558891538,
+    "barcodes": [
+      "8720389030475"
+    ],
+    "categoryId": 17039635,
+    "typeId": 91451,
+    "createdAt": "2026-08-21T23:06:14.415826Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 140,
+    "productId": 6064335018,
+    "offerId": "Philips Water Ersatzfilter für Wasserdispenser mit",
+    "name": "Сменный картридж для фильтра Philips Micro X-Clean Instant AWP225 3 шт. для диспенсера воды",
+    "price": "81.00 USD",
+    "oldPrice": "97.00 USD",
+    "sku": 5558891950,
+    "barcodes": [
+      "4897099307792"
+    ],
+    "categoryId": 17027931,
+    "typeId": 94593,
+    "createdAt": "2026-08-21T23:06:17.679153Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 141,
+    "productId": 6064334641,
+    "offerId": "QP6552/30",
+    "name": "Триммер PHILIPS OneBlade Pro 360 Face & Body QP6552/30",
+    "price": "210.00 USD",
+    "oldPrice": "253.00 USD",
+    "sku": 5558891238,
+    "barcodes": [
+      "8720689027342"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:10.697036Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 142,
+    "productId": 6064334748,
+    "offerId": "CA6903/10",
+    "name": "Фильтр для воды Philips AquaClean CA6903/10 для кофемашин Saeco и Philips",
+    "price": "44.00 USD",
+    "oldPrice": "53.00 USD",
+    "sku": 5558904416,
+    "barcodes": [],
+    "categoryId": 53968796,
+    "typeId": 95805,
+    "createdAt": "2026-08-21T23:06:12.126484Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 143,
+    "productId": 6064334602,
+    "offerId": "GC026/80",
+    "name": "Машинка для удаления катышков Philips GC026/80 8800 об/мин с насадкой для деликатных тканей",
+    "price": "36.00 USD",
+    "oldPrice": "43.00 USD",
+    "sku": 5558891807,
+    "barcodes": [
+      "8720389024962"
+    ],
+    "categoryId": 17027929,
+    "typeId": 94612,
+    "createdAt": "2026-08-21T23:06:10.258392Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 144,
+    "productId": 6064334694,
+    "offerId": "HX7101/01",
+    "name": "Электрическая зубная щетка Philips Sonicare 5300 HX7101/01 звуковая черная",
+    "price": "221.00 USD",
+    "oldPrice": "265.00 USD",
+    "sku": 5558891386,
+    "barcodes": [
+      "8720689021425"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-21T23:06:11.235479Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 145,
+    "productId": 6064334861,
+    "offerId": "BRI955/00",
+    "name": "Фотоэпилятор Philips Lumea IPL 9000 Series BRI955/00 с 3 насадками, беспроводной",
+    "price": "173.00 USD",
+    "oldPrice": "207.00 USD",
+    "sku": 5558891328,
+    "barcodes": [
+      "8720689024174"
+    ],
+    "categoryId": 77868900,
+    "typeId": 91686,
+    "createdAt": "2026-08-21T23:06:14.210843Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 146,
+    "productId": 6064335045,
+    "offerId": "SCY933/02",
+    "name": "Бутылочка для кормления Philips Avent Natural Response 240 мл 2 шт. стеклянная SCY933/02",
+    "price": "69.00 USD",
+    "oldPrice": "83.00 USD",
+    "sku": 5558892882,
+    "barcodes": [
+      "8710103990802"
+    ],
+    "categoryId": 17028971,
+    "typeId": 93002,
+    "createdAt": "2026-08-21T23:06:18.214915Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 147,
+    "productId": 6064335076,
+    "offerId": "XP9404/31",
+    "name": "Электробритва мужская Philips i9000 Prestige Ultra XP9404/31 роторная для влажного и сухого бритья, серая",
+    "price": "1141.00 USD",
+    "oldPrice": "1369.00 USD",
+    "sku": 5558891314,
+    "barcodes": [
+      "8720689039727"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-21T23:06:19.003786Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 148,
+    "productId": 6064334811,
+    "offerId": "S7887/35",
+    "name": "Электробритва мужская PHILIPS Shaver Series 7000 S7887/35 для сухого и влажного бритья",
+    "price": "463.00 USD",
+    "oldPrice": "557.00 USD",
+    "sku": 5558891352,
+    "barcodes": [
+      "8720689007832"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-21T23:06:13.277738Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 149,
+    "productId": 6064334909,
+    "offerId": "BRI921/00",
+    "name": "Фотоэпилятор Philips Lumea IPL 7000 Series BRI921/00 для тела и лица с триммером Satin Compact",
+    "price": "828.00 USD",
+    "oldPrice": "994.00 USD",
+    "sku": 5558891325,
+    "barcodes": [
+      "8710103871880"
+    ],
+    "categoryId": 77868900,
+    "typeId": 91686,
+    "createdAt": "2026-08-21T23:06:15.290836Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 150,
+    "productId": 6064335042,
+    "offerId": "S3145/00",
+    "name": "Электробритва PHILIPS Shaver Series 3000 S3145/00 роторная для влажного и сухого бритья",
+    "price": "197.00 USD",
+    "oldPrice": "236.00 USD",
+    "sku": 5558891746,
+    "barcodes": [
+      "8720689018562"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-21T23:06:18.197068Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 151,
+    "productId": 6064529902,
+    "offerId": "GV9225",
+    "name": "Парогенератор Tefal Pro Express Protect GV9225 2600 Вт, 7.6 бар, 1.8 л",
+    "price": "713.00 USD",
+    "oldPrice": "856.00 USD",
+    "sku": 5559045666,
+    "barcodes": [
+      "3121040091333"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-22T00:05:30.046866Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 152,
+    "productId": 6064530040,
+    "offerId": "Tefal Virtuoso 2-teiliges Pfannenset 24 + 28 cm, P",
+    "name": "Набор сковород Tefal Virtuoso 24 и 28 см из нержавеющей стали для индукции",
+    "price": "168.00 USD",
+    "oldPrice": "201.00 USD",
+    "sku": 5559046096,
+    "barcodes": [
+      "3168430338647"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:32.575715Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 153,
+    "productId": 6064529832,
+    "offerId": "L828SB04",
+    "name": "Набор посуды для приготовления Tefal Ingenio Serenity 11 предм. антипригарный со съемными ручками",
+    "price": "363.00 USD",
+    "oldPrice": "436.00 USD",
+    "sku": 5559046772,
+    "barcodes": [
+      "3168430378759"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:29.174595Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 154,
+    "productId": 6064335119,
+    "offerId": "Philips HC5630/15",
+    "name": "Машинка для стрижки Philips Hairclipper Series 5000 HC5630/15 28 установок длины",
+    "price": "124.00 USD",
+    "oldPrice": "150.00 USD",
+    "sku": 5558891777,
+    "barcodes": [
+      "8710103914068"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91678,
+    "createdAt": "2026-08-21T23:06:21.293221Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 155,
+    "productId": 6064529899,
+    "offerId": "Tefal Duetto Topfset Induktion 9-teilig, robuster",
+    "name": "Набор кастрюль Tefal Duetto A705S9 9 предм.",
+    "price": "357.00 USD",
+    "oldPrice": "428.00 USD",
+    "sku": 5559044986,
+    "barcodes": [
+      "3168430336155"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:30.031391Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 156,
+    "productId": 6064530130,
+    "offerId": "Tefal Ingenio Easy On 13-teiliges Topf und Pfannen",
+    "name": "Набор посуды для приготовления Tefal Ingenio Easy On L15992, 13 предм.",
+    "price": "573.00 USD",
+    "oldPrice": "688.00 USD",
+    "sku": 5559044852,
+    "barcodes": [
+      "3168430339958"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:33.282854Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 157,
+    "productId": 6064530273,
+    "offerId": "Tefal OptiGrill Elite XL Kontaktgrill, automatisch",
+    "name": "Электрогриль Tefal OptiGrill Elite XL GC760812 контактный 2200 Вт, черный",
+    "price": "713.00 USD",
+    "oldPrice": "856.00 USD",
+    "sku": 5559045685,
+    "barcodes": [
+      "3168437251239"
+    ],
+    "categoryId": 17039630,
+    "typeId": 95616,
+    "createdAt": "2026-08-22T00:05:34.372766Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 158,
+    "productId": 6064335162,
+    "offerId": "BRI957/00",
+    "name": "Фотоэпилятор Philips Lumea IPL 9000 Series BRI957/00 с 4 насадками SenseIQ беспроводной",
+    "price": "1160.00 USD",
+    "oldPrice": "1925.00 USD",
+    "sku": 5558892242,
+    "barcodes": [
+      "8720689017985"
+    ],
+    "categoryId": 77868900,
+    "typeId": 91686,
+    "createdAt": "2026-08-21T23:06:22.310536Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 159,
+    "productId": 6064529945,
+    "offerId": "SW854D",
+    "name": "Мультипекарь Tefal Snack Collection SW854D 4 в 1 со сменными панелями 700 Вт",
+    "price": "357.00 USD",
+    "oldPrice": "428.00 USD",
+    "sku": 5559046835,
+    "barcodes": [
+      "3045386371204"
+    ],
+    "categoryId": 17039630,
+    "typeId": 98490,
+    "createdAt": "2026-08-22T00:05:31.024425Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 160,
+    "productId": 6064530302,
+    "offerId": "G726S204",
+    "name": "Набор сковород Tefal Comfort Max 2 предм. (24/28 см) с антипригарным покрытием для индукции G726S204",
+    "price": "145.00 USD",
+    "oldPrice": "174.00 USD",
+    "sku": 5559046275,
+    "barcodes": [
+      "3168430315747"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:34.956477Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 161,
+    "productId": 6064529972,
+    "offerId": "C38804",
+    "name": "Сковорода Tefal Hard Titanium Essential 24 см с антипригарным покрытием",
+    "price": "86.00 USD",
+    "oldPrice": "104.00 USD",
+    "sku": 5559045010,
+    "barcodes": [
+      "3168430343115"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:31.323677Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 162,
+    "productId": 6064529973,
+    "offerId": "Tefal Ingenio Comfort Max 4-tlg. Pfannen-Set, unve",
+    "name": "Набор сковород Tefal Ingenio Comfort Max L968S434 4 предм. из нержавеющей стали со съемной ручкой для индукции",
+    "price": "250.00 USD",
+    "oldPrice": "299.00 USD",
+    "sku": 5559045436,
+    "barcodes": [
+      "8692523687299"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:31.333337Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 163,
+    "productId": 6064335166,
+    "offerId": "XP9205/30",
+    "name": "Электробритва мужская Philips i9000 Prestige XP9205/30 роторная для влажного и сухого бритья с системой очистки и триммером",
+    "price": "891.00 USD",
+    "oldPrice": "1070.00 USD",
+    "sku": 5558891830,
+    "barcodes": [
+      "8720689030083"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-21T23:06:22.364596Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 164,
+    "productId": 6064530041,
+    "offerId": "L8974S45",
+    "name": "Набор сковород Tefal Ingenio Emotion L8974S45 4 предм. из нержавеющей стали со съемной ручкой для индукции",
+    "price": "293.00 USD",
+    "oldPrice": "352.00 USD",
+    "sku": 5559046352,
+    "barcodes": [
+      "3168430358713"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:32.583015Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 165,
+    "productId": 6064335123,
+    "offerId": "SH91/50",
+    "name": "Бритвенная головка Philips SH91/50 для бритв Series 9000 и 9000 Prestige 3 шт",
+    "price": "121.00 USD",
+    "oldPrice": "145.00 USD",
+    "sku": 5558891975,
+    "barcodes": [
+      "8710103978916"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91675,
+    "createdAt": "2026-08-21T23:06:21.471436Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 166,
+    "productId": 6064529785,
+    "offerId": "C38806",
+    "name": "Сковорода Tefal Hard Titanium Essential 28 см с антипригарным покрытием",
+    "price": "87.00 USD",
+    "oldPrice": "105.00 USD",
+    "sku": 5559045586,
+    "barcodes": [
+      "3168430343122"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:28.559211Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 167,
+    "productId": 6064529885,
+    "offerId": "L966S344",
+    "name": "Набор сковород Tefal Ingenio Comfort Max со съемной ручкой 3 предм. (24, 28 см) для индукции",
+    "price": "214.00 USD",
+    "oldPrice": "256.00 USD",
+    "sku": 5559044525,
+    "barcodes": [
+      "8693746298996"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:29.899718Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 168,
+    "productId": 6064530221,
+    "offerId": "H81506",
+    "name": "Сковорода Tefal Infinite 28 см для индукции",
+    "price": "136.00 USD",
+    "oldPrice": "163.00 USD",
+    "sku": 5559044587,
+    "barcodes": [
+      "3168430344327"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:34.039298Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 169,
+    "productId": 6064530296,
+    "offerId": "K23209",
+    "name": "Нож кухонный Tefal Ice Force универсальный 11 см из нержавеющей стали",
+    "price": "31.00 USD",
+    "oldPrice": "37.00 USD",
+    "sku": 5559046100,
+    "barcodes": [
+      "3168430274259"
+    ],
+    "categoryId": 17028742,
+    "typeId": 92565,
+    "createdAt": "2026-08-22T00:05:34.906674Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 170,
+    "productId": 6064530281,
+    "offerId": "L72390",
+    "name": "Набор сковород со съемной ручкой Tefal Ingenio Enjoy L72390, 3 предмета (24/28 см)",
+    "price": "178.00 USD",
+    "oldPrice": "214.00 USD",
+    "sku": 5559045141,
+    "barcodes": [
+      "8699794393300"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:34.571620Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 171,
+    "productId": 6064529992,
+    "offerId": "L39593",
+    "name": "Набор посуды для приготовления Tefal Ingenio Unlimited On L39593 13 предметов со съемной ручкой для индукции",
+    "price": "713.00 USD",
+    "oldPrice": "856.00 USD",
+    "sku": 5559045241,
+    "barcodes": [
+      "3168430340749"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:31.868134Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 172,
+    "productId": 6064529738,
+    "offerId": "L897SK04",
+    "name": "Набор посуды для приготовления Tefal Ingenio Emotion, 20 предметов, со съемными ручками для индукции",
+    "price": "499.00 USD",
+    "oldPrice": "599.00 USD",
+    "sku": 5559046213,
+    "barcodes": [
+      "3168430342293"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:27.948761Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 173,
+    "productId": 6064335143,
+    "offerId": "HX6034/90",
+    "name": "Насадка для электрической зубной щетки Philips Sonicare For Kids HX6034/90, 4 шт.",
+    "price": "69.00 USD",
+    "oldPrice": "83.00 USD",
+    "sku": 5558894744,
+    "barcodes": [],
+    "categoryId": 17028937,
+    "typeId": 94700,
+    "createdAt": "2026-08-21T23:06:22.039174Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 174,
+    "productId": 6064529777,
+    "offerId": "Tefal Duetto 3-teiliges Pfannenset 20,24 und 28cm,",
+    "name": "Набор сковород Tefal Duetto 3 предм. (20, 24, 28 см) для индукции из нержавеющей стали",
+    "price": "214.00 USD",
+    "oldPrice": "256.00 USD",
+    "sku": 5559043400,
+    "barcodes": [
+      "3168430305533"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:28.386451Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 175,
+    "productId": 6064335110,
+    "offerId": "XB9154/09",
+    "name": "Пылесос без мешка PHILIPS Series 9000 XB9154/09 900 Вт черный",
+    "price": "888.00 USD",
+    "oldPrice": "1065.00 USD",
+    "sku": 5558892706,
+    "barcodes": [
+      "8710103931713"
+    ],
+    "categoryId": 17039623,
+    "typeId": 91586,
+    "createdAt": "2026-08-21T23:06:20.652741Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 176,
+    "productId": 6064335112,
+    "offerId": "FC9745/09",
+    "name": "Пылесос без мешка для сбора пыли PHILIPS Серия 7000 FC9745/09, темно-синий",
+    "price": "545.00 USD",
+    "oldPrice": "654.00 USD",
+    "sku": 5558892847,
+    "barcodes": [
+      "8710103810490"
+    ],
+    "categoryId": 17039623,
+    "typeId": 91586,
+    "createdAt": "2026-08-21T23:06:20.666239Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 177,
+    "productId": 6064529879,
+    "offerId": "B5550633",
+    "name": "Сковорода Tefal Easy Cook & Clean 28 см с антипригарным покрытием Titanium",
+    "price": "82.00 USD",
+    "oldPrice": "98.00 USD",
+    "sku": 5559046175,
+    "barcodes": [
+      "3168430305144"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:29.878862Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 178,
+    "productId": 6064529889,
+    "offerId": "Duetto Plus G719S734",
+    "name": "Набор кастрюль Tefal Duetto Plus 7 предм. из нержавеющей стали с крышками для индукции",
+    "price": "321.00 USD",
+    "oldPrice": "385.00 USD",
+    "sku": 5559045609,
+    "barcodes": [
+      "3168430299214"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:29.917220Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 179,
+    "productId": 6064335115,
+    "offerId": "S5465/18",
+    "name": "Электробритва Philips Series 5000 S5465/18 для сухого и влажного бритья",
+    "price": "250.00 USD",
+    "oldPrice": "299.00 USD",
+    "sku": 5558892094,
+    "barcodes": [
+      "8720689020855"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-21T23:06:21.081462Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 180,
+    "productId": 6064335113,
+    "offerId": "HX9914/57",
+    "name": "Электрическая зубная щетка звуковая Philips Sonicare DiamondClean 9000 HX9914/57 (набор из 2 шт.)",
+    "price": "173.00 USD",
+    "oldPrice": "207.00 USD",
+    "sku": 5558891401,
+    "barcodes": [
+      "8710103938101"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-21T23:06:20.727991Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 181,
+    "productId": 6064529925,
+    "offerId": "C26732",
+    "name": "Сотейник Tefal Start'Easy 24 см с крышкой для индукции C26732",
+    "price": "145.00 USD",
+    "oldPrice": "174.00 USD",
+    "sku": 5559047011,
+    "barcodes": [
+      "3168430303454"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92466,
+    "createdAt": "2026-08-22T00:05:30.578505Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 182,
+    "productId": 6064530061,
+    "offerId": "L898S3",
+    "name": "Набор кастрюль Tefal Ingenio Preference On 4 предм. из нержавеющей стали с антипригарным покрытием",
+    "price": "268.00 USD",
+    "oldPrice": "322.00 USD",
+    "sku": 5559044875,
+    "barcodes": [
+      "3168430348202"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:32.871014Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 183,
+    "productId": 6064530110,
+    "offerId": "D52602",
+    "name": "Сковорода Tefal Resist 20 см с антипригарным покрытием Titanium",
+    "price": "74.00 USD",
+    "oldPrice": "89.00 USD",
+    "sku": 5559045883,
+    "barcodes": [
+      "3168430327702"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:33.216216Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 184,
+    "productId": 6064335169,
+    "offerId": "SCF293/00",
+    "name": "Стерилизатор электрический паровой с сушкой Philips Avent SCF293/00 Premium",
+    "price": "268.00 USD",
+    "oldPrice": "322.00 USD",
+    "sku": 5558891967,
+    "barcodes": [
+      "8710103941620"
+    ],
+    "categoryId": 17028677,
+    "typeId": 93000,
+    "createdAt": "2026-08-21T23:06:22.412503Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 185,
+    "productId": 6064529743,
+    "offerId": "E304S344",
+    "name": "Набор сковород Tefal Jamie Oliver Cook's Direct On 3 предм. (20/24/28 см) с антипригарным покрытием",
+    "price": "289.00 USD",
+    "oldPrice": "346.00 USD",
+    "sku": 5559045361,
+    "barcodes": [
+      "3168430310919"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:27.967522Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 186,
+    "productId": 6064335108,
+    "offerId": "AWP1775CH/10",
+    "name": "Фильтр для душа Philips AWP1775CH/10 с картриджем AWP175 хромированный",
+    "price": "82.00 USD",
+    "oldPrice": "98.00 USD",
+    "sku": 5558891461,
+    "barcodes": [
+      "4897099302773"
+    ],
+    "categoryId": 17027931,
+    "typeId": 94602,
+    "createdAt": "2026-08-21T23:06:20.587339Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 187,
+    "productId": 6064335128,
+    "offerId": "FC8021/03",
+    "name": "Мешки для пылесоса Philips s-bag Classic Long Performance FC8021/03, 4 шт",
+    "price": "43.00 USD",
+    "oldPrice": "51.00 USD",
+    "sku": 5558891739,
+    "barcodes": [
+      "8710103291381"
+    ],
+    "categoryId": 53968796,
+    "typeId": 971002378,
+    "createdAt": "2026-08-21T23:06:21.730316Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 188,
+    "productId": 6064530270,
+    "offerId": "L3959143",
+    "name": "Набор сковород Tefal Ingenio Unlimited On 3 предм. со съемной ручкой (24, 28 см) для индукции",
+    "price": "278.00 USD",
+    "oldPrice": "334.00 USD",
+    "sku": 5559046369,
+    "barcodes": [
+      "3168430340718"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:34.358603Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 189,
+    "productId": 6064529838,
+    "offerId": "K13304",
+    "name": "Ручной измельчитель Tefal 5-Second Chopper K13304 500 мл",
+    "price": "37.00 USD",
+    "oldPrice": "44.00 USD",
+    "sku": 5559046006,
+    "barcodes": [
+      "3168430275584"
+    ],
+    "categoryId": 17027907,
+    "typeId": 92366,
+    "createdAt": "2026-08-22T00:05:29.367051Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 190,
+    "productId": 6064529778,
+    "offerId": "E3040644",
+    "name": "Сковорода Tefal Jamie Oliver Cook's Direct On 28 см для индукции",
+    "price": "143.00 USD",
+    "oldPrice": "171.00 USD",
+    "sku": 5559044165,
+    "barcodes": [
+      "3168430310872"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:28.389743Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 191,
+    "productId": 6064529934,
+    "offerId": "CY7548",
+    "name": "Мультиварка-скороварка Tefal Turbo Cuisine CY7548 4.8 л 1000 Вт, черная",
+    "price": "304.00 USD",
+    "oldPrice": "365.00 USD",
+    "sku": 5559044133,
+    "barcodes": [
+      "3045387245153"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94731,
+    "createdAt": "2026-08-22T00:05:30.848209Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 192,
+    "productId": 6064529997,
+    "offerId": "L827SB04",
+    "name": "Набор посуды для приготовления Tefal Ingenio Serenity Calm Blue 11 предм. для индукции",
+    "price": "457.00 USD",
+    "oldPrice": "547.00 USD",
+    "sku": 5559045442,
+    "barcodes": [
+      "3168430378797"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:31.992676Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 193,
+    "productId": 6064335106,
+    "offerId": "SCD657/11",
+    "name": "Набор бутылочек для кормления Philips Avent Natural Response SCD657/11 с клапаном AirFree (4 бутылочки, соска, ершик)",
+    "price": "124.00 USD",
+    "oldPrice": "150.00 USD",
+    "sku": 5558892661,
+    "barcodes": [
+      "8710103990666"
+    ],
+    "categoryId": 17028971,
+    "typeId": 93002,
+    "createdAt": "2026-08-21T23:06:20.539870Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 194,
+    "productId": 6064529736,
+    "offerId": "Tefal OptiGrill GC705D",
+    "name": "Электрогриль Tefal OptiGrill GC705D контактный с 6 программами 2000 Вт",
+    "price": "339.00 USD",
+    "oldPrice": "407.00 USD",
+    "sku": 5559044761,
+    "barcodes": [
+      "3016661146602"
+    ],
+    "categoryId": 17039630,
+    "typeId": 95616,
+    "createdAt": "2026-08-22T00:05:27.905283Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 195,
+    "productId": 6064529939,
+    "offerId": "GC722D16",
+    "name": "Электрогриль Tefal OptiGrill+ XL GC722D16 2000 Вт, 9 программ",
+    "price": "499.00 USD",
+    "oldPrice": "599.00 USD",
+    "sku": 5559044703,
+    "barcodes": [
+      "3016661146541"
+    ],
+    "categoryId": 17039630,
+    "typeId": 95616,
+    "createdAt": "2026-08-22T00:05:30.960658Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 196,
+    "productId": 6064530145,
+    "offerId": "FR8040",
+    "name": "Фритюрница Tefal Oleoclean Pro FR8040 3.5 л 2300 Вт",
+    "price": "316.00 USD",
+    "oldPrice": "380.00 USD",
+    "sku": 5559045603,
+    "barcodes": [
+      "3045386366545"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94740,
+    "createdAt": "2026-08-22T00:05:33.392804Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 197,
+    "productId": 6064530319,
+    "offerId": "Tefal EverSharp Pro 5-teiliges Messer-Set mit selb",
+    "name": "Набор кухонных ножей Tefal EverSharp Pro 5 предм. с самозатачивающимся блоком из немецкой стали, черный (K2976S04)",
+    "price": "473.00 USD",
+    "oldPrice": "567.00 USD",
+    "sku": 5559046651,
+    "barcodes": [
+      "3168430380783"
+    ],
+    "categoryId": 17028742,
+    "typeId": 92561,
+    "createdAt": "2026-08-22T00:05:35.185162Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 198,
+    "productId": 6064335105,
+    "offerId": "QP4631/65",
+    "name": "Триммер Philips OneBlade 360 Face and Body QP4631/65 для лица и тела",
+    "price": "182.00 USD",
+    "oldPrice": "219.00 USD",
+    "sku": 5558891679,
+    "barcodes": [
+      "8720689020558"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:20.445485Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 199,
+    "productId": 6064530242,
+    "offerId": "GC712D12",
+    "name": "Электрогриль Tefal OptiGrill+ GC712D12, 2000 Вт, серебристый",
+    "price": "375.00 USD",
+    "oldPrice": "450.00 USD",
+    "sku": 5559046290,
+    "barcodes": [
+      "3016661146602"
+    ],
+    "categoryId": 17039630,
+    "typeId": 95616,
+    "createdAt": "2026-08-22T00:05:34.237446Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 200,
+    "productId": 6064335107,
+    "offerId": "MG7961/15",
+    "name": "Триммер PHILIPS Multigroom Series 7000 MG7961/15 17 в 1 для бороды, волос и тела",
+    "price": "250.00 USD",
+    "oldPrice": "299.00 USD",
+    "sku": 5558891773,
+    "barcodes": [
+      "8720689045018"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-21T23:06:20.579586Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 201,
+    "productId": 6064530845,
+    "offerId": "L7239143",
+    "name": "Набор сковород Tefal Ingenio Enjoy 3 предм. 22/24/28 см со съемной ручкой для всех видов плит",
+    "price": "320.00 USD",
+    "oldPrice": "384.00 USD",
+    "sku": 5559047605,
+    "barcodes": [
+      "3168430374348"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:42.510490Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 202,
+    "productId": 6064531096,
+    "offerId": "E21872",
+    "name": "Сотейник TEFAL Trattoria 28 см с крышкой для индукции",
+    "price": "193.00 USD",
+    "oldPrice": "232.00 USD",
+    "sku": 5559047226,
+    "barcodes": [
+      "3168430291669"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92466,
+    "createdAt": "2026-08-22T00:05:45.977658Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 203,
+    "productId": 6064530377,
+    "offerId": "L15992",
+    "name": "Набор сковород Tefal Ingenio Easy On 4 предм. 22/24/26 см со съемной ручкой",
+    "price": "210.00 USD",
+    "oldPrice": "253.00 USD",
+    "sku": 5559045599,
+    "barcodes": [
+      "3168430339828"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:35.908563Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 204,
+    "productId": 6064530630,
+    "offerId": "DT2022",
+    "name": "Отпариватель для одежды Tefal DT2022 Pure Pop 1300 Вт, коралловый",
+    "price": "89.00 USD",
+    "oldPrice": "106.00 USD",
+    "sku": 5559046421,
+    "barcodes": [
+      "3121040088517"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91426,
+    "createdAt": "2026-08-22T00:05:39.630611Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 205,
+    "productId": 6064530887,
+    "offerId": "Tefal Ice Force Messerblock aus Holz, 5 Messer, Br",
+    "name": "Набор кухонных ножей Tefal Ice Force с деревянной подставкой, 5 ножей из нержавеющей стали K232S5",
+    "price": "214.00 USD",
+    "oldPrice": "256.00 USD",
+    "sku": 5559046457,
+    "barcodes": [
+      "3168430291690"
+    ],
+    "categoryId": 17028742,
+    "typeId": 92561,
+    "createdAt": "2026-08-22T00:05:42.960479Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 206,
+    "productId": 6064530865,
+    "offerId": "G713SB74",
+    "name": "Набор кастрюль и сковород Tefal Daily Cook 11 предм. из нержавеющей стали с антипригарным покрытием для индукции",
+    "price": "375.00 USD",
+    "oldPrice": "450.00 USD",
+    "sku": 5559045997,
+    "barcodes": [
+      "3168430280755"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:42.573956Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 207,
+    "productId": 6064530803,
+    "offerId": "JF4031E0",
+    "name": "Отпариватель для одежды Tefal Duo Power JF4031E0 2-в-1, 1700 Вт, 400 мл, зеленый и черный",
+    "price": "207.00 USD",
+    "oldPrice": "248.00 USD",
+    "sku": 5559045468,
+    "barcodes": [
+      "3121040092200"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91426,
+    "createdAt": "2026-08-22T00:05:42.341135Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 208,
+    "productId": 6064530514,
+    "offerId": "L98491",
+    "name": "Набор стеклянных крышек Tefal Ingenio 16/18/20 см с силиконовым ободком 3 шт.",
+    "price": "112.00 USD",
+    "oldPrice": "133.00 USD",
+    "sku": 5559046371,
+    "barcodes": [
+      "3168430171619"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92454,
+    "createdAt": "2026-08-22T00:05:37.592261Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 209,
+    "productId": 6064531098,
+    "offerId": "FR3140",
+    "name": "Фритюрница Tefal Super Uno FR3140 2.2 л 1800 Вт, белая с черным",
+    "price": "321.00 USD",
+    "oldPrice": "385.00 USD",
+    "sku": 5559047889,
+    "barcodes": [
+      "3045387242244"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94740,
+    "createdAt": "2026-08-22T00:05:45.988038Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 210,
+    "productId": 6064531073,
+    "offerId": "A705A8",
+    "name": "Набор кастрюль Tefal Duetto 7 предм. из нержавеющей стали с крышками для всех типов плит",
+    "price": "304.00 USD",
+    "oldPrice": "365.00 USD",
+    "sku": 5559047190,
+    "barcodes": [
+      "3168430215467"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:45.804314Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 211,
+    "productId": 6064530528,
+    "offerId": "8523.31",
+    "name": "Электрический нож Tefal Prep'Line 8523.31 100 Вт для нарезки и замороженных продуктов",
+    "price": "101.00 USD",
+    "oldPrice": "122.00 USD",
+    "sku": 5559047219,
+    "barcodes": [
+      "3045388523311"
+    ],
+    "categoryId": 17039641,
+    "typeId": 91489,
+    "createdAt": "2026-08-22T00:05:37.967536Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 212,
+    "productId": 6064530616,
+    "offerId": "SV8152",
+    "name": "Парогенератор Tefal Express Vision SV8152 2800 Вт, 6.9 бар",
+    "price": "531.00 USD",
+    "oldPrice": "637.00 USD",
+    "sku": 5559047157,
+    "barcodes": [
+      "3121040086421"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-22T00:05:39.367064Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 213,
+    "productId": 6064530414,
+    "offerId": "P2530738",
+    "name": "Скороварка Tefal Secure 5 Neo 6 л 22 см из нержавеющей стали с корзиной для пара",
+    "price": "198.00 USD",
+    "oldPrice": "237.00 USD",
+    "sku": 5559046253,
+    "barcodes": [
+      "3045384362433"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92464,
+    "createdAt": "2026-08-22T00:05:36.299805Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 214,
+    "productId": 6064530503,
+    "offerId": "C38504",
+    "name": "Сковорода Tefal XL Force 24 см антипригарная Titanium 2X без индукции C38504",
+    "price": "89.00 USD",
+    "oldPrice": "106.00 USD",
+    "sku": 5559047209,
+    "barcodes": [
+      "3168430320710"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:37.369465Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 215,
+    "productId": 6064530710,
+    "offerId": "BL771BF0",
+    "name": "Стационарный блендер Tefal PerfectMix Essential BL771BF0 1200 Вт со стеклянной чашей 2 л",
+    "price": "250.00 USD",
+    "oldPrice": "299.00 USD",
+    "sku": 5559046374,
+    "barcodes": [
+      "3016667294215"
+    ],
+    "categoryId": 17039627,
+    "typeId": 94973,
+    "createdAt": "2026-08-22T00:05:40.994417Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 216,
+    "productId": 6064530909,
+    "offerId": "BL19H4F0",
+    "name": "Блендер стационарный Tefal Blend Up BL19H4F0 1000 Вт с 2 дорожными бутылками синий",
+    "price": "267.00 USD",
+    "oldPrice": "320.00 USD",
+    "sku": 5559047368,
+    "barcodes": [
+      "3016667252277"
+    ],
+    "categoryId": 17039627,
+    "typeId": 94973,
+    "createdAt": "2026-08-22T00:05:43.625857Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 217,
+    "productId": 6064530655,
+    "offerId": "KI1R0DE0",
+    "name": "Электрический чайник Tefal KI1R0DE0 1.7 л 2200 Вт из нержавеющей стали",
+    "price": "89.00 USD",
+    "oldPrice": "106.00 USD",
+    "sku": 5559048105,
+    "barcodes": [
+      "3045380403574"
+    ],
+    "categoryId": 17039631,
+    "typeId": 94968,
+    "createdAt": "2026-08-22T00:05:39.867465Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 218,
+    "productId": 6064530871,
+    "offerId": "G7260244",
+    "name": "Сковорода Tefal Comfort Max 20 см для индукции",
+    "price": "89.00 USD",
+    "oldPrice": "106.00 USD",
+    "sku": 5559046594,
+    "barcodes": [
+      "3168430241442"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:42.645702Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 219,
+    "productId": 6064530836,
+    "offerId": "K122S2",
+    "name": "Набор кухонных ножей Tefal Fresh Kitchen K122S2 2 предм. из нержавеющей стали с антипригарным титановым покрытием и чехлами",
+    "price": "46.00 USD",
+    "oldPrice": "55.00 USD",
+    "sku": 5559047065,
+    "barcodes": [
+      "3168430276116"
+    ],
+    "categoryId": 17028742,
+    "typeId": 92561,
+    "createdAt": "2026-08-22T00:05:42.476682Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 220,
+    "productId": 6064530951,
+    "offerId": "GV9810",
+    "name": "Парогенератор Tefal GV9810 Pro Express Vision 8.3 бар 3000 Вт",
+    "price": "1070.00 USD",
+    "oldPrice": "1283.00 USD",
+    "sku": 5559047845,
+    "barcodes": [
+      "3121040082645"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-22T00:05:43.756011Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 221,
+    "productId": 6064530800,
+    "offerId": "XA8103F0",
+    "name": "Панели для мультипекаря Tefal Snack Collection XA8103F0 Панини и Гриль 2 шт с антипригарным покрытием",
+    "price": "71.00 USD",
+    "oldPrice": "85.00 USD",
+    "sku": 5559046773,
+    "barcodes": [
+      "3045380028630"
+    ],
+    "categoryId": 53968796,
+    "typeId": 96765,
+    "createdAt": "2026-08-22T00:05:42.326083Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 222,
+    "productId": 6064530596,
+    "offerId": "IG8024E0",
+    "name": "Мороженица Tefal Freezi 16-in-1 IG8024E0 компрессорная для мягкого мороженого и смузи",
+    "price": "1355.00 USD",
+    "oldPrice": "1626.00 USD",
+    "sku": 5559048234,
+    "barcodes": [
+      "3016661183249"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94730,
+    "createdAt": "2026-08-22T00:05:39.137601Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 223,
+    "productId": 6064530440,
+    "offerId": "DT6130",
+    "name": "Ручной отпариватель для одежды Tefal Access Steam First DT6130 1300 Вт",
+    "price": "93.00 USD",
+    "oldPrice": "112.00 USD",
+    "sku": 5559046656,
+    "barcodes": [
+      "3121040077467"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91426,
+    "createdAt": "2026-08-22T00:05:36.625583Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 224,
+    "productId": 6064530570,
+    "offerId": "GC750D16",
+    "name": "Электрогриль Tefal OptiGrill Elite GC750D16 контактный с 12 программами 2000 Вт",
+    "price": "173.00 USD",
+    "oldPrice": "207.00 USD",
+    "sku": 5559047654,
+    "barcodes": [
+      "3168430297555"
+    ],
+    "categoryId": 17039630,
+    "typeId": 95616,
+    "createdAt": "2026-08-22T00:05:38.722873Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 225,
+    "productId": 6064531139,
+    "offerId": "C38506",
+    "name": "Сковорода Tefal XL Force 28 см антипригарная C38506",
+    "price": "114.00 USD",
+    "oldPrice": "148.00 USD",
+    "sku": 5559046756,
+    "barcodes": [
+      "3168430320550"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:46.823594Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 226,
+    "productId": 6064530662,
+    "offerId": "Jamie Oliver Cook's Classics 28 см E3060635",
+    "name": "Сковорода Tefal Jamie Oliver Cook's Classics 28 см для индукции",
+    "price": "158.00 USD",
+    "oldPrice": "189.00 USD",
+    "sku": 5559045933,
+    "barcodes": [
+      "3168430310735"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:39.897397Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 227,
+    "productId": 6064530713,
+    "offerId": "L1509202",
+    "name": "Набор сковород Tefal Ingenio Easy Plus 3 предм. (24/28 см, со съемной ручкой)",
+    "price": "227.00 USD",
+    "oldPrice": "271.00 USD",
+    "sku": 5559048190,
+    "barcodes": [
+      "3168430327665"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:41.007635Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 228,
+    "productId": 6064530529,
+    "offerId": "GC760D12",
+    "name": "Электрогриль Tefal OptiGrill Elite XL GC760D12 2200 Вт",
+    "price": "677.00 USD",
+    "oldPrice": "813.00 USD",
+    "sku": 5559047526,
+    "barcodes": [
+      "3168430306097"
+    ],
+    "categoryId": 17039630,
+    "typeId": 95616,
+    "createdAt": "2026-08-22T00:05:37.981423Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 229,
+    "productId": 6064530692,
+    "offerId": "DT9810",
+    "name": "Отпариватель для одежды Tefal AeroSteam DT9810 1400 Вт, керамическая подошва, с функцией всасывания",
+    "price": "357.00 USD",
+    "oldPrice": "428.00 USD",
+    "sku": 5559046978,
+    "barcodes": [
+      "3121040092668"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91426,
+    "createdAt": "2026-08-22T00:05:40.324722Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 230,
+    "productId": 6064530417,
+    "offerId": "Tefal KO6931 Sense Wasserkocher, 1,5 L Kapazität,",
+    "name": "Электрический чайник Tefal Sense KO6931 1.5 л с терморегулятором и дисплеем",
+    "price": "135.00 USD",
+    "oldPrice": "161.00 USD",
+    "sku": 5559045444,
+    "barcodes": [
+      "3045387243159"
+    ],
+    "categoryId": 17039631,
+    "typeId": 94968,
+    "createdAt": "2026-08-22T00:05:36.312154Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 231,
+    "productId": 6064530459,
+    "offerId": "G25991",
+    "name": "Набор сковород Tefal Unlimited On 3 предмета (20, 24, 28 см) с антипригарным покрытием Titanium для индукции",
+    "price": "427.00 USD",
+    "oldPrice": "512.00 USD",
+    "sku": 5559045037,
+    "barcodes": [
+      "3168430308237"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:36.731073Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 232,
+    "productId": 6064530482,
+    "offerId": "GV9550",
+    "name": "Парогенератор Tefal GV9550 Pro Express Ultimate 2600 Вт, 8 бар, 1.9 л, черный/белый",
+    "price": "674.00 USD",
+    "oldPrice": "808.00 USD",
+    "sku": 5559047081,
+    "barcodes": [
+      "3121040075609"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-22T00:05:36.893305Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 233,
+    "productId": 6064530823,
+    "offerId": "BI8125",
+    "name": "Электрический чайник Tefal Mini BI8125 0.8 л 2200 Вт из нержавеющей стали",
+    "price": "143.00 USD",
+    "oldPrice": "171.00 USD",
+    "sku": 5559047239,
+    "barcodes": [
+      "3016661127977"
+    ],
+    "categoryId": 17039631,
+    "typeId": 94968,
+    "createdAt": "2026-08-22T00:05:42.466143Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 234,
+    "productId": 6064531000,
+    "offerId": "Tefal Crêpe-Pfanne, Aluminium, Schwarz, 25 cm (ohn",
+    "name": "Сковорода блинная Tefal Easy Cook & Clean 25 см с антипригарным покрытием",
+    "price": "114.00 USD",
+    "oldPrice": "137.00 USD",
+    "sku": 5559047447,
+    "barcodes": [
+      "3168430313330"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:44.813689Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 235,
+    "productId": 6064531015,
+    "offerId": "PF240E",
+    "name": "Хлебопечка Tefal Pain & D lices PF240E 720 Вт, 20 программ, до 1000 г",
+    "price": "328.00 USD",
+    "oldPrice": "393.00 USD",
+    "sku": 5559048101,
+    "barcodes": [
+      "3045385783428"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94741,
+    "createdAt": "2026-08-22T00:05:44.898663Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 236,
+    "productId": 6064530346,
+    "offerId": "Tefal Explore Stone G7 Pfannen-Set 24/28 cm, Antih",
+    "name": "Набор сковород Tefal Explore Stone G7 24/28 см 2 предм. антипригарные для индукции",
+    "price": "232.00 USD",
+    "oldPrice": "278.00 USD",
+    "sku": 5559045287,
+    "barcodes": [
+      "8699607473625"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:35.648882Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 237,
+    "productId": 6064530933,
+    "offerId": "FV1710",
+    "name": "Паровой утюг Tefal Virtuo FV1710 1800 Вт с паровым ударом 80 г/мин",
+    "price": "71.00 USD",
+    "oldPrice": "85.00 USD",
+    "sku": 5559047378,
+    "barcodes": [
+      "3121040065815"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "createdAt": "2026-08-22T00:05:43.685932Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 238,
+    "productId": 6064530505,
+    "offerId": "FV6842",
+    "name": "Утюг Tefal Ultragliss Plus FV6842 с коллектором от накипи",
+    "price": "210.00 USD",
+    "oldPrice": "253.00 USD",
+    "sku": 5559046688,
+    "barcodes": [
+      "3121040078686"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "createdAt": "2026-08-22T00:05:37.470937Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 239,
+    "productId": 6064531076,
+    "offerId": "K267S556",
+    "name": "Набор кухонных ножей Jamie Oliver by Tefal 6 предм. (5 ножей и блок из акации) K267S556",
+    "price": "325.00 USD",
+    "oldPrice": "391.00 USD",
+    "sku": 5565848395,
+    "barcodes": [],
+    "categoryId": 17028742,
+    "typeId": 92561,
+    "createdAt": "2026-08-22T00:05:45.810175Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 240,
+    "productId": 6064530726,
+    "offerId": "FV6846",
+    "name": "Утюг паровой Tefal Ultragliss Plus FV6846, 2800 Вт, синий/белый",
+    "price": "210.00 USD",
+    "oldPrice": "253.00 USD",
+    "sku": 5559047312,
+    "barcodes": [
+      "3121040083802"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "createdAt": "2026-08-22T00:05:41.306621Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 241,
+    "productId": 6064530895,
+    "offerId": "XA7248",
+    "name": "Панели для вафель Tefal OptiGrill XA7248 для OptiGrill+ и Elite",
+    "price": "214.00 USD",
+    "oldPrice": "256.00 USD",
+    "sku": 5559047576,
+    "barcodes": [
+      "3168437249809"
+    ],
+    "categoryId": 53968796,
+    "typeId": 971154891,
+    "createdAt": "2026-08-22T00:05:43.324467Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 242,
+    "productId": 6064531101,
+    "offerId": "FF1078",
+    "name": "Фритюрница Tefal Maxi Fry FF1078 2.1 л 1900 Вт, черный",
+    "price": "214.00 USD",
+    "oldPrice": "256.00 USD",
+    "sku": 5559047870,
+    "barcodes": [
+      "3045386371006"
+    ],
+    "categoryId": 17039629,
+    "typeId": 94740,
+    "createdAt": "2026-08-22T00:05:46.013353Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 243,
+    "productId": 6064530984,
+    "offerId": "GC271810",
+    "name": "Электрогриль Tefal Inicio Classic GC271810 2000 Вт, черный",
+    "price": "214.00 USD",
+    "oldPrice": "256.00 USD",
+    "sku": 5559047278,
+    "barcodes": [
+      "3045380026247"
+    ],
+    "categoryId": 17039630,
+    "typeId": 95616,
+    "createdAt": "2026-08-22T00:05:44.445064Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 244,
+    "productId": 6064530688,
+    "offerId": "G0229032",
+    "name": "Набор сковород Tefal Reflect On 24/28 см с керамическим антипригарным покрытием",
+    "price": "250.00 USD",
+    "oldPrice": "299.00 USD",
+    "sku": 5559047830,
+    "barcodes": [
+      "8699438295014"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:40.318097Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 245,
+    "productId": 6064530734,
+    "offerId": "BC50U0V0",
+    "name": "Кухонные весы Tefal Optiss BC50U0V0 электронные до 5 кг, белые",
+    "price": "90.00 USD",
+    "oldPrice": "108.00 USD",
+    "sku": 5559048067,
+    "barcodes": [
+      "3121040092392"
+    ],
+    "categoryId": 17028912,
+    "typeId": 91418,
+    "createdAt": "2026-08-22T00:05:41.330582Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 246,
+    "productId": 6064530948,
+    "offerId": "DT3041E1",
+    "name": "Отпариватель для одежды ручной Tefal Access Steam Pocket DT3041E1 1300 Вт",
+    "price": "164.00 USD",
+    "oldPrice": "198.00 USD",
+    "sku": 5559047273,
+    "barcodes": [
+      "3121040087763"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91426,
+    "createdAt": "2026-08-22T00:05:43.745795Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 247,
+    "productId": 6064530531,
+    "offerId": "SV6115",
+    "name": "Парогенератор Tefal Express Essential SV6115 2200 Вт, 5.2 бар",
+    "price": "278.00 USD",
+    "oldPrice": "334.00 USD",
+    "sku": 5559046143,
+    "barcodes": [
+      "3121040079034"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-22T00:05:38.095252Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 248,
+    "productId": 6064531147,
+    "offerId": "XA7278",
+    "name": "Противень для выпечки Tefal OptiGrill+ XL XA7278 2 л с антипригарным покрытием",
+    "price": "178.00 USD",
+    "oldPrice": "214.00 USD",
+    "sku": 5559047580,
+    "barcodes": [
+      "3168437245863"
+    ],
+    "categoryId": 53968796,
+    "typeId": 971154891,
+    "createdAt": "2026-08-22T00:05:46.992327Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 249,
+    "productId": 6064530542,
+    "offerId": "Tefal Snack Collection SW8674F0",
+    "name": "Мультипекарь Tefal Snack Collection SW8674F0 со сменными панелями для вафель и сэндвичей 700 Вт",
+    "price": "285.00 USD",
+    "oldPrice": "343.00 USD",
+    "sku": 5559047078,
+    "barcodes": [
+      "3045380028937"
+    ],
+    "categoryId": 17039630,
+    "typeId": 98490,
+    "createdAt": "2026-08-22T00:05:38.271858Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 250,
+    "productId": 6064530802,
+    "offerId": "Tefal Ingenio L897SJ04",
+    "name": "Набор посуды для приготовления Tefal Ingenio Emotion L897SJ04 20 предм. со съемной ручкой для индукции",
+    "price": "653.00 USD",
+    "oldPrice": "784.00 USD",
+    "sku": 5559047086,
+    "barcodes": [
+      "3168430345676"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:42.329440Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 251,
+    "productId": 6085180360,
+    "offerId": "HC9450/20",
+    "name": "Машинка для стрижки волос Philips Hairclipper Series 9000 HC9450/20",
+    "price": "250.00 USD",
+    "oldPrice": "300.00 USD",
+    "sku": 5576835955,
+    "barcodes": [
+      "8710103709381"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:27.000848Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 252,
+    "productId": 6085180931,
+    "offerId": "HD2350/80",
+    "name": "Бутербродница Philips 5000 Series HD2350/80 3 в 1 с антипригарным покрытием, 750 Вт",
+    "price": "142.00 USD",
+    "oldPrice": "170.00 USD",
+    "sku": 5576836435,
+    "barcodes": [
+      "8720389032813"
+    ],
+    "categoryId": 17039630,
+    "typeId": 95607,
+    "createdAt": "2026-08-23T12:01:32.231109Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 253,
+    "productId": 6085180648,
+    "offerId": "Philips Sonicare DiamondClean Smart 9400",
+    "name": "Электрическая зубная щетка Philips Sonicare DiamondClean Smart 9400 звуковая с Bluetooth и дорожным чехлом",
+    "price": "173.00 USD",
+    "oldPrice": "208.00 USD",
+    "sku": 5576836461,
+    "barcodes": [
+      "8710103986423"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-23T12:01:29.970968Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 254,
+    "productId": 6064531203,
+    "offerId": "Tefal Duetto On Bratpfanne 28 cm, Go Ceram keramis",
+    "name": "Сковорода Tefal Duetto On 28 см для индукции с керамическим покрытием Go Ceram (G7660634)",
+    "price": "120.00 USD",
+    "oldPrice": "144.00 USD",
+    "sku": 5559047030,
+    "barcodes": [
+      "3168430374355"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:48.125718Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 255,
+    "productId": 6085180864,
+    "offerId": "BRL149/00",
+    "name": "Женская электробритва Philips Lady Shaver Series 8000 BRL149/00, сиреневый",
+    "price": "214.00 USD",
+    "oldPrice": "257.00 USD",
+    "sku": 5576836661,
+    "barcodes": [
+      "8720689038201"
+    ],
+    "categoryId": 77868900,
+    "typeId": 91688,
+    "createdAt": "2026-08-23T12:01:31.807426Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 256,
+    "productId": 6064531270,
+    "offerId": "Tefal XL Force Bratpfanne 32 cm extragroß, Antihaf",
+    "name": "Сковорода Tefal XL Force 32 см с антипригарным покрытием Titanium 2X",
+    "price": "83.00 USD",
+    "oldPrice": "99.00 USD",
+    "sku": 5559047934,
+    "barcodes": [
+      "3168430320734"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:48.650275Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 257,
+    "productId": 6085180466,
+    "offerId": "HX9044/88",
+    "name": "Насадка для электрической зубной щетки Philips Sonicare C3 Premium Plaque Defense HX9044/88, 4 шт., черный",
+    "price": "132.00 USD",
+    "oldPrice": "158.00 USD",
+    "sku": 5576835749,
+    "barcodes": [
+      "8720689036702"
+    ],
+    "categoryId": 17028937,
+    "typeId": 94700,
+    "createdAt": "2026-08-23T12:01:28.460549Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 258,
+    "productId": 6085180505,
+    "offerId": "MG3946/15",
+    "name": "Триммер универсальный Philips Multigroom Series 3000 All-in-One 9-в-1 для бороды, волос и тела MG3946/15",
+    "price": "135.00 USD",
+    "oldPrice": "162.00 USD",
+    "sku": 5576836147,
+    "barcodes": [
+      "8720689027762"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-23T12:01:29.112815Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 259,
+    "productId": 6085180974,
+    "offerId": "HR1921/20",
+    "name": "Соковыжималка электрическая центробежная Philips Series 7000 HR1921/20 1100 Вт",
+    "price": "535.00 USD",
+    "oldPrice": "642.00 USD",
+    "sku": 5576837226,
+    "barcodes": [
+      "8710103777366"
+    ],
+    "categoryId": 17039644,
+    "typeId": 94989,
+    "createdAt": "2026-08-23T12:01:32.635160Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 260,
+    "productId": 6085180979,
+    "offerId": "BRL159/00",
+    "name": "Электробритва женская Philips Lady Shaver Series 8000 BRL159/00 для сухого и влажного бритья",
+    "price": "222.00 USD",
+    "oldPrice": "266.00 USD",
+    "sku": 5576836446,
+    "barcodes": [
+      "8720689037655"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:32.721477Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 261,
+    "productId": 6085180346,
+    "offerId": "Philips Sonicare Power Flosser 3000, Munddusche mi",
+    "name": "Ирригатор стационарный Philips Sonicare Power Flosser 3000 HX3711/20, 550 мл, 2 режима",
+    "price": "326.00 USD",
+    "oldPrice": "391.00 USD",
+    "sku": 5576836013,
+    "barcodes": [
+      "075020095732"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91903,
+    "createdAt": "2026-08-23T12:01:26.697294Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 262,
+    "productId": 6085180715,
+    "offerId": "FY2401/30",
+    "name": "Фильтр для увлажнителя воздуха Philips FY2401/30 для серии 2000 HU4801 HU4803 HU4811 HU4813",
+    "price": "61.00 USD",
+    "oldPrice": "73.00 USD",
+    "sku": 5576835579,
+    "barcodes": [
+      "8710103914952"
+    ],
+    "categoryId": 53968796,
+    "typeId": 98540,
+    "createdAt": "2026-08-23T12:01:30.608461Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 263,
+    "productId": 6085180652,
+    "offerId": "HF3531/01",
+    "name": "Световой будильник Philips SmartSleep Wake-up Light HF3531/01 с имитацией рассвета",
+    "price": "392.00 USD",
+    "oldPrice": "470.00 USD",
+    "sku": 5576836689,
+    "barcodes": [
+      "8710103783374"
+    ],
+    "categoryId": 72095144,
+    "typeId": 91760,
+    "createdAt": "2026-08-23T12:01:29.978092Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 264,
+    "productId": 6085180830,
+    "offerId": "CX3550/01",
+    "name": "Вентилятор напольный PHILIPS Smart 3000 Series CX3550/01 черный с Wi-Fi управлением",
+    "price": "368.00 USD",
+    "oldPrice": "442.00 USD",
+    "sku": 5576834690,
+    "barcodes": [
+      "8720389036910"
+    ],
+    "categoryId": 17039635,
+    "typeId": 91443,
+    "createdAt": "2026-08-23T12:01:31.396468Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 265,
+    "productId": 6085180869,
+    "offerId": "MG3930/15",
+    "name": "Триммер Philips Multigroom Series 3000 MG3930/15 для бороды, усов, волос, носа и ушей",
+    "price": "143.00 USD",
+    "oldPrice": "172.00 USD",
+    "sku": 5576836785,
+    "barcodes": [
+      "8720689026567"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-23T12:01:31.845113Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 266,
+    "productId": 6085180355,
+    "offerId": "JC302/50",
+    "name": "Чистящий картридж для бритвы Philips SmartClean JC302/50 (2 шт)",
+    "price": "43.00 USD",
+    "oldPrice": "52.00 USD",
+    "sku": 5576835227,
+    "barcodes": [
+      "8710103672494"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91675,
+    "createdAt": "2026-08-23T12:01:26.737256Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 267,
+    "productId": 6064531208,
+    "offerId": "GC510DE0",
+    "name": "Электрогриль Tefal SuperGrill 3in1 GC510DE0 2000 Вт",
+    "price": "285.00 USD",
+    "oldPrice": "343.00 USD",
+    "sku": 5559047291,
+    "barcodes": [
+      "3700845634749"
+    ],
+    "categoryId": 17039630,
+    "typeId": 95616,
+    "createdAt": "2026-08-22T00:05:48.148202Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 268,
+    "productId": 6064531151,
+    "offerId": "FV2838",
+    "name": "Утюг паровой Tefal Express Steam FV2838 2400 Вт, керамическая подошва, паровой удар 180 г/мин, синий",
+    "price": "100.00 USD",
+    "oldPrice": "120.00 USD",
+    "sku": 5559047148,
+    "barcodes": [
+      "3121040081914"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "createdAt": "2026-08-22T00:05:47.012980Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 269,
+    "productId": 6085180141,
+    "offerId": "FC9332/09",
+    "name": "Пылесос напольный безмешковый PHILIPS 3000 Series FC9332/09 с насадкой TriActive и фильтром Allergy H13",
+    "price": "321.00 USD",
+    "oldPrice": "385.00 USD",
+    "sku": 5576838548,
+    "barcodes": [
+      "8710103796299"
+    ],
+    "categoryId": 17039623,
+    "typeId": 91586,
+    "createdAt": "2026-08-23T12:01:24.706997Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 270,
+    "productId": 6085180440,
+    "offerId": "QC5115/15",
+    "name": "Машинка для стрижки волос Philips QC5115/15 семейная, лезвия из нержавеющей стали, питание от сети",
+    "price": "68.00 USD",
+    "oldPrice": "82.00 USD",
+    "sku": 5576835354,
+    "barcodes": [
+      "8710103493808"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:28.287056Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 271,
+    "productId": 6085180623,
+    "offerId": "QP430/60",
+    "name": "Сменные лезвия для триммера Philips OneBlade 360 QP430/60, 3 шт.",
+    "price": "114.00 USD",
+    "oldPrice": "137.00 USD",
+    "sku": 5576835573,
+    "barcodes": [
+      "8720689031622"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91675,
+    "createdAt": "2026-08-23T12:01:29.782194Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 272,
+    "productId": 6085180744,
+    "offerId": "STH7020/20",
+    "name": "Отпариватель для одежды ручной Philips STH7020/20 Series 7000, 1500 Вт, синий",
+    "price": "228.00 USD",
+    "oldPrice": "274.00 USD",
+    "sku": 5576836207,
+    "barcodes": [
+      "8720389007446"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91426,
+    "createdAt": "2026-08-23T12:01:30.906807Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 273,
+    "productId": 6064531252,
+    "offerId": "C27802",
+    "name": "Сковорода Tefal Generous Cook 20 см для индукции",
+    "price": "100.00 USD",
+    "oldPrice": "120.00 USD",
+    "sku": 5559048123,
+    "barcodes": [
+      "3168430325326"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:48.423762Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 274,
+    "productId": 6085180506,
+    "offerId": "GC9642/60",
+    "name": "Парогенератор Philips PerfectCare Elite GC9642/60 белый",
+    "price": "891.00 USD",
+    "oldPrice": "1069.00 USD",
+    "sku": 5576835194,
+    "barcodes": [
+      "8710103745754"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-23T12:01:29.134815Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 275,
+    "productId": 6085180977,
+    "offerId": "HU5600/03",
+    "name": "Увлажнитель воздуха Philips Series 5000 HU5600/03 NanoCloud 4.5 л до 50 м",
+    "price": "392.00 USD",
+    "oldPrice": "470.00 USD",
+    "sku": 5576835387,
+    "barcodes": [
+      "8720389069529"
+    ],
+    "categoryId": 17039635,
+    "typeId": 91456,
+    "createdAt": "2026-08-23T12:01:32.699618Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 276,
+    "productId": 6085180755,
+    "offerId": "BT7670/15",
+    "name": "Триммер для бороды и усов Philips Series 7000 BT7670/15 с контейнером для волосков",
+    "price": "232.00 USD",
+    "oldPrice": "278.00 USD",
+    "sku": 5576835521,
+    "barcodes": [
+      "8720689029421"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-23T12:01:30.994417Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 277,
+    "productId": 6064531218,
+    "offerId": "K1984634",
+    "name": "Лопатка кулинарная Tefal Ingenio+ K1984634 из нейлона",
+    "price": "24.00 USD",
+    "oldPrice": "29.00 USD",
+    "sku": 5559047488,
+    "barcodes": [
+      "3168430386402"
+    ],
+    "categoryId": 17027907,
+    "typeId": 92376,
+    "createdAt": "2026-08-22T00:05:48.301569Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 278,
+    "productId": 6085180182,
+    "offerId": "XP9401/38",
+    "name": "Электробритва мужская Philips i9000 Prestige Ultra XP9401/38 для сухого и влажного бритья",
+    "price": "1248.00 USD",
+    "oldPrice": "1498.00 USD",
+    "sku": 5576836240,
+    "barcodes": [
+      "8720689030236"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:25.132614Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 279,
+    "productId": 6085180791,
+    "offerId": "QP2724/31",
+    "name": "Триммер PHILIPS OneBlade 360 QP2724/31 с 2 лезвиями 360 и 3 насадками (1, 3, 5 мм)",
+    "price": "178.00 USD",
+    "oldPrice": "214.00 USD",
+    "sku": 5576836409,
+    "barcodes": [
+      "8720689035958"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-23T12:01:31.193236Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 280,
+    "productId": 6064531149,
+    "offerId": "E24906",
+    "name": "Сковорода Tefal Robusto 28 см для индукции с антипригарным покрытием E24906",
+    "price": "161.00 USD",
+    "oldPrice": "193.00 USD",
+    "sku": 5559047005,
+    "barcodes": [
+      "3168430333888"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92462,
+    "createdAt": "2026-08-22T00:05:46.998515Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 281,
+    "productId": 6085180393,
+    "offerId": "S7886/55",
+    "name": "Электробритва мужская роторная PHILIPS Series 7000 S7886/55 для сухого и влажного бритья",
+    "price": "531.00 USD",
+    "oldPrice": "637.00 USD",
+    "sku": 5576835600,
+    "barcodes": [
+      "8720689008464"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:27.563126Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 282,
+    "productId": 6085180448,
+    "offerId": "FC8010/02",
+    "name": "Набор фильтров для пылесоса Philips FC8010/02 PowerPro Compact / Active / City (3 шт.)",
+    "price": "64.00 USD",
+    "oldPrice": "77.00 USD",
+    "sku": 5576835979,
+    "barcodes": [
+      "8710103902942"
+    ],
+    "categoryId": 53968796,
+    "typeId": 971002378,
+    "createdAt": "2026-08-23T12:01:28.333746Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 283,
+    "productId": 6064531287,
+    "offerId": "CERA BRIGHT ON 7tlg.",
+    "name": "Набор кастрюль и сковород Tefal Cera Bright On 7 предм. с керамическим покрытием Go Ceram для индукции",
+    "price": "463.00 USD",
+    "oldPrice": "557.00 USD",
+    "sku": 5559047709,
+    "barcodes": [
+      "3168430349889"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:49.015580Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 284,
+    "productId": 6064531254,
+    "offerId": "FV5716E0",
+    "name": "Утюг паровой Tefal Easygliss Plus FV5716E0 2500 Вт, подошва Durilium Airglide",
+    "price": "143.00 USD",
+    "oldPrice": "171.00 USD",
+    "sku": 5559047328,
+    "barcodes": [
+      "3121040075739"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "createdAt": "2026-08-22T00:05:48.432286Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 285,
+    "productId": 6085180213,
+    "offerId": "HX7119/01",
+    "name": "Электрическая зубная щетка Philips Sonicare 5500 HX7119/01 набор 2 шт звуковая 2 режима",
+    "price": "464.00 USD",
+    "oldPrice": "557.00 USD",
+    "sku": 5576836243,
+    "barcodes": [
+      "8720689021708"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-23T12:01:25.501665Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 286,
+    "productId": 6085180663,
+    "offerId": "HS5980/15",
+    "name": "Электробритва Philips Head Shaver Pro Series 5000 HS5980/15 для бритья головы",
+    "price": "239.00 USD",
+    "oldPrice": "287.00 USD",
+    "sku": 5576835216,
+    "barcodes": [
+      "8720689044264"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:29.990416Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 287,
+    "productId": 6085180353,
+    "offerId": "X3001/00",
+    "name": "Электробритва мужская Philips Shaver Series 3000X X3001/00 роторная для сухого и влажного бритья",
+    "price": "174.00 USD",
+    "oldPrice": "209.00 USD",
+    "sku": 5576836139,
+    "barcodes": [
+      "8720689018920"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:26.730360Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 288,
+    "productId": 6085180415,
+    "offerId": "PHILIPS AquaTrio Nass-Trockensauger 9000 Serie, Sc",
+    "name": "Беспроводной моющий пылесос PHILIPS AquaTrio 9000 Series XW9463/11 3 в 1 с самоочисткой",
+    "price": "1423.00 USD",
+    "oldPrice": "1708.00 USD",
+    "sku": 5576835831,
+    "barcodes": [
+      "8720389040733"
+    ],
+    "categoryId": 17039623,
+    "typeId": 91587,
+    "createdAt": "2026-08-23T12:01:27.866326Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 289,
+    "productId": 6085180405,
+    "offerId": "Philips Water Wasserfilterkanne +6 Geschmack+ Ersa",
+    "name": "Фильтр-кувшин для воды Philips Micro X-Clean 2,6 л с 6 картриджами и таймером белый",
+    "price": "89.00 USD",
+    "oldPrice": "107.00 USD",
+    "sku": 5576835946,
+    "barcodes": [
+      "4897099308423"
+    ],
+    "categoryId": 17027931,
+    "typeId": 94601,
+    "createdAt": "2026-08-23T12:01:27.614422Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 290,
+    "productId": 6085180785,
+    "offerId": "HC7650/15",
+    "name": "Машинка для стрижки волос Philips Hairclipper Series 7000 HC7650/15",
+    "price": "214.00 USD",
+    "oldPrice": "257.00 USD",
+    "sku": 5576836372,
+    "barcodes": [
+      "8710103897903"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:31.177199Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 291,
+    "productId": 6064531184,
+    "offerId": "G720S674",
+    "name": "Набор кастрюль Tefal Opti'Space 6 предм. из нержавеющей стали для индукции",
+    "price": "394.00 USD",
+    "oldPrice": "474.00 USD",
+    "sku": 5559047272,
+    "barcodes": [
+      "3168430304482"
+    ],
+    "categoryId": 17028732,
+    "typeId": 92452,
+    "createdAt": "2026-08-22T00:05:47.468588Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 292,
+    "productId": 6086078382,
+    "offerId": "XP9404/38",
+    "name": "Электробритва Philips i9000 Prestige Ultra XP9404/38 роторная для сухого и влажного бритья",
+    "price": "949.00 USD",
+    "oldPrice": "999.00 USD",
+    "sku": 5577620052,
+    "barcodes": [
+      "8720689030373"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T14:08:29.420136Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 293,
+    "productId": 6085181542,
+    "offerId": "BHB878/00",
+    "name": "Плойка для завивки волос Philips MoistureProtect BHB878/00 автоматическая",
+    "price": "353.00 USD",
+    "oldPrice": "424.00 USD",
+    "sku": 5576836419,
+    "barcodes": [
+      "8710103878339"
+    ],
+    "categoryId": 17039639,
+    "typeId": 91732,
+    "createdAt": "2026-08-23T12:01:37.405231Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 294,
+    "productId": 6085181507,
+    "offerId": "PHILIPS Senseo Maestro Kaffeepadmaschine, Schwarz,",
+    "name": "Чалдовая кофемашина PHILIPS Senseo Maestro CSA260/60 1450 Вт 1.2 л",
+    "price": "317.00 USD",
+    "oldPrice": "380.00 USD",
+    "sku": 5576837740,
+    "barcodes": [
+      "8720389000553"
+    ],
+    "categoryId": 17039628,
+    "typeId": 96852,
+    "createdAt": "2026-08-23T12:01:37.080235Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 295,
+    "productId": 6085182010,
+    "offerId": "S5887/13",
+    "name": "Электробритва мужская роторная PHILIPS Series 5000 S5887/13 для сухого и влажного бритья",
+    "price": "392.00 USD",
+    "oldPrice": "470.00 USD",
+    "sku": 5576836866,
+    "barcodes": [
+      "8720689021197"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:41.646432Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 296,
+    "productId": 6085181794,
+    "offerId": "HX4044/52",
+    "name": "Электрическая зубная щетка Philips Sonicare Series 4100 HX4044/52 звуковая с датчиком давления и футляром",
+    "price": "203.00 USD",
+    "oldPrice": "244.00 USD",
+    "sku": 5576837887,
+    "barcodes": [
+      "8720689043618"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-23T12:01:39.393412Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 297,
+    "productId": 6085181975,
+    "offerId": "HX9914/54",
+    "name": "Электрическая зубная щетка Philips Sonicare DiamondClean 9000 HX9914/54 звуковая, набор из 2 шт",
+    "price": "647.00 USD",
+    "oldPrice": "776.00 USD",
+    "sku": 5576837076,
+    "barcodes": [
+      "8710103938057"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-23T12:01:41.136631Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 298,
+    "productId": 6085181981,
+    "offerId": "BHS732/00",
+    "name": "Выпрямитель для волос Philips Series 7000 BHS732/00 с ионизацией и аргановым маслом",
+    "price": "214.00 USD",
+    "oldPrice": "257.00 USD",
+    "sku": 5576837488,
+    "barcodes": [
+      "8710103974161"
+    ],
+    "categoryId": 17039639,
+    "typeId": 91724,
+    "createdAt": "2026-08-23T12:01:41.217916Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 299,
+    "productId": 6085181911,
+    "offerId": "QP1324/30",
+    "name": "Триммер Philips OneBlade First Shave QP1324/30 для чувствительной кожи лица с 2 лезвиями Anti-Friction",
+    "price": "131.00 USD",
+    "oldPrice": "157.00 USD",
+    "sku": 5576839223,
+    "barcodes": [
+      "8720689029308"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-23T12:01:40.808677Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 300,
+    "productId": 6085182243,
+    "offerId": "CX5120/11",
+    "name": "Тепловентилятор Philips Smart Tower Heater Series 5000 CX5120/11, 2000 Вт, керамический",
+    "price": "303.00 USD",
+    "oldPrice": "364.00 USD",
+    "sku": 5576836893,
+    "barcodes": [
+      "8720389030697"
+    ],
+    "categoryId": 17039635,
+    "typeId": 91455,
+    "createdAt": "2026-08-23T12:01:43.080881Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 301,
+    "productId": 6085181243,
+    "offerId": "HD5416/60",
+    "name": "Кофеварка капельная PHILIPS Caf Gourmet HD5416/60 1300 Вт 1.25 л",
+    "price": "353.00 USD",
+    "oldPrice": "424.00 USD",
+    "sku": 5576835801,
+    "barcodes": [
+      "8720389000669"
+    ],
+    "categoryId": 17039628,
+    "typeId": 504866213,
+    "createdAt": "2026-08-23T12:01:35.183266Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 302,
+    "productId": 6085182207,
+    "offerId": "HX7400/02",
+    "name": "Электрическая зубная щетка Philips Sonicare Series 6100 HX7400/02 звуковая, белая",
+    "price": "443.00 USD",
+    "oldPrice": "532.00 USD",
+    "sku": 5576837816,
+    "barcodes": [
+      "8720689021722"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-23T12:01:42.981200Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 303,
+    "productId": 6085181133,
+    "offerId": "Philips Sonicare S2 Sensitive, Original Ersatzbürs",
+    "name": "Насадка для электрической зубной щетки Philips Sonicare S2 Sensitive HX6054/87, 4 шт., белый",
+    "price": "89.00 USD",
+    "oldPrice": "107.00 USD",
+    "sku": 5576836872,
+    "barcodes": [
+      "8720689036870"
+    ],
+    "categoryId": 17028937,
+    "typeId": 94700,
+    "createdAt": "2026-08-23T12:01:34.195537Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 304,
+    "productId": 6085181317,
+    "offerId": "PHILIPS Senseo Switch Pad- und Filterkaffeemaschin",
+    "name": "Кофеварка комбинированная PHILIPS Senseo Switch HD6592/64 2 в 1 1450 Вт 1 л с термокувшином",
+    "price": "321.00 USD",
+    "oldPrice": "385.00 USD",
+    "sku": 5576836241,
+    "barcodes": [
+      "8720389014246"
+    ],
+    "categoryId": 17039628,
+    "typeId": 504866213,
+    "createdAt": "2026-08-23T12:01:35.887410Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 305,
+    "productId": 6085181714,
+    "offerId": "HR2291/41",
+    "name": "Блендер стационарный Philips 3000 Series HR2291/41 со стеклянной чашей и дорожной бутылкой",
+    "price": "158.00 USD",
+    "oldPrice": "190.00 USD",
+    "sku": 5576838203,
+    "barcodes": [
+      "8720389001505"
+    ],
+    "categoryId": 17039627,
+    "typeId": 94973,
+    "createdAt": "2026-08-23T12:01:38.593460Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 306,
+    "productId": 6085182014,
+    "offerId": "ASH138/10",
+    "name": "Сменный картридж для фильтра Philips ASH138/10 для лейки душа 3 шт",
+    "price": "127.00 USD",
+    "oldPrice": "152.00 USD",
+    "sku": 5576837262,
+    "barcodes": [
+      "4895244610919"
+    ],
+    "categoryId": 17027931,
+    "typeId": 94593,
+    "createdAt": "2026-08-23T12:01:41.650525Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 307,
+    "productId": 6085181530,
+    "offerId": "HP6341/00",
+    "name": "Электробритва женская Philips SatinShave Essential HP6341/00 для сухого и влажного бритья",
+    "price": "82.00 USD",
+    "oldPrice": "98.00 USD",
+    "sku": 5576836618,
+    "barcodes": [
+      "8710103533825"
+    ],
+    "categoryId": 77868900,
+    "typeId": 91688,
+    "createdAt": "2026-08-23T12:01:37.314412Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 308,
+    "productId": 6085181159,
+    "offerId": "HX4021/01",
+    "name": "Электрическая зубная щетка Philips Sonicare 2100 HX4021/01 звуковая, белая",
+    "price": "107.00 USD",
+    "oldPrice": "128.00 USD",
+    "sku": 5576838269,
+    "barcodes": [
+      "8720689042987"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-23T12:01:34.481488Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 309,
+    "productId": 6085181455,
+    "offerId": "BHD500/20",
+    "name": "Фен для волос Philips Series 5000 BHD500/20 с ионизацией и диффузором",
+    "price": "111.00 USD",
+    "oldPrice": "133.00 USD",
+    "sku": 5576837431,
+    "barcodes": [
+      "8710103998129"
+    ],
+    "categoryId": 17039639,
+    "typeId": 91730,
+    "createdAt": "2026-08-23T12:01:36.676714Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 310,
+    "productId": 6085181623,
+    "offerId": "ADD912",
+    "name": "Бутылка для сифона Philips GoZero ADD912 1 л из пластика BPA-free для газирования воды",
+    "price": "56.00 USD",
+    "oldPrice": "67.00 USD",
+    "sku": 5576837316,
+    "barcodes": [
+      "4897099302452"
+    ],
+    "categoryId": 17027928,
+    "typeId": 971893197,
+    "createdAt": "2026-08-23T12:01:38.199332Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 311,
+    "productId": 6085181168,
+    "offerId": "TAR3306/12",
+    "name": "Настольные часы-радио Philips TAR3306/12 электронный будильник с FM",
+    "price": "96.00 USD",
+    "oldPrice": "115.00 USD",
+    "sku": 5576836086,
+    "barcodes": [
+      "4895229116641"
+    ],
+    "categoryId": 72095144,
+    "typeId": 91760,
+    "createdAt": "2026-08-23T12:01:34.538398Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 312,
+    "productId": 6085181304,
+    "offerId": "X9000/10",
+    "name": "Электробритва мужская Philips i9000 X9000/10 для сухого и влажного бритья",
+    "price": "695.00 USD",
+    "oldPrice": "834.00 USD",
+    "sku": 5576836640,
+    "barcodes": [
+      "8720689030021"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:35.788961Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 313,
+    "productId": 6085181662,
+    "offerId": "HC3530/15",
+    "name": "Машинка для стрижки волос Philips Hairclipper Series 3000 HC3530/15 с насадкой для бороды",
+    "price": "114.00 USD",
+    "oldPrice": "137.00 USD",
+    "sku": 5576837207,
+    "barcodes": [
+      "8710103859734"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:38.494515Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 314,
+    "productId": 6085181787,
+    "offerId": "HX6352/42",
+    "name": "Электрическая зубная щетка Philips Sonicare For Kids HX6352/42 звуковая с Bluetooth и насадками, розовая",
+    "price": "141.00 USD",
+    "oldPrice": "169.00 USD",
+    "sku": 5576836994,
+    "barcodes": [
+      "8710103931096"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-23T12:01:39.345524Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 315,
+    "productId": 6085181183,
+    "offerId": "HX9911/94",
+    "name": "Электрическая зубная щетка Philips Sonicare DiamondClean 9000 HX9911/94 с приложением и зарядным стаканом",
+    "price": "478.00 USD",
+    "oldPrice": "574.00 USD",
+    "sku": 5576835586,
+    "barcodes": [
+      "8710103936060"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-23T12:01:34.649967Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 316,
+    "productId": 6085181249,
+    "offerId": "HD2581/90",
+    "name": "Тостер Philips Daily Collection HD2581/90 черный",
+    "price": "100.00 USD",
+    "oldPrice": "120.00 USD",
+    "sku": 5576836493,
+    "barcodes": [
+      "8710103800378"
+    ],
+    "categoryId": 17039630,
+    "typeId": 96031,
+    "createdAt": "2026-08-23T12:01:35.359785Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 317,
+    "productId": 6085181603,
+    "offerId": "AC2210/10",
+    "name": "Очиститель воздуха Philips PureProtect 2200 Series AC2210/10 белый",
+    "price": "784.00 USD",
+    "oldPrice": "941.00 USD",
+    "sku": 5576836408,
+    "barcodes": [
+      "8720389064678"
+    ],
+    "categoryId": 17039635,
+    "typeId": 91451,
+    "createdAt": "2026-08-23T12:01:38.153622Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 318,
+    "productId": 6085181291,
+    "offerId": "HX3886/43",
+    "name": "Ирригатор Philips Sonicare Cordless Power Flosser 3000 и электрическая зубная щетка DiamondClean 9000 HX3886/43",
+    "price": "786.00 USD",
+    "oldPrice": "943.00 USD",
+    "sku": 5576836729,
+    "barcodes": [
+      "8720689017084"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91903,
+    "createdAt": "2026-08-23T12:01:35.720785Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 319,
+    "productId": 6085182259,
+    "offerId": "BRL129/00",
+    "name": "Женский эпилятор-электробритва Philips Lady Shaver Series 8000 BRL129/00 для сухого и влажного бритья",
+    "price": "160.00 USD",
+    "oldPrice": "192.00 USD",
+    "sku": 5576836624,
+    "barcodes": [
+      "8720689038263"
+    ],
+    "categoryId": 77868900,
+    "typeId": 91688,
+    "createdAt": "2026-08-23T12:01:43.250264Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 320,
+    "productId": 6085181366,
+    "offerId": "STH5030/80",
+    "name": "Ручной отпариватель для одежды Philips 5000 Series STH5030/80, 1400 Вт, серый",
+    "price": "189.00 USD",
+    "oldPrice": "227.00 USD",
+    "sku": 5576837032,
+    "barcodes": [
+      "8720389050107"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91426,
+    "createdAt": "2026-08-23T12:01:36.042196Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 321,
+    "productId": 6085181968,
+    "offerId": "BT3619/15",
+    "name": "Триммер для бороды и усов Philips Series 3000 BT3619/15",
+    "price": "118.00 USD",
+    "oldPrice": "142.00 USD",
+    "sku": 5576837495,
+    "barcodes": [
+      "8720689042796"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91683,
+    "createdAt": "2026-08-23T12:01:41.068972Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 322,
+    "productId": 6085181045,
+    "offerId": "HX4072/42",
+    "name": "Электрическая зубная щетка Philips Sonicare 3100 Series HX4072/42 звуковая набор 2 шт. с чехлами",
+    "price": "250.00 USD",
+    "oldPrice": "300.00 USD",
+    "sku": 5576835944,
+    "barcodes": [
+      "8720689043632"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-23T12:01:33.349286Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 323,
+    "productId": 6085181137,
+    "offerId": "BRE257/00",
+    "name": "Эпилятор проводной Philips Series 4000 BRE257/00 с подсветкой и насадками для тела и бикини",
+    "price": "160.00 USD",
+    "oldPrice": "192.00 USD",
+    "sku": 5576836903,
+    "barcodes": [
+      "8720689032575"
+    ],
+    "categoryId": 77868900,
+    "typeId": 91688,
+    "createdAt": "2026-08-23T12:01:34.327482Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 324,
+    "productId": 6085181174,
+    "offerId": "XD3110/09",
+    "name": "Пылесос с мешком для сбора пыли Philips Series 3000 Performer Compact XD3110/09, 900 Вт, синий",
+    "price": "317.00 USD",
+    "oldPrice": "380.00 USD",
+    "sku": 5576839371,
+    "barcodes": [
+      "8710103939115"
+    ],
+    "categoryId": 17039623,
+    "typeId": 91586,
+    "createdAt": "2026-08-23T12:01:34.572502Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 325,
+    "productId": 6085181903,
+    "offerId": "Philips Shaver 5000 – Elektrischer Rasierer für He",
+    "name": "Электробритва Philips Series 5000 S5889/50 с технологией SkinIQ для сухого и влажного бритья",
+    "price": "428.00 USD",
+    "oldPrice": "514.00 USD",
+    "sku": 5576836804,
+    "barcodes": [
+      "8720689035095"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:40.748002Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 326,
+    "productId": 6085182168,
+    "offerId": "HX6044/90",
+    "name": "Насадка для электрической зубной щетки Philips Sonicare For Kids HX6044/90 от 7 лет 4 шт.",
+    "price": "70.00 USD",
+    "oldPrice": "84.00 USD",
+    "sku": 5576838586,
+    "barcodes": [
+      "8720689036849"
+    ],
+    "categoryId": 17028937,
+    "typeId": 94700,
+    "createdAt": "2026-08-23T12:01:42.568746Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 327,
+    "productId": 6085181724,
+    "offerId": "BHD837/10",
+    "name": "Фен для волос Philips Series 8000 BHD837/10, 1400 Вт, с ионизацией и диффузором",
+    "price": "560.00 USD",
+    "oldPrice": "672.00 USD",
+    "sku": 5576837046,
+    "barcodes": [
+      "8720689044691"
+    ],
+    "categoryId": 17039639,
+    "typeId": 91730,
+    "createdAt": "2026-08-23T12:01:38.615827Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 328,
+    "productId": 6085181040,
+    "offerId": "X5004/00",
+    "name": "Электробритва мужская Philips Series 5000X X5004/00 для сухого и влажного бритья",
+    "price": "228.00 USD",
+    "oldPrice": "274.00 USD",
+    "sku": 5576835681,
+    "barcodes": [
+      "8720689029131"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:33.268267Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 329,
+    "productId": 6085181036,
+    "offerId": "Philips Quick Clean Reinigungskartusche (Modell CC",
+    "name": "Картридж для очистки бритвы Philips CC12/50 Quick Clean Pod 2 шт.",
+    "price": "46.00 USD",
+    "oldPrice": "55.00 USD",
+    "sku": 5576836220,
+    "barcodes": [
+      "8710103944645"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91675,
+    "createdAt": "2026-08-23T12:01:33.217304Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 330,
+    "productId": 6085181821,
+    "offerId": "XP9207/30",
+    "name": "Электробритва мужская Philips i9000 Prestige XP9207/30 для сухого и влажного бритья",
+    "price": "1027.00 USD",
+    "oldPrice": "1232.00 USD",
+    "sku": 5576837480,
+    "barcodes": [
+      "8720689036795"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:39.676197Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 331,
+    "productId": 6085182116,
+    "offerId": "PSA3228/41",
+    "name": "Кофеварка рожковая PHILIPS Barista Brew PSA3228/41 полуавтоматическая с кофемолкой и капучинатором",
+    "price": "794.00 USD",
+    "oldPrice": "953.00 USD",
+    "sku": 5576837412,
+    "barcodes": [
+      "8720389035524"
+    ],
+    "categoryId": 17039628,
+    "typeId": 504866213,
+    "createdAt": "2026-08-23T12:01:42.133063Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 332,
+    "productId": 6085181616,
+    "offerId": "ADD6921DG/10",
+    "name": "Диспенсер для воды Philips Water Series 7500 ADD6921DG/10 с обратным осмосом и нагревом",
+    "price": "879.00 USD",
+    "oldPrice": "999.00 USD",
+    "sku": 5577418988,
+    "barcodes": [],
+    "categoryId": 17039636,
+    "typeId": 970952397,
+    "createdAt": "2026-08-23T12:01:38.177226Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 333,
+    "productId": 6085181797,
+    "offerId": "AIS8530/20",
+    "name": "Парогенератор Philips All-in-One 8500 Series AIS8530/20, 2200 Вт, 6 бар, 1.2 л",
+    "price": "995.00 USD",
+    "oldPrice": "1194.00 USD",
+    "sku": 5577409859,
+    "barcodes": [
+      "8720389036965"
+    ],
+    "categoryId": 17039625,
+    "typeId": 115948871,
+    "createdAt": "2026-08-23T12:01:39.400833Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 334,
+    "productId": 6085181444,
+    "offerId": "DST7040/80",
+    "name": "Утюг паровой Philips Azur 7000 Series DST7040/80 2800 Вт",
+    "price": "267.00 USD",
+    "oldPrice": "320.00 USD",
+    "sku": 5576837055,
+    "barcodes": [
+      "8720389015724"
+    ],
+    "categoryId": 17039625,
+    "typeId": 91429,
+    "createdAt": "2026-08-23T12:01:36.458639Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 335,
+    "productId": 6085182150,
+    "offerId": "AWP230P6/31",
+    "name": "Сменный картридж для фильтра-кувшина Philips Micro X-Clean Softening+ AWP230P6, 6 шт",
+    "price": "91.00 USD",
+    "oldPrice": "109.00 USD",
+    "sku": 5576837680,
+    "barcodes": [
+      "4897099307655"
+    ],
+    "categoryId": 17027931,
+    "typeId": 94593,
+    "createdAt": "2026-08-23T12:01:42.390313Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 336,
+    "productId": 6085181097,
+    "offerId": "HP8280/00",
+    "name": "Фен для волос Philips MoistureProtect HP8280/00 2300 Вт с ионизацией и диффузором",
+    "price": "178.00 USD",
+    "oldPrice": "214.00 USD",
+    "sku": 5576836486,
+    "barcodes": [
+      "8710103666011"
+    ],
+    "categoryId": 17039639,
+    "typeId": 91730,
+    "createdAt": "2026-08-23T12:01:33.611161Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 337,
+    "productId": 6085181830,
+    "offerId": "HX3603/01",
+    "name": "Электрическая зубная щетка Philips Sonicare For Kids Design a Pet Edition HX3603/01 звуковая детская",
+    "price": "107.00 USD",
+    "oldPrice": "128.00 USD",
+    "sku": 5576836616,
+    "barcodes": [
+      "8720689018777"
+    ],
+    "categoryId": 17028937,
+    "typeId": 91905,
+    "createdAt": "2026-08-23T12:01:39.755386Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 338,
+    "productId": 6085182240,
+    "offerId": "BHB968/10",
+    "name": "Стайлер для завивки волос Philips WavePro 9000 BHB968/10 с технологией SenseIQ, белый",
+    "price": "606.00 USD",
+    "oldPrice": "727.00 USD",
+    "sku": 5576837185,
+    "barcodes": [
+      "8720689052504"
+    ],
+    "categoryId": 17039639,
+    "typeId": 234850283,
+    "createdAt": "2026-08-23T12:01:43.076783Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 339,
+    "productId": 6085181855,
+    "offerId": "S3241/12",
+    "name": "Электробритва Philips Series 3000 S3241/12 роторная для сухого и влажного бритья",
+    "price": "267.00 USD",
+    "oldPrice": "320.00 USD",
+    "sku": 5576836977,
+    "barcodes": [
+      "8720689018579"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T12:01:40.416295Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 340,
+    "productId": 6085181500,
+    "offerId": "Philips DryCare Pro Haartrockner mit leistungsstar",
+    "name": "Фен для волос Philips DryCare Pro BHD274/00, черный",
+    "price": "139.00 USD",
+    "oldPrice": "167.00 USD",
+    "sku": 5576837165,
+    "barcodes": [
+      "8710103898122"
+    ],
+    "categoryId": 17039639,
+    "typeId": 91730,
+    "createdAt": "2026-08-23T12:01:37.000022Z",
+    "status": "Продается",
+    "moderation": "approved"
+  },
+  {
+    "sira": 341,
+    "productId": 6086116937,
+    "offerId": "XP9402/46",
+    "name": "Электробритва мужская Philips i9000 Prestige Ultra XP9402/46 роторная для сухого и влажного бритья",
+    "price": "949.00 USD",
+    "oldPrice": "999.00 USD",
+    "sku": 5577655689,
+    "barcodes": [
+      "8720689030243"
+    ],
+    "categoryId": 17039624,
+    "typeId": 91687,
+    "createdAt": "2026-08-23T14:13:50.331729Z",
+    "status": "Продается",
+    "moderation": "approved"
+  }
+]
