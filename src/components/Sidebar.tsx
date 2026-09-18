@@ -32,13 +32,13 @@ const PRIMARY_NAV: NavItem[] = [
   { name: 'Kâr hesaplama', href: '/kar-hesaplama', icon: Calculator },
   { name: 'Siparişler', href: '/siparisler', icon: Package },
   { name: 'Fulfillment', href: '/fulfillment', icon: Truck },
-  { name: 'Amazon avcısı', href: '/amazon-aktar', icon: Sparkles },
   { name: 'Fiyat endeksi', href: '/fiyat-endeksi', icon: LineChart },
 ];
 
 const PRODUCT_UPLOAD_SUBITEMS: NavItem[] = [
   { name: 'Tekli ürün yükle', href: '/urun-yukle', icon: PackagePlus },
   { name: 'Toplu yükleme', href: '/toplu-yukle', icon: Layers },
+  { name: 'Amazon avcısı', href: '/amazon-aktar', icon: Sparkles },
   { name: 'Kategori ağacı', href: '/kategori-agaci', icon: FolderTree },
 ];
 
