@@ -16,6 +16,7 @@ import {
   Sparkles,
   LineChart,
   ChevronDown,
+  LayoutDashboard,
 } from 'lucide-react';
 
 interface NavItem {
@@ -27,6 +28,7 @@ interface NavItem {
 }
 
 const PRIMARY_NAV: NavItem[] = [
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Canlı analitik', href: '/analitik', icon: TrendingUp, external: true },
   { name: 'Siparişler', href: '/siparisler', icon: Package },
   { name: 'Fulfillment', href: '/fulfillment', icon: Truck },
