@@ -1,6 +1,6 @@
 Add-Type -AssemblyName System.Drawing
 
-$srcPath = "C:\Users\furka\.gemini\antigravity\brain\bb7f5119-0f1e-4c98-9762-0ad5df73ed74\.user_uploaded\media_1789772232734.png"
+$srcPath = "C:\Users\furka\.gemini\antigravity\brain\bb7f5119-0f1e-4c98-9762-0ad5df73ed74\.user_uploaded\media_1789772492302.png"
 $src = [System.Drawing.Bitmap]::FromFile($srcPath)
 
 Write-Host "Original dimensions: $($src.Width)x$($src.Height)"
