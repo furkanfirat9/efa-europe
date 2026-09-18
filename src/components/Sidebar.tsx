@@ -53,7 +53,7 @@ export default function Sidebar() {
     (sub) => pathname === sub.href || (sub.alias && pathname === sub.alias)
   );
 
-  const [isOpen, setIsOpen] = useState<boolean>(true);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
     <aside className="flex min-h-screen w-14 shrink-0 flex-col border-r border-hairline bg-canvas lg:w-60">
