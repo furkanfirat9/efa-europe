@@ -36,8 +36,8 @@ const PRIMARY_NAV: NavItem[] = [
   { name: 'Fiyat endeksi', href: '/fiyat-endeksi', icon: LineChart },
 ];
 
-const PRODUCT_UPLOAD_SUBITEMS = [
-  { name: 'Tekli ürün yükle', href: '/', icon: PackagePlus, alias: '/urun-yukle' },
+const PRODUCT_UPLOAD_SUBITEMS: NavItem[] = [
+  { name: 'Tekli ürün yükle', href: '/urun-yukle', icon: PackagePlus },
   { name: 'Toplu yükleme', href: '/toplu-yukle', icon: Layers },
   { name: 'Kategori ağacı', href: '/kategori-agaci', icon: FolderTree },
 ];
@@ -50,7 +50,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   const isProductUploadActive = PRODUCT_UPLOAD_SUBITEMS.some(
-    (sub) => pathname === sub.href || pathname === sub.alias
+    (sub) => pathname === sub.href || (sub.alias && pathname === sub.alias)
   );
 
   const [isOpen, setIsOpen] = useState<boolean>(true);
@@ -146,7 +146,7 @@ export default function Sidebar() {
             <div className="mt-0.5 space-y-0.5 lg:pl-3">
               {PRODUCT_UPLOAD_SUBITEMS.map((sub) => {
                 const SubIcon = sub.icon;
-                const isSubActive = pathname === sub.href || pathname === sub.alias;
+                const isSubActive = pathname === sub.href || (sub.alias && pathname === sub.alias);
 
                 return (
                   <Link
