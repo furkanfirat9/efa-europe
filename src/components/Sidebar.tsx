@@ -29,7 +29,7 @@ interface NavItem {
 
 const PRIMARY_NAV: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Canlı analitik', href: '/analitik', icon: TrendingUp, external: true },
+  { name: 'Kâr hesaplama', href: '/kar-hesaplama', icon: Calculator },
   { name: 'Siparişler', href: '/siparisler', icon: Package },
   { name: 'Fulfillment', href: '/fulfillment', icon: Truck },
   { name: 'Amazon avcısı', href: '/amazon-aktar', icon: Sparkles },
@@ -43,7 +43,7 @@ const PRODUCT_UPLOAD_SUBITEMS: NavItem[] = [
 ];
 
 const SECONDARY_NAV: NavItem[] = [
-  { name: 'Kâr hesaplama', href: '/kar-hesaplama', icon: Calculator },
+  { name: 'Canlı analitik', href: '/analitik', icon: TrendingUp, external: true },
 ];
 
 export default function Sidebar() {
