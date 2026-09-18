@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "postinstall": "prisma generate",
     "sync:maplibre": "node scripts/sync_maplibre_worker.mjs",
     "predev": "node scripts/sync_maplibre_worker.mjs",
     "prebuild": "node scripts/sync_maplibre_worker.mjs"
