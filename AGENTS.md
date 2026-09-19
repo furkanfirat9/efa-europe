@@ -101,7 +101,11 @@ yeni kodda kullanılmaz. Referans ekran: `/muhasebe?gorunum=shadcn`.
 - **Radix:** Etkileşimli bileşenler (select, dialog, popover, dropdown, tooltip) `radix-ui` paketi üzerinden kurulur; klavye ve erişilebilirlik davranışı elle yeniden yazılmaz.
 - **Grafikler:** Recharts; renkler `--chart-1 … --chart-5`, shadcn grafik örneklerindeki gibi (yatay ince grid, eksen çizgisi yok, sade tooltip).
 - **İkonlar:** Yalnızca `lucide-react`.
-- **Tema kapsamı (geçici):** Tailwind v4 geçişi tamamlanana kadar shadcn teması yalnızca `.shadcn-theme` sınıfının altında geçerlidir (`src/app/globals.css`). shadcn kullanan her ekranın kökünde bu sınıf bulunmalı; body'ye portal edilen içerik (select, dialog, popover) de bu sınıfı taşımalıdır.
+- **Tailwind v4:** `tailwind.config.ts` yok; tema `src/app/globals.css` içindedir.
+  - Başka bir CSS değişkenine referans veren token'lar (`--color-ink: var(--ink)` gibi) **`@theme inline`** içinde tanımlanır. Düz `@theme` bunları kökte sabitler ve `.bg-canvas` / `.shadcn-theme` altındaki yeniden tanımlar çalışmaz.
+  - Sabit değerler (hex, px) düz `@theme` içinde durur. `:root`'ta Tailwind'in kendi adlarıyla (`--radius-sm`, `--text-*`, `--shadow-*`, `--color-*`) değişken tanımlanmaz; Tailwind utility'lerini ezer.
+  - `slate`, `blue` vb. hazır renkler ve `text-*` satır yükseklikleri görünüm değişmesin diye v3 değerlerine sabitlendi. shadcn'e taşınan ekranlar bunlara ihtiyaç duymaz; hepsi taşındığında bu blok kaldırılabilir.
+- **Tema kapsamı (geçici):** shadcn kurulumu (3. adım) tamamlanana kadar shadcn teması yalnızca `.shadcn-theme` sınıfının altında geçerlidir (`src/app/globals.css`). shadcn kullanan her ekranın kökünde bu sınıf bulunmalı; body'ye portal edilen içerik (select, dialog, popover) de bu sınıfı taşımalıdır.
 - **Eski bileşenler:** `src/components/ui/*` (Card, StatCard, PillBadge, PillButton, PillInput, PillTabs, HatchedCostBar, Panel) ve koyu konsol teması (`bg-canvas`, `panel`, `hairline`) eskidir. Yeni kodda kullanılmaz; dokunulan ekranlar shadcn'e taşınır.
 - **Taşırken:** Yalnızca görünüm değişir; iş mantığı, veri çekme, route'lar ve prop API'leri değiştirilmez.
 - **Erişilebilirlik:** Görünür odak halkası, yalnız ikonlu butonlarda `aria-label`, gövde metninde yeterli kontrast.
@@ -110,6 +114,6 @@ yeni kodda kullanılmaz. Referans ekran: `/muhasebe?gorunum=shadcn`.
 Sırayla uygulanır; tamamlanan adım `[x]` ile işaretlenir.
 
 1. [x] **Küçük ve güvenli adımlar:** `lucide-react` güncellemesi, `cn()` yardımcısının tüm yeni kodda kullanılması, bildirimler için `sonner`.
-2. [ ] **Tailwind v4 geçişi:** Ayrı bir branch'te (`npx @tailwindcss/upgrade`), `tailwind-merge` v3 ile birlikte. Token'lar `tailwind.config.ts`'ten CSS'teki `@theme` içine taşınır. Tüm sayfalar (özellikle koyu konsol sayfaları) tek tek kontrol edilir.
+2. [x] **Tailwind v4 geçişi:** Ayrı bir branch'te (`npx @tailwindcss/upgrade`), `tailwind-merge` v3 ile birlikte. Token'lar `tailwind.config.ts`'ten CSS'teki `@theme` içine taşınır. Tüm sayfalar (özellikle koyu konsol sayfaları) tek tek kontrol edilir.
 3. [ ] **shadcn kurulumu:** shadcn CLI ile, varsayılan temayla. `.shadcn-theme` kapsamı kaldırılıp tema global yapılır, uygulama fontu Geist olur. Dialog, Popover, DropdownMenu, Select, Tooltip ve Calendar (`react-day-picker` + `date-fns`, `tr` dil desteği) eklenir. Elle yazılmış bileşenler (`src/components/DateRangePicker.tsx`, `src/app/siparisler/_components/Order*Dropdown.tsx`, modaller) o sayfalara dokunulduğunda bunlarla değiştirilir. Muhasebe'deki "Mevcut tasarım" sekmesi ve dashboard kartları da bu adımda shadcn'e taşınır.
 4. [ ] **TanStack Table:** Siparişler sayfası ele alınırken eklenir (sıralama, filtre, sayfalama); tablo görünümü shadcn `Table` bileşeniyle.

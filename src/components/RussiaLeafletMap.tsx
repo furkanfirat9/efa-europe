@@ -542,7 +542,7 @@ export function RussiaLeafletMap({
               e.stopPropagation();
               onOpenGeography();
             }}
-            className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-hairline bg-panel-sunken/80 px-2.5 py-1 text-2xs font-medium text-ink-muted transition-colors hover:border-hairline-strong hover:bg-white/[0.04] hover:text-ink"
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-hairline bg-panel-sunken/80 px-2.5 py-1 text-2xs font-medium text-ink-muted transition-colors hover:border-hairline-strong hover:bg-white/4 hover:text-ink"
             title="Bölge, Eyalet ve Şehir Dağılımını Görüntüle"
           >
             <Layers className="h-3.5 w-3.5 text-brand" />
@@ -558,7 +558,7 @@ export function RussiaLeafletMap({
         <div ref={mapContainerRef} className={`${styles.map} h-full w-full`} />
 
         {selectedGroup && (
-          <div className="absolute left-4 top-4 z-[1100] flex max-h-[calc(100%-2rem)] w-[min(22rem,calc(100%-2rem))] flex-col rounded-panel border border-hairline-strong bg-panel/95 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.75)] backdrop-blur-sm">
+          <div className="absolute left-4 top-4 z-1100 flex max-h-[calc(100%-2rem)] w-[min(22rem,calc(100%-2rem))] flex-col rounded-panel border border-hairline-strong bg-panel/95 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.75)] backdrop-blur-xs">
             <div className="flex items-start justify-between gap-2 border-b border-hairline px-3.5 py-3">
               <div className="flex min-w-0 items-center gap-1.5">
                 <MapPin className="h-3.5 w-3.5 shrink-0 text-ink-subtle" />
@@ -575,7 +575,7 @@ export function RussiaLeafletMap({
                 type="button"
                 onClick={() => setSelectedKey(null)}
                 aria-label="Kapat"
-                className="-mr-1 -mt-1 flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-white/[0.06] hover:text-ink"
+                className="-mr-1 -mt-1 flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-white/6 hover:text-ink"
               >
                 <X className="h-3.5 w-3.5" />
               </button>

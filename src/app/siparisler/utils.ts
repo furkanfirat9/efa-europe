@@ -188,28 +188,28 @@ export function getShipmentCountdown(
  */
 export function getCountdownUrgencyStyle(daysLeft: number, isExpired: boolean): string {
   if (isExpired) {
-    return 'bg-zinc-900 text-rose-300 ring-1 ring-rose-500 shadow-xs';
+    return 'bg-zinc-900 text-rose-300 ring-1 ring-rose-500';
   }
   if (daysLeft === 0) {
     // Bugün Son: En yüksek alarm, güçlü kırmızı ve yanıp sönme
-    return 'bg-red-600 text-white animate-pulse ring-2 ring-red-300 shadow-sm shadow-red-500/40 font-extrabold';
+    return 'bg-red-600 text-white animate-pulse ring-2 ring-red-300 shadow-xs shadow-red-500/40 font-extrabold';
   }
   if (daysLeft === 1) {
     // Son 1 gün: Kırmızı alarm ve nabız
-    return 'bg-red-600 text-white animate-pulse ring-1.5 ring-red-200 shadow-xs shadow-red-500/30';
+    return 'bg-red-600 text-white animate-pulse ring-1.5 ring-red-200 shadow-red-500/30';
   }
   if (daysLeft === 2) {
     // Son 2 gün: Kritik kırmızı
-    return 'bg-[#DC2626] text-white shadow-xs';
+    return 'bg-[#DC2626] text-white';
   }
   if (daysLeft === 3) {
     // Son 3 gün: Kırmızı-gül tonu
-    return 'bg-[#E11D48] text-white shadow-xs';
+    return 'bg-[#E11D48] text-white';
   }
   if (daysLeft === 4) {
     // Son 4 gün: Canlı turuncu-kırmızı
-    return 'bg-[#EA580C] text-white shadow-xs';
+    return 'bg-[#EA580C] text-white';
   }
   // Son 5 gün: Amber / Turuncu (Geri sayım başlangıcı)
-  return 'bg-[#D97706] text-white shadow-xs';
+  return 'bg-[#D97706] text-white';
 }

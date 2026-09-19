@@ -8,7 +8,7 @@ import React from 'react';
  */
 
 const CONTROL =
-  'w-full rounded-lg border border-hairline bg-panel-sunken px-3 text-2xs text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-hairline-strong disabled:cursor-not-allowed disabled:opacity-60';
+  'w-full rounded-lg border border-hairline bg-panel-sunken px-3 text-2xs text-ink outline-hidden transition-colors placeholder:text-ink-faint focus:border-hairline-strong disabled:cursor-not-allowed disabled:opacity-60';
 
 export function Field({
   label,
@@ -80,7 +80,7 @@ export function Button({
     primary: 'bg-brand text-white hover:opacity-90',
     secondary:
       'border border-hairline bg-panel-sunken text-ink-muted hover:border-hairline-strong hover:text-ink',
-    ghost: 'text-ink-subtle hover:bg-white/[0.05] hover:text-ink',
+    ghost: 'text-ink-subtle hover:bg-white/5 hover:text-ink',
     danger: 'text-ink-subtle hover:bg-loss-soft hover:text-loss',
   };
 

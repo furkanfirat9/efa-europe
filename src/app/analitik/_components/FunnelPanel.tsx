@@ -70,7 +70,7 @@ export function FunnelPanel({ summary, loading }: FunnelPanelProps) {
                   )}
                 </div>
 
-                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.05]">
+                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/5">
                   {!loading && (
                     <div
                       className={`h-full rounded-full transition-[width] duration-500 ease-out ${
@@ -93,7 +93,7 @@ export function FunnelPanel({ summary, loading }: FunnelPanelProps) {
             </span>
           </div>
 
-          <div className="mt-2.5 flex h-1.5 gap-0.5 overflow-hidden rounded-full bg-white/[0.05]">
+          <div className="mt-2.5 flex h-1.5 gap-0.5 overflow-hidden rounded-full bg-white/5">
             {!loading && views > 0 && (
               <>
                 <div className="h-full rounded-full bg-brand" style={{ width: `${searchShare}%` }} />

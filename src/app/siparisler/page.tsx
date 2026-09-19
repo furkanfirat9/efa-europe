@@ -73,7 +73,7 @@ function SiparislerContent() {
           {/* Sol: AI Orb, Sayfa Başlığı ve Yıl/Ay Seçici */}
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             {/* Signature AI Orb */}
-            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-accent to-[#A5A6F6] p-0.5 shadow-xs">
+            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-tr from-accent to-[#A5A6F6] p-0.5">
               <div className="h-full w-full rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center">
                 <Package className="h-4 w-4 text-white" />
               </div>
@@ -90,7 +90,7 @@ function SiparislerContent() {
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(Number(e.target.value))}
-                  className="appearance-none cursor-pointer bg-transparent pr-5 py-1 text-xs font-medium text-text-primary focus:outline-none"
+                  className="appearance-none cursor-pointer bg-transparent pr-5 py-1 text-xs font-medium text-text-primary focus:outline-hidden"
                 >
                   {AVAILABLE_YEARS.map((y) => (
                     <option key={y} value={y}>
@@ -108,7 +108,7 @@ function SiparislerContent() {
                 <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                  className="appearance-none cursor-pointer bg-transparent pr-5 py-1 text-xs font-medium text-text-primary focus:outline-none"
+                  className="appearance-none cursor-pointer bg-transparent pr-5 py-1 text-xs font-medium text-text-primary focus:outline-hidden"
                 >
                   {availableMonths.map((m) => (
                     <option key={m.value} value={m.value}>
@@ -130,7 +130,7 @@ function SiparislerContent() {
                 placeholder="Tabloda ara…"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-9 w-36 sm:w-56 rounded-full border border-border-subtle bg-white pl-8 pr-7 text-xs text-text-primary placeholder:text-text-muted shadow-hairline focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
+                className="h-9 w-36 sm:w-56 rounded-full border border-border-subtle bg-white pl-8 pr-7 text-xs text-text-primary placeholder:text-text-muted shadow-hairline focus:outline-hidden focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
               />
               {searchTerm && (
                 <button
@@ -145,7 +145,7 @@ function SiparislerContent() {
             </div>
 
             {syncing && (
-              <PillBadge tone="info" dot className="animate-pulse shadow-xs">
+              <PillBadge tone="info" dot className="animate-pulse">
                 Güncelleniyor…
               </PillBadge>
             )}
@@ -157,7 +157,7 @@ function SiparislerContent() {
       <main className="w-full space-y-5 px-5 py-6 sm:pb-16 lg:px-8">
         {/* HATA BİLDİRİMİ */}
         {error && (
-          <div className="flex items-center justify-between rounded-[20px] border border-[#FDE7E7] bg-[#FDE7E7]/60 px-4 py-3 text-xs text-[#D14343] shadow-xs">
+          <div className="flex items-center justify-between rounded-[20px] border border-[#FDE7E7] bg-[#FDE7E7]/60 px-4 py-3 text-xs text-[#D14343]">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 shrink-0 text-[#D14343]" />
               <span className="font-medium">{error}</span>

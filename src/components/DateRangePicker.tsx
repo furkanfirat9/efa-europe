@@ -204,7 +204,7 @@ export default function DateRangePicker({ startDate, endDate, onChange }: DateRa
                 className={`cursor-pointer rounded-md px-2 py-1 text-2xs font-medium transition-colors ${
                   activePreset === preset.key
                     ? 'bg-brand-soft text-brand'
-                    : 'text-ink-muted hover:bg-white/[0.05] hover:text-ink'
+                    : 'text-ink-muted hover:bg-white/5 hover:text-ink'
                 }`}
               >
                 {preset.label}
@@ -217,7 +217,7 @@ export default function DateRangePicker({ startDate, endDate, onChange }: DateRa
               type="button"
               onClick={prevMonth}
               aria-label="Önceki ay"
-              className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-white/[0.05] hover:text-ink"
+              className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-white/5 hover:text-ink"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
             </button>
@@ -228,7 +228,7 @@ export default function DateRangePicker({ startDate, endDate, onChange }: DateRa
               type="button"
               onClick={nextMonth}
               aria-label="Sonraki ay"
-              className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-white/[0.05] hover:text-ink"
+              className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-white/5 hover:text-ink"
             >
               <ChevronRight className="h-3.5 w-3.5" />
             </button>
@@ -268,7 +268,7 @@ export default function DateRangePicker({ startDate, endDate, onChange }: DateRa
                   onClick={() => handleDateClick(day.dateStr)}
                   onMouseEnter={() => setHoverDate(day.dateStr)}
                   className={`relative flex h-8 cursor-pointer items-center justify-center text-2xs tabular-nums transition-colors ${tone} ${
-                    isEdge ? 'rounded-md' : inRange ? '' : 'rounded-md hover:bg-white/[0.05]'
+                    isEdge ? 'rounded-md' : inRange ? '' : 'rounded-md hover:bg-white/5'
                   }`}
                 >
                   {day.dayNum}

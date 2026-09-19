@@ -39,7 +39,7 @@ export function Panel({
       <header
         onClick={onHeaderClick}
         className={`flex min-h-[52px] items-center justify-between gap-4 border-b border-hairline px-5 py-3 ${
-          onHeaderClick ? 'cursor-pointer transition-colors hover:bg-white/[0.02]' : ''
+          onHeaderClick ? 'cursor-pointer transition-colors hover:bg-white/2' : ''
         }`}
       >
         <div className="min-w-0">

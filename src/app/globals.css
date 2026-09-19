@@ -1,233 +1,559 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-:root {
-  --background: #0a0b0d;
-  --foreground: #edeff2;
+/* Sabit değerler: kökte bir kez tanımlanır. */
+@theme {
+  --color-canvas: #0a0b0d;
 
-  /* Soft UI SaaS Dashboard Design Tokens (AGENTS.md Section 7) */
-  --bg-page: #F3F3F8;
-  --bg-page-gradient: linear-gradient(180deg, #F7F7FB 0%, #ECECF6 100%);
-  --surface: #FFFFFF;
-  --surface-muted: #F6F6FA;
-  --surface-accent: #EEEEFC;
-  --border-subtle: #ECECF3;
-  --text-primary: #111114;
-  --text-secondary: #6B6B78;
-  --text-muted: #A0A0AC;
-  --accent: #6C72E6;
-  --accent-soft: #D9DBFA;
-  --ink: #0E0E10;
-  --ink-foreground: #FFFFFF;
-  --ink-muted: #6B6B78;
-  --ink-subtle: #8A8A96;
-  --ink-faint: #A0A0AC;
+  --color-panel: #111317;
+  --color-panel-raised: #171a20;
+  --color-panel-sunken: #0d0f13;
 
-  /* Status badge pairs */
-  --status-success-bg: #E5F6EC;
-  --status-success-text: #2E8B57;
-  --status-danger-bg: #FDE7E7;
-  --status-danger-text: #D14343;
-  --status-info-bg: #ECEBFD;
-  --status-info-text: #5856D6;
-  --status-warning-bg: #FDF0E2;
-  --status-warning-text: #C47A2C;
-  --status-pink-bg: #FCE7F2;
-  --status-pink-text: #C2408A;
-  --status-neutral-bg: #F1F1F5;
-  --status-neutral-text: #6B6B78;
+  --color-hairline: rgba(255, 255, 255, 0.07);
+  --color-hairline-strong: rgba(255, 255, 255, 0.13);
 
-  /* Radii */
+  --color-brand: #005bff;
+  --color-brand-soft: rgba(0, 91, 255, 0.12);
+
+  --color-gain: #35c07e;
+  --color-caution: #f59e0b;
+  --color-loss: #ef4444;
+
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+
   --radius-card: 28px;
   --radius-inner: 20px;
-  --radius-sm: 12px;
+  --radius-sm-token: 12px;
+  --radius-panel: 12px;
 
-  /* Shadows */
   --shadow-hairline: 0 1px 2px rgba(20, 20, 40, 0.03);
   --shadow-float: 0 16px 40px -16px rgba(40, 40, 100, 0.18);
+
+  --font-sans:
+    var(--font-inter), Inter, -apple-system, BlinkMacSystemFont, Segoe UI,
+    Roboto, sans-serif;
+  --font-mono:
+    var(--font-mono), JetBrains Mono, ui-monospace, SFMono-Regular, Menlo,
+    Monaco, Consolas, monospace;
 }
 
-/* shadcn/ui varsayılan teması (new-york, neutral). Yalnızca Muhasebe'deki
-   shadcn karşılaştırma sekmesinde geçerlidir; uygulamanın geri kalanına sızmaz.
-   --accent / --background / --foreground burada shadcn anlamıyla ezilir. */
-.shadcn-theme {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  color: var(--foreground);
-  background: var(--background);
+/* Kapsamla değişen değerler: `inline` sayesinde utility'ler var(--ink) gibi
+   değişkeni doğrudan kullanır ve .bg-canvas / .shadcn-theme altındaki
+   yeniden tanımlar geçerli olur. Düz @theme bunları kökte sabitlerdi. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-bg-page: var(--bg-page);
+
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-accent: var(--surface-accent);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-ink-faint: var(--ink-faint);
+
+  --color-status-success-bg: var(--status-success-bg);
+  --color-status-success-text: var(--status-success-text);
+  --color-status-danger-bg: var(--status-danger-bg);
+  --color-status-danger-text: var(--status-danger-text);
+  --color-status-info-bg: var(--status-info-bg);
+  --color-status-info-text: var(--status-info-text);
+  --color-status-warning-bg: var(--status-warning-bg);
+  --color-status-warning-text: var(--status-warning-text);
+  --color-status-pink-bg: var(--status-pink-bg);
+  --color-status-pink-text: var(--status-pink-text);
+  --color-status-neutral-bg: var(--status-neutral-bg);
+  --color-status-neutral-text: var(--status-neutral-text);
+
+  /* shadcn/ui (değerler .shadcn-theme içinde tanımlı) */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
 }
 
-/* :where → özgüllük 0; border-transparent gibi utility'ler bunu ezebilsin. */
-:where(.shadcn-theme),
-:where(.shadcn-theme) *,
-:where(.shadcn-theme) ::before,
-:where(.shadcn-theme) ::after {
-  border-color: var(--border);
-  outline-color: color-mix(in oklab, var(--ring) 50%, transparent);
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+/* Tailwind v3 renk paleti ve satır yükseklikleri. v4 hazır renkleri daha canlı
+   oklch tonlarına çevirdi ve text-* satır yüksekliklerini orana dönüştürdü; bu da
+   text-[10px] gibi özel boyutların satırlarını daralttı. Görünüm v3 ile aynı kalsın
+   diye projede kullanılan aileler v3 değerleriyle sabitlendi. shadcn'e taşınan
+   ekranlar bu renkleri kullanmayacağı için ileride kaldırılabilir. */
+@theme {
+  --text-xs--line-height: 1rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  --color-gray-950: #030712;
+
+  --color-zinc-50: #fafafa;
+  --color-zinc-100: #f4f4f5;
+  --color-zinc-200: #e4e4e7;
+  --color-zinc-300: #d4d4d8;
+  --color-zinc-400: #a1a1aa;
+  --color-zinc-500: #71717a;
+  --color-zinc-600: #52525b;
+  --color-zinc-700: #3f3f46;
+  --color-zinc-800: #27272a;
+  --color-zinc-900: #18181b;
+  --color-zinc-950: #09090b;
+
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+  --color-neutral-950: #0a0a0a;
+
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-200: #fecaca;
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+  --color-red-800: #991b1b;
+  --color-red-900: #7f1d1d;
+  --color-red-950: #450a0a;
+
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fcd34d;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+  --color-amber-800: #92400e;
+  --color-amber-900: #78350f;
+  --color-amber-950: #451a03;
+
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-300: #6ee7b7;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065f46;
+  --color-emerald-900: #064e3b;
+  --color-emerald-950: #022c22;
+
+  --color-cyan-50: #ecfeff;
+  --color-cyan-100: #cffafe;
+  --color-cyan-200: #a5f3fc;
+  --color-cyan-300: #67e8f9;
+  --color-cyan-400: #22d3ee;
+  --color-cyan-500: #06b6d4;
+  --color-cyan-600: #0891b2;
+  --color-cyan-700: #0e7490;
+  --color-cyan-800: #155e75;
+  --color-cyan-900: #164e63;
+  --color-cyan-950: #083344;
+
+  --color-sky-50: #f0f9ff;
+  --color-sky-100: #e0f2fe;
+  --color-sky-200: #bae6fd;
+  --color-sky-300: #7dd3fc;
+  --color-sky-400: #38bdf8;
+  --color-sky-500: #0ea5e9;
+  --color-sky-600: #0284c7;
+  --color-sky-700: #0369a1;
+  --color-sky-800: #075985;
+  --color-sky-900: #0c4a6e;
+  --color-sky-950: #082f49;
+
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bfdbfe;
+  --color-blue-300: #93c5fd;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+  --color-blue-800: #1e40af;
+  --color-blue-900: #1e3a8a;
+  --color-blue-950: #172554;
+
+  --color-indigo-50: #eef2ff;
+  --color-indigo-100: #e0e7ff;
+  --color-indigo-200: #c7d2fe;
+  --color-indigo-300: #a5b4fc;
+  --color-indigo-400: #818cf8;
+  --color-indigo-500: #6366f1;
+  --color-indigo-600: #4f46e5;
+  --color-indigo-700: #4338ca;
+  --color-indigo-800: #3730a3;
+  --color-indigo-900: #312e81;
+  --color-indigo-950: #1e1b4b;
+
+  --color-purple-50: #faf5ff;
+  --color-purple-100: #f3e8ff;
+  --color-purple-200: #e9d5ff;
+  --color-purple-300: #d8b4fe;
+  --color-purple-400: #c084fc;
+  --color-purple-500: #a855f7;
+  --color-purple-600: #9333ea;
+  --color-purple-700: #7e22ce;
+  --color-purple-800: #6b21a8;
+  --color-purple-900: #581c87;
+  --color-purple-950: #3b0764;
+
+  --color-rose-50: #fff1f2;
+  --color-rose-100: #ffe4e6;
+  --color-rose-200: #fecdd3;
+  --color-rose-300: #fda4af;
+  --color-rose-400: #fb7185;
+  --color-rose-500: #f43f5e;
+  --color-rose-600: #e11d48;
+  --color-rose-700: #be123c;
+  --color-rose-800: #9f1239;
+  --color-rose-900: #881337;
+  --color-rose-950: #4c0519;
 }
 
-/* Koyu Konsol (Analitik, Fiyat Endeksi, Sidebar) renk token'ları */
-.bg-canvas,
-[class*="console_page"],
-[class*="console_header"],
-[class*="console_dialog"],
-[class*="console_overlay"],
-[class*="console_hairlineCell"] {
-  --ink: #EDEFF2;
-  --ink-foreground: #0A0B0D;
-  --ink-muted: #C5C9D3;
-  --ink-subtle: #949DAA;
-  --ink-faint: #68707E;
-  --foreground: #EDEFF2;
+/* v3 uyumluluğu: v4'te butonların imleci varsayılan oku gösterir,
+   placeholder rengi de metin renginin yarı saydamıdır. */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+  }
 }
 
-/* Açık Tema Sayfa Alanları için Ink Token Sıfırlaması */
-.bg-bg-page {
-  --ink: #0E0E10;
-  --ink-foreground: #FFFFFF;
-  --ink-muted: #6B6B78;
-  --ink-subtle: #8A8A96;
-  --ink-faint: #A0A0AC;
-  --foreground: #111114;
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  min-height: 100vh;
-}
-
-@layer components {
+@utility skeleton {
   /* Yükleniyor iskeleti — nabız yerine soldan sağa geçen tek bir parıltı.
      Sürekli yanıp sönen bloklardan daha sakin ve daha az dikkat çekicidir. */
-  .skeleton {
-    position: relative;
-    overflow: hidden;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 4px;
-  }
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
 
-  .skeleton::after {
+  &::after {
     content: '';
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.055), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.055),
+      transparent
+    );
     animation: skeleton-shimmer 1.4s infinite;
   }
+}
 
+@utility skeleton-soft {
   /* Açık tema iskeleti: beyaz kartların üzerinde okunacak lavanta-gri ton. */
-  .skeleton-soft {
-    position: relative;
-    overflow: hidden;
-    background-color: var(--surface-muted);
-    border-radius: 9999px;
-  }
+  position: relative;
+  overflow: hidden;
+  background-color: var(--surface-muted);
+  border-radius: 9999px;
 
-  .skeleton-soft::after {
+  &::after {
     content: '';
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.9),
+      transparent
+    );
     animation: skeleton-shimmer 1.4s infinite;
   }
+}
 
+@utility card-cutout {
   /* Ters kesik köşe (AGENTS.md §5.1). Kartın sağ üstüne oyulmuş çentik;
      iki iç bükey köşe radial-gradient ile karta yumuşakça bağlanır.
      --notch-bg kartın oturduğu zeminin rengiyle eşleşmeli. */
-  .card-cutout {
-    --notch-bg: var(--bg-page);
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 10;
-    padding: 7px;
-    background: var(--notch-bg);
-    border-bottom-left-radius: 24px;
-  }
+  --notch-bg: var(--bg-page);
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  padding: 7px;
+  background: var(--notch-bg);
+  border-bottom-left-radius: 24px;
 
-  .card-cutout::before,
-  .card-cutout::after {
+  &::before {
     content: '';
     position: absolute;
     width: 24px;
     height: 24px;
     pointer-events: none;
-    background: radial-gradient(circle at bottom left, transparent 24px, var(--notch-bg) 24.5px);
+    background: radial-gradient(
+      circle at bottom left,
+      transparent 24px,
+      var(--notch-bg) 24.5px
+    );
   }
 
-  .card-cutout::before {
+  &::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at bottom left,
+      transparent 24px,
+      var(--notch-bg) 24.5px
+    );
+  }
+
+  &::before {
     top: 0;
     right: 100%;
   }
 
-  .card-cutout::after {
+  &::after {
     top: 100%;
     right: 0;
   }
+}
 
+@utility hatch {
   /* Taralı şerit dolgu (AGENTS.md §5.3). Renk --hatch ile verilir;
      zemin aynı rengin çok açık bir tonudur, düz blok dolgu kullanılmaz. */
-  .hatch {
-    --hatch: var(--accent);
-    background-color: color-mix(in srgb, var(--hatch) 10%, transparent);
-    background-image: repeating-linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--hatch) 70%, transparent) 0 1.5px,
-      transparent 1.5px 6px
-    );
-  }
+  --hatch: var(--accent);
+  background-color: color-mix(in srgb, var(--hatch) 10%, transparent);
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--hatch) 70%, transparent) 0 1.5px,
+    transparent 1.5px 6px
+  );
+}
 
+@utility scroll-thin {
   /* İnce, üstte yüzen kaydırma çubuğu (panel içi listeler ve tablolar). */
-  .scroll-thin {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
-  }
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
 
-  .scroll-thin::-webkit-scrollbar {
+  &::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
-  .scroll-thin::-webkit-scrollbar-track {
+  &::-webkit-scrollbar-track {
     background: transparent;
   }
 
-  .scroll-thin::-webkit-scrollbar-thumb {
+  &::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.12);
     background-clip: content-box;
     border: 2px solid transparent;
     border-radius: 9999px;
   }
 
-  .scroll-thin::-webkit-scrollbar-thumb:hover {
+  &::-webkit-scrollbar-thumb:hover {
     background-color: rgba(255, 255, 255, 0.24);
     background-clip: content-box;
+  }
+}
+
+@layer utilities {
+  :root {
+    --background: #0a0b0d;
+    --foreground: #edeff2;
+
+    /* Soft UI SaaS Dashboard Design Tokens (AGENTS.md Section 7) */
+    --bg-page: #f3f3f8;
+    --bg-page-gradient: linear-gradient(180deg, #f7f7fb 0%, #ececf6 100%);
+    --surface: #ffffff;
+    --surface-muted: #f6f6fa;
+    --surface-accent: #eeeefc;
+    --border-subtle: #ececf3;
+    --text-primary: #111114;
+    --text-secondary: #6b6b78;
+    --text-muted: #a0a0ac;
+    --accent: #6c72e6;
+    --accent-soft: #d9dbfa;
+    --ink: #0e0e10;
+    --ink-foreground: #ffffff;
+    --ink-muted: #6b6b78;
+    --ink-subtle: #8a8a96;
+    --ink-faint: #a0a0ac;
+
+    /* Status badge pairs */
+    --status-success-bg: #e5f6ec;
+    --status-success-text: #2e8b57;
+    --status-danger-bg: #fde7e7;
+    --status-danger-text: #d14343;
+    --status-info-bg: #ecebfd;
+    --status-info-text: #5856d6;
+    --status-warning-bg: #fdf0e2;
+    --status-warning-text: #c47a2c;
+    --status-pink-bg: #fce7f2;
+    --status-pink-text: #c2408a;
+    --status-neutral-bg: #f1f1f5;
+    --status-neutral-text: #6b6b78;
+
+  }
+
+  /* shadcn/ui varsayılan teması (new-york, neutral). Yalnızca Muhasebe'deki
+   shadcn karşılaştırma sekmesinde geçerlidir; uygulamanın geri kalanına sızmaz.
+   --accent / --background / --foreground burada shadcn anlamıyla ezilir. */
+  .shadcn-theme {
+    --radius: 0.625rem;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --chart-1: oklch(0.646 0.222 41.116);
+    --chart-2: oklch(0.6 0.118 184.704);
+    --chart-3: oklch(0.398 0.07 227.392);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.769 0.188 70.08);
+    color: var(--foreground);
+    background: var(--background);
+  }
+
+  /* :where → özgüllük 0; border-transparent gibi utility'ler bunu ezebilsin. */
+  :where(.shadcn-theme),
+  :where(.shadcn-theme) *,
+  :where(.shadcn-theme) ::before,
+  :where(.shadcn-theme) ::after {
+    border-color: var(--border);
+    outline-color: color-mix(in oklab, var(--ring) 50%, transparent);
+  }
+
+  /* Koyu Konsol (Analitik, Fiyat Endeksi, Sidebar) renk token'ları */
+  .bg-canvas,
+  [class*='console_page'],
+  [class*='console_header'],
+  [class*='console_dialog'],
+  [class*='console_overlay'],
+  [class*='console_hairlineCell'] {
+    --ink: #edeff2;
+    --ink-foreground: #0a0b0d;
+    --ink-muted: #c5c9d3;
+    --ink-subtle: #949daa;
+    --ink-faint: #68707e;
+    --foreground: #edeff2;
+  }
+
+  /* Açık Tema Sayfa Alanları için Ink Token Sıfırlaması */
+  .bg-bg-page {
+    --ink: #0e0e10;
+    --ink-foreground: #ffffff;
+    --ink-muted: #6b6b78;
+    --ink-subtle: #8a8a96;
+    --ink-faint: #a0a0ac;
+    --foreground: #111114;
+  }
+
+  body {
+    color: var(--foreground);
+    background: var(--background);
+    font-family:
+      var(--font-inter),
+      'Inter',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      Roboto,
+      sans-serif;
+    min-height: 100vh;
   }
 }
 

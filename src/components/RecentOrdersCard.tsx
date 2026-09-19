@@ -93,7 +93,7 @@ export function RecentOrdersCard({ orders = [], loading = false }: RecentOrdersC
                 return (
                   <tr
                     key={order.postingNumber || order.orderId || index}
-                    className="border-b border-hairline transition-colors last:border-b-0 hover:bg-white/[0.02]"
+                    className="border-b border-hairline transition-colors last:border-b-0 hover:bg-white/2"
                   >
                     <td className="px-5 py-3">
                       <div className="flex min-w-0 items-center gap-3">

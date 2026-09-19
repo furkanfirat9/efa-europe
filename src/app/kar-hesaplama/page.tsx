@@ -277,7 +277,7 @@ export default function KarHesaplamaPage() {
   }, [buyPrice, sellPrice, weightG, customShipping, shippingMode, commissionRate, activeRate, isIntegrated, isSplitting]);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] text-text-primary p-5 sm:p-7 md:p-8 lg:p-10">
+    <div className="min-h-screen bg-(--bg-page) text-text-primary p-5 sm:p-7 md:p-8 lg:p-10">
       <div className="mx-auto max-w-7xl space-y-6 md:space-y-8">
         
         {/* ========================================================================= */}
@@ -287,7 +287,7 @@ export default function KarHesaplamaPage() {
           <div className="flex items-center gap-4">
             {/* 5.4 AI Gradient Orb */}
             <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#6C72E6] via-[#D9DBFA] to-[#C2408A] opacity-70 blur-md animate-pulse" />
+              <div className="absolute inset-0 rounded-full bg-linear-to-tr from-[#6C72E6] via-[#D9DBFA] to-[#C2408A] opacity-70 blur-md animate-pulse" />
               <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-hairline backdrop-blur-xs">
                 <Coins className="h-5 w-5 text-accent stroke-[1.75]" />
               </div>
@@ -429,7 +429,7 @@ export default function KarHesaplamaPage() {
                         onClick={() => setShippingMode('weight')}
                         className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all cursor-pointer ${
                           shippingMode === 'weight'
-                            ? 'bg-neutral-900 text-white shadow-xs'
+                            ? 'bg-neutral-900 text-white'
                             : 'text-text-secondary hover:text-text-primary'
                         }`}
                       >
@@ -440,7 +440,7 @@ export default function KarHesaplamaPage() {
                         onClick={() => setShippingMode('custom')}
                         className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all cursor-pointer ${
                           shippingMode === 'custom'
-                            ? 'bg-neutral-900 text-white shadow-xs'
+                            ? 'bg-neutral-900 text-white'
                             : 'text-text-secondary hover:text-text-primary'
                         }`}
                       >
@@ -487,7 +487,7 @@ export default function KarHesaplamaPage() {
                         onClick={() => setCurrency('EUR')}
                         className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all cursor-pointer ${
                           currency === 'EUR'
-                            ? 'bg-neutral-900 text-white shadow-xs'
+                            ? 'bg-neutral-900 text-white'
                             : 'text-text-secondary hover:text-text-primary'
                         }`}
                       >
@@ -498,7 +498,7 @@ export default function KarHesaplamaPage() {
                         onClick={() => setCurrency('USD')}
                         className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all cursor-pointer ${
                           currency === 'USD'
-                            ? 'bg-neutral-900 text-white shadow-xs'
+                            ? 'bg-neutral-900 text-white'
                             : 'text-text-secondary hover:text-text-primary'
                         }`}
                       >
@@ -519,7 +519,7 @@ export default function KarHesaplamaPage() {
                     <label
                       className={`flex cursor-pointer items-start gap-3 rounded-2xl p-3.5 border transition-all ${
                         isIntegrated
-                          ? 'border-accent/40 bg-surface-accent shadow-xs'
+                          ? 'border-accent/40 bg-surface-accent'
                           : 'border-border-subtle bg-surface-muted hover:border-border-subtle/80'
                       }`}
                     >
@@ -543,7 +543,7 @@ export default function KarHesaplamaPage() {
                     <label
                       className={`flex cursor-pointer items-start gap-3 rounded-2xl p-3.5 border transition-all ${
                         isSplitting
-                          ? 'border-accent/40 bg-surface-accent shadow-xs'
+                          ? 'border-accent/40 bg-surface-accent'
                           : 'border-border-subtle bg-surface-muted hover:border-border-subtle/80'
                       }`}
                     >

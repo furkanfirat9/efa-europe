@@ -864,21 +864,21 @@ export default function TopluYuklePage() {
 
       {/* 15-20 Kanallı Canlı Paralel İlerleme Çubuğu */}
       {activeTaskProgress && (
-        <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg space-y-3 animate-in fade-in duration-300">
+        <div className="p-5 rounded-2xl bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg space-y-3 animate-in fade-in duration-300">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
               <span className="text-sm font-bold tracking-wide">{activeTaskProgress.label}</span>
             </div>
-            <span className="text-xs font-mono font-bold bg-white/20 px-2.5 py-1 rounded-full backdrop-blur-sm">
+            <span className="text-xs font-mono font-bold bg-white/20 px-2.5 py-1 rounded-full backdrop-blur-xs">
               {activeTaskProgress.current} / {activeTaskProgress.total} Ürün (%{activeTaskProgress.percent})
             </span>
           </div>
 
           {/* İlerleme Çubuğu */}
-          <div className="w-full bg-black/20 rounded-full h-3 p-0.5 backdrop-blur-sm overflow-hidden">
+          <div className="w-full bg-black/20 rounded-full h-3 p-0.5 backdrop-blur-xs overflow-hidden">
             <div
-              className="bg-gradient-to-r from-emerald-400 to-cyan-300 h-full rounded-full transition-all duration-300 shadow-sm"
+              className="bg-linear-to-r from-emerald-400 to-cyan-300 h-full rounded-full transition-all duration-300 shadow-xs"
               style={{ width: `${Math.max(activeTaskProgress.percent, 3)}%` }}
             />
           </div>
@@ -912,7 +912,7 @@ export default function TopluYuklePage() {
       )}
 
       {/* 1. KART: TOPLU MODEL GİRİŞ KUTUSU (VARSAYILAN KAPALI) */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden transition-all">
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all">
         <button
           type="button"
           onClick={() => setIsManualInputCardOpen(!isManualInputCardOpen)}
@@ -956,7 +956,7 @@ export default function TopluYuklePage() {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Her satıra bir marka/model yazınız (Örn: Philips NA350/00&#10;Tefal EY9018&#10;Tefal EY7528E0)&#10;Dilerseniz boru (|) ile fiyat ve resim de ekleyebilirsiniz: Philips NA350/00 | 180 | https://.../img.jpg"
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-slate-50/50"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-mono focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-slate-50/50"
               />
               <div className="flex items-center justify-between text-xs text-slate-400">
                 <span>Yazdığınız tüm ürünler aşağıdaki seçili Ozon kategorisinde paralel araştırılacaktır.</span>
@@ -964,7 +964,7 @@ export default function TopluYuklePage() {
                   type="button"
                   onClick={handleParseAndAddItems}
                   disabled={!inputText.trim()}
-                  className="px-4 py-2 rounded-lg bg-slate-900 text-white font-semibold text-xs hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-sm"
+                  className="px-4 py-2 rounded-lg bg-slate-900 text-white font-semibold text-xs hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 shadow-xs"
                 >
                   <Plus className="w-4 h-4" /> Kuyruğa Ekle
                 </button>
@@ -975,7 +975,7 @@ export default function TopluYuklePage() {
       </div>
 
       {/* 2. KART: HEDEF OZON KATEGORİ SEÇİCİ (VARSAYILAN KAPALI) */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden transition-all">
+      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all">
         <button
           type="button"
           onClick={() => setIsPresetCategoryCardOpen(!isPresetCategoryCardOpen)}
@@ -1062,14 +1062,14 @@ export default function TopluYuklePage() {
                       onChange={(e) => setCategorySearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSearchOrDetectCategory()}
                       placeholder="Örn: Vantilatör, Buharlı paspas, Saç maşası..."
-                      className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                   <button
                     type="button"
                     onClick={() => handleSearchOrDetectCategory()}
                     disabled={isSearchingCategory}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 disabled:opacity-50"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 disabled:opacity-50"
                   >
                     {isSearchingCategory ? (
                       <>
@@ -1102,7 +1102,7 @@ export default function TopluYuklePage() {
                           <div className="font-bold text-xs text-slate-900">{cat.typeName}</div>
                           <div className="text-[11px] text-slate-500">{cat.path.join(' › ')}</div>
                         </div>
-                        <span className="px-2 py-1 rounded bg-blue-100 text-blue-800 text-[10px] font-bold">
+                        <span className="px-2 py-1 rounded-sm bg-blue-100 text-blue-800 text-[10px] font-bold">
                           Seç
                         </span>
                       </div>
@@ -1120,7 +1120,7 @@ export default function TopluYuklePage() {
         <div className="space-y-4">
           {/* ⚠️ TOKEN TASARRUFU & MÜKERRER ÜRÜN UYARI BANNERI */}
           {items.filter((i) => i.duplicateMatch?.isDuplicate).length > 0 && (
-            <div className="p-3.5 rounded-xl bg-amber-50/95 border-2 border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-slate-800 animate-in fade-in-50 shadow-xs">
+            <div className="p-3.5 rounded-xl bg-amber-50/95 border-2 border-amber-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-slate-800 animate-in fade-in-50">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-lg bg-amber-200 text-amber-900 shrink-0">
                   <AlertTriangle className="w-5 h-5 text-amber-700 animate-bounce" />
@@ -1142,7 +1142,7 @@ export default function TopluYuklePage() {
                 <button
                   type="button"
                   onClick={handleDeselectDuplicates}
-                  className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+                  className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all flex items-center gap-1.5"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
                   <span>Yüklüleri Seçimden Kaldır</span>
@@ -1159,14 +1159,14 @@ export default function TopluYuklePage() {
           )}
 
           {/* Aksiyon Çubuğu */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
             <div className="flex flex-wrap items-center gap-2.5">
               {/* 1. ADIM BUTONU */}
               <button
                 type="button"
                 onClick={handleBulkDetectCategories}
                 disabled={isDetectingCategories || isParallelRunning || isBatchUploading || items.length === 0}
-                className="px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2 shadow-sm shadow-indigo-500/20 transition-all"
+                className="px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2 shadow-xs shadow-indigo-500/20 transition-all"
               >
                 {isDetectingCategories ? (
                   <>
@@ -1186,7 +1186,7 @@ export default function TopluYuklePage() {
                 type="button"
                 onClick={handleRunParallelResearch}
                 disabled={isDetectingCategories || isParallelRunning || isBatchUploading || items.length === 0}
-                className="px-4 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2 shadow-sm shadow-blue-500/20 transition-all"
+                className="px-4 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2 shadow-xs shadow-blue-500/20 transition-all"
               >
                 {isParallelRunning ? (
                   <>
@@ -1205,7 +1205,7 @@ export default function TopluYuklePage() {
                 <button
                   type="button"
                   onClick={handleResetAllToReady}
-                  className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 border border-slate-300 shadow-2xs transition-all"
+                  className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 border border-slate-300 transition-all"
                   title="Nitelikleri koruyarak tüm ürünleri tekrar yüklenebilir 'Hazır' durumuna getirir"
                 >
                   <RefreshCw className="w-3.5 h-3.5 text-slate-600" />
@@ -1224,7 +1224,7 @@ export default function TopluYuklePage() {
                 type="button"
                 onClick={handleBatchUploadToOzon}
                 disabled={isDetectingCategories || isParallelRunning || isBatchUploading || canUploadCount === 0}
-                className="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 disabled:opacity-50 flex items-center gap-2 shadow-sm shadow-emerald-500/20 transition-all"
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 disabled:opacity-50 flex items-center gap-2 shadow-xs shadow-emerald-500/20 transition-all"
               >
                 {isBatchUploading ? (
                   <>
@@ -1242,7 +1242,7 @@ export default function TopluYuklePage() {
           </div>
 
           {/* Hızlı Tablo Görünümü */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -1252,7 +1252,7 @@ export default function TopluYuklePage() {
                         type="checkbox"
                         checked={items.length > 0 && items.every((i) => i.selected)}
                         onChange={(e) => handleToggleSelectAll(e.target.checked)}
-                        className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded-sm border-slate-300 text-blue-600 focus:ring-blue-500"
                       />
                     </th>
                     <th className="p-3 min-w-[220px]">Model, Marka & Kategori</th>
@@ -1279,7 +1279,7 @@ export default function TopluYuklePage() {
                             type="checkbox"
                             checked={item.selected}
                             onChange={(e) => handleUpdateItemField(item.id, 'selected', e.target.checked)}
-                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                            className="rounded-sm border-slate-300 text-blue-600 focus:ring-blue-500"
                           />
                         </td>
 
@@ -1291,7 +1291,7 @@ export default function TopluYuklePage() {
                               <button
                                 type="button"
                                 onClick={() => setCategoryModalItem(item)}
-                                className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 shadow-2xs transition-all cursor-pointer group"
+                                className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition-all cursor-pointer group"
                                 title="Kategoriyi değiştirmek için tıklayın"
                               >
                                 <FolderTree className="w-3 h-3 text-blue-500" />
@@ -1310,18 +1310,18 @@ export default function TopluYuklePage() {
                               </button>
                             )}
                             {item.brand && (
-                              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700">
+                              <span className="px-1.5 py-0.5 rounded-sm text-[10px] font-semibold bg-slate-100 text-slate-700">
                                 {item.brand}
                               </span>
                             )}
                             {seriesAttr?.valueText && (
-                              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-50 text-purple-700 border border-purple-100">
+                              <span className="px-1.5 py-0.5 rounded-sm text-[10px] font-mono bg-purple-50 text-purple-700 border border-purple-100">
                                 {seriesAttr.valueText}
                               </span>
                             )}
                           </div>
                           {item.duplicateMatch?.isDuplicate && (
-                            <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 text-[10px] font-bold border border-amber-300 shadow-2xs">
+                            <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm bg-amber-100 text-amber-900 text-[10px] font-bold border border-amber-300">
                               <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0" />
                               <span>Zaten Mağazada: {item.duplicateMatch.offerId || ''}</span>
                             </div>
@@ -1336,7 +1336,7 @@ export default function TopluYuklePage() {
                               rows={2}
                               value={item.russianSeoTitle}
                               onChange={(e) => handleUpdateItemField(item.id, 'russianSeoTitle', e.target.value)}
-                              className="w-full px-2 py-1.5 text-xs rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white leading-relaxed"
+                              className="w-full px-2 py-1.5 text-xs rounded-lg border border-slate-200 focus:outline-hidden focus:ring-1 focus:ring-blue-500 bg-white leading-relaxed"
                             />
                           ) : (
                             <span className="text-slate-400 italic">Araştırma bekleniyor...</span>
@@ -1347,12 +1347,12 @@ export default function TopluYuklePage() {
                         <td className="p-3 space-y-1">
                           <div className="flex flex-wrap gap-1">
                             {volumeAttr?.valueText && (
-                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                              <span className="px-1.5 py-0.5 rounded-sm text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
                                 {volumeAttr.valueText} L
                               </span>
                             )}
                             {powerAttr?.valueText && (
-                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                              <span className="px-1.5 py-0.5 rounded-sm text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
                                 {powerAttr.valueText} W
                               </span>
                             )}
@@ -1374,7 +1374,7 @@ export default function TopluYuklePage() {
                               value={item.price}
                               onChange={(e) => handleUpdateItemField(item.id, 'price', e.target.value)}
                               placeholder="Fiyat"
-                              className="w-full pl-5 pr-2 py-1.5 text-xs font-bold rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 bg-white"
+                              className="w-full pl-5 pr-2 py-1.5 text-xs font-bold rounded-lg border border-slate-200 focus:outline-hidden focus:ring-1 focus:ring-emerald-500 bg-white"
                             />
                           </div>
                           <input
@@ -1383,7 +1383,7 @@ export default function TopluYuklePage() {
                             value={item.oldPrice}
                             onChange={(e) => handleUpdateItemField(item.id, 'oldPrice', e.target.value)}
                             placeholder="Eski Fiyat"
-                            className="w-full px-2 py-1 text-[11px] rounded border border-slate-200 text-slate-400 bg-white"
+                            className="w-full px-2 py-1 text-[11px] rounded-sm border border-slate-200 text-slate-400 bg-white"
                           />
                         </td>
 
@@ -1420,7 +1420,7 @@ export default function TopluYuklePage() {
                               value={item.primaryImage}
                               onChange={(e) => handleUpdateItemField(item.id, 'primaryImage', e.target.value)}
                               placeholder="https://.../resim.jpg"
-                              className="w-full px-2 py-1.5 text-xs rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                              className="w-full px-2 py-1.5 text-xs rounded-lg border border-slate-200 focus:outline-hidden focus:ring-1 focus:ring-blue-500 bg-white"
                             />
                           </div>
 
@@ -1428,7 +1428,7 @@ export default function TopluYuklePage() {
                             <button
                               type="button"
                               onClick={() => setShowImageModalItem(item)}
-                              className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded transition-colors"
+                              className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded-sm transition-colors"
                             >
                               <ImageIcon className="w-3 h-3" />
                               <span>{1 + (item.additionalImages?.length || 0)} Görsel Galerisi</span>
@@ -1457,28 +1457,28 @@ export default function TopluYuklePage() {
                         {/* Durum */}
                         <td className="p-3 text-right">
                           {item.status === 'idle' && (
-                            <span className="px-2 py-1 rounded text-[10px] font-semibold bg-slate-100 text-slate-600">
+                            <span className="px-2 py-1 rounded-sm text-[10px] font-semibold bg-slate-100 text-slate-600">
                               Beklemede
                             </span>
                           )}
                           {item.status === 'researching' && (
-                            <span className="px-2 py-1 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1 justify-end">
+                            <span className="px-2 py-1 rounded-sm text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1 justify-end">
                               <Loader2 className="w-3 h-3 animate-spin" /> Araştırılıyor
                             </span>
                           )}
                           {item.status === 'ready' && (
-                            <span className="px-2 py-1 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1 justify-end">
+                            <span className="px-2 py-1 rounded-sm text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1 justify-end">
                               <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Hazır
                             </span>
                           )}
                           {item.status === 'uploading' && (
-                            <span className="px-2 py-1 rounded text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1 justify-end">
+                            <span className="px-2 py-1 rounded-sm text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1 justify-end">
                               <Loader2 className="w-3 h-3 animate-spin" /> Yükleniyor
                             </span>
                           )}
                           {item.status === 'success' && (
                             <div className="space-y-0.5">
-                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 inline-block">
+                              <span className="px-2 py-0.5 rounded-sm text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 inline-block">
                                 Yüklendi ✅
                               </span>
                               {item.ozonTaskId && (
@@ -1498,7 +1498,7 @@ export default function TopluYuklePage() {
                           )}
                           {item.status === 'error' && (
                             <div className="space-y-1">
-                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 inline-block">
+                              <span className="px-2 py-0.5 rounded-sm text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 inline-block">
                                 Hata
                               </span>
                               <div className="text-[10px] text-rose-600 max-w-[120px] truncate" title={item.errorMessage}>
@@ -1520,7 +1520,7 @@ export default function TopluYuklePage() {
                           <button
                             type="button"
                             onClick={() => handleRemoveItem(item.id)}
-                            className="p-1 text-slate-400 hover:text-rose-600 rounded"
+                            className="p-1 text-slate-400 hover:text-rose-600 rounded-sm"
                             title="Satırı Kaldır"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -1597,7 +1597,7 @@ export default function TopluYuklePage() {
               <button
                 type="button"
                 onClick={() => setEditingItem(null)}
-                className="px-5 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 shadow-sm"
+                className="px-5 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 shadow-xs"
               >
                 Tamam ve Kaydet
               </button>
@@ -1664,7 +1664,7 @@ export default function TopluYuklePage() {
             {/* Modal Body: Görsel Vitrini & Galeri */}
             <div className="p-6 overflow-y-auto space-y-6 flex-1 bg-slate-50/50">
               {/* 1. ANA VİTRİN GÖRSELİ KARTI */}
-              <div className="bg-white p-4 rounded-xl border-2 border-blue-500 shadow-sm space-y-3">
+              <div className="bg-white p-4 rounded-xl border-2 border-blue-500 shadow-xs space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-blue-700 flex items-center gap-1.5 uppercase tracking-wide">
                     <Sparkles className="w-4 h-4 text-blue-600" />
@@ -1674,7 +1674,7 @@ export default function TopluYuklePage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <div className="w-36 h-36 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center relative group shadow-2xs">
+                  <div className="w-36 h-36 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center relative group">
                     {showImageModalItem.primaryImage ? (
                       <img
                         src={showImageModalItem.primaryImage}
@@ -1689,7 +1689,7 @@ export default function TopluYuklePage() {
                         href={showImageModalItem.primaryImage}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="absolute top-1.5 right-1.5 p-1 rounded-md bg-white/90 shadow-sm text-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-1.5 right-1.5 p-1 rounded-md bg-white/90 shadow-xs text-slate-700 opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Yeni Sekmede Büyüt"
                       >
                         <ExternalLink className="w-3 h-3" />
@@ -1709,7 +1709,7 @@ export default function TopluYuklePage() {
                         setShowImageModalItem({ ...showImageModalItem, primaryImage: e.target.value });
                       }}
                       placeholder="https://m.media-amazon.com/images/I/...jpg"
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono"
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs text-slate-800 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono"
                     />
                     <p className="text-[11px] text-slate-500 leading-normal">
                       💡 Aşağıdaki galeri görsellerinden herhangi birini tek tıkla <strong>"Ana Görsel Yap"</strong> butonuna basarak buraya taşıyabilirsiniz.
@@ -1732,7 +1732,7 @@ export default function TopluYuklePage() {
                       handleUpdateItemField(showImageModalItem.id, 'additionalImages', updated);
                       setShowImageModalItem({ ...showImageModalItem, additionalImages: updated });
                     }}
-                    className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1 shadow-2xs"
+                    className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1"
                   >
                     <Plus className="w-3.5 h-3.5 text-blue-600" />
                     Manuel URL Ekle
@@ -1758,7 +1758,7 @@ export default function TopluYuklePage() {
                     {showImageModalItem.additionalImages.map((imgUrl, idx) => (
                       <div
                         key={idx}
-                        className="bg-white rounded-xl border border-slate-200 p-2.5 shadow-2xs space-y-2 flex flex-col justify-between group hover:border-blue-300 transition-colors"
+                        className="bg-white rounded-xl border border-slate-200 p-2.5 space-y-2 flex flex-col justify-between group hover:border-blue-300 transition-colors"
                       >
                         {/* Görsel Önizleme */}
                         <div className="w-full h-32 bg-slate-50 rounded-lg overflow-hidden flex items-center justify-center relative border border-slate-100">
@@ -1773,7 +1773,7 @@ export default function TopluYuklePage() {
                             <span className="text-[10px] text-slate-400">Boş URL</span>
                           )}
 
-                          <span className="absolute top-1 left-1 bg-slate-900/70 text-white font-mono text-[9px] px-1.5 py-0.5 rounded">
+                          <span className="absolute top-1 left-1 bg-slate-900/70 text-white font-mono text-[9px] px-1.5 py-0.5 rounded-sm">
                             #{idx + 2}
                           </span>
 
@@ -1782,7 +1782,7 @@ export default function TopluYuklePage() {
                               href={imgUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="absolute top-1 right-1 p-1 rounded bg-white/90 text-slate-700 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="absolute top-1 right-1 p-1 rounded-sm bg-white/90 text-slate-700 shadow-xs opacity-0 group-hover:opacity-100 transition-opacity"
                               title="Büyük Boyut Aç"
                             >
                               <ExternalLink className="w-3 h-3" />
@@ -1801,7 +1801,7 @@ export default function TopluYuklePage() {
                             setShowImageModalItem({ ...showImageModalItem, additionalImages: updated });
                           }}
                           placeholder="https://...jpg"
-                          className="w-full px-2 py-1 text-[10px] font-mono rounded border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                          className="w-full px-2 py-1 text-[10px] font-mono rounded-sm border border-slate-200 focus:outline-hidden focus:ring-1 focus:ring-blue-500 bg-white"
                         />
 
                         {/* Kart Aksiyonları */}
@@ -1810,7 +1810,7 @@ export default function TopluYuklePage() {
                             type="button"
                             onClick={() => handleSwapPrimaryImage(showImageModalItem.id, imgUrl)}
                             disabled={!imgUrl}
-                            className="flex-1 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors disabled:opacity-40"
+                            className="flex-1 py-1 rounded-sm bg-blue-50 hover:bg-blue-100 text-blue-700 text-[10px] font-bold flex items-center justify-center gap-1 transition-colors disabled:opacity-40"
                             title="Bu görseli 1. Ana Vitrin Görseli yap"
                           >
                             <Sparkles className="w-2.5 h-2.5" />
@@ -1824,7 +1824,7 @@ export default function TopluYuklePage() {
                               handleUpdateItemField(showImageModalItem.id, 'additionalImages', updated);
                               setShowImageModalItem({ ...showImageModalItem, additionalImages: updated });
                             }}
-                            className="p-1 rounded bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
+                            className="p-1 rounded-sm bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
                             title="Görseli Sil"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1846,7 +1846,7 @@ export default function TopluYuklePage() {
               <button
                 type="button"
                 onClick={() => setShowImageModalItem(null)}
-                className="px-6 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 shadow-sm transition-all"
+                className="px-6 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 shadow-xs transition-all"
               >
                 Kaydet ve Kapat
               </button>
@@ -1897,7 +1897,7 @@ export default function TopluYuklePage() {
                     setTreeModalTargetItemId(categoryModalItem.id);
                     setIsTreeModalOpen(true);
                   }}
-                  className="w-full py-2 px-3 rounded-lg border border-blue-300 bg-white hover:bg-blue-100 text-blue-800 text-xs font-bold flex items-center justify-center gap-2 transition-colors shadow-2xs"
+                  className="w-full py-2 px-3 rounded-lg border border-blue-300 bg-white hover:bg-blue-100 text-blue-800 text-xs font-bold flex items-center justify-center gap-2 transition-colors"
                 >
                   <FolderTree className="w-4 h-4 text-blue-600" />
                   <span>🌲 Hazır Listede Yok mu? Canlı Ozon Kategori Ağacından Seç</span>

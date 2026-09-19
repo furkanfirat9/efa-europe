@@ -66,7 +66,7 @@ export default function PresetCategorySelector({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Hazır kategorilerde ara (Örn: Airfryer, Kahve, Ütü, Kase, Blender)..."
-            className="w-full pl-10 pr-9 py-2.5 bg-slate-50/80 hover:bg-white focus:bg-white border border-slate-200 focus:border-blue-500 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/15 transition-all shadow-2xs"
+            className="w-full pl-10 pr-9 py-2.5 bg-slate-50/80 hover:bg-white focus:bg-white border border-slate-200 focus:border-blue-500 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500/15 transition-all"
           />
 
           {searchQuery && (
@@ -86,7 +86,7 @@ export default function PresetCategorySelector({
             onClick={() => setActiveGroupFilter('all')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
               activeGroupFilter === 'all'
-                ? 'bg-slate-900 text-white shadow-xs'
+                ? 'bg-slate-900 text-white'
                 : 'bg-slate-100 hover:bg-slate-200/80 text-slate-600'
             }`}
           >
@@ -102,7 +102,7 @@ export default function PresetCategorySelector({
                 onClick={() => setActiveGroupFilter(grp.id)}
                 className={`px-2.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-xs font-semibold'
+                    ? 'bg-blue-600 text-white font-semibold'
                     : 'bg-slate-100 hover:bg-slate-200/80 text-slate-600'
                 }`}
               >
@@ -124,7 +124,7 @@ export default function PresetCategorySelector({
               onClick={() => onSelectCategory(cat)}
               className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between group ${
                 isSelected
-                  ? 'bg-blue-50/90 border-blue-600 shadow-xs ring-2 ring-blue-500/20'
+                  ? 'bg-blue-50/90 border-blue-600 ring-2 ring-blue-500/20'
                   : 'bg-white hover:bg-slate-50 border-slate-200/80 hover:border-slate-300'
               }`}
             >
@@ -150,7 +150,7 @@ export default function PresetCategorySelector({
                       : 'border-slate-200 bg-white group-hover:border-slate-300'
                   }`}
                 >
-                  {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                  {isSelected && <Check className="w-2.5 h-2.5 stroke-3" />}
                 </div>
               </div>
 
@@ -176,7 +176,7 @@ export default function PresetCategorySelector({
             <span className="text-xl shrink-0">{currentSelected.icon}</span>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-600 text-white">
+                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-sm bg-blue-600 text-white">
                   SEÇİLİ
                 </span>
                 <span className="text-xs font-bold text-slate-900 truncate">

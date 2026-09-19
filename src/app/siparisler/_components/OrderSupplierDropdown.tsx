@@ -101,7 +101,7 @@ export const OrderSupplierDropdown: React.FC<OrderSupplierDropdownProps> = ({
               e.stopPropagation();
               onSelectSupplier('all');
             }}
-            className="hover:text-rose-400 rounded p-0.5 text-zinc-400 hover:bg-zinc-800 transition-colors"
+            className="hover:text-rose-400 rounded-sm p-0.5 text-zinc-400 hover:bg-zinc-800 transition-colors"
             title="Filtreyi temizle"
           >
             <X className="h-3 w-3 stroke-[2.5]" />

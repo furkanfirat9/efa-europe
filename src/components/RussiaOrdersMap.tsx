@@ -402,7 +402,7 @@ export const RussiaOrdersMap = memo(function RussiaOrdersMap({ orders = [], load
               onClick={() => flyToZone('all')}
               className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeZone === 'all' && scale === 1
-                  ? 'bg-slate-800 text-cyan-400 shadow-sm font-semibold'
+                  ? 'bg-slate-800 text-cyan-400 shadow-xs font-semibold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -415,7 +415,7 @@ export const RussiaOrdersMap = memo(function RussiaOrdersMap({ orders = [], load
               onClick={() => flyToZone('west')}
               className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeZone === 'west'
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-sm font-semibold'
+                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-xs font-semibold'
                   : 'text-slate-400 hover:text-cyan-300'
               }`}
             >
@@ -428,7 +428,7 @@ export const RussiaOrdersMap = memo(function RussiaOrdersMap({ orders = [], load
               onClick={() => flyToZone('central')}
               className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeZone === 'central'
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm font-semibold'
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-xs font-semibold'
                   : 'text-slate-400 hover:text-emerald-300'
               }`}
             >
@@ -441,7 +441,7 @@ export const RussiaOrdersMap = memo(function RussiaOrdersMap({ orders = [], load
               onClick={() => flyToZone('east')}
               className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeZone === 'east'
-                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30 shadow-sm font-semibold'
+                  ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30 shadow-xs font-semibold'
                   : 'text-slate-400 hover:text-purple-300'
               }`}
             >
@@ -456,7 +456,7 @@ export const RussiaOrdersMap = memo(function RussiaOrdersMap({ orders = [], load
             onClick={() => setShowLabels(!showLabels)}
             className={`px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
               showLabels
-                ? 'bg-slate-800 border-slate-700 text-cyan-400 shadow-xs'
+                ? 'bg-slate-800 border-slate-700 text-cyan-400'
                 : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-slate-200'
             }`}
             title="Eyalet ve Bölge İsimlerini Aç/Kapat"

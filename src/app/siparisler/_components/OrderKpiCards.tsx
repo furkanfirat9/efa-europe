@@ -73,7 +73,7 @@ export const OrderKpiCards: React.FC<OrderKpiCardsProps> = React.memo(
           onClick={() => handleFilterClick('awaiting')}
           className={`group rounded-[24px] p-4.5 sm:p-5 transition-all cursor-pointer border ${
             activeFilter === 'awaiting'
-              ? 'bg-[#FDF0E2]/60 border-[#C47A2C]/40 ring-2 ring-[#C47A2C]/20 shadow-xs'
+              ? 'bg-[#FDF0E2]/60 border-[#C47A2C]/40 ring-2 ring-[#C47A2C]/20'
               : 'bg-surface border-border-subtle hover:border-border-subtle hover:shadow-hairline'
           }`}
           title="Sevk bekleyen siparişleri filtrele"
@@ -92,7 +92,7 @@ export const OrderKpiCards: React.FC<OrderKpiCardsProps> = React.memo(
           onClick={() => handleFilterClick('cancelled')}
           className={`group rounded-[24px] p-4.5 sm:p-5 transition-all cursor-pointer border ${
             activeFilter === 'cancelled'
-              ? 'bg-[#FDE7E7]/60 border-[#D14343]/40 ring-2 ring-[#D14343]/20 shadow-xs'
+              ? 'bg-[#FDE7E7]/60 border-[#D14343]/40 ring-2 ring-[#D14343]/20'
               : 'bg-surface border-border-subtle hover:border-border-subtle hover:shadow-hairline'
           }`}
           title="İptal edilen siparişleri filtrele"
@@ -111,7 +111,7 @@ export const OrderKpiCards: React.FC<OrderKpiCardsProps> = React.memo(
           onClick={() => handleFilterClick('uncalculated')}
           className={`group rounded-[24px] p-4.5 sm:p-5 transition-all cursor-pointer border ${
             activeFilter === 'uncalculated'
-              ? 'bg-[#ECEBFD]/60 border-[#5856D6]/40 ring-2 ring-[#5856D6]/20 shadow-xs'
+              ? 'bg-[#ECEBFD]/60 border-[#5856D6]/40 ring-2 ring-[#5856D6]/20'
               : 'bg-surface border-border-subtle hover:border-border-subtle hover:shadow-hairline'
           }`}
           title="Alış fiyatı girilmemiş siparişleri filtrele"

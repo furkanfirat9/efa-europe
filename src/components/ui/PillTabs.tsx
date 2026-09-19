@@ -25,7 +25,7 @@ export function PillTabs<T extends string>({
     <div
       role="tablist"
       aria-label={ariaLabel}
-      className={`flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full bg-surface p-1 shadow-hairline [scrollbar-width:none] ${className}`}
+      className={`flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full bg-surface p-1 shadow-hairline scrollbar-none ${className}`}
     >
       {options.map((option) => {
         const active = option.value === value;
@@ -37,7 +37,7 @@ export function PillTabs<T extends string>({
             aria-selected={active}
             title={option.title}
             onClick={() => onChange(option.value)}
-            className={`h-8 shrink-0 cursor-pointer rounded-full px-3.5 text-[13px] font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 ${
+            className={`h-8 shrink-0 cursor-pointer rounded-full px-3.5 text-[13px] font-medium transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/30 ${
               active
                 ? 'bg-ink text-ink-foreground'
                 : 'text-text-secondary hover:bg-surface-muted hover:text-text-primary'

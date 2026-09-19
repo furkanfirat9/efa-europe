@@ -78,13 +78,13 @@ export function MuhasebeView() {
             onClick={fetchData}
             disabled={loading}
             aria-label="Verileri yenile"
-            className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-surface text-text-secondary shadow-hairline transition-colors hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-surface text-text-secondary shadow-hairline transition-colors hover:text-text-primary focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/30 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} strokeWidth={1.75} />
           </button>
           <Link
             href="/siparisler"
-            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full bg-ink pl-1.5 pr-5 text-[14px] font-medium text-ink-foreground transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full bg-ink pl-1.5 pr-5 text-[14px] font-medium text-ink-foreground transition-opacity hover:opacity-90 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/30"
           >
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-foreground text-ink">
               <ArrowUpRight className="h-4 w-4" strokeWidth={1.75} />

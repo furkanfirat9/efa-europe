@@ -241,7 +241,7 @@ export const OrderTableRow = React.memo(function OrderTableRow({
               href={getOzonPostingUrl(order.postingNumber, order.status)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-shrink-0 text-slate-400 hover:text-indigo-500 transition-colors"
+              className="shrink-0 text-slate-400 hover:text-indigo-500 transition-colors"
               title="Ozon'da görüntüle"
               onClick={(e) => e.stopPropagation()}
             >
@@ -254,7 +254,7 @@ export const OrderTableRow = React.memo(function OrderTableRow({
       {/* 4. GÖRSEL & SEVKİYAT UYARI ROZETİ */}
       <td className="px-1 py-3 text-center align-middle">
         <div className="relative inline-flex items-center justify-center">
-          <div className="w-10 h-10 rounded-xl border border-slate-100 bg-white p-1 shadow-sm flex items-center justify-center overflow-hidden">
+          <div className="w-10 h-10 rounded-xl border border-slate-100 bg-white p-1 shadow-xs flex items-center justify-center overflow-hidden">
             {order.productImage ? (
               <img
                 src={order.productImage}
@@ -269,7 +269,7 @@ export const OrderTableRow = React.memo(function OrderTableRow({
           {/* Ozon 6 Günlük Ek Süre Kalan Gün Rozeti (Görselin Önünü Kapatmayacak Şekilde Sağ Üste Dışa Yaslı) */}
           {countdown && (
             <span
-              className={`absolute -top-2 left-[30px] z-10 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8.5px] font-bold leading-none tracking-tight text-white shadow-xs whitespace-nowrap ring-1 ring-white select-none transition-all duration-300 ${getCountdownUrgencyStyle(
+              className={`absolute -top-2 left-[30px] z-10 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[8.5px] font-bold leading-none tracking-tight text-white whitespace-nowrap ring-1 ring-white select-none transition-all duration-300 ${getCountdownUrgencyStyle(
                 countdown.daysLeft,
                 countdown.isExpired
               )}`}
@@ -317,7 +317,7 @@ export const OrderTableRow = React.memo(function OrderTableRow({
             onKeyDown={(e) => {
               if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
             }}
-            className="text-center text-xs font-bold text-slate-800 placeholder:text-slate-400 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent hover:border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 rounded-xl px-2 py-1 transition-all outline-none w-24"
+            className="text-center text-xs font-bold text-slate-800 placeholder:text-slate-400 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent hover:border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 rounded-xl px-2 py-1 transition-all outline-hidden w-24"
           />
         </div>
       </td>
@@ -348,7 +348,7 @@ export const OrderTableRow = React.memo(function OrderTableRow({
             onKeyDown={(e) => {
               if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
             }}
-            className="text-center text-xs font-semibold text-slate-800 placeholder:text-slate-400 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent hover:border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 rounded-xl px-2.5 py-1 transition-all outline-none w-28"
+            className="text-center text-xs font-semibold text-slate-800 placeholder:text-slate-400 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent hover:border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 rounded-xl px-2.5 py-1 transition-all outline-hidden w-28"
           />
         </div>
       </td>
@@ -373,7 +373,7 @@ export const OrderTableRow = React.memo(function OrderTableRow({
             onKeyDown={(e) => {
               if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
             }}
-            className="text-center text-xs font-medium text-slate-700 placeholder:text-slate-400 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent hover:border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 rounded-xl px-2 py-1 transition-all outline-none w-24"
+            className="text-center text-xs font-medium text-slate-700 placeholder:text-slate-400 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent hover:border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 rounded-xl px-2 py-1 transition-all outline-hidden w-24"
           />
         </div>
       </td>
@@ -426,7 +426,7 @@ export const OrderTableRow = React.memo(function OrderTableRow({
                   setIsOrderIdEditing(false);
                 }
               }}
-              className={`text-center text-xs font-semibold text-slate-800 placeholder:text-slate-400 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent hover:border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 rounded-xl px-2.5 py-1 transition-all outline-none w-32 ${
+              className={`text-center text-xs font-semibold text-slate-800 placeholder:text-slate-400 bg-transparent hover:bg-slate-50 focus:bg-white border border-transparent hover:border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 rounded-xl px-2.5 py-1 transition-all outline-hidden w-32 ${
                 isOrderIdUrl ? 'border-indigo-300 text-indigo-600 bg-indigo-50/40' : ''
               }`}
             />

@@ -630,7 +630,7 @@ function UrunYukleContent() {
   return (
     <main className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-20 shadow-xs">
+      <div className="bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -644,7 +644,7 @@ function UrunYukleContent() {
 
           <div className="flex flex-wrap items-center gap-2.5">
             {sessionUsage ? (
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-50 text-purple-900 border border-purple-200/80 text-xs font-semibold shadow-2xs">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-50 text-purple-900 border border-purple-200/80 text-xs font-semibold">
                 <Cpu className="w-3.5 h-3.5 text-purple-600" />
                 <span>{sessionUsage.model}</span>
                 <span className="text-purple-300">•</span>
@@ -652,7 +652,7 @@ function UrunYukleContent() {
                   {sessionUsage.totalTokens.toLocaleString()} Token
                 </span>
                 <span className="text-purple-300">•</span>
-                <span className="px-1.5 py-0.5 rounded bg-purple-200/60 font-mono text-purple-950 text-[11px] font-bold">
+                <span className="px-1.5 py-0.5 rounded-sm bg-purple-200/60 font-mono text-purple-950 text-[11px] font-bold">
                   ${sessionUsage.estimatedCostUsd.toFixed(5)} USD
                 </span>
               </div>
@@ -679,11 +679,11 @@ function UrunYukleContent() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* SOL PANEL (6 Kolon): 1. AŞAMA - KATEGORİ SEÇİMİ */}
           <div className="lg:col-span-6 space-y-4">
-            <section className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs space-y-4 h-full flex flex-col justify-between">
+            <section className="bg-white border border-slate-200/90 rounded-2xl p-5 space-y-4 h-full flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-lg bg-blue-600 text-white text-xs font-bold flex items-center justify-center shadow-xs">
+                    <span className="w-6 h-6 rounded-lg bg-blue-600 text-white text-xs font-bold flex items-center justify-center">
                       1
                     </span>
                     <h2 className="text-sm font-bold text-slate-900">
@@ -694,7 +694,7 @@ function UrunYukleContent() {
                   <button
                     type="button"
                     onClick={() => setIsTreeModalOpen(true)}
-                    className="text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50/80 active:bg-blue-100 font-medium px-2.5 py-1 rounded-lg border border-blue-200/60 flex items-center gap-1.5 transition-colors shadow-2xs"
+                    className="text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50/80 active:bg-blue-100 font-medium px-2.5 py-1 rounded-lg border border-blue-200/60 flex items-center gap-1.5 transition-colors"
                   >
                     <FolderTree className="w-3.5 h-3.5" />
                     <span>🌲 Tüm Ağaçtan Seç</span>
@@ -737,14 +737,14 @@ function UrunYukleContent() {
                           onChange={(e) => setAiQuery(e.target.value)}
                           onKeyDown={(e) => e.key === 'Enter' && handleFindCategories()}
                           placeholder="Örn: Saç maşası, Vantilatör, Buharlı paspas..."
-                          className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                          className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                         />
                       </div>
 
                       <button
                         onClick={handleFindCategories}
                         disabled={isFindingCategory || !aiQuery.trim()}
-                        className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 active:bg-black text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 disabled:opacity-50 shrink-0"
+                        className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 active:bg-black text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 disabled:opacity-50 shrink-0"
                       >
                         {isFindingCategory ? (
                           <>
@@ -794,14 +794,14 @@ function UrunYukleContent() {
                           onClick={() => handleSelectCategoryOnly(cat)}
                           className={`p-2.5 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between ${
                             isSelected
-                              ? 'bg-blue-50/80 border-blue-600 text-blue-900 shadow-2xs'
+                              ? 'bg-blue-50/80 border-blue-600 text-blue-900'
                               : 'bg-white border-slate-200 hover:border-slate-300'
                           }`}
                         >
                           <div className="min-w-0 pr-2">
                             <div className="flex items-center gap-1.5">
                               <span className="text-xs font-bold text-slate-900">{cat.typeName}</span>
-                              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800">
+                              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-sm bg-emerald-100 text-emerald-800">
                                 %{cat.confidence}
                               </span>
                             </div>
@@ -830,11 +830,11 @@ function UrunYukleContent() {
 
           {/* SAĞ PANEL (6 Kolon): 2. AŞAMA - ÜRÜN MODEL GİRİŞİ & NİTELİK ODAKLI DERİN ARAŞTIRMA */}
           <div className="lg:col-span-6 space-y-4">
-            <section className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs space-y-4 h-full flex flex-col justify-between">
+            <section className="bg-white border border-slate-200/90 rounded-2xl p-5 space-y-4 h-full flex flex-col justify-between">
               <div className="space-y-3.5">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-lg bg-purple-600 text-white text-xs font-bold flex items-center justify-center shadow-xs">
+                    <span className="w-6 h-6 rounded-lg bg-purple-600 text-white text-xs font-bold flex items-center justify-center">
                       2
                     </span>
                     <h2 className="text-sm font-bold text-slate-900">
@@ -843,7 +843,7 @@ function UrunYukleContent() {
                   </div>
 
                   {selectedCategory && (
-                    <span className="text-[11px] font-mono text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded border border-purple-100">
+                    <span className="text-[11px] font-mono text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded-sm border border-purple-100">
                       {categoryAttributes.length} Nitelik Hazır
                     </span>
                   )}
@@ -876,7 +876,7 @@ function UrunYukleContent() {
                       <Search className="w-3.5 h-3.5 text-purple-600" />
                       <span>Araştırılacak Marka &amp; Model Kodu:</span>
                     </label>
-                    <span className="text-[10px] text-purple-700 font-semibold bg-purple-50 px-1.5 py-0.2 rounded border border-purple-200">
+                    <span className="text-[10px] text-purple-700 font-semibold bg-purple-50 px-1.5 py-0.2 rounded-sm border border-purple-200">
                       Google Search + Gemini 3.8
                     </span>
                   </div>
@@ -893,7 +893,7 @@ function UrunYukleContent() {
                           : 'Önce sol taraftan kategori seçiniz...'
                       }
                       disabled={!selectedCategory || isDeepResearching}
-                      className="w-full pl-3.5 pr-16 py-2.5 bg-white border-2 border-purple-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600 shadow-2xs disabled:bg-slate-100 disabled:opacity-60 transition-all placeholder:font-normal"
+                      className="w-full pl-3.5 pr-16 py-2.5 bg-white border-2 border-purple-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600 disabled:bg-slate-100 disabled:opacity-60 transition-all placeholder:font-normal"
                     />
                     {productModelQuery && (
                       <button
@@ -910,7 +910,7 @@ function UrunYukleContent() {
 
                 {/* ⚠️ TOKEN TASARRUFU & MÜKERRER ÜRÜN UYARI KARTI */}
                 {duplicateWarning?.isDuplicate && !isDuplicateDismissed && (
-                  <div className="p-3.5 rounded-xl bg-amber-50/95 border-2 border-amber-300 text-slate-800 space-y-2.5 animate-in fade-in-50 shadow-xs">
+                  <div className="p-3.5 rounded-xl bg-amber-50/95 border-2 border-amber-300 text-slate-800 space-y-2.5 animate-in fade-in-50">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5 text-amber-900 font-bold text-xs">
                         <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 animate-bounce" />
@@ -921,7 +921,7 @@ function UrunYukleContent() {
                       </span>
                     </div>
 
-                    <div className="bg-white/90 p-2.5 rounded-lg border border-amber-200 text-xs space-y-1.5 shadow-2xs">
+                    <div className="bg-white/90 p-2.5 rounded-lg border border-amber-200 text-xs space-y-1.5">
                       <div className="font-semibold text-slate-900 line-clamp-2 leading-tight">
                         {duplicateWarning.matchedProduct?.name}
                       </div>
@@ -944,7 +944,7 @@ function UrunYukleContent() {
                       <button
                         type="button"
                         onClick={() => setIsDuplicateDismissed(true)}
-                        className="text-[11px] font-bold text-amber-900 hover:text-amber-950 bg-amber-200/80 hover:bg-amber-200 px-2 py-1 rounded transition-colors ml-2 shrink-0 border border-amber-300"
+                        className="text-[11px] font-bold text-amber-900 hover:text-amber-950 bg-amber-200/80 hover:bg-amber-200 px-2 py-1 rounded-sm transition-colors ml-2 shrink-0 border border-amber-300"
                       >
                         Yine de Araştır →
                       </button>
@@ -961,7 +961,7 @@ function UrunYukleContent() {
                         <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                         <span>Derin Araştırma Tamamlandı:</span>
                       </span>
-                      <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-mono">
+                      <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-sm font-mono">
                         {deepResearchResult.attributes.filter((a) => a.valueText).length} Nitelik Bulundu
                       </span>
                     </div>
@@ -990,7 +990,7 @@ function UrunYukleContent() {
                     type="button"
                     onClick={handleRunDeepResearch}
                     disabled={!selectedCategory || isDeepResearching || isLoadingAttributesList}
-                    className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 active:from-purple-800 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="w-full py-3 bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 active:from-purple-800 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {isDeepResearching ? (
                       <>
@@ -1024,7 +1024,7 @@ function UrunYukleContent() {
                       className={`py-2.5 px-4 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 ${
                         isAppliedToForm
                           ? 'bg-emerald-600 hover:bg-emerald-700'
-                          : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700'
+                          : 'bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700'
                       }`}
                     >
                       {isAppliedToForm ? (
@@ -1047,7 +1047,7 @@ function UrunYukleContent() {
         </div>
 
         {/* Sabit Ozon Standartları Bilgi Çubuğu */}
-        <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+        <section className="bg-white border border-slate-200 rounded-2xl p-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
             <div className="p-2.5 bg-slate-50 border border-slate-200/70 rounded-xl">
               <span className="text-[10px] text-slate-400 block font-medium">Para Birimi</span>
@@ -1096,7 +1096,7 @@ function UrunYukleContent() {
         {/* ========================================================================= */}
         {/* GRUP 1: OZON SABİT TEMEL ÜRÜN BİLGİLERİ */}
         {/* ========================================================================= */}
-        <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
+        <section className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6">
           <div className="flex items-center justify-between pb-4 border-b border-slate-100">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
@@ -1129,7 +1129,7 @@ function UrunYukleContent() {
                       <span>Model Numarası / Model No</span>
                       <span className="text-red-500 font-bold">*</span>
                     </label>
-                    <span className="text-[10px] font-mono text-amber-600 font-semibold bg-amber-50 px-1.5 py-0.5 rounded">
+                    <span className="text-[10px] font-mono text-amber-600 font-semibold bg-amber-50 px-1.5 py-0.5 rounded-sm">
                       offer_id
                     </span>
                   </div>
@@ -1138,7 +1138,7 @@ function UrunYukleContent() {
                     value={modelNo}
                     onChange={(e) => setModelNo(e.target.value)}
                     placeholder="Örn: HD7769-00"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-mono font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-2xs"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-mono font-bold focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
                 </div>
 
@@ -1150,11 +1150,11 @@ function UrunYukleContent() {
                       <span>Barkod (EAN-13)</span>
                     </label>
                     {isBarcodeGenerated ? (
-                      <span className="text-[10px] font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium">
+                      <span className="text-[10px] font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-sm font-medium">
                         Sistem 13 Haneli Üretti
                       </span>
                     ) : (
-                      <span className="text-[10px] font-mono text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-medium">
+                      <span className="text-[10px] font-mono text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-sm font-medium">
                         Orijinal Barkod
                       </span>
                     )}
@@ -1167,7 +1167,7 @@ function UrunYukleContent() {
                       setIsBarcodeGenerated(false);
                     }}
                     placeholder="Örn: 8710103859215"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-2xs"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-mono focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -1187,7 +1187,7 @@ function UrunYukleContent() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Örn: Кофеварка капельная Philips HD7769/00 со встроенной кофемолкой, 1000 Вт, черный"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-2xs font-medium"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium"
                 />
               </div>
 
@@ -1198,7 +1198,7 @@ function UrunYukleContent() {
                     <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Fiyat Belirleme (USD - $)</span>
                   </span>
-                  <span className="text-[10px] text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded font-medium">
+                  <span className="text-[10px] text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded-sm font-medium">
                     Kullanıcı Tarafından Girilir
                   </span>
                 </div>
@@ -1218,7 +1218,7 @@ function UrunYukleContent() {
                         value={price}
                         onChange={(e) => setPrice(e.target.value)}
                         placeholder="Örn: 189.90"
-                        className="w-full pl-7 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        className="w-full pl-7 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -1237,7 +1237,7 @@ function UrunYukleContent() {
                         value={oldPrice}
                         onChange={(e) => setOldPrice(e.target.value)}
                         placeholder="Örn: 229.00"
-                        className="w-full pl-7 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        className="w-full pl-7 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -1251,7 +1251,7 @@ function UrunYukleContent() {
                     <Ruler className="w-3.5 h-3.5 text-indigo-600" />
                     <span>Paket Ölçüleri &amp; Ağırlık (AI Tarafından Araştırıldı)</span>
                   </span>
-                  <span className="text-[10px] text-emerald-600 font-medium bg-emerald-50 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] text-emerald-600 font-medium bg-emerald-50 px-1.5 py-0.5 rounded-sm">
                     mm &amp; gram
                   </span>
                 </div>
@@ -1267,7 +1267,7 @@ function UrunYukleContent() {
                       value={width}
                       onChange={(e) => setWidth(e.target.value)}
                       placeholder="Örn: 212"
-                      className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
 
@@ -1281,7 +1281,7 @@ function UrunYukleContent() {
                       value={height}
                       onChange={(e) => setHeight(e.target.value)}
                       placeholder="Örn: 440"
-                      className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
 
@@ -1295,7 +1295,7 @@ function UrunYukleContent() {
                       value={depth}
                       onChange={(e) => setDepth(e.target.value)}
                       placeholder="Örn: 277"
-                      className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
 
@@ -1309,7 +1309,7 @@ function UrunYukleContent() {
                       value={weight}
                       onChange={(e) => setWeight(e.target.value)}
                       placeholder="Örn: 4600"
-                      className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -1336,7 +1336,7 @@ function UrunYukleContent() {
                     value={primaryImage}
                     onChange={(e) => setPrimaryImage(e.target.value)}
                     placeholder="Örn: https://example.com/kahve-makinesi-ana.jpg"
-                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
 
                   {primaryImage && (
@@ -1374,7 +1374,7 @@ function UrunYukleContent() {
                           value={imgUrl}
                           onChange={(e) => handleImageChange(idx, e.target.value)}
                           placeholder={`Örn: https://example.com/detay-${idx + 1}.jpg`}
-                          className="flex-1 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                          className="flex-1 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                         />
                         {additionalImages.length > 1 && (
                           <button
@@ -1402,7 +1402,7 @@ function UrunYukleContent() {
         {/* GRUP 2: KATEGORİYE ÖZEL OZON NİTELİKLERİ LİSTESİ */}
         {/* ========================================================================= */}
         {selectedCategory && (
-          <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
+          <section className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
               <div>
                 <div className="flex items-center gap-2">
@@ -1425,7 +1425,7 @@ function UrunYukleContent() {
                   type="button"
                   onClick={handleRunDeepResearch}
                   disabled={isDeepResearching || isLoadingAttributesList}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-2xs transition-all disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-all disabled:opacity-50"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isDeepResearching ? 'animate-spin' : ''}`} />
                   <span>{isDeepResearching ? 'Araştırılıyor...' : 'Yeniden Derin Araştır'}</span>
@@ -1459,7 +1459,7 @@ function UrunYukleContent() {
         {/* ========================================================================= */}
         {/* AKSİYON & OZON YÜKLEME BUTONLARI */}
         {/* ========================================================================= */}
-        <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+        <section className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <h3 className="text-sm font-bold text-slate-900">Ürün Yüklemeye Hazır</h3>
@@ -1472,7 +1472,7 @@ function UrunYukleContent() {
               <button
                 type="button"
                 onClick={() => setShowJsonPreview(!showJsonPreview)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-all shadow-xs"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition-all"
               >
                 <FileJson className="w-4 h-4 text-slate-500" />
                 <span>{showJsonPreview ? 'JSON Gizle' : 'Ozon JSON Önizle'}</span>
@@ -1542,7 +1542,7 @@ function UrunYukleContent() {
                 <div className="space-y-2 text-xs">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-slate-700">İşlem Durumu:</span>
-                    <span className="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-100 text-emerald-900 border border-emerald-300">
+                    <span className="px-2 py-0.5 rounded-sm text-[11px] font-bold font-mono bg-emerald-100 text-emerald-900 border border-emerald-300">
                       {importStatusInfo.items?.[0]?.status || 'İşleniyor (In Progress)'}
                     </span>
                   </div>

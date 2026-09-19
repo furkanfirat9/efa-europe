@@ -43,7 +43,7 @@ export function TopProductsPanel({ products, loading, onOpenAll }: TopProductsPa
         <button
           type="button"
           onClick={onOpenAll}
-          className="inline-flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-ink-muted transition-colors hover:bg-white/[0.04] hover:text-ink"
+          className="inline-flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-2xs font-medium text-ink-muted transition-colors hover:bg-white/4 hover:text-ink"
         >
           Tümü
           <ArrowRight className="h-3 w-3" />
@@ -76,7 +76,7 @@ export function TopProductsPanel({ products, loading, onOpenAll }: TopProductsPa
             {top.map((product, index) => (
               <li
                 key={product.sku || index}
-                className="flex items-center gap-3 border-b border-hairline px-5 py-2.5 transition-colors last:border-b-0 hover:bg-white/[0.02]"
+                className="flex items-center gap-3 border-b border-hairline px-5 py-2.5 transition-colors last:border-b-0 hover:bg-white/2"
               >
                 <span className="w-4 shrink-0 text-right text-2xs tabular-nums text-ink-faint">
                   {index + 1}

@@ -200,7 +200,7 @@ export default function KategoriAgaciPage() {
   return (
     <main className="min-h-screen bg-slate-50 flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-20 shadow-xs">
+      <div className="bg-white border-b border-slate-200 px-8 py-5 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -224,7 +224,7 @@ export default function KategoriAgaciPage() {
                   }}
                   className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
                     language === lang
-                      ? 'bg-white text-blue-700 shadow-sm'
+                      ? 'bg-white text-blue-700 shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -237,7 +237,7 @@ export default function KategoriAgaciPage() {
             <button
               onClick={() => handleFetchTree(language)}
               disabled={loading}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold shadow-sm transition-all disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold shadow-xs transition-all disabled:opacity-50"
               title="Ağacı Yenile"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -248,7 +248,7 @@ export default function KategoriAgaciPage() {
             {treeData.length > 0 && (
               <button
                 onClick={handleDownloadJson}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition-all shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition-all shadow-xs"
                 title="JSON Olarak İndir"
               >
                 <Download className="w-3.5 h-3.5 text-slate-500" />
@@ -284,19 +284,19 @@ export default function KategoriAgaciPage() {
             <div className="h-10 bg-slate-200/70 rounded-xl animate-pulse w-full" />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <div className="h-[520px] bg-white border border-slate-200 rounded-xl p-4 space-y-3 animate-pulse">
-                <div className="h-4 bg-slate-200 rounded w-1/3 mb-4" />
+                <div className="h-4 bg-slate-200 rounded-sm w-1/3 mb-4" />
                 {[...Array(10)].map((_, i) => (
                   <div key={i} className="h-9 bg-slate-100 rounded-lg w-full" />
                 ))}
               </div>
               <div className="h-[520px] bg-white border border-slate-200 rounded-xl p-4 space-y-3 animate-pulse">
-                <div className="h-4 bg-slate-200 rounded w-1/3 mb-4" />
+                <div className="h-4 bg-slate-200 rounded-sm w-1/3 mb-4" />
                 {[...Array(8)].map((_, i) => (
                   <div key={i} className="h-9 bg-slate-100 rounded-lg w-full" />
                 ))}
               </div>
               <div className="h-[520px] bg-white border border-slate-200 rounded-xl p-4 space-y-3 animate-pulse">
-                <div className="h-4 bg-slate-200 rounded w-1/3 mb-4" />
+                <div className="h-4 bg-slate-200 rounded-sm w-1/3 mb-4" />
                 {[...Array(12)].map((_, i) => (
                   <div key={i} className="h-9 bg-slate-100 rounded-lg w-full" />
                 ))}
@@ -318,7 +318,7 @@ export default function KategoriAgaciPage() {
                   placeholder="Kategori, ürün tipi veya ID ara (örn: Telefon, 92341, Fantezi, Ayakkabı)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-xs transition-all"
                 />
                 {searchQuery && (
                   <button
@@ -331,7 +331,7 @@ export default function KategoriAgaciPage() {
               </div>
 
               {/* Quick Summary Pill */}
-              <div className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 flex items-center justify-between shadow-sm text-xs">
+              <div className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 flex items-center justify-between shadow-xs text-xs">
                 <div className="flex items-center gap-2 text-slate-600">
                   <Layers className="w-4 h-4 text-blue-600" />
                   <span>Ana Kategori: <strong className="text-slate-900">{stats.rootCount}</strong></span>
@@ -346,7 +346,7 @@ export default function KategoriAgaciPage() {
 
             {/* Search Results Mode */}
             {searchQuery.trim() ? (
-              <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+              <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
                 <div className="px-5 py-3.5 border-b border-slate-200 bg-slate-50/70 flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-700">
                     Arama Sonuçları ({searchResults.length} sonuç bulundu)
@@ -373,10 +373,10 @@ export default function KategoriAgaciPage() {
                         <div className="space-y-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-xs text-slate-900">{item.typeName}</span>
-                            <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-mono">
+                            <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-sm text-[10px] font-mono">
                               Type ID: {item.typeId}
                             </span>
-                            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-mono">
+                            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-sm text-[10px] font-mono">
                               Cat ID: {item.categoryId}
                             </span>
                           </div>
@@ -394,7 +394,7 @@ export default function KategoriAgaciPage() {
               /* Drilldown 3-Column Explorer */
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Column 1: Root Categories */}
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-[520px]">
+                <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden flex flex-col h-[520px]">
                   <div className="px-4 py-3 border-b border-slate-200 bg-slate-50/70 text-xs font-bold text-slate-700 flex items-center justify-between">
                     <span>1. Ana Kategoriler ({treeData.length})</span>
                     <span className="text-[10px] text-slate-400 font-normal">Level 1</span>
@@ -414,7 +414,7 @@ export default function KategoriAgaciPage() {
                           }}
                           className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between transition-all ${
                             isSelected
-                              ? 'bg-blue-600 text-white shadow-sm font-semibold'
+                              ? 'bg-blue-600 text-white shadow-xs font-semibold'
                               : 'text-slate-700 hover:bg-slate-100'
                           }`}
                         >
@@ -427,7 +427,7 @@ export default function KategoriAgaciPage() {
                 </div>
 
                 {/* Column 2: Subcategories */}
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-[520px]">
+                <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden flex flex-col h-[520px]">
                   <div className="px-4 py-3 border-b border-slate-200 bg-slate-50/70 text-xs font-bold text-slate-700 flex items-center justify-between">
                     <span>2. Alt Kategoriler ({selectedRoot?.children?.length || 0})</span>
                     <span className="text-[10px] text-slate-400 font-normal">Level 2</span>
@@ -452,7 +452,7 @@ export default function KategoriAgaciPage() {
                             }}
                             className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between transition-all ${
                               isSelected
-                                ? 'bg-indigo-600 text-white shadow-sm font-semibold'
+                                ? 'bg-indigo-600 text-white shadow-xs font-semibold'
                                 : 'text-slate-700 hover:bg-slate-100'
                             }`}
                           >
@@ -473,10 +473,10 @@ export default function KategoriAgaciPage() {
                 </div>
 
                 {/* Column 3: Types / Leaf Nodes */}
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-[520px]">
+                <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden flex flex-col h-[520px]">
                   <div className="px-4 py-3 border-b border-slate-200 bg-slate-50/70 text-xs font-bold text-slate-700 flex items-center justify-between">
                     <span>3. Ürün Türleri ({selectedSub?.children?.length || 0})</span>
-                    <span className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-mono">
+                    <span className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-sm font-mono">
                       Yüklenebilir
                     </span>
                   </div>
@@ -508,7 +508,7 @@ export default function KategoriAgaciPage() {
                             }}
                             className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium flex items-center justify-between transition-all ${
                               isSelected
-                                ? 'bg-emerald-600 text-white shadow-sm font-semibold'
+                                ? 'bg-emerald-600 text-white shadow-xs font-semibold'
                                 : 'text-slate-700 hover:bg-slate-100'
                             }`}
                           >
@@ -530,7 +530,7 @@ export default function KategoriAgaciPage() {
 
             {/* Selected Category Details & Attributes Inspector */}
             {selectedLeaf && (
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
                 {/* Header Info */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-100">
                   <div className="space-y-1">
@@ -556,7 +556,7 @@ export default function KategoriAgaciPage() {
                     </div>
                     <a
                       href={`/?catId=${selectedLeaf.categoryId}&typeId=${selectedLeaf.typeId}&catName=${encodeURIComponent(selectedLeaf.categoryName)}&typeName=${encodeURIComponent(selectedLeaf.typeName)}`}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl text-xs font-bold shadow-xs transition-all"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>Bu Kategoriyle Ürün Yükle</span>
@@ -581,7 +581,7 @@ export default function KategoriAgaciPage() {
                           onClick={() => setAttributeFilter('all')}
                           className={`px-2.5 py-1 rounded font-medium transition-all ${
                             attributeFilter === 'all'
-                              ? 'bg-white text-slate-900 shadow-sm'
+                              ? 'bg-white text-slate-900 shadow-xs'
                               : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
@@ -591,7 +591,7 @@ export default function KategoriAgaciPage() {
                           onClick={() => setAttributeFilter('required')}
                           className={`px-2.5 py-1 rounded font-medium transition-all ${
                             attributeFilter === 'required'
-                              ? 'bg-amber-500 text-white shadow-sm'
+                              ? 'bg-amber-500 text-white shadow-xs'
                               : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
@@ -601,7 +601,7 @@ export default function KategoriAgaciPage() {
                           onClick={() => setAttributeFilter('aspect')}
                           className={`px-2.5 py-1 rounded font-medium transition-all ${
                             attributeFilter === 'aspect'
-                              ? 'bg-purple-600 text-white shadow-sm'
+                              ? 'bg-purple-600 text-white shadow-xs'
                               : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
@@ -611,7 +611,7 @@ export default function KategoriAgaciPage() {
                           onClick={() => setAttributeFilter('dictionary')}
                           className={`px-2.5 py-1 rounded font-medium transition-all ${
                             attributeFilter === 'dictionary'
-                              ? 'bg-blue-600 text-white shadow-sm'
+                              ? 'bg-blue-600 text-white shadow-xs'
                               : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
@@ -621,7 +621,7 @@ export default function KategoriAgaciPage() {
                           onClick={() => setAttributeFilter('input')}
                           className={`px-2.5 py-1 rounded font-medium transition-all ${
                             attributeFilter === 'input'
-                              ? 'bg-emerald-600 text-white shadow-sm'
+                              ? 'bg-emerald-600 text-white shadow-xs'
                               : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >

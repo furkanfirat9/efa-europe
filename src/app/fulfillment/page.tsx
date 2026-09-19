@@ -639,7 +639,7 @@ export default function FulfillmentPage() {
 
         {/* METRİK ŞERİDİ — Yönerge Madde 2: Sahte kartlar yok, birleşik 4 sütunlu sessiz şerit */}
         <div className={styles.card}>
-          <div className="grid grid-cols-2 divide-x divide-y divide-[var(--border)] sm:grid-cols-4 sm:divide-y-0">
+          <div className="grid grid-cols-2 divide-x divide-y divide-(--border) sm:grid-cols-4 sm:divide-y-0">
             {stats.map((stat) => (
               <div key={stat.label} className="p-4 sm:p-5">
                 <div
@@ -1325,7 +1325,7 @@ export default function FulfillmentPage() {
               {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {Array.from({ length: 3 }).map((_, idx) => (
-                    <div key={idx} className="border p-4 rounded-[12px] space-y-2" style={{ borderColor: 'var(--border)' }}>
+                    <div key={idx} className="border p-4 rounded-panel space-y-2" style={{ borderColor: 'var(--border)' }}>
                       <div className="h-32 bg-slate-100 rounded-[6px] animate-pulse" />
                       <div className="h-4 w-32 bg-slate-100 rounded-[4px] animate-pulse" />
                     </div>
@@ -1345,7 +1345,7 @@ export default function FulfillmentPage() {
                     return (
                       <article
                         key={report.id}
-                        className="flex flex-col border rounded-[12px] overflow-hidden"
+                        className="flex flex-col border rounded-panel overflow-hidden"
                         style={{
                           borderColor: 'var(--border)',
                           backgroundColor: 'var(--surface)',
@@ -1777,7 +1777,7 @@ export default function FulfillmentPage() {
           <img
             src={lightboxUrl}
             alt="Depo görseli"
-            className="max-h-[88vh] max-w-[90vw] rounded-[12px] border border-black/20 object-contain"
+            className="max-h-[88vh] max-w-[90vw] rounded-panel border border-black/20 object-contain"
             onClick={(e) => e.stopPropagation()}
           />
           <button

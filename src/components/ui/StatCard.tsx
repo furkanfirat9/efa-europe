@@ -15,7 +15,7 @@ interface StatCardProps {
 }
 
 const CUTOUT_BUTTON =
-  'flex h-9 w-9 items-center justify-center rounded-full bg-surface text-text-secondary transition-colors hover:bg-ink hover:text-ink-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30';
+  'flex h-9 w-9 items-center justify-center rounded-full bg-surface text-text-secondary transition-colors hover:bg-ink hover:text-ink-foreground focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/30';
 
 export const StatCard: React.FC<StatCardProps> = ({
   label,

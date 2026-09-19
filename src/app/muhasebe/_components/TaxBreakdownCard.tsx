@@ -70,7 +70,7 @@ export function TaxBreakdownCard({ data }: { data: EuropeAccounting }) {
                 <p className="truncate text-[13px] font-medium text-text-primary">{s.label}</p>
                 <p className="truncate text-[12px] text-text-muted">{s.caption}</p>
               </div>
-              <div className="order-last col-span-2 h-2 rounded-full bg-surface-muted sm:order-none sm:col-span-1">
+              <div className="order-last col-span-2 h-2 rounded-full bg-surface-muted sm:order-0 sm:col-span-1">
                 <div
                   className="hatch h-full rounded-full transition-[width] duration-500"
                   style={{ width: `${pct}%`, ['--hatch' as string]: s.hatch }}
@@ -109,7 +109,7 @@ export function TaxBreakdownCard({ data }: { data: EuropeAccounting }) {
               onChange={(e) => handleOtherExpensesChange(e.target.value)}
               placeholder="0,00"
               aria-label="Diğer masraflar (TL)"
-              className="h-10 w-full rounded-full bg-surface pl-10 pr-4 text-[14px] font-medium text-text-primary tabular-nums placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30"
+              className="h-10 w-full rounded-full bg-surface pl-10 pr-4 text-[14px] font-medium text-text-primary tabular-nums placeholder:text-text-muted focus:outline-hidden focus:ring-2 focus:ring-accent/30"
             />
           </span>
         </label>
@@ -118,7 +118,7 @@ export function TaxBreakdownCard({ data }: { data: EuropeAccounting }) {
         <div className="relative overflow-hidden rounded-inner bg-surface-accent p-4">
           <div
             aria-hidden
-            className="hatch pointer-events-none absolute inset-0 opacity-40 [mask-image:linear-gradient(to_left,black,transparent_70%)]"
+            className="hatch pointer-events-none absolute inset-0 opacity-40 mask-[linear-gradient(to_left,black,transparent_70%)]"
           />
           <p className="relative text-[13px] font-medium text-text-primary">Cebinizde kalan net kâr</p>
           <p className="relative text-[12px] text-text-secondary">Vergi sonrası</p>

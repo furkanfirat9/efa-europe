@@ -43,7 +43,7 @@ export function InvoiceHeroCard({ data }: { data: EuropeAccounting }) {
         <Link
           href="/siparisler"
           aria-label="Avrupa siparişlerine git"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-surface text-text-secondary transition-colors hover:bg-ink hover:text-ink-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-surface text-text-secondary transition-colors hover:bg-ink hover:text-ink-foreground focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/30"
         >
           <ArrowUpRight className="h-[18px] w-[18px]" strokeWidth={1.75} />
         </Link>
@@ -52,7 +52,7 @@ export function InvoiceHeroCard({ data }: { data: EuropeAccounting }) {
       {/* Dekoratif taralı ışık — kartı düz bir kutudan ayırır, veri taşımaz. */}
       <div
         aria-hidden
-        className="hatch pointer-events-none absolute -right-24 -bottom-28 h-72 w-72 rounded-full opacity-60 [mask-image:radial-gradient(circle,black_30%,transparent_70%)]"
+        className="hatch pointer-events-none absolute -right-24 -bottom-28 h-72 w-72 rounded-full opacity-60 mask-[radial-gradient(circle,black_30%,transparent_70%)]"
       />
 
       <div className="relative pr-14">

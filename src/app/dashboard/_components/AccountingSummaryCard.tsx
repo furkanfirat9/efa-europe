@@ -17,7 +17,7 @@ export function AccountingSummaryCard() {
         <Link
           href="/muhasebe"
           aria-label="Muhasebe sayfasına git"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-surface text-text-secondary transition-colors hover:bg-ink hover:text-ink-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-surface text-text-secondary transition-colors hover:bg-ink hover:text-ink-foreground focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/30"
         >
           <ArrowUpRight className="h-[18px] w-[18px]" strokeWidth={1.75} />
         </Link>

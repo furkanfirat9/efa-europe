@@ -312,7 +312,7 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
 
               {docFile ? (
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 rounded-2xl bg-white border border-border-subtle shadow-xs">
+                  <div className="flex items-center justify-between p-3 rounded-2xl bg-white border border-border-subtle">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="h-8 w-8 rounded-xl bg-[#ECEBFD] text-[#5856D6] flex items-center justify-center shrink-0">
                         <FileText className="h-4 w-4" />
@@ -327,7 +327,7 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                     <button
                       type="button"
                       onClick={handleViewDocument}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-zinc-900 hover:bg-black text-white text-xs font-semibold transition-colors cursor-pointer shrink-0 shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-zinc-900 hover:bg-black text-white text-xs font-semibold transition-colors cursor-pointer shrink-0"
                       title="Yeni sekmede görüntüle"
                     >
                       <Eye className="h-3.5 w-3.5 text-white stroke-[2.2]" />
@@ -435,7 +435,7 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                   - {formatUSD((order.salePrice || 0) * 0.05)}
                 </span>
               </div>
-              <div className="flex items-center justify-between py-3 bg-white px-4 rounded-2xl border border-border-subtle shadow-xs mt-1.5">
+              <div className="flex items-center justify-between py-3 bg-white px-4 rounded-2xl border border-border-subtle mt-1.5">
                 <span className="font-medium text-text-primary text-[13px]">Tahmini Net Kâr</span>
                 <span
                   className={`font-semibold text-[15px] tabular-nums ${
@@ -455,7 +455,7 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                 placeholder="Örn: Allegro DPD ile Polonya deposuna gönderildi..."
                 value={notes}
                 onChange={(e) => onNotesChange(e.target.value)}
-                className="w-full rounded-[16px] border border-border-subtle bg-surface-muted p-3 text-xs text-text-primary placeholder:text-text-muted focus:bg-white focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none leading-relaxed transition-all"
+                className="w-full rounded-[16px] border border-border-subtle bg-surface-muted p-3 text-xs text-text-primary placeholder:text-text-muted focus:bg-white focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-hidden leading-relaxed transition-all"
               />
             </div>
           </div>

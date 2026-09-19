@@ -220,7 +220,7 @@ export function GeographyModal({
               type="button"
               onClick={onClose}
               aria-label="Kapat"
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-ink-subtle transition-colors hover:bg-white/[0.05] hover:text-ink"
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-ink-subtle transition-colors hover:bg-white/5 hover:text-ink"
             >
               <X className="h-4 w-4" />
             </button>
@@ -285,7 +285,7 @@ export function GeographyModal({
               onClick={() => setActiveTab('hierarchy')}
               className={`flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1 text-2xs font-medium transition-colors ${
                 activeTab === 'hierarchy'
-                  ? 'bg-panel-raised text-ink shadow-sm'
+                  ? 'bg-panel-raised text-ink shadow-xs'
                   : 'text-ink-subtle hover:text-ink'
               }`}
             >
@@ -297,7 +297,7 @@ export function GeographyModal({
               onClick={() => setActiveTab('top_cities')}
               className={`flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1 text-2xs font-medium transition-colors ${
                 activeTab === 'top_cities'
-                  ? 'bg-panel-raised text-ink shadow-sm'
+                  ? 'bg-panel-raised text-ink shadow-xs'
                   : 'text-ink-subtle hover:text-ink'
               }`}
             >
@@ -314,7 +314,7 @@ export function GeographyModal({
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Bölge, eyalet veya şehir ara…"
-                className="h-8 w-56 rounded-lg border border-hairline bg-panel-sunken pl-8 pr-3 text-2xs text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-hairline-strong"
+                className="h-8 w-56 rounded-lg border border-hairline bg-panel-sunken pl-8 pr-3 text-2xs text-ink outline-hidden transition-colors placeholder:text-ink-faint focus:border-hairline-strong"
               />
             </div>
 
@@ -378,7 +378,7 @@ export function GeographyModal({
                       <button
                         type="button"
                         onClick={() => toggleDistrict(district.districtId)}
-                        className="flex w-full cursor-pointer items-center justify-between gap-4 p-4 text-left transition-colors hover:bg-white/[0.02]"
+                        className="flex w-full cursor-pointer items-center justify-between gap-4 p-4 text-left transition-colors hover:bg-white/2"
                       >
                         <div className="flex min-w-0 items-center gap-3">
                           <span
@@ -413,7 +413,7 @@ export function GeographyModal({
                               {formatMoney(district.revenue)}
                             </div>
                             {/* İnce renkli dolgu çubuğu */}
-                            <div className="mt-1.5 h-1 w-24 overflow-hidden rounded-full bg-white/[0.05]">
+                            <div className="mt-1.5 h-1 w-24 overflow-hidden rounded-full bg-white/5">
                               <div
                                 className="h-full rounded-full"
                                 style={{
@@ -456,7 +456,7 @@ export function GeographyModal({
                                   <button
                                     type="button"
                                     onClick={() => toggleSubject(sKey)}
-                                    className="flex w-full cursor-pointer items-center justify-between gap-3 p-3 text-left transition-colors hover:bg-white/[0.02]"
+                                    className="flex w-full cursor-pointer items-center justify-between gap-3 p-3 text-left transition-colors hover:bg-white/2"
                                   >
                                     <div className="flex min-w-0 items-center gap-2.5">
                                       <MapPin className="h-3.5 w-3.5 shrink-0 text-ink-subtle" />
@@ -514,7 +514,7 @@ export function GeographyModal({
                                               <button
                                                 type="button"
                                                 onClick={() => toggleCity(cKey)}
-                                                className="flex w-full cursor-pointer items-center justify-between gap-3 p-2.5 text-left transition-colors hover:bg-white/[0.03]"
+                                                className="flex w-full cursor-pointer items-center justify-between gap-3 p-2.5 text-left transition-colors hover:bg-white/3"
                                               >
                                                 <div className="flex min-w-0 items-center gap-2">
                                                   <Building2 className="h-3 w-3 shrink-0 text-ink-faint" />
@@ -557,10 +557,10 @@ export function GeographyModal({
                                                     return (
                                                       <li
                                                         key={order.postingNumber || idx}
-                                                        className="flex items-center justify-between gap-3 p-2.5 px-3 transition-colors hover:bg-white/[0.02]"
+                                                        className="flex items-center justify-between gap-3 p-2.5 px-3 transition-colors hover:bg-white/2"
                                                       >
                                                         <div className="flex min-w-0 items-center gap-2.5">
-                                                          <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded border border-hairline bg-panel-sunken">
+                                                          <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-sm border border-hairline bg-panel-sunken">
                                                             {product?.primaryImage ? (
                                                               <img
                                                                 src={product.primaryImage}
@@ -660,7 +660,7 @@ export function GeographyModal({
                         <React.Fragment key={cKey}>
                           <tr
                             onClick={() => toggleCity(cKey)}
-                            className="cursor-pointer transition-colors hover:bg-white/[0.02]"
+                            className="cursor-pointer transition-colors hover:bg-white/2"
                           >
                             <td className="py-3 pl-3 text-2xs tabular-nums text-ink-faint">
                               {index + 1}
@@ -707,7 +707,7 @@ export function GeographyModal({
                                   <div className="text-2xs font-medium text-ink-subtle">
                                     {city.cityName} İçin Siparişler ({city.orders.length}):
                                   </div>
-                                  <ul className="divide-y divide-hairline rounded border border-hairline bg-panel">
+                                  <ul className="divide-y divide-hairline rounded-sm border border-hairline bg-panel">
                                     {city.orders.map((o, oIdx) => {
                                       const prod = o.products?.[0];
                                       return (
@@ -757,7 +757,7 @@ export function GeographyModal({
           <button
             type="button"
             onClick={onClose}
-            className="cursor-pointer rounded-md border border-hairline px-3 py-1 text-2xs font-medium text-ink transition-colors hover:bg-white/[0.05]"
+            className="cursor-pointer rounded-md border border-hairline px-3 py-1 text-2xs font-medium text-ink transition-colors hover:bg-white/5"
           >
             Kapat
           </button>

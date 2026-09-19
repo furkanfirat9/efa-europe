@@ -124,7 +124,7 @@ function AnalyticsPageContent() {
             <button
               type="button"
               onClick={() => fetchAnalytics(true)}
-              className="shrink-0 cursor-pointer rounded-md border border-hairline-strong px-2.5 py-1 text-2xs font-medium text-ink transition-colors hover:bg-white/[0.05]"
+              className="shrink-0 cursor-pointer rounded-md border border-hairline-strong px-2.5 py-1 text-2xs font-medium text-ink transition-colors hover:bg-white/5"
             >
               Tekrar dene
             </button>

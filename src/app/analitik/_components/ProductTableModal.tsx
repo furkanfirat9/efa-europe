@@ -117,7 +117,7 @@ export function ProductTableModal({
                 value={query}
                 onChange={(event) => onQueryChange(event.target.value)}
                 placeholder="Ürün veya SKU ara"
-                className="h-8 w-56 rounded-lg border border-hairline bg-panel-sunken pl-8 pr-3 text-2xs text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-hairline-strong"
+                className="h-8 w-56 rounded-lg border border-hairline bg-panel-sunken pl-8 pr-3 text-2xs text-ink outline-hidden transition-colors placeholder:text-ink-faint focus:border-hairline-strong"
               />
             </div>
 
@@ -125,7 +125,7 @@ export function ProductTableModal({
               type="button"
               onClick={onClose}
               aria-label="Kapat"
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-ink-subtle transition-colors hover:bg-white/[0.05] hover:text-ink"
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-ink-subtle transition-colors hover:bg-white/5 hover:text-ink"
             >
               <X className="h-4 w-4" />
             </button>
@@ -206,7 +206,7 @@ export function ProductTableModal({
                 products.map((product, index) => (
                   <tr
                     key={product.sku || index}
-                    className="border-b border-hairline transition-colors last:border-b-0 hover:bg-white/[0.02]"
+                    className="border-b border-hairline transition-colors last:border-b-0 hover:bg-white/2"
                   >
                     <td className="px-5 py-2.5">
                       <div className="flex min-w-0 items-center gap-3">
@@ -262,7 +262,7 @@ export function ProductTableModal({
                                 sayıların hizası bozulmasın diye boşluk kalır. */}
                             <div className="mt-1 h-[2px] w-12 overflow-hidden rounded-full">
                               {!rank && (
-                                <div className="h-full w-full rounded-full bg-white/[0.04]">
+                                <div className="h-full w-full rounded-full bg-white/4">
                                   {value > 0 && (
                                     <div
                                       className={`h-full rounded-full transition-all duration-300 ${barColor}`}

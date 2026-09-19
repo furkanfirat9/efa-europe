@@ -87,8 +87,8 @@ export default function Sidebar() {
               aria-current={isActive ? 'page' : undefined}
               className={`group relative flex items-center justify-center rounded-lg py-2 text-[13px] transition-colors lg:justify-between lg:gap-3 lg:pl-3 lg:pr-2.5 ${
                 isActive
-                  ? 'bg-white/[0.08] font-medium text-white shadow-xs'
-                  : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200'
+                  ? 'bg-white/8 font-medium text-white'
+                  : 'text-zinc-400 hover:bg-white/4 hover:text-zinc-200'
               }`}
             >
               {isActive && (
@@ -119,8 +119,8 @@ export default function Sidebar() {
             title="Ürün Yükleme"
             className={`group relative flex w-full items-center justify-center rounded-lg py-2 text-[13px] transition-colors lg:justify-between lg:gap-3 lg:pl-3 lg:pr-2.5 ${
               isProductUploadActive
-                ? 'font-medium text-white bg-white/[0.04]'
-                : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200'
+                ? 'font-medium text-white bg-white/4'
+                : 'text-zinc-400 hover:bg-white/4 hover:text-zinc-200'
             }`}
           >
             {isProductUploadActive && !isOpen && (
@@ -158,8 +158,8 @@ export default function Sidebar() {
                     aria-current={isSubActive ? 'page' : undefined}
                     className={`group relative flex items-center justify-center rounded-lg py-1.5 text-[12px] transition-colors lg:justify-start lg:gap-2.5 lg:pl-3 lg:pr-2.5 ${
                       isSubActive
-                        ? 'bg-white/[0.08] font-medium text-white shadow-xs'
-                        : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200'
+                        ? 'bg-white/8 font-medium text-white'
+                        : 'text-zinc-400 hover:bg-white/4 hover:text-zinc-200'
                     }`}
                   >
                     {isSubActive && (
@@ -194,8 +194,8 @@ export default function Sidebar() {
               aria-current={isActive ? 'page' : undefined}
               className={`group relative flex items-center justify-center rounded-lg py-2 text-[13px] transition-colors lg:justify-between lg:gap-3 lg:pl-3 lg:pr-2.5 ${
                 isActive
-                  ? 'bg-white/[0.08] font-medium text-white shadow-xs'
-                  : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200'
+                  ? 'bg-white/8 font-medium text-white'
+                  : 'text-zinc-400 hover:bg-white/4 hover:text-zinc-200'
               }`}
             >
               {isActive && (

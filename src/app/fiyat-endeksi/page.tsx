@@ -172,7 +172,7 @@ export default function FiyatEndeksiPage() {
             <h1 className="text-sm font-semibold tracking-[-0.01em] text-ink lg:text-base">
               Fiyat Endeksi
             </h1>
-            <span className="rounded border border-hairline bg-panel-sunken px-2 py-0.5 text-2xs font-medium text-ink-subtle">
+            <span className="rounded-sm border border-hairline bg-panel-sunken px-2 py-0.5 text-2xs font-medium text-ink-subtle">
               Piyasa Takibi
             </span>
           </div>
@@ -312,7 +312,7 @@ export default function FiyatEndeksiPage() {
                     onClick={() => setStatusFilter(statusFilter === 'GREEN' ? 'ALL' : 'GREEN')}
                     className={`flex cursor-pointer flex-col justify-between rounded-xl border bg-panel p-4 transition-all ${
                       statusFilter === 'GREEN'
-                        ? 'border-gain ring-1 ring-gain shadow-xs'
+                        ? 'border-gain ring-1 ring-gain'
                         : 'border-gain/40 hover:border-gain'
                     }`}
                   >
@@ -338,7 +338,7 @@ export default function FiyatEndeksiPage() {
                     onClick={() => setStatusFilter(statusFilter === 'YELLOW' ? 'ALL' : 'YELLOW')}
                     className={`flex cursor-pointer flex-col justify-between rounded-xl border bg-panel p-4 transition-all ${
                       statusFilter === 'YELLOW'
-                        ? 'border-caution ring-1 ring-caution shadow-xs'
+                        ? 'border-caution ring-1 ring-caution'
                         : 'border-caution/40 hover:border-caution'
                     }`}
                   >
@@ -364,7 +364,7 @@ export default function FiyatEndeksiPage() {
                     onClick={() => setStatusFilter(statusFilter === 'RED' ? 'ALL' : 'RED')}
                     className={`flex cursor-pointer flex-col justify-between rounded-xl border bg-panel p-4 transition-all ${
                       statusFilter === 'RED'
-                        ? 'border-loss ring-1 ring-loss shadow-xs'
+                        ? 'border-loss ring-1 ring-loss'
                         : 'border-loss/40 hover:border-loss'
                     }`}
                   >
@@ -390,7 +390,7 @@ export default function FiyatEndeksiPage() {
                     onClick={() => setStatusFilter(statusFilter === 'WITHOUT_INDEX' ? 'ALL' : 'WITHOUT_INDEX')}
                     className={`flex cursor-pointer flex-col justify-between rounded-xl border bg-panel p-4 transition-all ${
                       statusFilter === 'WITHOUT_INDEX'
-                        ? 'border-ink-muted ring-1 ring-ink-muted shadow-xs'
+                        ? 'border-ink-muted ring-1 ring-ink-muted'
                         : 'border-hairline hover:border-hairline-strong'
                     }`}
                   >
@@ -554,17 +554,17 @@ export default function FiyatEndeksiPage() {
                           <div className="flex items-center gap-3">
                             <div className="h-10 w-10 shrink-0 rounded-md bg-panel-sunken" />
                             <div className="space-y-1.5">
-                              <div className="h-3 w-28 rounded bg-panel-sunken" />
-                              <div className="h-2.5 w-48 rounded bg-panel-sunken" />
+                              <div className="h-3 w-28 rounded-sm bg-panel-sunken" />
+                              <div className="h-2.5 w-48 rounded-sm bg-panel-sunken" />
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 px-3"><div className="h-4 w-16 rounded bg-panel-sunken" /></td>
-                        <td className="py-3 px-3"><div className="h-4 w-20 rounded bg-panel-sunken" /></td>
-                        <td className="py-3 px-3"><div className="h-4 w-20 rounded bg-panel-sunken" /></td>
-                        <td className="py-3 px-3"><div className="h-4 w-16 rounded bg-panel-sunken" /></td>
-                        <td className="py-3 px-3"><div className="h-4 w-10 rounded bg-panel-sunken" /></td>
-                        <td className="py-3 pl-3 pr-4"><div className="ml-auto h-4 w-8 rounded bg-panel-sunken" /></td>
+                        <td className="py-3 px-3"><div className="h-4 w-16 rounded-sm bg-panel-sunken" /></td>
+                        <td className="py-3 px-3"><div className="h-4 w-20 rounded-sm bg-panel-sunken" /></td>
+                        <td className="py-3 px-3"><div className="h-4 w-20 rounded-sm bg-panel-sunken" /></td>
+                        <td className="py-3 px-3"><div className="h-4 w-16 rounded-sm bg-panel-sunken" /></td>
+                        <td className="py-3 px-3"><div className="h-4 w-10 rounded-sm bg-panel-sunken" /></td>
+                        <td className="py-3 pl-3 pr-4"><div className="ml-auto h-4 w-8 rounded-sm bg-panel-sunken" /></td>
                       </tr>
                     ))
                   ) : paginatedProducts.length === 0 ? (
@@ -597,7 +597,7 @@ export default function FiyatEndeksiPage() {
                           {/* Ürün Görseli, Model ve Başlık */}
                           <td className="py-3 pl-4 pr-3">
                             <div className="flex items-center gap-3">
-                              <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-hairline bg-white/[0.03]">
+                              <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-hairline bg-white/3">
                                 {p.image ? (
                                   <img
                                     src={p.image}
