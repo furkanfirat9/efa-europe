@@ -38,7 +38,7 @@ import {
   isUrlString,
 } from '../utils';
 import { useOrderDocument, type OnDocumentChange } from '../useOrderDocument';
-import { DOC_ACCEPT } from './cells';
+import { DOC_ACCEPT, isDocumentExpected } from './cells';
 import { OrderStatusBadge } from './OrderStatusBadge';
 
 interface OrderDetailDrawerProps {
@@ -208,8 +208,17 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                       <Loader2 className="animate-spin" />
                       İşleniyor
                     </Badge>
+                  ) : docFile ? (
+                    <Badge variant="secondary">Kayıtlı</Badge>
+                  ) : isDocumentExpected(order) ? (
+                    <Badge
+                      variant="outline"
+                      className="border-status-warning-text bg-status-warning-bg text-status-warning-text"
+                    >
+                      Belge bekleniyor
+                    </Badge>
                   ) : (
-                    <Badge variant={docFile ? 'secondary' : 'outline'}>{docFile ? 'Kayıtlı' : 'Belge yok'}</Badge>
+                    <Badge variant="outline">Belge yok</Badge>
                   )
                 }
               >

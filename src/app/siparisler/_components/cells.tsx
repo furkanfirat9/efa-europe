@@ -281,6 +281,10 @@ export function SupplierOrderIdCell({ order, onUpdate }: { order: OrderItem; onU
 
 export const DOC_ACCEPT = '.pdf,image/*,.doc,.docx,.xls,.xlsx';
 
+// Alış fiyatı girilmiş sipariş satın alınmıştır; alış faturası bekleniyor demektir.
+export const isDocumentExpected = (order: OrderItem) =>
+  order.buyPrice !== null && order.buyPrice !== undefined;
+
 export function DocumentCell({ order, onDocumentChange }: { order: OrderItem; onDocumentChange: OnDocumentChange }) {
   const { docFile, busy, upload, view } = useOrderDocument(order, onDocumentChange);
 
@@ -305,16 +309,26 @@ export function DocumentCell({ order, onDocumentChange }: { order: OrderItem; on
     );
   }
 
+  const expected = isDocumentExpected(order);
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
           variant="outline"
           size="icon"
-          className="size-8 border-dashed border-muted-foreground/40 text-muted-foreground shadow-none hover:border-foreground/40 hover:text-foreground"
+          className={cn(
+            'relative size-8 shadow-none',
+            expected
+              ? 'border-status-warning-text bg-status-warning-bg text-status-warning-text hover:bg-status-warning-bg hover:text-status-warning-text'
+              : 'border-dashed border-muted-foreground/40 text-muted-foreground hover:border-foreground/40 hover:text-foreground'
+          )}
           asChild
         >
-          <label className="cursor-pointer" aria-label="Belge yükle">
+          <label className="cursor-pointer" aria-label={expected ? 'Alış faturası bekleniyor, yükle' : 'Belge yükle'}>
+            {expected && (
+              <span className="absolute -top-1 -right-1 size-2 rounded-full bg-status-warning-text ring-2 ring-background" />
+            )}
             <Upload />
             <input
               type="file"
@@ -329,7 +343,11 @@ export function DocumentCell({ order, onDocumentChange }: { order: OrderItem; on
           </label>
         </Button>
       </TooltipTrigger>
-      <TooltipContent>Fatura / belge yükle (PDF, görsel, en fazla 4 MB)</TooltipContent>
+      <TooltipContent>
+        {expected
+          ? 'Alış fiyatı girildi, alış faturası bekleniyor. Yükle (PDF, görsel, en fazla 4 MB)'
+          : 'Fatura / belge yükle (PDF, görsel, en fazla 4 MB)'}
+      </TooltipContent>
     </Tooltip>
   );
 }
