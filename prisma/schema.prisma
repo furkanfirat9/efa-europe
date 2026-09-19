@@ -92,6 +92,15 @@ model OzonOrder {
   netProfit           Float?
   netProfitTry        Float?
   notes               String?
+
+  // Siparişe yüklenen fatura / belge (Vercel Blob, private). Dosya yalnızca
+  // /api/siparisler/document üzerinden sunulur; blob adresi istemciye verilmez.
+  documentUrl         String?
+  documentName        String?
+  documentContentType String?
+  documentSize        Int?
+  documentUploadedAt  DateTime?
+
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 

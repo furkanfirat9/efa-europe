@@ -30,6 +30,7 @@ import { OrderItem, STATUS_FILTER_OPTIONS } from '../types';
 import type { AvailableProduct, AvailableSupplier, SortDirection, SortField } from '../useOrders';
 import { buildOrderColumns, COLUMN_LABELS, orderTableFeatures } from './columns';
 import type { UpdateOrder } from './cells';
+import type { OnDocumentChange } from '../useOrderDocument';
 import { FilterCombobox } from './FilterCombobox';
 
 const PAGE_SIZES = [25, 50, 100];
@@ -60,6 +61,7 @@ interface OrdersDataTableProps {
   resetKey: string;
   onUpdate: UpdateOrder;
   onOpenDetail: (order: OrderItem) => void;
+  onDocumentChange: OnDocumentChange;
 }
 
 function loadVisibility(): ColumnVisibilityState {
@@ -79,11 +81,18 @@ export function OrdersDataTable(props: OrdersDataTableProps) {
     onToggleSort,
     onUpdate,
     onOpenDetail,
+    onDocumentChange,
   } = props;
 
   const columns = useMemo(
-    () => buildOrderColumns({ onUpdate, onOpenDetail, sort: { sortField, sortDirection, onToggle: onToggleSort } }),
-    [onUpdate, onOpenDetail, sortField, sortDirection, onToggleSort]
+    () =>
+      buildOrderColumns({
+        onUpdate,
+        onOpenDetail,
+        onDocumentChange,
+        sort: { sortField, sortDirection, onToggle: onToggleSort },
+      }),
+    [onUpdate, onOpenDetail, onDocumentChange, sortField, sortDirection, onToggleSort]
   );
 
   const table = useTable({

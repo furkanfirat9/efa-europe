@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { OrderItem, OrderStats, MONTHS } from './types';
+import { OrderItem, OrderStats, MONTHS, type OrderDocumentFields } from './types';
 
 export type SortField = 'date' | 'salePrice' | 'buyPrice';
 export type SortDirection = 'asc' | 'desc';
@@ -544,6 +544,12 @@ export function useOrders() {
     [showToast, selectedYear, selectedMonth]
   );
 
+  // Belge yüklenince / silinince sunucuya tekrar gitmeden listedeki ve açık paneldeki siparişi günceller.
+  const patchOrderDocument = useCallback((postingNumber: string, fields: OrderDocumentFields) => {
+    setAllOrders((prev) => prev.map((o) => (o.postingNumber === postingNumber ? { ...o, ...fields } : o)));
+    setSelectedOrder((prev) => (prev && prev.postingNumber === postingNumber ? { ...prev, ...fields } : prev));
+  }, []);
+
   // Detay Panelini Aç
   const handleOpenDetail = useCallback((order: OrderItem) => {
     setSelectedOrder(order);
@@ -605,5 +611,6 @@ export function useOrders() {
     handleInlineUpdate,
     handleOpenDetail,
     handleSaveDetailNotes,
+    patchOrderDocument,
   };
 }

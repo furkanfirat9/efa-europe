@@ -24,6 +24,7 @@ import {
   SupplierOrderIdCell,
   type UpdateOrder,
 } from './cells';
+import type { OnDocumentChange } from '../useOrderDocument';
 
 /**
  * Sıralama ve filtreleme useOrders'ta (URL ile senkron) yapılır; tablo yalnızca
@@ -78,10 +79,12 @@ function SortableHeader({ field, label, sort }: { field: SortField; label: strin
 export function buildOrderColumns({
   onUpdate,
   onOpenDetail,
+  onDocumentChange,
   sort,
 }: {
   onUpdate: UpdateOrder;
   onOpenDetail: (order: OrderItem) => void;
+  onDocumentChange: OnDocumentChange;
   sort: SortProps;
 }) {
   return helper.columns([
@@ -120,7 +123,8 @@ export function buildOrderColumns({
       id: 'status',
       header: 'Durum',
       cell: ({ row }) => <OrderStatusBadge status={row.original.status} statusName={row.original.statusName} />,
-    }),    helper.display({
+    }),
+    helper.display({
       id: 'salePrice',
       header: () => <SortableHeader field="salePrice" label="Satış" sort={sort} />,
       cell: ({ row }) => (
@@ -130,7 +134,8 @@ export function buildOrderColumns({
             : `${formatNumber(row.original.salePrice)} ${row.original.currency}`}
         </span>
       ),
-    }),    helper.display({
+    }),
+    helper.display({
       id: 'buyPrice',
       header: () => <SortableHeader field="buyPrice" label="Alış ₺" sort={sort} />,
       cell: ({ row }) => <BuyPriceCell order={row.original} onUpdate={onUpdate} />,
@@ -165,7 +170,7 @@ export function buildOrderColumns({
     helper.display({
       id: 'document',
       header: 'Belge',
-      cell: ({ row }) => <DocumentCell order={row.original} />,
+      cell: ({ row }) => <DocumentCell order={row.original} onDocumentChange={onDocumentChange} />,
     }),
 
     helper.display({

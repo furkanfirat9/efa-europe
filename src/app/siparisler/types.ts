@@ -28,7 +28,17 @@ export interface OrderItem {
   netProfit?: number | null;
   netProfitTry?: number | null;
   notes?: string | null;
+  // Yüklü belge (dosya /api/siparisler/document üzerinden açılır)
+  documentName?: string | null;
+  documentContentType?: string | null;
+  documentSize?: number | null;
+  documentUploadedAt?: string | null;
 }
+
+export type OrderDocumentFields = Pick<
+  OrderItem,
+  'documentName' | 'documentContentType' | 'documentSize' | 'documentUploadedAt'
+>;
 
 export interface MonthOption {
   value: number;

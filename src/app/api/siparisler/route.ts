@@ -215,8 +215,10 @@ export async function GET(request: NextRequest) {
         image = imageByOfferId.get(offerId) || null;
       }
 
+      // Belgenin private blob adresi istemciye gönderilmez (bkz. /api/siparisler/document).
+      const { documentUrl: _documentUrl, ...rest } = o;
       return {
-        ...o,
+        ...rest,
         salePrice,
         currency,
         productOfferId: offerId,
@@ -367,8 +369,9 @@ export async function PATCH(request: NextRequest) {
 
     // Ürün başlığı ve offer_id'nin kaybolmaması için metadata zenginleştirmesi
     const meta = extractProductMeta(updated);
+    const { documentUrl: _documentUrl, ...updatedRest } = updated;
     const enrichedUpdated = {
-      ...updated,
+      ...updatedRest,
       salePrice: Number(updated.totalPrice) || parsePriceFromRaw(updated),
       productOfferId: meta.offerId || updated.productOfferId || '-',
       productTitle: meta.title || updated.productTitle || '-',

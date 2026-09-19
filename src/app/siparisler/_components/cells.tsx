@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ExternalLink, FileCheck, Link2, Package, Upload } from 'lucide-react';
+import { ExternalLink, FileCheck, Link2, Loader2, Package, Upload } from 'lucide-react';
 import { Badge } from '@/components/shadcn/badge';
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
@@ -16,7 +16,7 @@ import {
   getShipmentCountdown,
   isUrlString,
 } from '../utils';
-import { useOrderDocument } from '../useOrderDocument';
+import { useOrderDocument, type OnDocumentChange } from '../useOrderDocument';
 
 export type UpdateOrder = (postingNumber: string, payload: Record<string, any>) => Promise<void>;
 
@@ -279,8 +279,18 @@ export function SupplierOrderIdCell({ order, onUpdate }: { order: OrderItem; onU
 
 // ─── Belge ───────────────────────────────────────────────────────────────────
 
-export function DocumentCell({ order }: { order: OrderItem }) {
-  const { docFile, upload, view } = useOrderDocument(order.postingNumber);
+export const DOC_ACCEPT = '.pdf,image/*,.doc,.docx,.xls,.xlsx';
+
+export function DocumentCell({ order, onDocumentChange }: { order: OrderItem; onDocumentChange: OnDocumentChange }) {
+  const { docFile, busy, upload, view } = useOrderDocument(order, onDocumentChange);
+
+  if (busy) {
+    return (
+      <Button variant="outline" size="icon" className="size-8" disabled aria-label="Belge yükleniyor">
+        <Loader2 className="animate-spin" />
+      </Button>
+    );
+  }
 
   if (docFile) {
     return (
@@ -309,7 +319,7 @@ export function DocumentCell({ order }: { order: OrderItem }) {
             <input
               type="file"
               className="hidden"
-              accept=".pdf,image/*,.doc,.docx,.xlsx"
+              accept={DOC_ACCEPT}
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) upload(file);
@@ -319,7 +329,7 @@ export function DocumentCell({ order }: { order: OrderItem }) {
           </label>
         </Button>
       </TooltipTrigger>
-      <TooltipContent>Fatura / belge yükle (PDF, görsel)</TooltipContent>
+      <TooltipContent>Fatura / belge yükle (PDF, görsel, en fazla 4 MB)</TooltipContent>
     </Tooltip>
   );
 }
