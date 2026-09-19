@@ -1,5 +1,6 @@
 import React from 'react';
 import { MonthlyRevenueCard } from './_components/MonthlyRevenueCard';
+import { EuropeAccountingPanel } from './_components/EuropeAccountingPanel';
 
 export const metadata = {
   title: 'Dashboard | Ozon AI Studio',
@@ -7,15 +8,15 @@ export const metadata = {
 
 export default function DashboardPage() {
   return (
-    <div className="w-full px-4 py-6 sm:px-6 lg:px-8">
+    <div className="w-full px-4 py-6 sm:px-6 lg:px-8 space-y-6">
       {/* Header: Title left, compact monthly revenue card right */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-text-primary sm:text-3xl">
             Dashboard
           </h1>
           <p className="mt-1 text-sm text-text-secondary">
-            Genel mağaza özeti ve performans paneli.
+            Avrupa mağazası muhasebe ve resmi fatura yönetim masası.
           </p>
         </div>
 
@@ -24,11 +25,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="rounded-[28px] bg-surface p-12 text-center shadow-xs">
-        <p className="text-sm text-text-muted">
-          Dashboard paneli hazırlanıyor.
-        </p>
-      </div>
+      {/* Avrupa Mağazası Muhasebe & TCMB Fatura Paneli */}
+      <EuropeAccountingPanel />
     </div>
   );
 }

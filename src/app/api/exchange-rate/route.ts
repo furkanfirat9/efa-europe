@@ -1,20 +1,52 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 let cachedRateData: {
-  eurBuying: number;   // ForexBuying (EUR Döviz Alış)
-  eurSelling: number;  // ForexSelling (EUR Döviz Satış)
-  usdBuying: number;   // ForexBuying (USD Döviz Alış)
-  usdSelling: number;  // ForexSelling (USD Döviz Satış)
+  eurBuying: number;
+  eurSelling: number;
+  usdBuying: number;
+  usdSelling: number;
   date: string;
   timestamp: number;
 } | null = null;
 
 const CACHE_TTL_MS = 30 * 60 * 1000; // 30 Dakika RAM Önbelleği
 
-export async function GET() {
+function parseTcmbXml(xml: string) {
+  const dateMatch = xml.match(/<Tarih_Date[^>]*Tarih="([^"]+)"/i);
+  const date = dateMatch ? dateMatch[1] : '';
+
+  // EUR
+  const eurBlockMatch = xml.match(/<Currency[^>]*Kod="EUR"[^>]*>([\s\S]*?)<\/Currency>/i);
+  let eurBuying = 0;
+  let eurSelling = 0;
+  if (eurBlockMatch) {
+    const eurBlock = eurBlockMatch[1];
+    eurBuying = parseFloat(eurBlock.match(/<ForexBuying>([\d.]+)<\/ForexBuying>/i)?.[1] || '0');
+    eurSelling = parseFloat(eurBlock.match(/<ForexSelling>([\d.]+)<\/ForexSelling>/i)?.[1] || '0') || eurBuying;
+  }
+
+  // USD
+  const usdBlockMatch = xml.match(/<Currency[^>]*Kod="USD"[^>]*>([\s\S]*?)<\/Currency>/i);
+  let usdBuying = 0;
+  let usdSelling = 0;
+  if (usdBlockMatch) {
+    const usdBlock = usdBlockMatch[1];
+    usdBuying = parseFloat(usdBlock.match(/<ForexBuying>([\d.]+)<\/ForexBuying>/i)?.[1] || '0');
+    usdSelling = parseFloat(usdBlock.match(/<ForexSelling>([\d.]+)<\/ForexSelling>/i)?.[1] || '0') || usdBuying;
+  }
+
+  return { date, eurBuying, eurSelling, usdBuying, usdSelling };
+}
+
+export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const requestedDate = searchParams.get('date'); // YYYY-MM-DD
+
     const now = Date.now();
-    if (cachedRateData && (now - cachedRateData.timestamp) < CACHE_TTL_MS) {
+
+    // Tarih belirtilmemişse ve taze önbellek varsa doğrudan dön
+    if (!requestedDate && cachedRateData && (now - cachedRateData.timestamp) < CACHE_TTL_MS) {
       return NextResponse.json({
         success: true,
         source: 'cache',
@@ -22,7 +54,50 @@ export async function GET() {
       });
     }
 
-    // TCMB XML Çekimi
+    // Belirli bir tarih istenmişse (örn: ay sonu veya geçmiş gün)
+    if (requestedDate) {
+      // YYYY-MM-DD -> DDMMYYYY ve YYYYMM
+      const parts = requestedDate.split('-');
+      if (parts.length === 3) {
+        let curDate = new Date(`${requestedDate}T12:00:00Z`);
+
+        // Tatil veya hafta sonuysa son iş gününü bulana kadar en fazla 5 gün geriye git
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const y = curDate.getUTCFullYear();
+          const m = String(curDate.getUTCMonth() + 1).padStart(2, '0');
+          const d = String(curDate.getUTCDate()).padStart(2, '0');
+          const url = `https://www.tcmb.gov.tr/kurlar/${y}${m}/${d}${m}${y}.xml`;
+
+          try {
+            const res = await fetch(url, {
+              headers: { 'User-Agent': 'Mozilla/5.0' },
+              next: { revalidate: 86400 },
+            });
+
+            if (res.ok) {
+              const xml = await res.text();
+              const parsed = parseTcmbXml(xml);
+              if (parsed.usdBuying > 0) {
+                return NextResponse.json({
+                  success: true,
+                  source: 'historical',
+                  requestedDate,
+                  effectiveDate: `${d}.${m}.${y}`,
+                  ...parsed,
+                });
+              }
+            }
+          } catch {
+            // Devam et
+          }
+
+          // 1 gün geriye git
+          curDate = new Date(curDate.getTime() - 24 * 60 * 60 * 1000);
+        }
+      }
+    }
+
+    // Bugünün canlı TCMB kuru
     const response = await fetch('https://www.tcmb.gov.tr/kurlar/today.xml', {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
@@ -35,61 +110,25 @@ export async function GET() {
     }
 
     const xml = await response.text();
+    const parsed = parseTcmbXml(xml);
 
-    // Tarih Yakalama: <Tarih_Date Tarih="21.08.2026" ...>
-    const dateMatch = xml.match(/<Tarih_Date[^>]*Tarih="([^"]+)"/i);
-    const date = dateMatch ? dateMatch[1] : new Date().toLocaleDateString('tr-TR');
-
-    // EUR Bloğu Yakalama: <Currency ... Kod="EUR" ...>...</Currency>
-    const eurBlockMatch = xml.match(/<Currency[^>]*Kod="EUR"[^>]*>([\s\S]*?)<\/Currency>/i);
-    if (!eurBlockMatch) {
-      throw new Error('TCMB XML içerisinde EUR kuru bulunamadı.');
-    }
-
-    const eurBlock = eurBlockMatch[1];
-    const forexBuyingStr = eurBlock.match(/<ForexBuying>([\d.]+)<\/ForexBuying>/i)?.[1];
-    const forexSellingStr = eurBlock.match(/<ForexSelling>([\d.]+)<\/ForexSelling>/i)?.[1];
-
-    const eurBuying = parseFloat(forexBuyingStr || '0');
-    const eurSelling = parseFloat(forexSellingStr || '0');
-
-    if (!eurBuying || isNaN(eurBuying)) {
-      throw new Error('EUR Döviz Alış kuru ayrıştırılamadı.');
-    }
-
-    // USD Bloğu Yakalama: <Currency ... Kod="USD" ...>...</Currency>
-    const usdBlockMatch = xml.match(/<Currency[^>]*Kod="USD"[^>]*>([\s\S]*?)<\/Currency>/i);
-    let usdBuying = 36.00;
-    let usdSelling = 36.10;
-    if (usdBlockMatch) {
-      const usdBlock = usdBlockMatch[1];
-      const usdForexBuyingStr = usdBlock.match(/<ForexBuying>([\d.]+)<\/ForexBuying>/i)?.[1];
-      const usdForexSellingStr = usdBlock.match(/<ForexSelling>([\d.]+)<\/ForexSelling>/i)?.[1];
-      usdBuying = parseFloat(usdForexBuyingStr || '0') || 36.00;
-      usdSelling = parseFloat(usdForexSellingStr || '0') || usdBuying;
+    if (!parsed.usdBuying || parsed.usdBuying === 0) {
+      throw new Error('TCMB XML içerisinde USD kuru bulunamadı.');
     }
 
     cachedRateData = {
-      eurBuying,
-      eurSelling: eurSelling || eurBuying,
-      usdBuying,
-      usdSelling: usdSelling || usdBuying,
-      date,
+      ...parsed,
       timestamp: now,
     };
 
     return NextResponse.json({
       success: true,
       source: 'live',
-      eurBuying,
-      eurSelling,
-      usdBuying,
-      usdSelling,
-      date,
+      ...parsed,
     });
   } catch (error: any) {
     console.error('TCMB Kur Hatası:', error.message);
-    
+
     if (cachedRateData) {
       return NextResponse.json({
         success: true,
@@ -102,11 +141,11 @@ export async function GET() {
       {
         success: false,
         error: error.message || 'TCMB kurları alınamadı',
-        eurBuying: 38.45,
-        eurSelling: 38.55,
-        usdBuying: 36.00,
-        usdSelling: 36.10,
-        date: 'Varsayılan',
+        eurBuying: 55.80,
+        eurSelling: 55.90,
+        usdBuying: 48.60,
+        usdSelling: 48.70,
+        date: new Date().toLocaleDateString('tr-TR'),
       },
       { status: 500 }
     );
