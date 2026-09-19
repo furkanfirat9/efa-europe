@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   PackagePlus,
   Package,
@@ -19,6 +19,7 @@ import {
   LayoutDashboard,
   Receipt,
   FileStack,
+  LogOut,
 } from 'lucide-react';
 
 interface NavItem {
@@ -220,6 +221,58 @@ export default function Sidebar() {
           );
         })}
       </nav>
+
+      <SidebarAccount />
     </aside>
+  );
+}
+
+/** Oturumdaki kullanıcı ve çıkış butonu. */
+function SidebarAccount() {
+  const router = useRouter();
+  const [username, setUsername] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/auth/me')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.success) setUsername(data.username);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const logout = async () => {
+    setBusy(true);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.replace('/login');
+      router.refresh();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-2 border-t border-hairline p-2 lg:justify-between lg:px-3 lg:py-2.5">
+      <span className="hidden min-w-0 flex-col lg:flex">
+        <span className="truncate text-[13px] text-zinc-300">{username ?? '—'}</span>
+        <span className="text-2xs leading-tight text-zinc-500">Oturum açık</span>
+      </span>
+      <button
+        type="button"
+        onClick={logout}
+        disabled={busy}
+        title="Çıkış yap"
+        aria-label="Çıkış yap"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/8 hover:text-white disabled:opacity-60"
+      >
+        <LogOut className="h-4 w-4" />
+      </button>
+    </div>
   );
 }
