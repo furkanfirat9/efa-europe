@@ -1,12 +1,20 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AppLayoutShell from "@/components/AppLayoutShell";
 import { Toaster } from "@/components/shadcn/sonner";
+import { TooltipProvider } from "@/components/shadcn/tooltip";
 
-const inter = Inter({
-  subsets: ["latin", "cyrillic"],
-  variable: "--font-inter",
+// shadcn/ui'nin varsayılan fontları. latin-ext Türkçe, cyrillic Rusça ürün adları için.
+const geistSans = Geist({
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  variable: "--font-geist-sans",
+  display: "swap",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  variable: "--font-geist-mono",
   display: "swap",
 });
 
@@ -28,12 +36,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr" className={inter.variable}>
-      <body className={`${inter.className} antialiased min-h-screen bg-canvas`}>
-        <AppLayoutShell>
-          {children}
-        </AppLayoutShell>
-        <Toaster position="bottom-right" />
+    <html lang="tr" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className="font-sans antialiased min-h-screen bg-canvas">
+        <TooltipProvider>
+          <AppLayoutShell>{children}</AppLayoutShell>
+          <Toaster position="bottom-right" />
+        </TooltipProvider>
       </body>
     </html>
   );

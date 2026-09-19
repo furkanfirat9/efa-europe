@@ -8,27 +8,19 @@ export const metadata = {
 
 /**
  * Uygulamanın özet sayfası. Her alan tek bir kartla temsil edilir
- * (ana rakam + detay sayfasına ok); ayrıntı kendi sayfasında durur.
+ * (ana rakam + detay sayfasına bağlantı); ayrıntı kendi sayfasında durur.
  */
 export default function DashboardPage() {
   return (
-    <div className="w-full space-y-4 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-      <header className="pb-2">
-        <h1 className="text-[32px] font-normal leading-[1.15] tracking-tight text-text-primary sm:text-[36px]">
-          Genel bakış
-        </h1>
-        <p className="mt-1 text-[14px] text-text-secondary">
-          Mağazaların, siparişlerin ve muhasebenin özeti.
-        </p>
-      </header>
+    <div className="flex-1 space-y-4 bg-background p-4 pt-6 text-foreground md:p-8">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Genel bakış</h1>
+        <p className="text-muted-foreground">Mağazaların, siparişlerin ve muhasebenin özeti.</p>
+      </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-12">
-        <div className="xl:col-span-4">
-          <MonthlyRevenueCard />
-        </div>
-        <div className="xl:col-span-4">
-          <AccountingSummaryCard />
-        </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <MonthlyRevenueCard />
+        <AccountingSummaryCard />
       </div>
     </div>
   );

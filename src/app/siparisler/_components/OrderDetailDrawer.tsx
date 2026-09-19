@@ -175,7 +175,7 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                   href={getOzonPostingUrl(order.postingNumber, order.status)}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-text-muted hover:text-accent transition-colors inline-flex items-center"
+                  className="text-text-muted hover:text-iris transition-colors inline-flex items-center"
                   title="Ozon'da görüntüle"
                 >
                   <ExternalLink className="h-3 w-3" />
@@ -387,8 +387,8 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                   )}
                 </div>
               ) : (
-                <label className="flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl border border-dashed border-border-subtle bg-white hover:border-accent hover:bg-accent-soft/10 transition-all cursor-pointer group text-center">
-                  <div className="h-8 w-8 rounded-full bg-surface-muted flex items-center justify-center text-text-muted group-hover:text-accent group-hover:bg-accent-soft/20 transition-colors">
+                <label className="flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl border border-dashed border-border-subtle bg-white hover:border-iris hover:bg-iris-soft/10 transition-all cursor-pointer group text-center">
+                  <div className="h-8 w-8 rounded-full bg-surface-muted flex items-center justify-center text-text-muted group-hover:text-iris group-hover:bg-iris-soft/20 transition-colors">
                     <Upload className="h-4 w-4" />
                   </div>
                   <span className="text-[12px] font-medium text-text-secondary group-hover:text-text-primary">
@@ -455,7 +455,7 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                 placeholder="Örn: Allegro DPD ile Polonya deposuna gönderildi..."
                 value={notes}
                 onChange={(e) => onNotesChange(e.target.value)}
-                className="w-full rounded-[16px] border border-border-subtle bg-surface-muted p-3 text-xs text-text-primary placeholder:text-text-muted focus:bg-white focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-hidden leading-relaxed transition-all"
+                className="w-full rounded-[16px] border border-border-subtle bg-surface-muted p-3 text-xs text-text-primary placeholder:text-text-muted focus:bg-white focus:border-iris focus:ring-2 focus:ring-iris/20 focus:outline-hidden leading-relaxed transition-all"
               />
             </div>
           </div>

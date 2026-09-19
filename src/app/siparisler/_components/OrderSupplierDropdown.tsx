@@ -138,7 +138,7 @@ export const OrderSupplierDropdown: React.FC<OrderSupplierDropdownProps> = ({
                     onSelectSupplier('all');
                     setOpen(false);
                   }}
-                  className="text-[11px] text-accent hover:underline cursor-pointer font-medium"
+                  className="text-[11px] text-iris hover:underline cursor-pointer font-medium"
                 >
                   Temizle
                 </button>
@@ -154,12 +154,12 @@ export const OrderSupplierDropdown: React.FC<OrderSupplierDropdownProps> = ({
               }}
               className={`w-full flex items-center justify-between rounded-full px-3 py-1.5 text-[12px] transition-colors cursor-pointer ${
                 supplierFilter === 'all'
-                  ? 'bg-surface-accent text-accent font-medium'
+                  ? 'bg-surface-accent text-iris font-medium'
                   : 'text-text-secondary hover:bg-surface-muted hover:text-text-primary'
               }`}
             >
               <span>Tümü (Tüm Tedarikçiler)</span>
-              {supplierFilter === 'all' && <Check className="h-3.5 w-3.5 text-accent stroke-[2.5]" />}
+              {supplierFilter === 'all' && <Check className="h-3.5 w-3.5 text-iris stroke-[2.5]" />}
             </button>
 
             {/* Tedarikçi Listesi */}
@@ -181,7 +181,7 @@ export const OrderSupplierDropdown: React.FC<OrderSupplierDropdownProps> = ({
                       }}
                       className={`w-full flex items-center justify-between gap-2 rounded-full px-3 py-1.5 text-xs transition-colors cursor-pointer ${
                         isSelected
-                          ? 'bg-surface-accent text-accent font-medium'
+                          ? 'bg-surface-accent text-iris font-medium'
                           : 'text-text-secondary hover:bg-surface-muted hover:text-text-primary'
                       }`}
                     >
@@ -190,7 +190,7 @@ export const OrderSupplierDropdown: React.FC<OrderSupplierDropdownProps> = ({
                         <span className="rounded-full bg-surface-muted px-2 py-0.5 text-[11px] font-medium tabular-nums text-text-secondary">
                           {s.count}
                         </span>
-                        {isSelected && <Check className="h-3.5 w-3.5 text-accent stroke-[2.5]" />}
+                        {isSelected && <Check className="h-3.5 w-3.5 text-iris stroke-[2.5]" />}
                       </div>
                     </button>
                   );

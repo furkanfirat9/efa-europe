@@ -289,7 +289,7 @@ export default function KarHesaplamaPage() {
             <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
               <div className="absolute inset-0 rounded-full bg-linear-to-tr from-[#6C72E6] via-[#D9DBFA] to-[#C2408A] opacity-70 blur-md animate-pulse" />
               <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-hairline backdrop-blur-xs">
-                <Coins className="h-5 w-5 text-accent stroke-[1.75]" />
+                <Coins className="h-5 w-5 text-iris stroke-[1.75]" />
               </div>
             </div>
 
@@ -311,7 +311,7 @@ export default function KarHesaplamaPage() {
           {/* Sağ Aksiyonlar: Canlı Döviz Kuru Hapları */}
           <div className="flex flex-wrap items-center gap-2.5">
             <div className="flex items-center gap-2 rounded-full border border-border-subtle bg-white px-3.5 py-1.5 shadow-hairline text-[12px] font-medium text-text-secondary">
-              <span className="flex h-2 w-2 rounded-full bg-accent animate-pulse" />
+              <span className="flex h-2 w-2 rounded-full bg-iris animate-pulse" />
               <span>1€ =</span>
               <span className="font-semibold tabular-nums text-text-primary">{eurRate} ₺</span>
               <span className="text-border-subtle">|</span>
@@ -348,7 +348,7 @@ export default function KarHesaplamaPage() {
                   <PillButton
                     variant="ghost"
                     onClick={handleLoadSample}
-                    icon={<Sparkles className="h-3.5 w-3.5 text-accent" />}
+                    icon={<Sparkles className="h-3.5 w-3.5 text-iris" />}
                     title="Örnek veriler yükle"
                   >
                     Örnek
@@ -366,9 +366,9 @@ export default function KarHesaplamaPage() {
             >
               <div className="space-y-4">
                 {sampleProductName && (
-                  <div className="flex items-center justify-between rounded-xl bg-accent-soft/30 border border-accent/20 px-3.5 py-2 text-xs text-text-primary">
+                  <div className="flex items-center justify-between rounded-xl bg-iris-soft/30 border border-iris/20 px-3.5 py-2 text-xs text-text-primary">
                     <div className="flex items-center gap-2 truncate">
-                      <Sparkles className="h-3.5 w-3.5 text-accent shrink-0" />
+                      <Sparkles className="h-3.5 w-3.5 text-iris shrink-0" />
                       <span className="font-medium truncate">{sampleProductName}</span>
                     </div>
                     <span className="text-[11px] text-text-muted shrink-0">Örnek Ürün</span>
@@ -519,7 +519,7 @@ export default function KarHesaplamaPage() {
                     <label
                       className={`flex cursor-pointer items-start gap-3 rounded-2xl p-3.5 border transition-all ${
                         isIntegrated
-                          ? 'border-accent/40 bg-surface-accent'
+                          ? 'border-iris/40 bg-surface-accent'
                           : 'border-border-subtle bg-surface-muted hover:border-border-subtle/80'
                       }`}
                     >
@@ -527,7 +527,7 @@ export default function KarHesaplamaPage() {
                         type="checkbox"
                         checked={isIntegrated}
                         onChange={(e) => setIsIntegrated(e.target.checked)}
-                        className="mt-0.5 h-4 w-4 rounded-full accent-accent cursor-pointer"
+                        className="mt-0.5 h-4 w-4 rounded-full accent-iris cursor-pointer"
                       />
                       <div className="min-w-0">
                         <span className="block text-[13px] font-medium text-text-primary">
@@ -543,7 +543,7 @@ export default function KarHesaplamaPage() {
                     <label
                       className={`flex cursor-pointer items-start gap-3 rounded-2xl p-3.5 border transition-all ${
                         isSplitting
-                          ? 'border-accent/40 bg-surface-accent'
+                          ? 'border-iris/40 bg-surface-accent'
                           : 'border-border-subtle bg-surface-muted hover:border-border-subtle/80'
                       }`}
                     >
@@ -551,7 +551,7 @@ export default function KarHesaplamaPage() {
                         type="checkbox"
                         checked={isSplitting}
                         onChange={(e) => setIsSplitting(e.target.checked)}
-                        className="mt-0.5 h-4 w-4 rounded-full accent-accent cursor-pointer"
+                        className="mt-0.5 h-4 w-4 rounded-full accent-iris cursor-pointer"
                       />
                       <div className="min-w-0">
                         <span className="block text-[13px] font-medium text-text-primary">

@@ -1,29 +1,39 @@
-'use client';
+"use client"
 
-import type * as React from 'react';
-import { Toaster as Sonner, type ToasterProps } from 'sonner';
+import type * as React from "react"
 
-/**
- * shadcn/ui bildirim kutusu. Uygulamanın kökünde, `.shadcn-theme` kapsamının
- * dışında durduğu için renkler shadcn varsayılanlarıyla yedeklenir.
- * Kullanım: `import { toast } from 'sonner'; toast.success('Kaydedildi')`.
- */
-function Toaster(props: ToasterProps) {
+import {
+  CircleCheckIcon,
+  InfoIcon,
+  Loader2Icon,
+  OctagonXIcon,
+  TriangleAlertIcon,
+} from "lucide-react"
+import { Toaster as Sonner, type ToasterProps } from "sonner"
+
+const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme="light"
       className="toaster group"
+      icons={{
+        success: <CircleCheckIcon className="size-4" />,
+        info: <InfoIcon className="size-4" />,
+        warning: <TriangleAlertIcon className="size-4" />,
+        error: <OctagonXIcon className="size-4" />,
+        loading: <Loader2Icon className="size-4 animate-spin" />,
+      }}
       style={
         {
-          '--normal-bg': 'var(--popover, oklch(1 0 0))',
-          '--normal-text': 'var(--popover-foreground, oklch(0.145 0 0))',
-          '--normal-border': 'var(--border, oklch(0.922 0 0))',
-          '--border-radius': 'var(--radius, 0.625rem)',
+          "--normal-bg": "var(--popover)",
+          "--normal-text": "var(--popover-foreground)",
+          "--normal-border": "var(--border)",
+          "--border-radius": "var(--radius)",
         } as React.CSSProperties
       }
       {...props}
     />
-  );
+  )
 }
 
-export { Toaster };
+export { Toaster }

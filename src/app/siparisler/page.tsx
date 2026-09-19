@@ -73,7 +73,7 @@ function SiparislerContent() {
           {/* Sol: AI Orb, Sayfa Başlığı ve Yıl/Ay Seçici */}
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             {/* Signature AI Orb */}
-            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-tr from-accent to-[#A5A6F6] p-0.5">
+            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-tr from-iris to-[#A5A6F6] p-0.5">
               <div className="h-full w-full rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center">
                 <Package className="h-4 w-4 text-white" />
               </div>
@@ -130,7 +130,7 @@ function SiparislerContent() {
                 placeholder="Tabloda ara…"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-9 w-36 sm:w-56 rounded-full border border-border-subtle bg-white pl-8 pr-7 text-xs text-text-primary placeholder:text-text-muted shadow-hairline focus:outline-hidden focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
+                className="h-9 w-36 sm:w-56 rounded-full border border-border-subtle bg-white pl-8 pr-7 text-xs text-text-primary placeholder:text-text-muted shadow-hairline focus:outline-hidden focus:ring-2 focus:ring-iris/20 focus:border-iris transition-all"
               />
               {searchTerm && (
                 <button
@@ -397,7 +397,7 @@ export default function SiparislerPage() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-bg-page flex items-center justify-center">
-          <div className="h-7 w-7 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+          <div className="h-7 w-7 animate-spin rounded-full border-2 border-iris border-t-transparent" />
         </div>
       }
     >

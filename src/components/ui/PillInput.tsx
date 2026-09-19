@@ -32,7 +32,7 @@ export const PillInput: React.FC<PillInputProps> = ({
           </div>
         )}
         <input
-          className={`h-11 w-full rounded-full border border-border-subtle bg-surface-muted px-4 text-[14px] text-text-primary transition-all placeholder:text-text-muted focus:border-accent focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-accent/25 ${
+          className={`h-11 w-full rounded-full border border-border-subtle bg-surface-muted px-4 text-[14px] text-text-primary transition-all placeholder:text-text-muted focus:border-iris focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-iris/25 ${
             prefixIcon ? 'pl-12' : ''
           } ${suffix ? 'pr-14' : ''} ${className}`}
           {...props}

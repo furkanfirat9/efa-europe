@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { PillBadge } from '@/components/ui/PillBadge';
+import { Badge } from '@/components/shadcn/badge';
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/shadcn/card';
+import { Skeleton } from '@/components/shadcn/skeleton';
 
 export function MonthlyRevenueCard() {
   const [europeRevenue, setEuropeRevenue] = useState<number | null>(null);
@@ -72,63 +74,53 @@ export function MonthlyRevenueCard() {
   const europeShare = total > 0 ? (europe / total) * 100 : 50;
 
   const stores = [
-    { key: 'europe', label: 'Europe', value: europe, share: europeShare, hatch: 'var(--accent)', dot: 'bg-accent' },
-    { key: 'turkiye', label: 'Türkiye', value: turkiye, share: 100 - europeShare, hatch: 'var(--text-muted)', dot: 'bg-text-muted' },
+    { key: 'europe', label: 'Europe', value: europe, share: europeShare, color: 'bg-chart-2' },
+    { key: 'turkiye', label: 'Türkiye', value: turkiye, share: 100 - europeShare, color: 'bg-chart-4' },
   ];
 
   return (
-    <section className="flex h-full flex-col justify-between gap-6 rounded-card bg-surface p-6 shadow-hairline md:p-7">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-[20px] font-normal tracking-tight text-text-primary md:text-[22px]">
-            Bu ay ciro
-          </h2>
-          <p className="mt-1 text-[13px] text-text-secondary">Ozon · iki mağaza · USD</p>
+    <Card className="h-full">
+      <CardHeader>
+        <CardDescription>Bu ay ciro · iki mağaza</CardDescription>
+        <CardTitle className="text-3xl font-semibold tabular-nums">
+          {loading ? <Skeleton className="h-9 w-36" /> : formatUsd(total)}
+        </CardTitle>
+        <CardAction>
+          <Badge variant="outline">
+            <span className="size-1.5 rounded-full bg-emerald-500" />
+            Canlı
+          </Badge>
+        </CardAction>
+      </CardHeader>
+      <CardFooter className="mt-auto flex-col items-stretch gap-3 text-sm">
+        {/* Mağaza payı */}
+        <div className="flex h-2 gap-0.5 overflow-hidden rounded-full bg-muted" aria-hidden>
+          {!loading &&
+            total > 0 &&
+            stores.map((s) => <div key={s.key} className={s.color} style={{ width: `${s.share}%` }} />)}
         </div>
-        <PillBadge tone="success" dot>Canlı</PillBadge>
-      </div>
-
-      <div>
-        <p className="text-[12px] font-medium text-text-muted">Toplam</p>
-        {loading ? (
-          <span className="skeleton-soft mt-2 block h-10 w-40" />
-        ) : (
-          <p className="mt-1 text-[40px] font-light leading-none tracking-[-0.03em] text-text-primary tabular-nums">
-            {formatUsd(total)}
-          </p>
-        )}
-      </div>
-
-      {/* Mağaza payı: taralı şerit, iki segment arasında boşluk */}
-      <div className="space-y-4">
-        <div className="flex h-3 gap-1" aria-hidden>
-          {stores.map((s) => (
-            <div
-              key={s.key}
-              className="hatch h-full rounded-full transition-[width] duration-500"
-              style={{ width: `${Math.max(s.share, 2)}%`, ['--hatch' as string]: s.hatch }}
-            />
-          ))}
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          {stores.map((s) => (
-            <div key={s.key}>
-              <div className="flex items-center gap-1.5 text-[12px] text-text-secondary">
-                <span className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
-                {s.label}
-                {!loading && total > 0 && (
-                  <span className="text-text-muted tabular-nums">%{s.share.toFixed(0)}</span>
-                )}
-              </div>
-              <p className="mt-1 text-[22px] font-medium tracking-tight text-text-primary tabular-nums">
-                {loading ? <span className="skeleton-soft inline-block h-6 w-20 align-middle" /> : formatUsd(s.value)}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+        {stores.map((s) => (
+          <div key={s.key} className="flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2 text-muted-foreground">
+              <span className={`size-2 rounded-full ${s.color}`} />
+              {s.label}
+            </span>
+            <span className="font-medium tabular-nums">
+              {loading ? (
+                <Skeleton className="h-4 w-16" />
+              ) : (
+                <>
+                  {formatUsd(s.value)}
+                  {total > 0 && (
+                    <span className="ml-2 font-normal text-muted-foreground">%{s.share.toFixed(0)}</span>
+                  )}
+                </>
+              )}
+            </span>
+          </div>
+        ))}
+      </CardFooter>
+    </Card>
   );
 }
 

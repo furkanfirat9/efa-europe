@@ -60,7 +60,7 @@ export default function Sidebar() {
   return (
     <aside className="flex min-h-screen w-14 shrink-0 flex-col border-r border-hairline bg-canvas lg:w-60">
       <div className="flex h-16 items-center justify-center border-b border-hairline lg:justify-start lg:gap-2.5 lg:px-5">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-white">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-iris text-white">
           <ShoppingBag className="h-4 w-4" />
         </div>
         <div className="hidden min-w-0 lg:block">
@@ -92,7 +92,7 @@ export default function Sidebar() {
               }`}
             >
               {isActive && (
-                <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-r-full bg-accent" />
+                <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-r-full bg-iris" />
               )}
 
               <span className="flex min-w-0 items-center gap-2.5">
@@ -124,13 +124,13 @@ export default function Sidebar() {
             }`}
           >
             {isProductUploadActive && !isOpen && (
-              <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-r-full bg-accent" />
+              <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-r-full bg-iris" />
             )}
 
             <span className="flex min-w-0 items-center gap-2.5">
               <PackagePlus
                 className={`h-4 w-4 shrink-0 ${
-                  isProductUploadActive ? 'text-accent' : 'text-zinc-500 group-hover:text-zinc-300'
+                  isProductUploadActive ? 'text-iris' : 'text-zinc-500 group-hover:text-zinc-300'
                 }`}
               />
               <span className="hidden truncate lg:inline">Ürün Yükleme</span>
@@ -163,12 +163,12 @@ export default function Sidebar() {
                     }`}
                   >
                     {isSubActive && (
-                      <span className="absolute left-0 top-1/2 h-3.5 w-0.5 -translate-y-1/2 rounded-r-full bg-accent" />
+                      <span className="absolute left-0 top-1/2 h-3.5 w-0.5 -translate-y-1/2 rounded-r-full bg-iris" />
                     )}
 
                     <SubIcon
                       className={`h-3.5 w-3.5 shrink-0 ${
-                        isSubActive ? 'text-accent' : 'text-zinc-500 group-hover:text-zinc-300'
+                        isSubActive ? 'text-iris' : 'text-zinc-500 group-hover:text-zinc-300'
                       }`}
                     />
                     <span className="hidden truncate lg:inline">{sub.name}</span>
@@ -199,7 +199,7 @@ export default function Sidebar() {
               }`}
             >
               {isActive && (
-                <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-r-full bg-accent" />
+                <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-r-full bg-iris" />
               )}
 
               <span className="flex min-w-0 items-center gap-2.5">

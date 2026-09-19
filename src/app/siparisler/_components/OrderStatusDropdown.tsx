@@ -135,7 +135,7 @@ export const OrderStatusDropdown: React.FC<OrderStatusDropdownProps> = ({
                     }}
                     className={`w-full flex items-center justify-between rounded-full px-3 py-1.5 text-[12px] transition-colors cursor-pointer ${
                       isSelected
-                        ? 'bg-surface-accent text-accent font-medium'
+                        ? 'bg-surface-accent text-iris font-medium'
                         : 'text-text-secondary hover:bg-surface-muted hover:text-text-primary'
                     }`}
                   >
@@ -143,7 +143,7 @@ export const OrderStatusDropdown: React.FC<OrderStatusDropdownProps> = ({
                       <span className={`h-2 w-2 rounded-full ${opt.dotColor}`} />
                       <span>{opt.fullLabel}</span>
                     </div>
-                    {isSelected && <Check className="h-3.5 w-3.5 text-accent stroke-[2.5]" />}
+                    {isSelected && <Check className="h-3.5 w-3.5 text-iris stroke-[2.5]" />}
                   </button>
                 );
               })}

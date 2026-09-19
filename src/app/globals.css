@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
 
 /* Sabit değerler: kökte bir kez tanımlanır. */
 @theme {
@@ -30,15 +31,15 @@
   --shadow-float: 0 16px 40px -16px rgba(40, 40, 100, 0.18);
 
   --font-sans:
-    var(--font-inter), Inter, -apple-system, BlinkMacSystemFont, Segoe UI,
+    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI,
     Roboto, sans-serif;
   --font-mono:
-    var(--font-mono), JetBrains Mono, ui-monospace, SFMono-Regular, Menlo,
-    Monaco, Consolas, monospace;
+    var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, monospace;
 }
 
 /* Kapsamla değişen değerler: `inline` sayesinde utility'ler var(--ink) gibi
-   değişkeni doğrudan kullanır ve .bg-canvas / .shadcn-theme altındaki
+   değişkeni doğrudan kullanır ve .bg-canvas altındaki
    yeniden tanımlar geçerli olur. Düz @theme bunları kökte sabitlerdi. */
 @theme inline {
   --color-background: var(--background);
@@ -54,9 +55,9 @@
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
 
-  --color-accent: var(--accent);
-  --color-accent-soft: var(--accent-soft);
-  --color-accent-foreground: var(--accent-foreground);
+  /* Eski soft UI vurgu rengi (mor-mavi). shadcn'in accent'iyle çakışmasın diye ayrı ad. */
+  --color-iris: var(--iris);
+  --color-iris-soft: var(--iris-soft);
 
   --color-ink: var(--ink);
   --color-ink-foreground: var(--ink-foreground);
@@ -77,7 +78,9 @@
   --color-status-neutral-bg: var(--status-neutral-bg);
   --color-status-neutral-text: var(--status-neutral-text);
 
-  /* shadcn/ui (değerler .shadcn-theme içinde tanımlı) */
+  /* shadcn/ui */
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -97,6 +100,11 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
 /*
@@ -299,7 +307,8 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    border-color: var(--border, currentcolor);
+    outline-color: color-mix(in oklab, var(--ring) 50%, transparent);
   }
 }
 
@@ -320,28 +329,6 @@
       90deg,
       transparent,
       rgba(255, 255, 255, 0.055),
-      transparent
-    );
-    animation: skeleton-shimmer 1.4s infinite;
-  }
-}
-
-@utility skeleton-soft {
-  /* Açık tema iskeleti: beyaz kartların üzerinde okunacak lavanta-gri ton. */
-  position: relative;
-  overflow: hidden;
-  background-color: var(--surface-muted);
-  border-radius: 9999px;
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    transform: translateX(-100%);
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.9),
       transparent
     );
     animation: skeleton-shimmer 1.4s infinite;
@@ -398,18 +385,6 @@
   }
 }
 
-@utility hatch {
-  /* Taralı şerit dolgu (AGENTS.md §5.3). Renk --hatch ile verilir;
-     zemin aynı rengin çok açık bir tonudur, düz blok dolgu kullanılmaz. */
-  --hatch: var(--accent);
-  background-color: color-mix(in srgb, var(--hatch) 10%, transparent);
-  background-image: repeating-linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--hatch) 70%, transparent) 0 1.5px,
-    transparent 1.5px 6px
-  );
-}
-
 @utility scroll-thin {
   /* İnce, üstte yüzen kaydırma çubuğu (panel içi listeler ve tablolar). */
   scrollbar-width: thin;
@@ -439,47 +414,7 @@
 
 @layer utilities {
   :root {
-    --background: #0a0b0d;
-    --foreground: #edeff2;
-
-    /* Soft UI SaaS Dashboard Design Tokens (AGENTS.md Section 7) */
-    --bg-page: #f3f3f8;
-    --bg-page-gradient: linear-gradient(180deg, #f7f7fb 0%, #ececf6 100%);
-    --surface: #ffffff;
-    --surface-muted: #f6f6fa;
-    --surface-accent: #eeeefc;
-    --border-subtle: #ececf3;
-    --text-primary: #111114;
-    --text-secondary: #6b6b78;
-    --text-muted: #a0a0ac;
-    --accent: #6c72e6;
-    --accent-soft: #d9dbfa;
-    --ink: #0e0e10;
-    --ink-foreground: #ffffff;
-    --ink-muted: #6b6b78;
-    --ink-subtle: #8a8a96;
-    --ink-faint: #a0a0ac;
-
-    /* Status badge pairs */
-    --status-success-bg: #e5f6ec;
-    --status-success-text: #2e8b57;
-    --status-danger-bg: #fde7e7;
-    --status-danger-text: #d14343;
-    --status-info-bg: #ecebfd;
-    --status-info-text: #5856d6;
-    --status-warning-bg: #fdf0e2;
-    --status-warning-text: #c47a2c;
-    --status-pink-bg: #fce7f2;
-    --status-pink-text: #c2408a;
-    --status-neutral-bg: #f1f1f5;
-    --status-neutral-text: #6b6b78;
-
-  }
-
-  /* shadcn/ui varsayılan teması (new-york, neutral). Yalnızca Muhasebe'deki
-   shadcn karşılaştırma sekmesinde geçerlidir; uygulamanın geri kalanına sızmaz.
-   --accent / --background / --foreground burada shadcn anlamıyla ezilir. */
-  .shadcn-theme {
+    /* shadcn/ui varsayılan teması (new-york, neutral) */
     --radius: 0.625rem;
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
@@ -504,17 +439,40 @@
     --chart-3: oklch(0.398 0.07 227.392);
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
-    color: var(--foreground);
-    background: var(--background);
-  }
 
-  /* :where → özgüllük 0; border-transparent gibi utility'ler bunu ezebilsin. */
-  :where(.shadcn-theme),
-  :where(.shadcn-theme) *,
-  :where(.shadcn-theme) ::before,
-  :where(.shadcn-theme) ::after {
-    border-color: var(--border);
-    outline-color: color-mix(in oklab, var(--ring) 50%, transparent);
+
+    /* Soft UI SaaS Dashboard Design Tokens (AGENTS.md Section 7) */
+    --bg-page: #f3f3f8;
+    --bg-page-gradient: linear-gradient(180deg, #f7f7fb 0%, #ececf6 100%);
+    --surface: #ffffff;
+    --surface-muted: #f6f6fa;
+    --surface-accent: #eeeefc;
+    --border-subtle: #ececf3;
+    --text-primary: #111114;
+    --text-secondary: #6b6b78;
+    --text-muted: #a0a0ac;
+    --iris: #6c72e6;
+    --iris-soft: #d9dbfa;
+    --ink: #0e0e10;
+    --ink-foreground: #ffffff;
+    --ink-muted: #6b6b78;
+    --ink-subtle: #8a8a96;
+    --ink-faint: #a0a0ac;
+
+    /* Status badge pairs */
+    --status-success-bg: #e5f6ec;
+    --status-success-text: #2e8b57;
+    --status-danger-bg: #fde7e7;
+    --status-danger-text: #d14343;
+    --status-info-bg: #ecebfd;
+    --status-info-text: #5856d6;
+    --status-warning-bg: #fdf0e2;
+    --status-warning-text: #c47a2c;
+    --status-pink-bg: #fce7f2;
+    --status-pink-text: #c2408a;
+    --status-neutral-bg: #f1f1f5;
+    --status-neutral-text: #6b6b78;
+
   }
 
   /* Koyu Konsol (Analitik, Fiyat Endeksi, Sidebar) renk token'ları */
@@ -529,7 +487,6 @@
     --ink-muted: #c5c9d3;
     --ink-subtle: #949daa;
     --ink-faint: #68707e;
-    --foreground: #edeff2;
   }
 
   /* Açık Tema Sayfa Alanları için Ink Token Sıfırlaması */
@@ -539,20 +496,15 @@
     --ink-muted: #6b6b78;
     --ink-subtle: #8a8a96;
     --ink-faint: #a0a0ac;
-    --foreground: #111114;
   }
 
+  /* Eski ekranlar gövde rengini koyu konsoldan miras alıyor. shadcn ekranları
+     kendi köklerinde bg-background text-foreground kullanır; tüm ekranlar
+     taşınınca gövde de shadcn'e geçer. */
   body {
-    color: var(--foreground);
-    background: var(--background);
-    font-family:
-      var(--font-inter),
-      'Inter',
-      -apple-system,
-      BlinkMacSystemFont,
-      'Segoe UI',
-      Roboto,
-      sans-serif;
+    color: #edeff2;
+    background: #0a0b0d;
+    font-family: var(--font-sans);
     min-height: 100vh;
   }
 }
@@ -562,8 +514,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skeleton::after,
-  .skeleton-soft::after {
+  .skeleton::after {
     animation: none;
   }
 }
