@@ -1,6 +1,10 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+/* shadcn bileşenlerindeki dark: stilleri işletim sisteminin koyu moduna değil .dark
+   sınıfına bağlanır. Uygulamada koyu mod yok; bu sınıf hiçbir yerde kullanılmaz. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Sabit değerler: kökte bir kez tanımlanır. */
 @theme {
   --color-canvas: #0a0b0d;
@@ -285,6 +289,21 @@
   --color-rose-800: #9f1239;
   --color-rose-900: #881337;
   --color-rose-950: #4c0519;
+}
+
+/* Body'ye portal edilen shadcn yüzeyleri metin rengini body'den miras alır; body ise eski
+   koyu konsol ekranları için açık renk taşıyor. Tüm ekranlar shadcn'e geçip body
+   text-foreground olunca bu kural kaldırılabilir. */
+@layer base {
+  [data-slot='sheet-content'],
+  [data-slot='dialog-content'],
+  [data-slot='alert-dialog-content'],
+  [data-slot='popover-content'],
+  [data-slot='dropdown-menu-content'],
+  [data-slot='select-content'],
+  [data-slot='command'] {
+    color: var(--foreground);
+  }
 }
 
 /* v3 uyumluluğu: v4'te butonların imleci varsayılan oku gösterir,

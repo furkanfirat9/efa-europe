@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 import { OrderItem, OrderStats, MONTHS } from './types';
 
 export type SortField = 'date' | 'salePrice' | 'buyPrice';
@@ -217,7 +218,6 @@ export function useOrders() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successToast, setSuccessToast] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
 
   // Filtreler (URL parametreleri ile başlar)
@@ -421,20 +421,10 @@ export function useOrders() {
   const [detailNotes, setDetailNotes] = useState('');
   const [savingDetail, setSavingDetail] = useState(false);
 
-  // Toast Bildirimi
-  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Başarı bildirimi (sonner; kök layout'taki Toaster gösterir)
   const showToast = useCallback((msg: string) => {
-    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-    setSuccessToast(msg);
-    toastTimeoutRef.current = setTimeout(() => {
-      setSuccessToast(null);
-    }, 3000);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-    };
+    // Sabit id: art arda gelen kayıt bildirimleri üst üste yığılmaz, birbirinin yerini alır.
+    toast.success(msg, { id: 'orders-save' });
   }, []);
 
   // Sunucudan Seçili Ayın Siparişlerini Çek
@@ -509,17 +499,6 @@ export function useOrders() {
     };
   }, []);
 
-  // ESC tuşu ile yan paneli kapat
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && detailModalOpen) {
-        setDetailModalOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [detailModalOpen]);
-
   // İyimser Güncelleme & PATCH
   const handleInlineUpdate = useCallback(
     async (postingNumber: string, payload: Record<string, any>) => {
@@ -562,7 +541,7 @@ export function useOrders() {
         setError('Kaydedilemedi: ' + err.message);
       }
     },
-    [showToast]
+    [showToast, selectedYear, selectedMonth]
   );
 
   // Detay Panelini Aç
@@ -601,8 +580,6 @@ export function useOrders() {
     syncing,
     error,
     setError,
-    successToast,
-    setSuccessToast,
     lastUpdated,
     searchTerm,
     setSearchTerm,

@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { PillBadge, BadgeTone } from '@/components/ui/PillBadge';
+import { Badge } from '@/components/shadcn/badge';
+import { cn } from '@/lib/utils';
 
 interface OrderStatusBadgeProps {
   status: string;
@@ -10,7 +11,7 @@ interface OrderStatusBadgeProps {
 }
 
 export const OrderStatusBadge: React.FC<OrderStatusBadgeProps> = React.memo(
-  function OrderStatusBadge({ status, statusName, className = '' }) {
+  function OrderStatusBadge({ status, statusName, className }) {
     const isAwaiting = ['awaiting_deliver', 'awaiting_packaging', 'awaiting_registration'].includes(
       status
     );
@@ -30,17 +31,21 @@ export const OrderStatusBadge: React.FC<OrderStatusBadgeProps> = React.memo(
         ? 'İptal'
         : status);
 
-    let badgeClass = 'bg-slate-100 text-slate-600 border-slate-200/50';
-    if (isAwaiting) badgeClass = 'bg-amber-50 text-amber-600 border-amber-100/50';
-    else if (isDelivered) badgeClass = 'bg-emerald-50 text-emerald-600 border-emerald-100/50';
-    else if (isDelivering) badgeClass = 'bg-blue-50 text-blue-600 border-blue-100/50';
-    else if (isCancelled) badgeClass = 'bg-rose-50 text-rose-600 border-rose-100/50';
+    const dot = isAwaiting
+      ? 'bg-amber-500'
+      : isDelivered
+      ? 'bg-emerald-500'
+      : isDelivering
+      ? 'bg-blue-500'
+      : isCancelled
+      ? 'bg-rose-500'
+      : 'bg-muted-foreground';
 
     return (
-      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg border ${badgeClass} ${className}`}>
-        <span className="w-1.5 h-1.5 rounded-full bg-current opacity-80" />
-        <span>{label}</span>
-      </span>
+      <Badge variant="outline" className={cn('gap-1.5 text-muted-foreground', className)}>
+        <span className={cn('size-1.5 rounded-full', dot)} />
+        {label}
+      </Badge>
     );
   }
 );

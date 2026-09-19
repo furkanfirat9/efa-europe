@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/shadcn/card';
+import { cn } from '@/lib/utils';
+import { formatNumber, formatTL, formatUSD } from '@/lib/format';
 import { OrderStats } from '../types';
-import { formatNumber, formatUSD, formatTL } from '@/lib/format';
-import { PillBadge } from '@/components/ui/PillBadge';
 
 interface OrderKpiCardsProps {
   stats: OrderStats | null;
@@ -13,118 +14,75 @@ interface OrderKpiCardsProps {
   totalBuyCost?: number;
 }
 
-export const OrderKpiCards: React.FC<OrderKpiCardsProps> = React.memo(
-  function OrderKpiCards({ stats, ordersCount, activeFilter, onSelectFilter, totalBuyCost }) {
-    const handleFilterClick = (key: string) => {
-      if (activeFilter === key) {
-        onSelectFilter('all');
-      } else {
-        onSelectFilter(key);
-      }
-    };
+interface Kpi {
+  label: string;
+  value: string;
+  dot?: string;
+  /** Tıklanınca uygulanan durum filtresi. */
+  filter?: string;
+  hint?: string;
+}
 
-    const uncalculatedCount =
-      stats?.uncalculatedOrders ??
-      Math.max(0, (stats?.totalOrders || ordersCount) - (stats?.recordedBuyCount || 0));
+export const OrderKpiCards: React.FC<OrderKpiCardsProps> = React.memo(function OrderKpiCards({
+  stats,
+  ordersCount,
+  activeFilter,
+  onSelectFilter,
+  totalBuyCost,
+}) {
+  const uncalculatedCount =
+    stats?.uncalculatedOrders ??
+    Math.max(0, (stats?.totalOrders || ordersCount) - (stats?.recordedBuyCount || 0));
 
-    const displayedBuyCost =
-      totalBuyCost !== undefined ? totalBuyCost : stats?.totalBuyCostTry || 0;
+  const displayedBuyCost = totalBuyCost !== undefined ? totalBuyCost : stats?.totalBuyCostTry || 0;
 
-    return (
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {/* Kart 1: Toplam Sipariş (Vurgulanmaz, sade Soft UI kart) */}
-        <div
-          onClick={() => onSelectFilter('all')}
-          className="group rounded-[24px] bg-surface p-4.5 sm:p-5 transition-all cursor-pointer border border-border-subtle hover:border-border-subtle hover:shadow-hairline shadow-hairline"
-          title="Tüm siparişleri listele"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] font-medium text-text-muted">Toplam Sipariş</span>
-          </div>
-          <div className="mt-2 text-2xl sm:text-[28px] font-medium leading-none tracking-tight tabular-nums text-text-primary">
-            {formatNumber(stats?.totalOrders || ordersCount)}
-          </div>
-        </div>
+  const kpis: Kpi[] = [
+    { label: 'Toplam sipariş', value: formatNumber(stats?.totalOrders || ordersCount), filter: 'all', hint: 'Tüm siparişleri listele' },
+    { label: 'Toplam alım', value: formatTL(displayedBuyCost) },
+    { label: 'Toplam ciro', value: formatUSD(stats?.totalRevenueUsd) },
+    { label: 'Sevk bekleyen', value: formatNumber(stats?.awaitingOrders || 0), dot: 'bg-amber-500', filter: 'awaiting', hint: 'Sevk bekleyenleri filtrele' },
+    { label: 'İptaller', value: formatNumber(stats?.cancelledOrders || 0), dot: 'bg-rose-500', filter: 'cancelled', hint: 'İptalleri filtrele' },
+    { label: 'Hesaplanmayan', value: formatNumber(uncalculatedCount), dot: 'bg-purple-500', filter: 'uncalculated', hint: 'Alış fiyatı girilmemişleri filtrele' },
+  ];
 
-        {/* Kart 2: Toplam Alım (Maliyet) */}
-        <div className="rounded-[24px] bg-surface p-4.5 sm:p-5 border border-border-subtle shadow-hairline">
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] font-medium text-text-muted">Toplam Alım</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#D14343]" />
-          </div>
-          <div className="mt-2 text-2xl sm:text-[28px] font-medium leading-none tracking-tight tabular-nums text-[#D14343]">
-            {formatTL(displayedBuyCost)}
-          </div>
-        </div>
+  return (
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
+      {kpis.map((kpi) => {
+        const active = kpi.filter !== undefined && kpi.filter !== 'all' && activeFilter === kpi.filter;
+        const body = (
+          <Card
+            className={cn(
+              'h-full gap-0 py-4 transition-colors',
+              kpi.filter && 'group-hover:bg-muted/50',
+              active && 'border-primary bg-muted/50'
+            )}
+          >
+            <CardHeader className="gap-2 px-4">
+              <CardDescription className="flex items-center gap-2">
+                {kpi.dot && <span className={cn('size-2 rounded-full', kpi.dot)} />}
+                {kpi.label}
+              </CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums">{kpi.value}</CardTitle>
+            </CardHeader>
+          </Card>
+        );
 
-        {/* Kart 3: Toplam Ciro */}
-        <div className="rounded-[24px] bg-surface p-4.5 sm:p-5 border border-border-subtle shadow-hairline">
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] font-medium text-text-muted">Toplam Ciro</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#2E8B57]" />
-          </div>
-          <div className="mt-2 text-2xl sm:text-[28px] font-medium leading-none tracking-tight tabular-nums text-[#2E8B57]">
-            {formatUSD(stats?.totalRevenueUsd)}
-          </div>
-        </div>
+        if (!kpi.filter) return <div key={kpi.label}>{body}</div>;
 
-        {/* Kart 4: Sevk Bekleyen Siparişler */}
-        <div
-          onClick={() => handleFilterClick('awaiting')}
-          className={`group rounded-[24px] p-4.5 sm:p-5 transition-all cursor-pointer border ${
-            activeFilter === 'awaiting'
-              ? 'bg-[#FDF0E2]/60 border-[#C47A2C]/40 ring-2 ring-[#C47A2C]/20'
-              : 'bg-surface border-border-subtle hover:border-border-subtle hover:shadow-hairline'
-          }`}
-          title="Sevk bekleyen siparişleri filtrele"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] font-medium text-text-muted">Sevk Bekleyen</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#C47A2C]" />
-          </div>
-          <div className="mt-2 text-2xl sm:text-[28px] font-medium leading-none tracking-tight tabular-nums text-[#C47A2C]">
-            {formatNumber(stats?.awaitingOrders || 0)}
-          </div>
-        </div>
-
-        {/* Kart 5: İptaller */}
-        <div
-          onClick={() => handleFilterClick('cancelled')}
-          className={`group rounded-[24px] p-4.5 sm:p-5 transition-all cursor-pointer border ${
-            activeFilter === 'cancelled'
-              ? 'bg-[#FDE7E7]/60 border-[#D14343]/40 ring-2 ring-[#D14343]/20'
-              : 'bg-surface border-border-subtle hover:border-border-subtle hover:shadow-hairline'
-          }`}
-          title="İptal edilen siparişleri filtrele"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] font-medium text-text-muted">İptaller</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#D14343]" />
-          </div>
-          <div className="mt-2 text-2xl sm:text-[28px] font-medium leading-none tracking-tight tabular-nums text-[#D14343]">
-            {formatNumber(stats?.cancelledOrders || 0)}
-          </div>
-        </div>
-
-        {/* Kart 6: Hesaplanmayanlar (Alış Fiyatı Eksik Siparişler) */}
-        <div
-          onClick={() => handleFilterClick('uncalculated')}
-          className={`group rounded-[24px] p-4.5 sm:p-5 transition-all cursor-pointer border ${
-            activeFilter === 'uncalculated'
-              ? 'bg-[#ECEBFD]/60 border-[#5856D6]/40 ring-2 ring-[#5856D6]/20'
-              : 'bg-surface border-border-subtle hover:border-border-subtle hover:shadow-hairline'
-          }`}
-          title="Alış fiyatı girilmemiş siparişleri filtrele"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[12px] font-medium text-text-muted">Hesaplanmayan</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-[#5856D6]" />
-          </div>
-          <div className="mt-2 text-2xl sm:text-[28px] font-medium leading-none tracking-tight tabular-nums text-[#5856D6]">
-            {formatNumber(uncalculatedCount)}
-          </div>
-        </div>
-      </div>
-    );
-  }
-);
+        return (
+          <button
+            key={kpi.label}
+            type="button"
+            title={kpi.hint}
+            aria-pressed={kpi.filter === 'all' ? undefined : active}
+            // Seçili karta yeniden tıklamak filtreyi kaldırır.
+            onClick={() => onSelectFilter(kpi.filter === 'all' || active ? 'all' : kpi.filter!)}
+            className="group rounded-xl text-left outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          >
+            {body}
+          </button>
+        );
+      })}
+    </div>
+  );
+});
