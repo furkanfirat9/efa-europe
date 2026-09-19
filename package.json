@@ -10,7 +10,8 @@
     "postinstall": "prisma generate",
     "sync:maplibre": "node scripts/sync_maplibre_worker.mjs",
     "predev": "node scripts/sync_maplibre_worker.mjs",
-    "prebuild": "node scripts/sync_maplibre_worker.mjs"
+    "prebuild": "node scripts/sync_maplibre_worker.mjs",
+    "kullanici": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/panel-user.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.17.1",

@@ -187,3 +187,14 @@ model AccountingDocumentLine {
 
   @@index([documentId])
 }
+
+// Panel kullanıcısı. Kullanıcı adı ve şifre terminalden `npm run kullanici` ile
+// belirlenir; şifre yalnızca scrypt özeti olarak saklanır, düz metin tutulmaz.
+model PanelUser {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}

@@ -15,6 +15,11 @@ export default function AppLayoutShell({ children }: { children: React.ReactNode
     return <main className="w-full min-h-screen bg-canvas">{children}</main>;
   }
 
+  // Giriş sayfası panelin dışındadır; menü gösterilmez.
+  if (pathname === '/login') {
+    return <main className="w-full">{children}</main>;
+  }
+
   const isConsole = CONSOLE_ROUTES.includes(pathname);
 
   return (
