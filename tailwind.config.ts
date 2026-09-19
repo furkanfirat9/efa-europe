@@ -1,5 +1,10 @@
 import type { Config } from "tailwindcss";
 
+/* shadcn/ui renkleri. Değerler yalnızca `.shadcn-theme` kapsamında tanımlı
+   (globals.css); `/50` gibi opaklık ekleri color-mix ile çalışır. */
+const sc = (name: string) =>
+  `color-mix(in oklab, var(--${name}) calc(<alpha-value> * 100%), transparent)`;
+
 const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -45,6 +50,24 @@ const config: Config = {
         accent: {
           DEFAULT: "var(--accent)",
           soft: "var(--accent-soft)",
+          foreground: sc("accent-foreground"),
+        },
+        /* shadcn/ui (Muhasebe › shadcn sekmesi) */
+        primary: { DEFAULT: sc("primary"), foreground: sc("primary-foreground") },
+        secondary: { DEFAULT: sc("secondary"), foreground: sc("secondary-foreground") },
+        muted: { DEFAULT: sc("muted"), foreground: sc("muted-foreground") },
+        card: { DEFAULT: sc("card"), foreground: sc("card-foreground") },
+        popover: { DEFAULT: sc("popover"), foreground: sc("popover-foreground") },
+        destructive: { DEFAULT: sc("destructive") },
+        border: sc("border"),
+        input: sc("input"),
+        ring: sc("ring"),
+        chart: {
+          1: sc("chart-1"),
+          2: sc("chart-2"),
+          3: sc("chart-3"),
+          4: sc("chart-4"),
+          5: sc("chart-5"),
         },
         ink: {
           DEFAULT: "var(--ink)",
