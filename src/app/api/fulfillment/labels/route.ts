@@ -1,52 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { get } from '@vercel/blob';
 import { prisma } from '@/lib/db/prisma';
 
+/**
+ * Ozon kargo etiketi (PDF)
+ *
+ * Etiket Vercel Blob'da private tutulur. Blob adresi yalnızca veritabanındaki
+ * sipariş kaydından okunur; istekten adres kabul edilmez, aksi hâlde token
+ * dışarıdan verilen herhangi bir adrese gönderilebilirdi.
+ *
+ *   GET ?orderId=… → etiketi aç
+ */
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const orderId = searchParams.get('orderId');
-    const directUrl = searchParams.get('url');
+    const orderId = request.nextUrl.searchParams.get('orderId')?.trim();
+    if (!orderId) return new NextResponse('Sipariş numarası eksik.', { status: 400 });
 
-    let blobUrl = directUrl;
-    let fileName = 'ozon_label.pdf';
+    const order = await prisma.arbitrageOrder.findUnique({
+      where: { ozonOrderId: orderId },
+      select: { ozonOrderId: true, labelPdfUrl: true, labelFileName: true },
+    });
+    if (!order?.labelPdfUrl) return new NextResponse('PDF etiketi bulunamadı.', { status: 404 });
 
-    if (orderId) {
-      const order = await prisma.arbitrageOrder.findUnique({
-        where: { ozonOrderId: orderId },
-      });
-      if (order?.labelPdfUrl) {
-        blobUrl = order.labelPdfUrl;
-        fileName = order.labelFileName || `ozon_label_${order.ozonOrderId}.pdf`;
-      }
+    const result = await get(order.labelPdfUrl, {
+      access: 'private',
+      token: process.env.BLOB_READ_WRITE_TOKEN || undefined,
+    });
+    if (!result || result.statusCode !== 200) {
+      return new NextResponse('Etiket depodan okunamadı.', { status: 502 });
     }
 
-    if (!blobUrl) {
-      return new NextResponse('PDF etiketi bulunamadı.', { status: 404 });
-    }
-
-    const token = process.env.BLOB_READ_WRITE_TOKEN;
-    const headers: Record<string, string> = {};
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    const blobRes = await fetch(blobUrl, { headers });
-    if (!blobRes.ok) {
-      return new NextResponse('Blob dosyası yüklenemedi.', { status: blobRes.status });
-    }
-
-    const pdfBuffer = await blobRes.arrayBuffer();
-
-    return new NextResponse(pdfBuffer, {
-      status: 200,
+    const fileName = order.labelFileName || `ozon_label_${order.ozonOrderId}.pdf`;
+    return new NextResponse(result.stream, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="${fileName}"`,
-        'Cache-Control': 'public, max-age=3600',
+        'Content-Disposition': `inline; filename="${fileName.replace(/[^\x20-\x7e]|"/g, '_')}"; filename*=UTF-8''${encodeURIComponent(fileName)}`,
+        'Cache-Control': 'private, no-store',
       },
     });
   } catch (error: any) {
     console.error('API /fulfillment/labels Error:', error);
-    return new NextResponse('Etiket sunulurken hata oluştu: ' + error.message, { status: 500 });
+    return new NextResponse('Etiket sunulurken hata oluştu: ' + (error.message || 'bilinmeyen hata'), {
+      status: 500,
+    });
   }
 }
