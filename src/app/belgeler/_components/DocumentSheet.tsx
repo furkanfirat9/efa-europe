@@ -41,6 +41,7 @@ import { groupedCategories, PLATFORMS } from '@/lib/documents/categories';
 import { formatTL, formatTrNumber, parseTrNumber } from '@/lib/format';
 import type { DocumentPatch } from '../useDocuments';
 import { CURRENCIES, formatAmount, formatIsoDate, formatRate, type DocumentItem } from '../utils';
+import { DateField } from './DateField';
 
 type FormState = Record<
   | 'platform'
@@ -153,7 +154,14 @@ export function DocumentSheet({
 
   return (
     <Sheet open={open && !!current} onOpenChange={(next) => !next && onClose()}>
-      <SheetContent className="flex w-full flex-col gap-0 p-0 sm:max-w-xl">
+      <SheetContent
+        className="flex w-full flex-col gap-0 p-0 outline-none sm:max-w-xl"
+        // Varsayılan davranış odağı ilk alana (tarih) taşıyıp takvimi açtırıyordu; odak panelin kendisine gider.
+        onOpenAutoFocus={(e) => {
+          e.preventDefault();
+          (e.currentTarget as HTMLElement | null)?.focus();
+        }}
+      >
         {doc && form && (
           <>
             <SheetHeader className="border-b p-6">
@@ -192,7 +200,7 @@ export function DocumentSheet({
 
               <section className="grid grid-cols-2 gap-4">
                 <Field label="Belge tarihi" htmlFor="doc-documentDate">
-                  <Input type="date" {...input('documentDate')} />
+                  <DateField id="doc-documentDate" value={form.documentDate} onChange={set('documentDate')} />
                 </Field>
                 <Field label="Belge no" htmlFor="doc-documentNo">
                   <Input {...input('documentNo')} className="font-mono text-xs" />
@@ -298,10 +306,10 @@ export function DocumentSheet({
                 {showPeriod && (
                   <>
                     <Field label="Hizmet dönemi başı" htmlFor="doc-servicePeriodStart">
-                      <Input type="date" {...input('servicePeriodStart')} />
+                      <DateField id="doc-servicePeriodStart" value={form.servicePeriodStart} onChange={set('servicePeriodStart')} />
                     </Field>
                     <Field label="Hizmet dönemi sonu" htmlFor="doc-servicePeriodEnd">
-                      <Input type="date" {...input('servicePeriodEnd')} />
+                      <DateField id="doc-servicePeriodEnd" value={form.servicePeriodEnd} onChange={set('servicePeriodEnd')} />
                     </Field>
                   </>
                 )}
