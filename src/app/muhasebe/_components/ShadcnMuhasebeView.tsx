@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { DollarSign, FileText, Package, Receipt, RefreshCw, TrendingUp } from 'lucide-react';
+import { toast } from 'sonner';
 import { useEuropeAccounting } from '@/hooks/useEuropeAccounting';
 import { formatTL, formatUSD } from '@/lib/format';
 import { Button } from '@/components/shadcn/button';
@@ -91,7 +92,10 @@ export function ShadcnMuhasebeView() {
           <Button
             variant="outline"
             size="icon"
-            onClick={d.fetchData}
+            onClick={async () => {
+              await d.fetchData();
+              toast.success(`${d.activeMonth.label} verileri yenilendi`);
+            }}
             disabled={d.loading}
             aria-label="Yenile"
           >

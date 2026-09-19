@@ -109,7 +109,7 @@ yeni kodda kullanılmaz. Referans ekran: `/muhasebe?gorunum=shadcn`.
 ### Geçiş Yol Haritası
 Sırayla uygulanır; tamamlanan adım `[x]` ile işaretlenir.
 
-1. [ ] **Küçük ve güvenli adımlar:** `lucide-react` güncellemesi, `cn()` yardımcısının tüm yeni kodda kullanılması, bildirimler için `sonner`.
+1. [x] **Küçük ve güvenli adımlar:** `lucide-react` güncellemesi, `cn()` yardımcısının tüm yeni kodda kullanılması, bildirimler için `sonner`.
 2. [ ] **Tailwind v4 geçişi:** Ayrı bir branch'te (`npx @tailwindcss/upgrade`), `tailwind-merge` v3 ile birlikte. Token'lar `tailwind.config.ts`'ten CSS'teki `@theme` içine taşınır. Tüm sayfalar (özellikle koyu konsol sayfaları) tek tek kontrol edilir.
 3. [ ] **shadcn kurulumu:** shadcn CLI ile, varsayılan temayla. `.shadcn-theme` kapsamı kaldırılıp tema global yapılır, uygulama fontu Geist olur. Dialog, Popover, DropdownMenu, Select, Tooltip ve Calendar (`react-day-picker` + `date-fns`, `tr` dil desteği) eklenir. Elle yazılmış bileşenler (`src/components/DateRangePicker.tsx`, `src/app/siparisler/_components/Order*Dropdown.tsx`, modaller) o sayfalara dokunulduğunda bunlarla değiştirilir. Muhasebe'deki "Mevcut tasarım" sekmesi ve dashboard kartları da bu adımda shadcn'e taşınır.
 4. [ ] **TanStack Table:** Siparişler sayfası ele alınırken eklenir (sıralama, filtre, sayfalama); tablo görünümü shadcn `Table` bileşeniyle.

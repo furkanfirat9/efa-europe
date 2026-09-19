@@ -36,6 +36,7 @@ import AttributeSelectCard from '@/components/AttributeSelectCard';
 import { PRESET_CATEGORIES, PresetCategory } from '@/lib/constants/presetCategories';
 import PresetCategorySelector from '@/components/PresetCategorySelector';
 import CategoryTreeModal from '@/components/CategoryTreeModal';
+import { toast } from 'sonner';
 
 export interface SelectedCategoryInfo {
   categoryId: number;
@@ -597,7 +598,7 @@ export default function TopluYuklePage() {
   // Canlı Amazon Galeri Çekme (Modal İçinden)
   const handleFetchModalGallery = async (item: BulkProductItem) => {
     if (!item.asin) {
-      alert('Bu ürün için Amazon ASIN kodu bulunamadı.');
+      toast.warning('Bu ürün için Amazon ASIN kodu bulunamadı.');
       return;
     }
     setIsFetchingModalGallery(true);
@@ -618,11 +619,12 @@ export default function TopluYuklePage() {
             ? { ...prev, primaryImage: newPrimary, additionalImages: newAdditionals }
             : prev
         );
+        toast.success(`${data.images.length} görsel Amazon'dan çekildi`);
       } else {
-        alert(data.error || 'Amazon galerisi çekilemedi.');
+        toast.error(data.error || 'Amazon galerisi çekilemedi.');
       }
     } catch (e: any) {
-      alert(`Galeri çekilirken hata: ${e.message}`);
+      toast.error('Galeri çekilemedi', { description: e.message });
     } finally {
       setIsFetchingModalGallery(false);
     }

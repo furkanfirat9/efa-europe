@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import AppLayoutShell from "@/components/AppLayoutShell";
+import { Toaster } from "@/components/shadcn/sonner";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -32,6 +33,7 @@ export default function RootLayout({
         <AppLayoutShell>
           {children}
         </AppLayoutShell>
+        <Toaster position="bottom-right" />
       </body>
     </html>
   );
