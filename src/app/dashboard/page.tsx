@@ -1,32 +1,35 @@
 import React from 'react';
 import { MonthlyRevenueCard } from './_components/MonthlyRevenueCard';
-import { EuropeAccountingPanel } from './_components/EuropeAccountingPanel';
+import { AccountingSummaryCard } from './_components/AccountingSummaryCard';
 
 export const metadata = {
   title: 'Dashboard | Ozon AI Studio',
 };
 
+/**
+ * Uygulamanın özet sayfası. Her alan tek bir kartla temsil edilir
+ * (ana rakam + detay sayfasına ok); ayrıntı kendi sayfasında durur.
+ */
 export default function DashboardPage() {
   return (
-    <div className="w-full px-4 py-6 sm:px-6 lg:px-8 space-y-6">
-      {/* Header: Title left, compact monthly revenue card right */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-text-primary sm:text-3xl">
-            Dashboard
-          </h1>
-          <p className="mt-1 text-sm text-text-secondary">
-            Avrupa mağazası muhasebe ve resmi fatura yönetim masası.
-          </p>
-        </div>
+    <div className="w-full space-y-4 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+      <header className="pb-2">
+        <h1 className="text-[32px] font-normal leading-[1.15] tracking-tight text-text-primary sm:text-[36px]">
+          Genel bakış
+        </h1>
+        <p className="mt-1 text-[14px] text-text-secondary">
+          Mağazaların, siparişlerin ve muhasebenin özeti.
+        </p>
+      </header>
 
-        <div className="shrink-0">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-12">
+        <div className="xl:col-span-4">
           <MonthlyRevenueCard />
         </div>
+        <div className="xl:col-span-4">
+          <AccountingSummaryCard />
+        </div>
       </div>
-
-      {/* Avrupa Mağazası Muhasebe & TCMB Fatura Paneli */}
-      <EuropeAccountingPanel />
     </div>
   );
 }

@@ -25,7 +25,7 @@ export const Card: React.FC<CardProps> = ({
     >
       {/* İsteğe bağlı Cutout Köşe Aksiyonu (Inverted Cutout Corner) */}
       {cutoutAction && (
-        <div className="absolute top-0 right-0 z-10 flex items-center justify-center rounded-bl-[24px] bg-[var(--bg-page)] p-2">
+        <div className="card-cutout">
           {cutoutAction}
         </div>
       )}

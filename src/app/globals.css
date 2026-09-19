@@ -99,6 +99,69 @@ body {
     animation: skeleton-shimmer 1.4s infinite;
   }
 
+  /* Açık tema iskeleti: beyaz kartların üzerinde okunacak lavanta-gri ton. */
+  .skeleton-soft {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--surface-muted);
+    border-radius: 9999px;
+  }
+
+  .skeleton-soft::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+    animation: skeleton-shimmer 1.4s infinite;
+  }
+
+  /* Ters kesik köşe (AGENTS.md §5.1). Kartın sağ üstüne oyulmuş çentik;
+     iki iç bükey köşe radial-gradient ile karta yumuşakça bağlanır.
+     --notch-bg kartın oturduğu zeminin rengiyle eşleşmeli. */
+  .card-cutout {
+    --notch-bg: var(--bg-page);
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    padding: 7px;
+    background: var(--notch-bg);
+    border-bottom-left-radius: 24px;
+  }
+
+  .card-cutout::before,
+  .card-cutout::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+    background: radial-gradient(circle at bottom left, transparent 24px, var(--notch-bg) 24.5px);
+  }
+
+  .card-cutout::before {
+    top: 0;
+    right: 100%;
+  }
+
+  .card-cutout::after {
+    top: 100%;
+    right: 0;
+  }
+
+  /* Taralı şerit dolgu (AGENTS.md §5.3). Renk --hatch ile verilir;
+     zemin aynı rengin çok açık bir tonudur, düz blok dolgu kullanılmaz. */
+  .hatch {
+    --hatch: var(--accent);
+    background-color: color-mix(in srgb, var(--hatch) 10%, transparent);
+    background-image: repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--hatch) 70%, transparent) 0 1.5px,
+      transparent 1.5px 6px
+    );
+  }
+
   /* İnce, üstte yüzen kaydırma çubuğu (panel içi listeler ve tablolar). */
   .scroll-thin {
     scrollbar-width: thin;
@@ -132,7 +195,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skeleton::after {
+  .skeleton::after,
+  .skeleton-soft::after {
     animation: none;
   }
 }

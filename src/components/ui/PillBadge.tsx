@@ -13,34 +13,34 @@ interface PillBadgeProps {
 
 const TONE_CLASSES: Record<BadgeTone, { bg: string; text: string; dot: string }> = {
   success: {
-    bg: 'bg-[#E5F6EC]',
-    text: 'text-[#2E8B57]',
-    dot: 'bg-[#2E8B57]',
+    bg: 'bg-status-success-bg',
+    text: 'text-status-success-text',
+    dot: 'bg-status-success-text',
   },
   danger: {
-    bg: 'bg-[#FDE7E7]',
-    text: 'text-[#D14343]',
-    dot: 'bg-[#D14343]',
+    bg: 'bg-status-danger-bg',
+    text: 'text-status-danger-text',
+    dot: 'bg-status-danger-text',
   },
   info: {
-    bg: 'bg-[#ECEBFD]',
-    text: 'text-[#5856D6]',
-    dot: 'bg-[#5856D6]',
+    bg: 'bg-status-info-bg',
+    text: 'text-status-info-text',
+    dot: 'bg-status-info-text',
   },
   warning: {
-    bg: 'bg-[#FDF0E2]',
-    text: 'text-[#C47A2C]',
-    dot: 'bg-[#C47A2C]',
+    bg: 'bg-status-warning-bg',
+    text: 'text-status-warning-text',
+    dot: 'bg-status-warning-text',
   },
   pink: {
-    bg: 'bg-[#FCE7F2]',
-    text: 'text-[#C2408A]',
-    dot: 'bg-[#C2408A]',
+    bg: 'bg-status-pink-bg',
+    text: 'text-status-pink-text',
+    dot: 'bg-status-pink-text',
   },
   neutral: {
-    bg: 'bg-[#F1F1F5]',
-    text: 'text-[#6B6B78]',
-    dot: 'bg-[#6B6B78]',
+    bg: 'bg-status-neutral-bg',
+    text: 'text-status-neutral-text',
+    dot: 'bg-status-neutral-text',
   },
 };
 
