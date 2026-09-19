@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ExternalLink, FileText, Link2, Package, Upload } from 'lucide-react';
+import { ExternalLink, FileCheck, Link2, Package, Upload } from 'lucide-react';
 import { Badge } from '@/components/shadcn/badge';
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
@@ -286,8 +286,8 @@ export function DocumentCell({ order }: { order: OrderItem }) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button variant="secondary" size="icon" className="size-8" onClick={view} aria-label="Belgeyi görüntüle">
-            <FileText />
+          <Button variant="outline" size="icon" className="size-8" onClick={view} aria-label="Belgeyi görüntüle">
+            <FileCheck className="text-emerald-600" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>{docFile.name} — yeni sekmede aç</TooltipContent>
@@ -298,7 +298,12 @@ export function DocumentCell({ order }: { order: OrderItem }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon" className="size-8 text-muted-foreground" asChild>
+        <Button
+          variant="outline"
+          size="icon"
+          className="size-8 border-dashed border-muted-foreground/40 text-muted-foreground shadow-none hover:border-foreground/40 hover:text-foreground"
+          asChild
+        >
           <label className="cursor-pointer" aria-label="Belge yükle">
             <Upload />
             <input
