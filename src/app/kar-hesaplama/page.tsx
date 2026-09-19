@@ -11,16 +11,34 @@ import {
   Box,
   Percent,
   TrendingUp,
-  Coins,
-  ShieldCheck,
+  Wallet,
+  ArrowUpRight,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { calculateOzonProfit } from '@/lib/calculator/profitCalculator';
-import { Card } from '@/components/ui/Card';
-import { PillButton } from '@/components/ui/PillButton';
-import { PillInput } from '@/components/ui/PillInput';
-import { PillBadge } from '@/components/ui/PillBadge';
-import { StatCard } from '@/components/ui/StatCard';
 import { formatTL, formatPercent } from '@/lib/format';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/shadcn/button';
+import { Badge } from '@/components/shadcn/badge';
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/shadcn/card';
+import { Input } from '@/components/shadcn/input';
+import { Label } from '@/components/shadcn/label';
+import { Switch } from '@/components/shadcn/switch';
+import { Separator } from '@/components/shadcn/separator';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableRow,
+} from '@/components/shadcn/table';
 
 type Currency = 'EUR' | 'USD';
 type ShippingMode = 'weight' | 'custom';
@@ -180,7 +198,7 @@ export default function KarHesaplamaPage() {
   // Aktif Hesaplama Kuru
   const activeRate = useMemo(() => {
     const parsed = parseFloat(currency === 'EUR' ? eurRate : usdRate);
-    return Number.isNaN(parsed) || parsed <= 0 ? (currency === 'EUR' ? 38.45 : 36.00) : parsed;
+    return Number.isNaN(parsed) || parsed <= 0 ? (currency === 'EUR' ? 38.45 : 36.0) : parsed;
   }, [currency, eurRate, usdRate]);
 
   // Para Birimi Sembolü ve Formatlayıcı
@@ -195,7 +213,8 @@ export default function KarHesaplamaPage() {
   };
 
   // TCMB Canlı Kuru Çek
-  const fetchTcmbRate = async () => {
+  // Açılıştaki otomatik çekim sessizdir; başarı bildirimi yalnızca elle yenilemede çıkar
+  const fetchTcmbRate = async (silent = false) => {
     setRateLoading(true);
     try {
       const res = await fetch('/api/exchange-rate');
@@ -203,16 +222,20 @@ export default function KarHesaplamaPage() {
       if (data.success) {
         if (data.eurBuying) setEurRate(data.eurBuying.toFixed(4));
         if (data.usdBuying) setUsdRate(data.usdBuying.toFixed(4));
+        if (!silent) toast.success('TCMB döviz kurları güncellendi');
+      } else {
+        toast.error('Kurlar alınamadı');
       }
     } catch (err) {
       console.error('TCMB kurları çekilemedi:', err);
+      toast.error('TCMB kurları çekilirken hata oluştu');
     } finally {
       setRateLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTcmbRate();
+    fetchTcmbRate(true);
   }, []);
 
   // Form Sıfırlama
@@ -227,6 +250,7 @@ export default function KarHesaplamaPage() {
     setIsIntegrated(true);
     setIsSplitting(false);
     setSampleProductName(null);
+    toast.success('Hesaplama formu sıfırlandı');
   };
 
   // Mantıklı Rastgele Örnek Değerleri Doldur
@@ -238,15 +262,12 @@ export default function KarHesaplamaPage() {
     setSampleIndex(nextIndex);
     const item = SAMPLE_SCENARIOS[nextIndex];
 
-    // Doğal fiyat varyasyonu (-3 ile +4 arası)
     const priceVariance = Math.floor(Math.random() * 8) - 3;
     const finalBuyPrice = Math.max(15, item.buyPrice + priceVariance);
 
-    // Ozon arbitraj satış çarpanı (~2.65x ile ~3.15x arası, tam sayı)
     const multiplier = 2.65 + Math.random() * 0.5;
     const finalSellPrice = Math.round(finalBuyPrice * multiplier);
 
-    // Gramaj varyasyonu
     const weightVariance = (Math.floor(Math.random() * 5) - 2) * 20;
     const finalWeight = Math.max(200, item.weightG + weightVariance);
 
@@ -260,6 +281,7 @@ export default function KarHesaplamaPage() {
     setIsIntegrated(true);
     setIsSplitting(item.isSplitting || false);
     setSampleProductName(`${item.name} · ${item.category}`);
+    toast.success(`Örnek ürün yüklendi: ${item.name}`);
   };
 
   // Saf Hesaplama Motoru
@@ -276,533 +298,649 @@ export default function KarHesaplamaPage() {
     });
   }, [buyPrice, sellPrice, weightG, customShipping, shippingMode, commissionRate, activeRate, isIntegrated, isSplitting]);
 
+  // Maliyet Dağılım Oranları
+  const distribution = useMemo(() => {
+    const sp = calc.sellPrice > 0 ? calc.sellPrice : 1;
+    const buy = Math.max(0, Math.min(100, (calc.buyPrice / sp) * 100));
+    const platform = Math.max(0, Math.min(100, (calc.totalPlatformFees / sp) * 100));
+    const logistics = Math.max(
+      0,
+      Math.min(100, ((calc.shipping.totalShipping + calc.fulfillment.totalFulfillment) / sp) * 100)
+    );
+    const profit = Math.max(0, Math.min(100, (calc.netProfit / sp) * 100));
+    return { buy, platform, logistics, profit };
+  }, [calc]);
+
   return (
-    <div className="min-h-screen bg-(--bg-page) text-text-primary p-5 sm:p-7 md:p-8 lg:p-10">
-      <div className="mx-auto max-w-7xl space-y-6 md:space-y-8">
-        
-        {/* ========================================================================= */}
-        {/* 1. SAYFA BAŞLIĞI & AKILLI ORB (Section 3 & 5.4)                           */}
-        {/* ========================================================================= */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            {/* 5.4 AI Gradient Orb */}
-            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
-              <div className="absolute inset-0 rounded-full bg-linear-to-tr from-[#6C72E6] via-[#D9DBFA] to-[#C2408A] opacity-70 blur-md animate-pulse" />
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-hairline backdrop-blur-xs">
-                <Coins className="h-5 w-5 text-iris stroke-[1.75]" />
-              </div>
-            </div>
+    <div className="flex-1 space-y-6 bg-background p-4 pt-6 text-foreground md:p-8">
+      {/* 1. SAYFA BAŞLIĞI & CANLI KURLAR */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-3xl font-bold tracking-tight">Kâr & Maliyet Analizi</h1>
+            <Badge variant="outline" className="gap-1.5 py-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+              Canlı Motor
+            </Badge>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Ozon komisyonu, acentelik, lojistik ve fulfillment hakediş simülatörü
+          </p>
+        </div>
 
-            <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-[28px] md:text-[34px] font-normal tracking-tight text-text-primary leading-tight">
-                  Kâr & Maliyet Analizi
-                </h1>
-                <PillBadge tone="info" dot>
-                  Canlı Motor
-                </PillBadge>
-              </div>
-              <p className="mt-0.5 text-[14px] text-text-secondary">
-                Ozon komisyonu, acentelik, lojistik ve fulfillment hakediş simülatörü
-              </p>
-            </div>
+        {/* Canlı TCMB Kurları ve Yenileme Butonu */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 rounded-lg border bg-card px-3 py-1.5 text-xs text-muted-foreground shadow-xs">
+            <span>1€ =</span>
+            <span className="font-semibold tabular-nums text-foreground">{eurRate} ₺</span>
+            <span className="text-border">|</span>
+            <span>1$ =</span>
+            <span className="font-semibold tabular-nums text-foreground">{usdRate} ₺</span>
           </div>
 
-          {/* Sağ Aksiyonlar: Canlı Döviz Kuru Hapları */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            <div className="flex items-center gap-2 rounded-full border border-border-subtle bg-white px-3.5 py-1.5 shadow-hairline text-[12px] font-medium text-text-secondary">
-              <span className="flex h-2 w-2 rounded-full bg-iris animate-pulse" />
-              <span>1€ =</span>
-              <span className="font-semibold tabular-nums text-text-primary">{eurRate} ₺</span>
-              <span className="text-border-subtle">|</span>
-              <span>1$ =</span>
-              <span className="font-semibold tabular-nums text-text-primary">{usdRate} ₺</span>
-            </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fetchTcmbRate()}
+            disabled={rateLoading}
+            className="gap-1.5"
+          >
+            <RefreshCw className={cn('h-3.5 w-3.5', rateLoading && 'animate-spin')} />
+            <span>Kurları Yenile</span>
+          </Button>
+        </div>
+      </div>
 
-            <PillButton
-              variant="secondary"
-              onClick={fetchTcmbRate}
-              disabled={rateLoading}
-              icon={<RefreshCw className={`h-3.5 w-3.5 ${rateLoading ? 'animate-spin' : ''}`} />}
-              title="TCMB kurlarını yenile"
-            >
-              <span className="hidden sm:inline">Kurları Yenile</span>
-            </PillButton>
-          </div>
+      {/* 2. ANA DÜZEN (Grid 12 Sütun) */}
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
+        {/* ========================================================================= */}
+        {/* SOL SÜTUN: GİRDİ PARAMETRELERİ (5 Kolon)                                  */}
+        {/* ========================================================================= */}
+        <div className="space-y-6 xl:col-span-5">
+          <Card>
+            <CardHeader>
+              <CardTitle>Hesaplama Parametreleri</CardTitle>
+              <CardDescription>
+                Alış, satış, paket ağırlığı ve kategori komisyonu
+              </CardDescription>
+              <CardAction className="flex items-center gap-1.5">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLoadSample}
+                  className="h-8 gap-1.5 text-xs"
+                >
+                  <Sparkles className="h-3.5 w-3.5 text-primary" />
+                  <span>Örnek</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleReset}
+                  className="h-8 gap-1.5 text-xs"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  <span>Sıfırla</span>
+                </Button>
+              </CardAction>
+            </CardHeader>
+
+            <CardContent className="space-y-4">
+              {sampleProductName && (
+                <div className="flex items-center justify-between rounded-md border bg-muted/50 p-2.5 text-xs">
+                  <div className="flex items-center gap-2 truncate">
+                    <Sparkles className="h-3.5 w-3.5 text-primary shrink-0" />
+                    <span className="font-medium truncate">{sampleProductName}</span>
+                  </div>
+                  <Badge variant="secondary" className="text-[11px] shrink-0">
+                    Örnek Ürün
+                  </Badge>
+                </div>
+              )}
+
+              {/* Para Birimi & Kur Satırı */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs">Para Birimi</Label>
+                  <div className="grid grid-cols-2 gap-1 rounded-md border bg-muted/40 p-1">
+                    <Button
+                      type="button"
+                      variant={currency === 'EUR' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setCurrency('EUR')}
+                      className="h-7 text-xs"
+                    >
+                      EUR (€)
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={currency === 'USD' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setCurrency('USD')}
+                      className="h-7 text-xs"
+                    >
+                      USD ($)
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="exchange-rate" className="text-xs">
+                    TCMB Kuru (1{currencySymbol} = ₺)
+                  </Label>
+                  <Input
+                    id="exchange-rate"
+                    type="number"
+                    step="any"
+                    min="1"
+                    value={currency === 'EUR' ? eurRate : usdRate}
+                    onChange={(e) => {
+                      if (currency === 'EUR') setEurRate(e.target.value);
+                      else setUsdRate(e.target.value);
+                    }}
+                    placeholder={currency === 'EUR' ? '38.45' : '36.00'}
+                    className="font-medium tabular-nums h-9"
+                  />
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* 1. Alış Fiyatı */}
+              <div className="space-y-1.5">
+                <Label htmlFor="buy-price" className="text-xs">
+                  Alış Fiyatı ({currencySymbol})
+                </Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                    {currencySymbol}
+                  </span>
+                  <Input
+                    id="buy-price"
+                    type="number"
+                    step="any"
+                    min="0"
+                    value={buyPrice}
+                    onChange={(e) => setBuyPrice(e.target.value)}
+                    placeholder="0.00"
+                    className="pl-7 font-semibold tabular-nums"
+                  />
+                </div>
+              </div>
+
+              {/* 2. Satış Fiyatı */}
+              <div className="space-y-1.5">
+                <Label htmlFor="sell-price" className="text-xs">
+                  Ozon Satış Fiyatı ({currencySymbol})
+                </Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-semibold">
+                    {currencySymbol}
+                  </span>
+                  <Input
+                    id="sell-price"
+                    type="number"
+                    step="any"
+                    min="0"
+                    value={sellPrice}
+                    onChange={(e) => setSellPrice(e.target.value)}
+                    placeholder="0.00"
+                    className="pl-7 font-semibold tabular-nums"
+                  />
+                </div>
+              </div>
+
+              {/* 3. Kargo Hesaplama Modu ve Girdisi */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="shipping-input" className="text-xs">
+                    {shippingMode === 'weight'
+                      ? 'Paketli Ürün Ağırlığı (Gram)'
+                      : `Kargo Ücreti (${currencySymbol})`}
+                  </Label>
+                  <div className="inline-flex rounded-md border bg-muted/40 p-0.5 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setShippingMode('weight')}
+                      className={cn(
+                        'rounded px-2 py-0.5 text-[11px] font-medium transition-all',
+                        shippingMode === 'weight'
+                          ? 'bg-background text-foreground shadow-xs'
+                          : 'text-muted-foreground hover:text-foreground'
+                      )}
+                    >
+                      Ağırlık (g)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShippingMode('custom')}
+                      className={cn(
+                        'rounded px-2 py-0.5 text-[11px] font-medium transition-all',
+                        shippingMode === 'custom'
+                          ? 'bg-background text-foreground shadow-xs'
+                          : 'text-muted-foreground hover:text-foreground'
+                      )}
+                    >
+                      Sabit ({currencySymbol})
+                    </button>
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    {shippingMode === 'weight' ? (
+                      <Scale className="h-3.5 w-3.5" />
+                    ) : (
+                      <span className="text-sm">{currencySymbol}</span>
+                    )}
+                  </span>
+                  <Input
+                    id="shipping-input"
+                    type="number"
+                    step="any"
+                    min="0"
+                    value={shippingMode === 'weight' ? weightG : customShipping}
+                    onChange={(e) => {
+                      if (shippingMode === 'weight') setWeightG(e.target.value);
+                      else setCustomShipping(e.target.value);
+                    }}
+                    placeholder={shippingMode === 'weight' ? '1200' : '15.00'}
+                    className="pl-8 pr-12 font-semibold tabular-nums"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                    {shippingMode === 'weight' ? 'gram' : currencySymbol}
+                  </span>
+                </div>
+              </div>
+
+              {/* 4. Ozon Kategori Komisyonu */}
+              <div className="space-y-1.5">
+                <Label htmlFor="commission-rate" className="text-xs">
+                  Ozon Kategori Komisyonu (%)
+                </Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    <Percent className="h-3.5 w-3.5" />
+                  </span>
+                  <Input
+                    id="commission-rate"
+                    type="number"
+                    step="any"
+                    min="0"
+                    max="100"
+                    value={commissionRate}
+                    onChange={(e) => setCommissionRate(e.target.value)}
+                    placeholder="5"
+                    className="pl-8 pr-8 font-semibold tabular-nums"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-medium">
+                    %
+                  </span>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* 5. Depo & Lojistik Seçenekleri */}
+              <div className="space-y-3">
+                <Label className="text-xs font-semibold">Depo & Lojistik Seçenekleri</Label>
+
+                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                  {/* Entegrasyonlu Depo */}
+                  <div className="flex items-start justify-between rounded-lg border p-3 bg-card shadow-xs">
+                    <div className="space-y-0.5 pr-2">
+                      <Label
+                        htmlFor="integrated-warehouse"
+                        className="text-xs font-medium cursor-pointer"
+                      >
+                        Entegrasyonlu Depo
+                      </Label>
+                      <p className="text-[11px] text-muted-foreground leading-snug">
+                        İndirimli kabul (€0.40) ve sevkiyat
+                      </p>
+                    </div>
+                    <Switch
+                      id="integrated-warehouse"
+                      checked={isIntegrated}
+                      onCheckedChange={setIsIntegrated}
+                      className="mt-0.5"
+                    />
+                  </div>
+
+                  {/* Bölmeli Paket Kabulü */}
+                  <div className="flex items-start justify-between rounded-lg border p-3 bg-card shadow-xs">
+                    <div className="space-y-0.5 pr-2">
+                      <Label
+                        htmlFor="split-package"
+                        className="text-xs font-medium cursor-pointer"
+                      >
+                        Bölmeli Paket Kabulü
+                      </Label>
+                      <p className="text-[11px] text-muted-foreground leading-snug">
+                        1 koliden 2+ farklı siparişi ayrıştırma
+                      </p>
+                    </div>
+                    <Switch
+                      id="split-package"
+                      checked={isSplitting}
+                      onCheckedChange={setIsSplitting}
+                      className="mt-0.5"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* ========================================================================= */}
-        {/* 2. ASİMETRİK BENTO GRID (12 Sütunlu Bento Yerleşimi)                       */}
+        {/* SAĞ SÜTUN: ANALİZ, SONUÇLAR VE KIRILIMLAR (7 Kolon)                       */}
         {/* ========================================================================= */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
-
-          {/* ----------------------------------------------------------------------- */}
-          {/* SOL SÜTUN: GİRDİ PARAMETRELERİ (5 Kolon)                                */}
-          {/* ----------------------------------------------------------------------- */}
-          <div className="lg:col-span-5 space-y-6">
-            <Card
-              title="Hesaplama Parametreleri"
-              subtitle="Alış, satış, paket ağırlığı ve kategori komisyonu"
-              actions={
-                <div className="flex items-center gap-1.5">
-                  <PillButton
-                    variant="ghost"
-                    onClick={handleLoadSample}
-                    icon={<Sparkles className="h-3.5 w-3.5 text-iris" />}
-                    title="Örnek veriler yükle"
+        <div className="space-y-6 xl:col-span-7">
+          {/* A. 4 KPI KARTI */}
+          <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
+            {/* 1. Net Kâr */}
+            <Card>
+              <CardHeader className="p-4 pb-2">
+                <CardDescription className="flex items-center justify-between text-xs">
+                  <span>Net Kâr</span>
+                  <Badge
+                    variant={calc.netProfit >= 0 ? 'default' : 'destructive'}
+                    className="text-[10px] px-1.5 py-0"
                   >
-                    Örnek
-                  </PillButton>
-                  <PillButton
-                    variant="ghost"
-                    onClick={handleReset}
-                    icon={<RotateCcw className="h-3.5 w-3.5" />}
-                    title="Formu temizle"
-                  >
-                    Sıfırla
-                  </PillButton>
+                    {calc.netProfit >= 0 ? 'Kârda' : 'Zarar'}
+                  </Badge>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                <div
+                  className={cn(
+                    'text-2xl font-bold tracking-tight',
+                    calc.netProfit < 0 && 'text-destructive'
+                  )}
+                >
+                  {formatCurr(calc.netProfit)}
                 </div>
-              }
-            >
-              <div className="space-y-4">
-                {sampleProductName && (
-                  <div className="flex items-center justify-between rounded-xl bg-iris-soft/30 border border-iris/20 px-3.5 py-2 text-xs text-text-primary">
-                    <div className="flex items-center gap-2 truncate">
-                      <Sparkles className="h-3.5 w-3.5 text-iris shrink-0" />
-                      <span className="font-medium truncate">{sampleProductName}</span>
-                    </div>
-                    <span className="text-[11px] text-text-muted shrink-0">Örnek Ürün</span>
-                  </div>
-                )}
-                
-                {/* 1. Alış Fiyatı */}
-                <PillInput
-                  label="Alış Fiyatı"
-                  type="number"
-                  step="any"
-                  min="0"
-                  value={buyPrice}
-                  onChange={(e) => setBuyPrice(e.target.value)}
-                  placeholder="0.00"
-                  prefixIcon={<span>{currencySymbol}</span>}
-                  className="font-semibold tabular-nums"
-                />
+                <p className="text-xs text-muted-foreground mt-0.5">{formatTL(calc.netProfitTry)}</p>
+              </CardContent>
+            </Card>
 
-                {/* 2. Satış Fiyatı */}
-                <PillInput
-                  label="Ozon Satış Fiyatı"
-                  type="number"
-                  step="any"
-                  min="0"
-                  value={sellPrice}
-                  onChange={(e) => setSellPrice(e.target.value)}
-                  placeholder="0.00"
-                  prefixIcon={<span className="text-[#2E8B57] font-semibold">{currencySymbol}</span>}
-                  className="font-semibold tabular-nums text-[#2E8B57]"
-                />
-
-                {/* 3. Kargo Hesaplama Modu (Ağırlık vs Sabit Tutar) */}
-                <PillInput
-                  label={shippingMode === 'weight' ? 'Paketli Ürün Ağırlığı' : 'Kargo Ücreti'}
-                  type="number"
-                  step="any"
-                  min="0"
-                  value={shippingMode === 'weight' ? weightG : customShipping}
-                  onChange={(e) => {
-                    if (shippingMode === 'weight') setWeightG(e.target.value);
-                    else setCustomShipping(e.target.value);
-                  }}
-                  placeholder={shippingMode === 'weight' ? '1200' : '15.00'}
-                  prefixIcon={
-                    shippingMode === 'weight' ? (
-                      <Scale className="h-3.5 w-3.5 text-text-muted" />
-                    ) : (
-                      <span>{currencySymbol}</span>
-                    )
-                  }
-                  suffix={shippingMode === 'weight' ? 'gram' : currencySymbol}
-                  className="font-semibold tabular-nums"
-                  action={
-                    <div className="inline-flex rounded-full bg-surface-muted p-0.5 border border-border-subtle">
-                      <button
-                        type="button"
-                        onClick={() => setShippingMode('weight')}
-                        className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all cursor-pointer ${
-                          shippingMode === 'weight'
-                            ? 'bg-neutral-900 text-white'
-                            : 'text-text-secondary hover:text-text-primary'
-                        }`}
-                      >
-                        Ağırlık (g)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShippingMode('custom')}
-                        className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all cursor-pointer ${
-                          shippingMode === 'custom'
-                            ? 'bg-neutral-900 text-white'
-                            : 'text-text-secondary hover:text-text-primary'
-                        }`}
-                      >
-                        Tutar ({currencySymbol})
-                      </button>
-                    </div>
-                  }
-                />
-
-                {/* 4. Ozon Kategori Komisyonu */}
-                <PillInput
-                  label="Ozon Kategori Komisyonu"
-                  type="number"
-                  step="any"
-                  min="0"
-                  max="100"
-                  value={commissionRate}
-                  onChange={(e) => setCommissionRate(e.target.value)}
-                  placeholder="5"
-                  prefixIcon={<Percent className="h-3.5 w-3.5 text-text-muted" />}
-                  suffix="%"
-                  className="font-semibold tabular-nums"
-                />
-
-                {/* 5. Döviz Kuru Seçimi */}
-                <PillInput
-                  label="Hesaplama Kuru (TCMB)"
-                  type="number"
-                  step="any"
-                  min="1"
-                  value={currency === 'EUR' ? eurRate : usdRate}
-                  onChange={(e) => {
-                    if (currency === 'EUR') setEurRate(e.target.value);
-                    else setUsdRate(e.target.value);
-                  }}
-                  placeholder={currency === 'EUR' ? '38.45' : '36.00'}
-                  prefixIcon={<span>1{currencySymbol} =</span>}
-                  suffix="₺"
-                  className="font-semibold tabular-nums"
-                  action={
-                    <div className="inline-flex rounded-full bg-surface-muted p-0.5 border border-border-subtle">
-                      <button
-                        type="button"
-                        onClick={() => setCurrency('EUR')}
-                        className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all cursor-pointer ${
-                          currency === 'EUR'
-                            ? 'bg-neutral-900 text-white'
-                            : 'text-text-secondary hover:text-text-primary'
-                        }`}
-                      >
-                        EUR (€)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setCurrency('USD')}
-                        className={`rounded-full px-3 py-1 text-[11px] font-medium transition-all cursor-pointer ${
-                          currency === 'USD'
-                            ? 'bg-neutral-900 text-white'
-                            : 'text-text-secondary hover:text-text-primary'
-                        }`}
-                      >
-                        USD ($)
-                      </button>
-                    </div>
-                  }
-                />
-
-                {/* 6. Fulfillment ve Depo Seçenekleri */}
-                <div className="space-y-2 pt-2">
-                  <span className="text-[13px] font-medium text-text-secondary block">
-                    Depo & Lojistik Seçenekleri
-                  </span>
-
-                  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                    {/* Entegrasyonlu Depo */}
-                    <label
-                      className={`flex cursor-pointer items-start gap-3 rounded-2xl p-3.5 border transition-all ${
-                        isIntegrated
-                          ? 'border-iris/40 bg-surface-accent'
-                          : 'border-border-subtle bg-surface-muted hover:border-border-subtle/80'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isIntegrated}
-                        onChange={(e) => setIsIntegrated(e.target.checked)}
-                        className="mt-0.5 h-4 w-4 rounded-full accent-iris cursor-pointer"
-                      />
-                      <div className="min-w-0">
-                        <span className="block text-[13px] font-medium text-text-primary">
-                          Entegrasyonlu Depo
-                        </span>
-                        <span className="block text-[11px] leading-tight text-text-muted mt-0.5">
-                          İndirimli kabul (€0.40) ve sevkiyat tarifesi
-                        </span>
-                      </div>
-                    </label>
-
-                    {/* Bölmeli Paket Kabulü */}
-                    <label
-                      className={`flex cursor-pointer items-start gap-3 rounded-2xl p-3.5 border transition-all ${
-                        isSplitting
-                          ? 'border-iris/40 bg-surface-accent'
-                          : 'border-border-subtle bg-surface-muted hover:border-border-subtle/80'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isSplitting}
-                        onChange={(e) => setIsSplitting(e.target.checked)}
-                        className="mt-0.5 h-4 w-4 rounded-full accent-iris cursor-pointer"
-                      />
-                      <div className="min-w-0">
-                        <span className="block text-[13px] font-medium text-text-primary">
-                          Bölmeli Paket Kabulü
-                        </span>
-                        <span className="block text-[11px] leading-tight text-text-muted mt-0.5">
-                          1 koliden 2+ farklı siparişi ayrıştırma
-                        </span>
-                      </div>
-                    </label>
-                  </div>
+            {/* 2. Kâr Marjı */}
+            <Card>
+              <CardHeader className="p-4 pb-2">
+                <CardDescription className="flex items-center justify-between text-xs">
+                  <span>Kâr Marjı</span>
+                  <Percent className="h-3.5 w-3.5 text-muted-foreground" />
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                <div className="text-2xl font-bold tracking-tight">
+                  {formatPercent(calc.profitMargin, 1)}
                 </div>
+                <p className="text-xs text-muted-foreground mt-0.5">Net Kâr / Satış</p>
+              </CardContent>
+            </Card>
 
-              </div>
+            {/* 3. ROI (Yatırım Getirisi) */}
+            <Card>
+              <CardHeader className="p-4 pb-2">
+                <CardDescription className="flex items-center justify-between text-xs">
+                  <span>ROI</span>
+                  <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground" />
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                <div className="text-2xl font-bold tracking-tight">
+                  {formatPercent(calc.roi, 1)}
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">Net Kâr / Alış</p>
+              </CardContent>
+            </Card>
+
+            {/* 4. Ozon Hakedişi */}
+            <Card>
+              <CardHeader className="p-4 pb-2">
+                <CardDescription className="flex items-center justify-between text-xs">
+                  <span>Hakediş</span>
+                  <Wallet className="h-3.5 w-3.5 text-muted-foreground" />
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                <div className="text-2xl font-bold tracking-tight">
+                  {formatCurr(calc.payoutEur)}
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">{formatTL(calc.payoutTry)}</p>
+              </CardContent>
             </Card>
           </div>
 
-          {/* ----------------------------------------------------------------------- */}
-          {/* SAĞ SÜTUN: ANALİZ, SONUÇLAR VE KIRILIMLAR (7 Kolon)                     */}
-          {/* ----------------------------------------------------------------------- */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* B. MALİYET VE GELİR DAĞILIMI */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Maliyet & Kesinti Dağılımı</CardTitle>
+              <CardDescription>
+                Tüm gider kalemleri, platform kesintileri ve net hakediş dökümü
+              </CardDescription>
+            </CardHeader>
 
-            {/* A. Üst Bento KPI Kartları (4 StatCard) */}
-            <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
-              
-              {/* 1. Net Kâr Kartı (Cutout Corner) */}
-              <StatCard
-                label="Net Kâr"
-                value={formatCurr(calc.netProfit)}
-                subValue={formatTL(calc.netProfitTry)}
-                badge={
-                  <PillBadge tone={calc.netProfit >= 0 ? 'success' : 'danger'} dot>
-                    {calc.netProfit >= 0 ? 'Kârda' : 'Zarar'}
-                  </PillBadge>
-                }
-              />
+            <CardContent className="space-y-6">
+              {/* Oransal Dağılım Çubuğu */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Satış Fiyatı Dağılım Oranı</span>
+                  <span className="font-semibold text-foreground">{formatCurr(calc.sellPrice)}</span>
+                </div>
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted flex">
+                  <div
+                    style={{ width: `${distribution.buy}%` }}
+                    className="h-full bg-chart-2 transition-all"
+                    title={`Ürün Alış: %${distribution.buy.toFixed(1)}`}
+                  />
+                  <div
+                    style={{ width: `${distribution.platform}%` }}
+                    className="h-full bg-chart-3 transition-all"
+                    title={`Platform Kesintileri: %${distribution.platform.toFixed(1)}`}
+                  />
+                  <div
+                    style={{ width: `${distribution.logistics}%` }}
+                    className="h-full bg-chart-4 transition-all"
+                    title={`Lojistik & Depo: %${distribution.logistics.toFixed(1)}`}
+                  />
+                  <div
+                    style={{ width: `${distribution.profit}%` }}
+                    className="h-full bg-primary transition-all"
+                    title={`Net Kâr: %${distribution.profit.toFixed(1)}`}
+                  />
+                </div>
+                <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-chart-2" />
+                    <span>Ürün Alış (%{distribution.buy.toFixed(0)})</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-chart-3" />
+                    <span>Ozon & Finans (%{distribution.platform.toFixed(0)})</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-chart-4" />
+                    <span>Lojistik & Depo (%{distribution.logistics.toFixed(0)})</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-primary" />
+                    <span className="font-medium text-foreground">
+                      Net Kâr (%{distribution.profit.toFixed(0)})
+                    </span>
+                  </div>
+                </div>
+              </div>
 
-              {/* 2. Kâr Marjı */}
-              <StatCard
-                label="Kâr Marjı"
-                value={formatPercent(calc.profitMargin, 1)}
-                subValue="Net Kâr / Satış"
-                badge={
-                  <PillBadge tone={calc.profitMargin >= 0 ? 'success' : 'danger'}>
-                    Marj
-                  </PillBadge>
-                }
-              />
+              <Separator />
 
-              {/* 3. ROI (Yatırım Getirisi) */}
-              <StatCard
-                label="ROI (Getiri)"
-                value={formatPercent(calc.roi, 1)}
-                subValue="Net Kâr / Alış"
-                badge={
-                  <PillBadge tone={calc.roi >= 0 ? 'info' : 'danger'}>
-                    Verim
-                  </PillBadge>
-                }
-              />
-
-              {/* 4. Hakediş (Ozon'dan Bankaya Geçecek Tutar) */}
-              <StatCard
-                label="Hakediş"
-                value={formatCurr(calc.payoutEur)}
-                subValue={formatTL(calc.payoutTry)}
-                badge={
-                  <PillBadge tone="info" dot>
-                    Banka
-                  </PillBadge>
-                }
-              />
-
-            </div>
-
-            {/* B. Maliyet ve Kesinti Dağılımı (Ortadan Çizgili: Sol Gider, Sağ Gelir & Kâr) */}
-            <Card
-              title="Maliyet & Kesinti Dağılımı"
-              subtitle="Sol tarafta tüm giderler ve kesintiler, sağ tarafta satış geliri ve net kâr"
-            >
-              <div className="overflow-hidden rounded-[18px] border border-border-subtle bg-white">
-                <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border-subtle">
-                  
-                  {/* ================================================================= */}
-                  {/* SOL SÜTUN: GİDERLER & KESİNTİLER                                   */}
-                  {/* ================================================================= */}
-                  <div className="flex flex-col justify-between">
-                    <div>
-                      {/* Sütun Başlığı */}
-                      <div className="flex items-center justify-between border-b border-border-subtle bg-surface-muted px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <span className="h-2 w-2 rounded-full bg-[#D14343]" />
-                          <span className="text-[12px] font-medium text-text-primary">Giderler & Kesintiler</span>
-                        </div>
-                        <PillBadge tone="danger">
-                          Toplam: -{formatCurr(calc.totalCost)}
-                        </PillBadge>
-                      </div>
-
-                      {/* Gider Kalemleri */}
-                      <div className="divide-y divide-border-subtle text-[13px]">
-                        {/* Kalem 1: Ürün Alış Maliyeti */}
-                        <div className="flex items-center justify-between px-4 py-3 hover:bg-surface-muted transition-colors">
-                          <span className="text-text-primary">Ürün Alış Maliyeti</span>
-                          <div className="text-right tabular-nums">
-                            <span className="font-medium text-[#D14343]">
-                              - {formatCurr(calc.buyPrice)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Kalem 2: Ozon Satış Komisyonu */}
-                        <div className="flex items-center justify-between px-4 py-3 hover:bg-surface-muted transition-colors">
-                          <span className="text-text-primary">Ozon Komisyonu</span>
-                          <div className="text-right tabular-nums">
-                            <span className="font-medium text-[#D14343]">
-                              - {formatCurr(calc.commissionAmount)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Kalem 3: Ozon Acentelik Bedeli */}
-                        <div className="flex items-center justify-between px-4 py-3 hover:bg-surface-muted transition-colors">
-                          <span className="text-text-primary">Acentelik Bedeli</span>
-                          <div className="text-right tabular-nums">
-                            <span className="font-medium text-[#D14343]">
-                              - {formatCurr(calc.agencyFee)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Kalem 4: Aracı Banka Kesintisi */}
-                        <div className="flex items-center justify-between px-4 py-3 hover:bg-surface-muted transition-colors">
-                          <span className="text-text-primary">Aracı Banka Kesintisi</span>
-                          <div className="text-right tabular-nums">
-                            <span className="font-medium text-[#D14343]">
-                              - {formatCurr(calc.bankFee)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Kalem 5: Uluslararası Kargo */}
-                        <div className="flex items-center justify-between px-4 py-3 hover:bg-surface-muted transition-colors">
-                          <div className="flex items-center gap-1.5 text-text-primary">
-                            <Truck className="h-3.5 w-3.5 text-text-muted" />
-                            <span>Uluslararası Kargo</span>
-                          </div>
-                          <div className="text-right tabular-nums">
-                            <span className="font-medium text-[#D14343]">
-                              - {formatCurr(calc.shipping.totalShipping)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Kalem 6: Fulfillment & Depo */}
-                        <div className="flex items-center justify-between px-4 py-3 hover:bg-surface-muted transition-colors">
-                          <div className="flex items-center gap-1.5 text-text-primary">
-                            <Box className="h-3.5 w-3.5 text-text-muted" />
-                            <span>Depo & Fulfillment</span>
-                          </div>
-                          <div className="text-right tabular-nums">
-                            {calc.fulfillment.totalFulfillment > 0 ? (
-                              <span className="font-medium text-[#D14343]">
-                                - {formatCurr(calc.fulfillment.totalFulfillment)}
-                              </span>
-                            ) : (
-                              <span className="text-text-muted">Dahil Değil</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+              {/* Giderler ve Gelirler Tablosu (2 Kolon Grid) */}
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {/* Sol Taraf: Giderler & Kesintiler */}
+                <div className="rounded-lg border bg-card">
+                  <div className="flex items-center justify-between border-b px-4 py-2.5 bg-muted/40">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-destructive" />
+                      <span className="text-xs font-semibold">Giderler & Kesintiler</span>
                     </div>
-
-                    {/* Sol Alt: Toplam Gider Dip Satırı */}
-                    <div className="flex items-center justify-between border-t border-border-subtle bg-surface-muted/60 px-4 py-3.5 font-medium">
-                      <span className="text-[13px] text-text-primary">Toplam Gider & Kesintiler</span>
-                      <div className="text-right tabular-nums">
-                        <span className="text-[14px] font-semibold text-[#D14343]">
-                          - {formatCurr(calc.totalCost)}
-                        </span>
-                      </div>
-                    </div>
+                    <Badge variant="destructive" className="text-[11px]">
+                      -{formatCurr(calc.totalCost)}
+                    </Badge>
                   </div>
 
-                  {/* ================================================================= */}
-                  {/* SAĞ SÜTUN: GELİRLER & NET KÂR                                     */}
-                  {/* ================================================================= */}
-                  <div className="flex flex-col justify-between">
-                    <div>
-                      {/* Sütun Başlığı */}
-                      <div className="flex items-center justify-between border-b border-border-subtle bg-surface-muted px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <span className="h-2 w-2 rounded-full bg-[#2E8B57]" />
-                          <span className="text-[12px] font-medium text-text-primary">Gelirler</span>
-                        </div>
-                        <PillBadge tone="success">
-                          Satış: {formatCurr(calc.sellPrice)}
-                        </PillBadge>
-                      </div>
+                  <Table>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="text-xs py-2.5">Ürün Alış Maliyeti</TableCell>
+                        <TableCell className="text-right text-xs py-2.5 font-medium tabular-nums text-destructive">
+                          -{formatCurr(calc.buyPrice)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="text-xs py-2.5">Ozon Satış Komisyonu</TableCell>
+                        <TableCell className="text-right text-xs py-2.5 font-medium tabular-nums text-destructive">
+                          -{formatCurr(calc.commissionAmount)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="text-xs py-2.5">Ozon Acentelik Bedeli</TableCell>
+                        <TableCell className="text-right text-xs py-2.5 font-medium tabular-nums text-destructive">
+                          -{formatCurr(calc.agencyFee)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="text-xs py-2.5">Aracı Banka Kesintisi (%1)</TableCell>
+                        <TableCell className="text-right text-xs py-2.5 font-medium tabular-nums text-destructive">
+                          -{formatCurr(calc.bankFee)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="text-xs py-2.5">
+                          <div className="flex items-center gap-1.5">
+                            <Truck className="h-3 w-3 text-muted-foreground" />
+                            <span>Uluslararası Kargo</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right text-xs py-2.5 font-medium tabular-nums text-destructive">
+                          -{formatCurr(calc.shipping.totalShipping)}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="text-xs py-2.5">
+                          <div className="flex items-center gap-1.5">
+                            <Box className="h-3 w-3 text-muted-foreground" />
+                            <span>Depo & Fulfillment</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right text-xs py-2.5 font-medium tabular-nums text-destructive">
+                          {calc.fulfillment.totalFulfillment > 0
+                            ? `-${formatCurr(calc.fulfillment.totalFulfillment)}`
+                            : 'Dahil Değil'}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                    <TableFooter>
+                      <TableRow className="bg-muted/30">
+                        <TableCell className="text-xs font-semibold py-3">Toplam Giderler</TableCell>
+                        <TableCell className="text-right text-xs font-bold py-3 tabular-nums text-destructive">
+                          -{formatCurr(calc.totalCost)}
+                        </TableCell>
+                      </TableRow>
+                    </TableFooter>
+                  </Table>
+                </div>
 
-                      {/* Gelir Kalemleri */}
-                      <div className="divide-y divide-border-subtle text-[13px]">
-                        {/* Satış Fiyatı */}
-                        <div className="flex items-center justify-between px-4 py-3 bg-surface-accent/30 font-medium">
-                          <div className="flex items-center gap-2 text-text-primary">
-                            <CreditCard className="h-4 w-4 text-[#2E8B57]" />
-                            <span>Ozon Satış Fiyatı</span>
-                          </div>
-                          <div className="text-right tabular-nums">
-                            <span className="font-semibold text-[#2E8B57]">
-                              {formatCurr(calc.sellPrice)}
-                            </span>
-                          </div>
-                        </div>
+                {/* Sağ Taraf: Gelirler & Net Sonuç */}
+                <div className="rounded-lg border bg-card flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between border-b px-4 py-2.5 bg-muted/40">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-primary" />
+                        <span className="text-xs font-semibold">Gelirler & Hakediş</span>
                       </div>
+                      <Badge variant="outline" className="text-[11px]">
+                        Satış: {formatCurr(calc.sellPrice)}
+                      </Badge>
                     </div>
 
-                    {/* Sağ Alt: Tahmini Net Kâr Dip Satırı */}
-                    <div
-                      className={`flex items-center justify-between border-t border-border-subtle px-4 py-3.5 font-medium ${
-                        calc.netProfit >= 0 ? 'bg-[#E5F6EC]/40' : 'bg-[#FDE7E7]/40'
-                      }`}
-                    >
+                    <Table>
+                      <TableBody>
+                        <TableRow>
+                          <TableCell className="text-xs py-2.5">
+                            <div className="flex items-center gap-1.5">
+                              <CreditCard className="h-3 w-3 text-muted-foreground" />
+                              <span>Ozon Satış Fiyatı</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right text-xs py-2.5 font-semibold tabular-nums text-foreground">
+                            {formatCurr(calc.sellPrice)}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="text-xs py-2.5">Satış Tutarı (₺ Karşılığı)</TableCell>
+                          <TableCell className="text-right text-xs py-2.5 font-medium tabular-nums text-muted-foreground">
+                            {formatTL(calc.sellPriceTry)}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="text-xs py-2.5">
+                            <div className="flex items-center gap-1.5">
+                              <Wallet className="h-3 w-3 text-muted-foreground" />
+                              <span>Ozon Hakediş Tutarı</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right text-xs py-2.5 font-semibold tabular-nums text-foreground">
+                            {formatCurr(calc.payoutEur)}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="text-xs py-2.5">Hakediş (₺ Karşılığı)</TableCell>
+                          <TableCell className="text-right text-xs py-2.5 font-medium tabular-nums text-muted-foreground">
+                            {formatTL(calc.payoutTry)}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="text-xs py-2.5">Alış Maliyeti (₺)</TableCell>
+                          <TableCell className="text-right text-xs py-2.5 font-medium tabular-nums text-muted-foreground">
+                            {formatTL(calc.buyPriceTry)}
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  <div className="border-t p-4 bg-muted/20">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <TrendingUp
-                          className={`h-4 w-4 ${
-                            calc.netProfit >= 0 ? 'text-[#2E8B57]' : 'text-[#D14343]'
-                          }`}
+                          className={cn(
+                            'h-4 w-4',
+                            calc.netProfit >= 0 ? 'text-primary' : 'text-destructive'
+                          )}
                         />
-                        <span className="text-[13px] font-semibold text-text-primary">
-                          Tahmini Net Kâr
-                        </span>
+                        <span className="text-sm font-semibold">Tahmini Net Kâr</span>
                       </div>
-                      <div className="text-right tabular-nums">
+                      <div className="text-right">
                         <span
-                          className={`text-[15px] font-bold ${
-                            calc.netProfit >= 0 ? 'text-[#2E8B57]' : 'text-[#D14343]'
-                          }`}
+                          className={cn(
+                            'text-lg font-bold tabular-nums',
+                            calc.netProfit >= 0 ? 'text-primary' : 'text-destructive'
+                          )}
                         >
                           {formatCurr(calc.netProfit)}
                         </span>
+                        <div className="text-xs text-muted-foreground">
+                          {formatTL(calc.netProfitTry)}
+                        </div>
                       </div>
                     </div>
                   </div>
-
                 </div>
               </div>
-            </Card>
-
-          </div>
-
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
