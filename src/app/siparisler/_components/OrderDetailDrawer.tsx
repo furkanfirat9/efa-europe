@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ExternalLink, Eye, FileText, Package, Trash2, Upload } from 'lucide-react';
+import { ExternalLink, Eye, FileText, Loader2, Package, Trash2, Upload } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,7 +37,8 @@ import {
   getShipmentCountdown,
   isUrlString,
 } from '../utils';
-import { useOrderDocument } from '../useOrderDocument';
+import { useOrderDocument, type OnDocumentChange } from '../useOrderDocument';
+import { DOC_ACCEPT } from './cells';
 import { OrderStatusBadge } from './OrderStatusBadge';
 
 interface OrderDetailDrawerProps {
@@ -48,6 +49,7 @@ interface OrderDetailDrawerProps {
   saving: boolean;
   onSave: () => Promise<void>;
   onClose: () => void;
+  onDocumentChange: OnDocumentChange;
 }
 
 function Section({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
@@ -71,8 +73,6 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-const DOC_ACCEPT = '.pdf,image/*,.doc,.docx,.xlsx';
-
 export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
   order,
   open,
@@ -81,8 +81,9 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
   saving,
   onSave,
   onClose,
+  onDocumentChange,
 }) => {
-  const { docFile, upload, remove, view } = useOrderDocument(order?.postingNumber);
+  const { docFile, busy, upload, remove, view } = useOrderDocument(order, onDocumentChange);
 
   const countdown = React.useMemo(
     () => (order ? getShipmentCountdown(order.shipmentDate, order.status) : null),
@@ -201,7 +202,16 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
 
               <Section
                 title="Belge / fatura"
-                action={<Badge variant={docFile ? 'secondary' : 'outline'}>{docFile ? 'Yüklendi' : 'Belge yok'}</Badge>}
+                action={
+                  busy ? (
+                    <Badge variant="outline" className="gap-1">
+                      <Loader2 className="animate-spin" />
+                      İşleniyor
+                    </Badge>
+                  ) : (
+                    <Badge variant={docFile ? 'secondary' : 'outline'}>{docFile ? 'Kayıtlı' : 'Belge yok'}</Badge>
+                  )
+                }
               >
                 {docFile ? (
                   <div className="space-y-3">

@@ -11,6 +11,7 @@ import { OrderKpiCards } from './_components/OrderKpiCards';
 import { OrdersDataTable } from './_components/OrdersDataTable';
 import { OrderDetailDrawer } from './_components/OrderDetailDrawer';
 import { AVAILABLE_YEARS } from './types';
+import { useLegacyDocumentMigration } from './useOrderDocument';
 
 function SiparislerContent() {
   const {
@@ -51,7 +52,11 @@ function SiparislerContent() {
     handleInlineUpdate,
     handleOpenDetail,
     handleSaveDetailNotes,
+    patchOrderDocument,
   } = useOrders();
+
+  // Tarayıcıda kalmış eski belgeleri bir kez sunucuya taşı.
+  useLegacyDocumentMigration(patchOrderDocument);
 
   const onToggleSort = useMemo<Record<SortField, () => void>>(
     () => ({ date: toggleDateSort, salePrice: toggleSaleSort, buyPrice: toggleBuySort }),
@@ -144,6 +149,7 @@ function SiparislerContent() {
         resetKey={`${selectedYear}-${selectedMonth}`}
         onUpdate={handleInlineUpdate}
         onOpenDetail={handleOpenDetail}
+        onDocumentChange={patchOrderDocument}
       />
 
       <OrderDetailDrawer
@@ -154,6 +160,7 @@ function SiparislerContent() {
         saving={savingDetail}
         onSave={handleSaveDetailNotes}
         onClose={() => setDetailModalOpen(false)}
+        onDocumentChange={patchOrderDocument}
       />
     </div>
   );
