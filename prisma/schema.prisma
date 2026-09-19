@@ -113,3 +113,77 @@ model OzonOrder {
   @@index([customerCity])
   @@index([customerRegion])
 }
+
+// Belgeler sayfası (/belgeler): tedarik, hizmet ve Ozon gider belgeleri.
+// Dosya Vercel Blob'da private tutulur ve yalnızca /api/belgeler/[id]/file
+// üzerinden sunulur; blob adresi istemciye verilmez.
+model AccountingDocument {
+  id                 String    @id @default(cuid())
+  // Şimdilik yalnızca "lenora"; ikinci mağaza eklendiğinde aynı tablo kullanılır.
+  store              String    @default("lenora")
+  // draft: okundu, onay bekliyor · confirmed: onaylandı, toplamlara girer
+  status             String    @default("draft")
+  kind               String    @default("invoice")
+  platform           String?
+  // src/lib/documents/categories.ts içindeki anahtarlardan biri
+  category           String?
+
+  documentNo         String?
+  // Polonya e-fatura (KSeF) numarası; varsa mükerrer kontrolü bununla yapılır.
+  ksefNo             String?
+  dedupKey           String?
+  documentDate       DateTime? @db.Date
+  sellerName         String?
+  sellerCountry      String?
+  sellerTaxId        String?
+  buyerName          String?
+  buyerIsOwn         Boolean?
+  currency           String?
+  // KDV dahil belge toplamı
+  totalAmount        Float?
+  orderNumber        String?
+  servicePeriodStart DateTime? @db.Date
+  servicePeriodEnd   DateTime? @db.Date
+
+  // TL çevirimi: fatura tarihinde geçerli TCMB kuru (EVDS). Kaydedilen kur sonradan değişmez.
+  fxRate             Float?
+  fxRateDate         DateTime? @db.Date
+  fxSource           String?
+  totalTry           Float?
+
+  notes              String?
+  // Okuma sırasında çıkan uyarılar (string[])
+  warnings           Json?
+  aiModel            String?
+
+  fileUrl            String
+  fileName           String
+  fileContentType    String
+  fileSize           Int
+  fileHash           String
+
+  lines              AccountingDocumentLine[]
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@unique([store, fileHash])
+  @@index([store, documentDate])
+  @@index([store, status])
+  @@index([store, dedupKey])
+}
+
+model AccountingDocumentLine {
+  id          String             @id @default(cuid())
+  documentId  String
+  document    AccountingDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  position    Int
+  description String
+  quantity    Float?
+  // KDV dahil satır tutarı
+  amount      Float?
+  category    String?
+  isShipping  Boolean            @default(false)
+
+  @@index([documentId])
+}

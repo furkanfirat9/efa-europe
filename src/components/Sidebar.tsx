@@ -18,6 +18,7 @@ import {
   ChevronDown,
   LayoutDashboard,
   Receipt,
+  FileStack,
 } from 'lucide-react';
 
 interface NavItem {
@@ -31,6 +32,7 @@ interface NavItem {
 const PRIMARY_NAV: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Muhasebe', href: '/muhasebe', icon: Receipt },
+  { name: 'Belgeler', href: '/belgeler', icon: FileStack },
   { name: 'Kâr hesaplama', href: '/kar-hesaplama', icon: Calculator },
   { name: 'Siparişler', href: '/siparisler', icon: Package },
   { name: 'Fulfillment', href: '/fulfillment', icon: Truck },
