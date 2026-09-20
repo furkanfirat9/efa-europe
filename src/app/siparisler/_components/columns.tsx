@@ -120,9 +120,9 @@ export function buildOrderColumns({
       ),
     }),
     helper.display({
-      id: 'status',
-      header: 'Durum',
-      cell: ({ row }) => <OrderStatusBadge status={row.original.status} statusName={row.original.statusName} />,
+      id: 'buyPrice',
+      header: () => <SortableHeader field="buyPrice" label="Alış ₺" sort={sort} />,
+      cell: ({ row }) => <BuyPriceCell order={row.original} onUpdate={onUpdate} />,
     }),
     helper.display({
       id: 'salePrice',
@@ -134,11 +134,6 @@ export function buildOrderColumns({
             : `${formatNumber(row.original.salePrice)} ${row.original.currency}`}
         </span>
       ),
-    }),
-    helper.display({
-      id: 'buyPrice',
-      header: () => <SortableHeader field="buyPrice" label="Alış ₺" sort={sort} />,
-      cell: ({ row }) => <BuyPriceCell order={row.original} onUpdate={onUpdate} />,
     }),
 
     helper.display({
@@ -171,6 +166,11 @@ export function buildOrderColumns({
       id: 'document',
       header: 'Belge',
       cell: ({ row }) => <DocumentCell order={row.original} onDocumentChange={onDocumentChange} />,
+    }),
+    helper.display({
+      id: 'status',
+      header: 'Durum',
+      cell: ({ row }) => <OrderStatusBadge status={row.original.status} statusName={row.original.statusName} />,
     }),
 
     helper.display({
