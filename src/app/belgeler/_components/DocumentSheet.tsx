@@ -56,6 +56,7 @@ type FormState = Record<
   | 'currency'
   | 'totalAmount'
   | 'orderNumber'
+  | 'postingNumber'
   | 'servicePeriodStart'
   | 'servicePeriodEnd'
   | 'notes',
@@ -75,6 +76,7 @@ const toForm = (d: DocumentItem): FormState => ({
   currency: d.currency ?? '',
   totalAmount: d.totalAmount == null ? '' : formatTrNumber(d.totalAmount),
   orderNumber: d.orderNumber ?? '',
+  postingNumber: d.postingNumber ?? '',
   servicePeriodStart: d.servicePeriodStart ?? '',
   servicePeriodEnd: d.servicePeriodEnd ?? '',
   notes: d.notes ?? '',
@@ -93,6 +95,7 @@ const toPatch = (f: FormState): DocumentPatch => ({
   currency: f.currency || null,
   totalAmount: parseTrNumber(f.totalAmount),
   orderNumber: f.orderNumber || null,
+  postingNumber: f.postingNumber || null,
   servicePeriodStart: f.servicePeriodStart || null,
   servicePeriodEnd: f.servicePeriodEnd || null,
   notes: f.notes || null,
@@ -127,12 +130,15 @@ export function DocumentSheet({
   // Panel kapanırken belge seçimi hemen boşalır; kapanma animasyonu boyunca son belge gösterilir.
   const [doc, setDoc] = useState<DocumentItem | null>(current);
   const [form, setForm] = useState<FormState | null>(current ? toForm(current) : null);
+  // Çok kalemli belgelerde (Ozon UPD'si) her kalemin kategorisi ayrı tutulur.
+  const [lineCategories, setLineCategories] = useState<Record<string, string>>({});
 
   // Başka bir belge açıldığında ya da sunucudan güncel hâli geldiğinde formu yenile.
   useEffect(() => {
     if (!current) return;
     setDoc(current);
     setForm(toForm(current));
+    setLineCategories(Object.fromEntries(current.lines.map((l) => [l.id, l.category ?? ''])));
   }, [current]);
 
   const set = (key: keyof FormState) => (value: string) => setForm((prev) => (prev ? { ...prev, [key]: value } : prev));
@@ -143,12 +149,17 @@ export function DocumentSheet({
   });
 
   const isDraft = doc?.status === 'draft';
+  const lineSum = doc?.lines.reduce((acc, l) => acc + (l.amount ?? 0), 0) ?? 0;
   const fxWillChange = !!doc && !!form && (form.documentDate !== (doc.documentDate ?? '') || form.currency !== (doc.currency ?? ''));
   const showPeriod = !!form && (form.category.startsWith('uyelik') || !!form.servicePeriodStart || !!form.servicePeriodEnd);
 
   const submit = async (confirm: boolean) => {
     if (!doc || !form) return;
-    const ok = await onSave(doc.id, toPatch(form), confirm);
+    const patch = {
+      ...toPatch(form),
+      lines: doc.lines.map((l) => ({ id: l.id, category: lineCategories[l.id] || null })),
+    };
+    const ok = await onSave(doc.id, patch, confirm);
     if (ok && confirm) onClose();
   };
 
@@ -292,8 +303,26 @@ export function DocumentSheet({
                     </SelectContent>
                   </Select>
                 </Field>
-                <Field label="Sipariş no" htmlFor="doc-orderNumber">
+                <Field label="Sipariş no (platform)" htmlFor="doc-orderNumber">
                   <Input {...input('orderNumber')} className="font-mono text-xs" />
+                </Field>
+                <Field label="Eşleşen gönderi no" htmlFor="doc-postingNumber" className="col-span-2">
+                  <div className="flex items-center gap-2">
+                    <Input {...input('postingNumber')} className="font-mono text-xs" placeholder="Ozon gönderi no" />
+                    {doc.postingNumber && (
+                      <Button variant="outline" size="icon" className="size-9 shrink-0" asChild>
+                        <a
+                          href={`/siparisler?search=${encodeURIComponent(doc.postingNumber)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label="Siparişi aç"
+                          title="Siparişler sayfasında aç"
+                        >
+                          <ExternalLink />
+                        </a>
+                      </Button>
+                    )}
+                  </div>
                 </Field>
                 <Field label="Alıcı" htmlFor="doc-buyerName" className="col-span-2">
                   <Input {...input('buyerName')} />
@@ -322,18 +351,54 @@ export function DocumentSheet({
                 <>
                   <Separator />
                   <section className="space-y-2">
-                    <h3 className="text-sm font-medium">Belgedeki kalemler</h3>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-medium">Belgedeki kalemler</h3>
+                      {doc.lines.length > 1 && (
+                        <span className="text-xs text-muted-foreground">
+                          Toplam {formatAmount(lineSum, doc.currency)}
+                        </span>
+                      )}
+                    </div>
+                    {doc.lines.length > 1 && (
+                      <p className="text-xs text-muted-foreground">
+                        Kalemler farklı kategorilere giriyorsa her birini ayrı seçin; belge kategorisi boş kalabilir.
+                      </p>
+                    )}
                     <ul className="divide-y rounded-md border text-sm">
                       {doc.lines.map((line) => (
-                        <li key={line.id} className="flex items-start gap-3 p-3">
-                          <div className="min-w-0 flex-1">
-                            <p className="line-clamp-2">{line.description}</p>
-                            <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                              {line.quantity != null && <span>{line.quantity} adet</span>}
-                              {line.isShipping && <Badge variant="outline">Kargo</Badge>}
+                        <li key={line.id} className="space-y-2 p-3">
+                          <div className="flex items-start gap-3">
+                            <div className="min-w-0 flex-1">
+                              <p className="line-clamp-2">{line.description}</p>
+                              <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                                {line.quantity != null && <span>{line.quantity} adet</span>}
+                                {line.isShipping && <Badge variant="outline">Kargo</Badge>}
+                              </div>
                             </div>
+                            <span className="shrink-0 tabular-nums">{formatAmount(line.amount, doc.currency)}</span>
                           </div>
-                          <span className="shrink-0 tabular-nums">{formatAmount(line.amount, doc.currency)}</span>
+                          {doc.lines.length > 1 && (
+                            <Select
+                              value={lineCategories[line.id] ?? ''}
+                              onValueChange={(value) => setLineCategories((prev) => ({ ...prev, [line.id]: value }))}
+                            >
+                              <SelectTrigger size="sm" className="w-full" aria-label="Kalem kategorisi">
+                                <SelectValue placeholder="Kalem kategorisi seçin" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {groupedCategories().map(({ group, items }) => (
+                                  <SelectGroup key={group}>
+                                    <SelectLabel>{group}</SelectLabel>
+                                    {items.map((c) => (
+                                      <SelectItem key={c.key} value={c.key}>
+                                        {c.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectGroup>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
                         </li>
                       ))}
                     </ul>

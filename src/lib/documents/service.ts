@@ -2,11 +2,22 @@ import type { AccountingDocument, AccountingDocumentLine } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma';
 import { getTryRate } from '@/lib/fx/evds';
 import { categoryLabel } from './categories';
+import type { ExtractedDocument } from './extract';
 
 export const CURRENT_STORE = 'lenora';
 
 /** Faturada alıcı olarak şirketin farklı yazılışları geçebilir ("LENORA LIMITED SIRKETI" gibi). */
 export const isOwnBuyer = (buyerName?: string | null) => (buyerName ? /lenora/i.test(buyerName) : null);
+
+/**
+ * Kullanıcının ikinci Ozon mağazası bu ad altında; o mağazanın belgeleri Lenora'nın
+ * giderine karışmamalı. İkinci mağaza da panele eklenirse buradaki liste yerine
+ * belgenin mağazası seçilir.
+ */
+const OTHER_STORE_BUYERS = [/elif\s*fırat/i, /elif\s*firat/i];
+
+export const isOtherStoreBuyer = (buyerName?: string | null) =>
+  !!buyerName && OTHER_STORE_BUYERS.some((pattern) => pattern.test(buyerName));
 
 const normalizeKey = (s: string) => s.toLocaleUpperCase('tr-TR').replace(/[^\p{L}\p{N}]+/gu, '');
 
@@ -52,13 +63,25 @@ export async function buildWarnings(
     AccountingDocument,
     'id' | 'store' | 'kind' | 'documentDate' | 'currency' | 'totalAmount' | 'category' | 'buyerName' | 'fxRate' | 'dedupKey'
   >,
-  extra: string[] = []
+  extra: string[] = [],
+  lines: Pick<AccountingDocumentLine, 'amount' | 'category'>[] = []
 ): Promise<string[]> {
   const warnings = [...extra];
   if (!doc.documentDate) warnings.push('Belge tarihi okunamadı.');
   if (!doc.currency) warnings.push('Para birimi okunamadı.');
   if (doc.totalAmount == null) warnings.push('Toplam tutar okunamadı.');
-  if (!doc.category) warnings.push('Kategori seçilmedi.');
+  if (!isCategorised({ ...doc, lines })) {
+    warnings.push(
+      lines.length > 1 ? 'Kategorisiz kalem var; belge ya da satır kategorisi seçin.' : 'Kategori seçilmedi.'
+    );
+  }
+  // Ozon belgeleri gibi çok kalemli belgelerde satırların toplamı belge toplamını tutmalı.
+  if (lines.length > 1 && doc.totalAmount != null) {
+    const sum = lines.reduce((acc, l) => acc + (l.amount ?? 0), 0);
+    if (Math.abs(sum - doc.totalAmount) > 0.02) {
+      warnings.push(`Kalemlerin toplamı (${sum.toFixed(2)}) belge toplamını tutmuyor.`);
+    }
+  }
   if (doc.currency && doc.documentDate && doc.fxRate == null) {
     warnings.push(`${doc.currency} için TCMB kuru bulunamadı; TL karşılığı hesaplanamadı.`);
   }
@@ -75,6 +98,18 @@ export async function buildWarnings(
     if (duplicate) warnings.push(`Bu belge daha önce kaydedilmiş (${duplicate.documentNo ?? 'aynı numara'}).`);
   }
   return warnings;
+}
+
+/**
+ * Belge kategorili sayılır: ya belgenin kendi kategorisi vardır ya da (Ozon UPD'si
+ * gibi çok kalemli belgelerde) her kalemin kategorisi vardır.
+ */
+export function isCategorised(doc: {
+  category: string | null;
+  lines: Pick<AccountingDocumentLine, 'category'>[];
+}): boolean {
+  if (doc.category) return true;
+  return doc.lines.length > 0 && doc.lines.every((l) => !!l.category);
 }
 
 export type DocumentWithLines = AccountingDocument & { lines: AccountingDocumentLine[] };
@@ -99,6 +134,8 @@ export function toDto(doc: DocumentWithLines) {
     currency: doc.currency,
     totalAmount: doc.totalAmount,
     orderNumber: doc.orderNumber,
+    postingNumber: doc.postingNumber,
+    fileShared: doc.fileShared,
     servicePeriodStart: isoDate(doc.servicePeriodStart),
     servicePeriodEnd: isoDate(doc.servicePeriodEnd),
     fxRate: doc.fxRate,
@@ -125,3 +162,97 @@ export function toDto(doc: DocumentWithLines) {
 }
 
 export type AccountingDocumentDto = ReturnType<typeof toDto>;
+
+/** Faturadaki platform sipariş numarasına göre siparişi bulur (tedarikçi sipariş no alanı). */
+export async function findOrderByOrderNumber(orderNumber?: string | null): Promise<string | null> {
+  const value = orderNumber?.trim();
+  if (!value || value.length < 4) return null;
+  const order = await prisma.ozonOrder.findFirst({
+    where: { supplierOrderId: { contains: value } },
+    select: { postingNumber: true },
+    orderBy: { inProcessAt: 'desc' },
+  });
+  return order?.postingNumber ?? null;
+}
+
+/**
+ * Okunan belgeyi taslak olarak kaydeder (kur, mükerrer anahtarı, sipariş eşleştirmesi
+ * ve uyarılarla birlikte). Hem doğrudan yüklemede hem siparişteki belgeyi okumada kullanılır.
+ */
+export async function saveExtractedDocument(input: {
+  extracted: ExtractedDocument | null;
+  aiModel: string | null;
+  extraWarnings?: string[];
+  file: { url: string; name: string; contentType: string; size: number; hash: string; shared?: boolean };
+  postingNumber?: string | null;
+}): Promise<DocumentWithLines> {
+  const { extracted, aiModel, file } = input;
+  const documentDate = parseIsoDate(extracted?.documentDate);
+
+  const fields = {
+    kind: extracted?.documentKind ?? 'invoice',
+    platform: extracted?.platform ?? null,
+    category: extracted?.suggestedCategory ?? null,
+    documentNo: extracted?.documentNo ?? null,
+    ksefNo: extracted?.ksefNo ?? null,
+    documentDate,
+    sellerName: extracted?.sellerName ?? null,
+    sellerCountry: extracted?.sellerCountry ?? null,
+    sellerTaxId: extracted?.sellerTaxId ?? null,
+    buyerName: extracted?.buyerName ?? null,
+    buyerIsOwn: isOwnBuyer(extracted?.buyerName),
+    currency: extracted?.currency ?? null,
+    totalAmount: extracted?.totalAmount ?? null,
+    orderNumber: extracted?.orderNumber ?? null,
+    servicePeriodStart: parseIsoDate(extracted?.servicePeriodStart),
+    servicePeriodEnd: parseIsoDate(extracted?.servicePeriodEnd),
+    notes: extracted?.notes ?? null,
+  };
+
+  const extraWarnings = [...(input.extraWarnings ?? [])];
+  const postingNumber = input.postingNumber ?? (await findOrderByOrderNumber(fields.orderNumber));
+  if (!input.postingNumber && postingNumber) {
+    extraWarnings.push(`Sipariş ${postingNumber} ile eşleştirildi; kontrol edin.`);
+  }
+
+  const fx = await computeFx(fields).catch((err) => {
+    console.error('Kur alınamadı:', err);
+    return computeFx({});
+  });
+
+  const created = await prisma.accountingDocument.create({
+    data: {
+      store: CURRENT_STORE,
+      status: 'draft',
+      ...fields,
+      ...fx,
+      postingNumber,
+      dedupKey: buildDedupKey(fields),
+      aiModel,
+      fileUrl: file.url,
+      fileName: file.name,
+      fileContentType: file.contentType,
+      fileSize: file.size,
+      fileHash: file.hash,
+      fileShared: file.shared ?? false,
+      lines: {
+        create: (extracted?.lines ?? []).map((line, position) => ({
+          position,
+          description: line.description,
+          quantity: line.quantity,
+          amount: line.amount,
+          isShipping: line.isShipping,
+          category: line.category,
+        })),
+      },
+    },
+    include: { lines: true },
+  });
+
+  const warnings = await buildWarnings(created, extraWarnings, created.lines);
+  return prisma.accountingDocument.update({
+    where: { id: created.id },
+    data: { warnings },
+    include: { lines: true },
+  });
+}

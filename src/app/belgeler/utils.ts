@@ -1,6 +1,54 @@
+import { categoryLabel } from '@/lib/documents/categories';
 import type { AccountingDocumentDto } from '@/lib/documents/service';
 
 export type DocumentItem = AccountingDocumentDto;
+
+/** Siparişler sayfasına yüklenmiş, henüz okunmamış alış faturası. */
+export interface OrderDocumentItem {
+  postingNumber: string;
+  fileName: string | null;
+  fileSize: number | null;
+  uploadedAt: string | null;
+  supplier: string | null;
+  supplierOrderId: string | null;
+  orderDate: string | null;
+}
+
+/**
+ * Kategori bazında TL toplamları. Ozon UPD'si gibi çok kalemli belgelerde toplam,
+ * kalemlerin kendi kategorilerine oranlanarak dağıtılır.
+ */
+export function categoryTotals(documents: DocumentItem[]): { key: string; label: string; total: number }[] {
+  const totals = new Map<string, number>();
+  const add = (key: string | null, amount: number) => {
+    const k = key ?? 'diger';
+    totals.set(k, (totals.get(k) ?? 0) + amount);
+  };
+
+  for (const doc of documents) {
+    const tl = doc.totalTry ?? 0;
+    if (!tl) continue;
+    const lineSum = doc.lines.reduce((acc, l) => acc + (l.amount ?? 0), 0);
+    if (!doc.category && doc.lines.length && lineSum > 0) {
+      for (const line of doc.lines) add(line.category, (tl * (line.amount ?? 0)) / lineSum);
+    } else {
+      add(doc.category, tl);
+    }
+  }
+
+  return [...totals]
+    .map(([key, total]) => ({ key, label: categoryLabel(key), total: Math.round(total * 100) / 100 }))
+    .sort((a, b) => b.total - a.total);
+}
+
+/** Tabloda gösterilecek kategori adı; çok kalemli belgelerde kalem sayısını da söyler. */
+export function documentCategoryLabel(doc: DocumentItem): string {
+  if (doc.category) return doc.categoryLabel;
+  const categories = new Set(doc.lines.map((l) => l.category).filter(Boolean));
+  if (categories.size === 1) return categoryLabel([...categories][0]!);
+  if (categories.size > 1) return `${doc.lines.length} kalem`;
+  return 'Kategorisiz';
+}
 
 export const DOC_ACCEPT = '.pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp';
 export const CURRENCIES = ['EUR', 'PLN', 'USD', 'TRY'] as const;

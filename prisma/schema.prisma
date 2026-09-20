@@ -142,6 +142,10 @@ model AccountingDocument {
   // KDV dahil belge toplamı
   totalAmount        Float?
   orderNumber        String?
+  // Eşleştiği Ozon siparişinin gönderi numarası (OzonOrder.postingNumber)
+  postingNumber      String?
+  // Dosya siparişe yüklenmiş belgeye aitse true olur; belge silinirken dosyaya dokunulmaz.
+  fileShared         Boolean   @default(false)
   servicePeriodStart DateTime? @db.Date
   servicePeriodEnd   DateTime? @db.Date
 
@@ -171,6 +175,7 @@ model AccountingDocument {
   @@index([store, documentDate])
   @@index([store, status])
   @@index([store, dedupKey])
+  @@index([postingNumber])
 }
 
 model AccountingDocumentLine {

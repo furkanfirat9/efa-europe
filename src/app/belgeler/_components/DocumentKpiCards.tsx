@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/shadcn/card';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import { formatTL } from '@/lib/format';
-import type { DocumentItem } from '../utils';
+import { categoryTotals, type DocumentItem } from '../utils';
 
 export function DocumentKpiCards({
   documents,
@@ -15,14 +15,22 @@ export function DocumentKpiCards({
   pendingCount: number;
   loading: boolean;
 }) {
-  const sum = (items: DocumentItem[]) => items.reduce((acc, d) => acc + (d.totalTry ?? 0), 0);
-  const goods = documents.filter((d) => d.category === 'tedarik.mal');
-  const services = documents.filter((d) => d.category !== 'tedarik.mal');
+  // Çok kalemli belgelerde (Ozon UPD'si) toplam, kalem kategorilerine dağıtılır.
+  const totals = categoryTotals(documents);
+  const sumOf = (prefix: string) =>
+    totals.filter((t) => t.key === prefix || t.key.startsWith(`${prefix}.`)).reduce((acc, t) => acc + t.total, 0);
+  const grandTotal = totals.reduce((acc, t) => acc + t.total, 0);
+  const goodsTotal = sumOf('tedarik');
+  const ozonTotal = sumOf('ozon');
 
   const cards = [
-    { label: 'Toplam gider', value: formatTL(sum(documents)), note: `${documents.length} belge` },
-    { label: 'Mal alımı', value: formatTL(sum(goods)), note: `${goods.length} fatura` },
-    { label: 'Hizmet ve üyelik', value: formatTL(sum(services)), note: `${services.length} belge` },
+    { label: 'Toplam gider', value: formatTL(grandTotal), note: `${documents.length} belge` },
+    {
+      label: 'Mal alımı',
+      value: formatTL(goodsTotal),
+      note: `${documents.filter((d) => d.category === 'tedarik.mal').length} fatura`,
+    },
+    { label: 'Ozon giderleri', value: formatTL(ozonTotal), note: 'komisyon, lojistik, abonelik' },
     { label: 'Onay bekleyen', value: String(pendingCount), note: 'Tüm aylar' },
   ];
 
