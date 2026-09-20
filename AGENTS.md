@@ -69,8 +69,8 @@ Mağazada daha önce yüklenmiş olan ürünleri takip etmek, mükerrer yükleme
 
 ## 6. Ozon Analitik ve Huni Takibi Standartları (Ozon Analytics Engine)
 - **API Endpoint:** `POST https://api-seller.ozon.ru/v1/analytics/data`
-- **Rate Limit Kalkanı:** Ozon'a giden **her** çağrı `src/app/api/ozon/analytics/route.ts` içindeki `ozonFetch` kapısından geçer; doğrudan `fetch` yazılmaz. Kapının garantileri:
-  - İstekler mağaza (Client-Id) bazlı bir şeritte sıraya girer, başlangıçları arasında en az **550ms** bırakılır (~1,8 istek/sn).
+- **Rate Limit Kalkanı:** Ozon'a giden **her** çağrı `src/lib/ozon/gate.ts` içindeki `ozonFetch` kapısından geçer; doğrudan `fetch` yazılmaz. Şerit tablosu bu modülde yaşar — yeni bir uç kendi sınırlayıcısını yazarsa aynı Client-Id'yi iki bağımsız kapı döver ve sınır yine aşılır. Kapının garantileri:
+  - İstekler mağaza (Client-Id) bazlı bir şeritte sıraya girer, başlangıçları arasında en az **650ms** bırakılır (~1,5 istek/sn).
   - `/v1/analytics/data` **ağır** uçtur: ölçümde tek çağrı ~4 saniye sürüyor ve üst üste bindirildiğinde Ozon yanıtı 4 → 6 → 8 saniyeye çıkarıp bazen reddediyor. Bu yüzden aynı anda uçuşta en fazla 2 analitik çağrısı bulunur. Ucuz uçlar (`/v3/posting/fbs/list` ~135ms, `/v3/product/info/list`) yalnızca hız sınırına tabidir.
   - `429` / `code: 8` durumunda üstel geri çekilme + jitter ile 3 kez yeniden denenir ve geri çekilme boyunca **tüm şerit** duraklatılır.
   - Sınır aşımı yutulmaz: `fetchRealOrders` eskiden 429 aldığında boş liste dönüp ekrana "sipariş yok" yazdırıyordu; artık hata yukarı taşınır ve route `429` + okunur mesaj döner.
@@ -129,3 +129,32 @@ Sırayla uygulanır; tamamlanan adım `[x]` ile işaretlenir.
    - Kurulu sürüm **v9**: `useReactTable`/`getCoreRowModel` yok; `useTable({ features, columns, data })`, özellikler `tableFeatures({ rowPaginationFeature, paginatedRowModel: createPaginatedRowModel(), ... })` ile kaydedilir, hücreler `<table.FlexRender cell={cell} />`. Kullanım kılavuzu pakette: `node_modules/@tanstack/react-table/skills/` ve `node_modules/@tanstack/table-core/skills/`.
    - Örnek: `src/app/siparisler/_components/{columns,OrdersDataTable}.tsx`. Sıralama ve filtreler URL ile senkron `useOrders`'ta kalır; tablo yalnızca sayfalama ve kolon görünürlüğünü yönetir. Düzenlenebilir hücreler kendi durumunu taşıyan bileşenlerdir (`cells.tsx`), satır kimliği `getRowId` ile gönderi no.
    - Bir durum dilimini hem `state`+`on…Change` hem tablo API'siyle yönetme; mount sonrası değer uygulamak için tablonun kendi metodunu (`table.setColumnVisibility`) kullan.
+
+## 8. Siparişler Sayfası ve Dönem Çekme (Orders Period Fetch)
+
+Siparişler sayfası **yalnızca Avrupa mağazasını (`store1`)** gösterir. Türkiye
+mağazası (`store2`) bu panele entegre edilmez; ayrı bir panelde yönetilir ve bu
+panelde yalnızca dashboard kartı ile `/analitik` sayfasında görünür.
+
+- **Dönem çekme:** Bir aya ilk girildiğinde o ay Ozon'dan indirilip veri
+  tabanına yazılır; sonraki girişlerde doğrudan veri tabanından okunur.
+  - Karar sunucuda verilir (`POST /api/siparisler/sync`, gövdede `year` + `month`):
+    dönem hiç indirilmemişse indirir, içinde bulunulan ay 5 dakikadan eskiyse
+    tazeler, aksi hâlde Ozon'a hiç gitmeden `skipped: true` döner.
+  - İşaret `OrderPeriodSync` tablosunda tutulur (`storeId` + `year` + `month`).
+    "O döneme ait sipariş var mı" diye bakmak yetmez: eski 30 günlük senkron
+    bazı ayları yarım doldurmuş olabiliyor ve boş geçen bir ay her ziyarette
+    yeniden sorulurdu. İşaret yalnızca çekim başarıyla bittikten sonra konur.
+  - İstemci önce veri tabanından gösterir, sonra arka planda indirir; indirme
+    sessizdir (iskelet/banner yok), yalnızca "Ozon ile eşitleniyor" rozeti çıkar.
+    Ay hızlı değiştirilirse uçuştaki eski tur sonucunu uygulamaz.
+- **Sayfalama:** `/v3/posting/fbs/list` tek istekte en fazla 1000 kayıt verir;
+  `has_next` bitene kadar `offset` ilerletilir (`fetchPostingsForRange`).
+  Sabit `limit: 50` ile çekmek geçmiş ayları yarım bırakıyordu.
+- **Ay sınırı UTC+3'tür** (`monthRangeMsk`). Sunucunun yerel saatine bırakmak,
+  aynı kodun geliştirme makinesinde (UTC+3) ve Vercel'de (UTC) farklı aylar
+  üretmesine yol açıyordu. Ozon'dan çekme ve veri tabanı filtresi **aynı**
+  yardımcıyı kullanır; ayrılırlarsa çekilen sipariş ekranda görünmez.
+- **Elle girilen alanlara dokunulmaz:** `syncOzonOrdersToDb` upsert'i yalnızca
+  Ozon'dan gelen alanları yazar. Alış fiyatı, tedarikçi, kart, not ve belge
+  alanları senkronla ezilmez.

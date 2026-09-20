@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { parseTrNumber } from '@/lib/format';
+import { monthRangeMsk } from '@/lib/ozon/postings';
 
 export const dynamic = 'force-dynamic';
 
@@ -132,8 +133,8 @@ export async function GET(request: NextRequest) {
       const y = parseInt(yearParam, 10);
       const m = parseInt(monthParam, 10); // 1-indexed: 1 = Ocak, 9 = Eylül
       if (!isNaN(y) && !isNaN(m) && m >= 1 && m <= 12) {
-        startDate = new Date(y, m - 1, 1, 0, 0, 0, 0);
-        endDate = new Date(y, m, 1, 0, 0, 0, 0);
+        // Ozon çekimiyle aynı sınır: ay UTC+3'e göre başlar ve biter.
+        ({ start: startDate, end: endDate } = monthRangeMsk(y, m));
       }
     }
 
@@ -349,14 +350,15 @@ export async function PATCH(request: NextRequest) {
     let patchStartDate: Date | undefined = undefined;
     let patchEndDate: Date | undefined = undefined;
     if (year && month) {
-      const y = Number(year);
-      const m = Number(month);
-      patchStartDate = new Date(y, m - 1, 1, 0, 0, 0, 0);
-      patchEndDate = new Date(y, m, 1, 0, 0, 0, 0);
+      ({ start: patchStartDate, end: patchEndDate } = monthRangeMsk(Number(year), Number(month)));
     } else {
+      // Dönem gelmediyse siparişin kendi tarihinin ayı kullanılır.
       const refDate = existing.inProcessAt || existing.createdAt || new Date();
-      patchStartDate = new Date(refDate.getFullYear(), refDate.getMonth(), 1, 0, 0, 0, 0);
-      patchEndDate = new Date(refDate.getFullYear(), refDate.getMonth() + 1, 1, 0, 0, 0, 0);
+      const local = new Date(refDate.getTime() + 3 * 3600 * 1000);
+      ({ start: patchStartDate, end: patchEndDate } = monthRangeMsk(
+        local.getUTCFullYear(),
+        local.getUTCMonth() + 1
+      ));
     }
 
     const [updated, stats] = await Promise.all([
