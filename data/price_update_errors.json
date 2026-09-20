@@ -1,0 +1,554 @@
+[
+  {
+    "product_id": 6043112774,
+    "offer_id": "DST8030/70",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6043133223,
+    "offer_id": "DST8050/20",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6043312531,
+    "offer_id": "FV9844",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6045477636,
+    "offer_id": "FV9E50E0",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064148956,
+    "offer_id": "1871016030",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064148962,
+    "offer_id": "0658776040",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064148967,
+    "offer_id": "18.7998.4500",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064334566,
+    "offer_id": "HX6068/88",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064334583,
+    "offer_id": "Philips Sonicare DiamondClean Prestige 9900 elektr",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064334602,
+    "offer_id": "GC026/80",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064334685,
+    "offer_id": "Philips Sonicare DiamondClean 9000",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064334731,
+    "offer_id": "HX9911/89",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064334755,
+    "offer_id": "QP440/50",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064334859,
+    "offer_id": "TT2000/43",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064334873,
+    "offer_id": "HX6064/88",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064334929,
+    "offer_id": "HX3675/13",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064334980,
+    "offer_id": "HX9046/87",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064335048,
+    "offer_id": "HX7110/01",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064335099,
+    "offer_id": "HX9046/88",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064335106,
+    "offer_id": "SCD657/11",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064335113,
+    "offer_id": "HX9914/57",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064335123,
+    "offer_id": "SH91/50",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064335143,
+    "offer_id": "HX6034/90",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064530145,
+    "offer_id": "FR8040",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064530734,
+    "offer_id": "BC50U0V0",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6064531098,
+    "offer_id": "FR3140",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085180152,
+    "offer_id": "DiamondClean 9900 Prestige",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085180191,
+    "offer_id": "HX6018/87",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085180213,
+    "offer_id": "HX7119/01",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085180231,
+    "offer_id": "HX9096/88",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085180325,
+    "offer_id": "HX6064/87",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085180399,
+    "offer_id": "HX9992/11",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085180455,
+    "offer_id": "HX7429/01",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085180466,
+    "offer_id": "HX9044/88",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085180623,
+    "offer_id": "QP430/60",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085180725,
+    "offer_id": "Philips Sonicare DiamondClean 9900 Prestige",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085181045,
+    "offer_id": "HX4072/42",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085181133,
+    "offer_id": "Philips Sonicare S2 Sensitive, Original Ersatzbürs",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085181156,
+    "offer_id": "SCD923/26",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085181183,
+    "offer_id": "HX9911/94",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085181291,
+    "offer_id": "HX3886/43",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085181616,
+    "offer_id": "ADD6921DG/10",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085181975,
+    "offer_id": "HX9914/54",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085182168,
+    "offer_id": "HX6044/90",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6085182207,
+    "offer_id": "HX7400/02",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  },
+  {
+    "product_id": 6115612012,
+    "offer_id": "CNS-R101S",
+    "updated": false,
+    "errors": [
+      {
+        "code": "price_out_of_range",
+        "message": "Цена слишком высокая"
+      }
+    ],
+    "warnings": []
+  }
+]
