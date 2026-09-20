@@ -450,54 +450,72 @@ export function useOrders() {
     }
   }, [selectedYear, selectedMonth]);
 
-  // Yıl veya ay değiştiğinde o aya ait siparişleri yükle
-  useEffect(() => {
-    setLoading(true);
-    fetchOrders(selectedYear, selectedMonth);
-  }, [selectedYear, selectedMonth, fetchOrders]);
-
-  // İlk açılışta arka planda Ozon API senkronizasyonunu başlat (sadece 1 kez)
-  const initialSyncedRef = useRef(false);
+  // Dönem indirmesi tamamlandığında tabloyu tazelemek için: efekt bağımlılığı
+  // yaratmadan güncel fetchOrders'a ulaşılır.
   const fetchOrdersRef = useRef(fetchOrders);
   fetchOrdersRef.current = fetchOrders;
-  const selectedYearRef = useRef(selectedYear);
-  selectedYearRef.current = selectedYear;
-  const selectedMonthRef = useRef(selectedMonth);
-  selectedMonthRef.current = selectedMonth;
 
-  useEffect(() => {
-    if (initialSyncedRef.current) return;
-    initialSyncedRef.current = true;
-
-    let isCancelled = false;
-    const safetyTimer = setTimeout(() => {
-      setSyncing(false);
-    }, 12000);
-
-    const runAutoSync = async () => {
+  /**
+   * Seçili dönemi gerekiyorsa Ozon'dan indirir.
+   *
+   * Sunucu karar verir: dönem daha önce hiç indirilmemişse indirir, içinde
+   * bulunulan ay bayatlamışsa tazeler, aksi hâlde Ozon'a hiç gitmeden
+   * `skipped` döner. Yani bir aya ilk girişte veri Ozon'dan iner ve veri
+   * tabanına yazılır; sonraki girişlerde doğrudan veri tabanından okunur.
+   */
+  const ensurePeriodSynced = useCallback(
+    async (yr: number, mo: number, isStale: () => boolean) => {
       try {
         setSyncing(true);
-        const syncRes = await fetch('/api/siparisler/sync', { method: 'POST' });
-        const syncData = await syncRes.json();
-        if (!isCancelled && syncData.success) {
-          await fetchOrdersRef.current(selectedYearRef.current, selectedMonthRef.current);
-        }
-      } catch (err) {
-        console.warn('[Ozon Auto-Sync] Arka plan senkronizasyon uyarısı:', err);
-      } finally {
-        clearTimeout(safetyTimer);
-        setSyncing(false);
-      }
-    };
+        const res = await fetch('/api/siparisler/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ year: yr, month: mo }),
+        });
+        const data = await res.json();
 
-    runAutoSync();
+        // Kullanıcı bu sırada başka bir aya geçtiyse gelen veri artık
+        // ekrandakiyle ilgisiz; tabloyu onunla ezme.
+        if (isStale()) return;
+
+        if (!res.ok || !data.success) {
+          // Arka plan indirmesi; ekrandaki veri yerinde kalsın, hata
+          // banner'ı açmak yerine yalnızca konsola düşsün.
+          console.warn('[Ozon] Dönem indirilemedi:', data?.error_message);
+          return;
+        }
+
+        // Ozon'a gidilmediyse tabloyu tekrar çekmenin anlamı yok.
+        if (data.skipped) return;
+
+        await fetchOrdersRef.current(yr, mo);
+      } catch (err) {
+        console.warn('[Ozon] Dönem indirme uyarısı:', err);
+      } finally {
+        // Rozeti yalnızca hâlâ güncel olan tur kapatır; eski turun bitişi
+        // yeni turun göstergesini söndürmesin.
+        if (!isStale()) setSyncing(false);
+      }
+    },
+    []
+  );
+
+  // Yıl veya ay değiştiğinde: önce veri tabanından göster, sonra gerekiyorsa
+  // arka planda Ozon'dan indir. Tablo beklemeden dolar.
+  useEffect(() => {
+    let cancelled = false;
+    const isStale = () => cancelled;
+    setLoading(true);
+
+    (async () => {
+      await fetchOrders(selectedYear, selectedMonth);
+      if (!cancelled) await ensurePeriodSynced(selectedYear, selectedMonth, isStale);
+    })();
 
     return () => {
-      isCancelled = true;
-      clearTimeout(safetyTimer);
-      setSyncing(false);
+      cancelled = true;
     };
-  }, []);
+  }, [selectedYear, selectedMonth, fetchOrders, ensurePeriodSynced]);
 
   // İyimser Güncelleme & PATCH
   const handleInlineUpdate = useCallback(

@@ -203,3 +203,25 @@ model PanelUser {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }
+
+// Bir ayın Ozon'dan çekilip çekilmediğini işaretler.
+//
+// Siparişler sayfasında bir aya ilk girildiğinde o ay Ozon'dan indirilip veri
+// tabanına yazılır; sonraki girişlerde doğrudan veri tabanından okunur. Bu
+// kaydın varlığı "bu dönem indirildi" demektir. İçinde bulunulan ay istisnadır:
+// yeni sipariş akmaya devam ettiği için kısa aralıklarla tazelenir.
+//
+// Ayrı bir tabloda tutulmasının sebebi, "o döneme ait sipariş var mı" diye
+// bakmanın yetmemesi: eski 30 günlük senkron bazı ayları yarım doldurmuş
+// olabiliyor ve boş geçen bir ay her ziyarette yeniden sorulurdu.
+model OrderPeriodSync {
+  id         String   @id @default(cuid())
+  storeId    String
+  year       Int
+  month      Int
+  orderCount Int      @default(0)
+  syncedAt   DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@unique([storeId, year, month])
+}

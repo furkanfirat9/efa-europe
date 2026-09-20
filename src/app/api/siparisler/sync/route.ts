@@ -1,162 +1,148 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { syncOzonOrdersToDb } from '@/lib/db/orders';
 import { prisma } from '@/lib/db/prisma';
+import { getOzonHeaders, OzonRateLimitError } from '@/lib/ozon/gate';
+import {
+  fetchPostingsForRange,
+  enrichPostingsWithProductDetails,
+  monthRangeMsk,
+  currentMonthMsk,
+} from '@/lib/ozon/postings';
 
 export const dynamic = 'force-dynamic';
 
-async function fetchStoreOrders(clientId: string, apiKey: string, storeId: string) {
-  if (!clientId || !apiKey) return [];
+const STORE_ID = 'store1';
 
-  const headers = {
-    'Client-Id': clientId,
-    'Api-Key': apiKey,
-    'Content-Type': 'application/json',
-  };
+/**
+ * İçinde bulunulan ay bu süreden eskiyse yeniden çekilir. Geçmiş aylar bir
+ * kez indirildikten sonra hiç sorulmaz; onlara yeni sipariş düşmez.
+ */
+const CURRENT_MONTH_TTL_MS = 5 * 60 * 1000;
 
-  const sinceISO = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const toISO = new Date().toISOString();
-
+/**
+ * Görseli olmayan siparişleri, aynı ürünün görseli bilinen başka bir
+ * siparişinden tamamlar.
+ */
+async function backfillMissingImages() {
   try {
-    const res = await fetch('https://api-seller.ozon.ru/v3/posting/fbs/list', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        dir: 'DESC',
-        filter: { since: sinceISO, to: toISO },
-        limit: 50,
-        with: { analytics_data: true, financial_data: true },
-      }),
-      cache: 'no-store',
+    const ordersWithImages = await prisma.ozonOrder.findMany({
+      where: { productImage: { not: null } },
+      select: { productOfferId: true, productImage: true },
     });
 
-    if (!res.ok) {
-      console.warn(`[Ozon Sync] HTTP ${res.status} for store ${storeId}`);
-      return [];
-    }
-
-    const json = await res.json();
-    return json.result?.postings || [];
-  } catch (err: any) {
-    console.warn(`[Ozon Sync] Error for store ${storeId}:`, err.message);
-    return [];
-  }
-}
-
-async function enrichPostingsWithProductDetails(
-  postings: any[],
-  clientId: string,
-  apiKey: string
-) {
-  if (!postings || postings.length === 0 || !clientId || !apiKey) return;
-
-  const skus = new Set<number>();
-  for (const p of postings) {
-    for (const prod of p.products || []) {
-      const numSku = Number(prod.sku);
-      if (!isNaN(numSku) && numSku > 0) {
-        skus.add(numSku);
+    for (const src of ordersWithImages) {
+      if (src.productOfferId && src.productImage) {
+        await prisma.ozonOrder.updateMany({
+          where: { productOfferId: src.productOfferId, productImage: null },
+          data: { productImage: src.productImage },
+        });
       }
     }
-  }
-
-  if (skus.size === 0) return;
-
-  const skuImageMap = new Map<number, string>();
-  const skuTitleMap = new Map<number, string>();
-  const skuOfferIdMap = new Map<number, string>();
-
-  try {
-    const res = await fetch('https://api-seller.ozon.ru/v3/product/info/list', {
-      method: 'POST',
-      headers: {
-        'Client-Id': clientId,
-        'Api-Key': apiKey,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ sku: Array.from(skus) }),
-      cache: 'no-store',
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      for (const item of data.items || []) {
-        const img =
-          (Array.isArray(item.primary_image) ? item.primary_image[0] : item.primary_image) ||
-          (Array.isArray(item.images) ? item.images[0] : item.images) ||
-          '';
-        const numSku = Number(item.sku);
-        if (numSku && img) skuImageMap.set(numSku, img);
-        if (numSku && item.name) skuTitleMap.set(numSku, item.name);
-        if (numSku && item.offer_id) skuOfferIdMap.set(numSku, item.offer_id);
-      }
-    }
-  } catch (e) {
-    console.warn('[Ozon Sync] Ürün bilgisi/görseli çekilemedi:', e);
-  }
-
-  for (const p of postings) {
-    if (p.products && p.products.length > 0) {
-      const first = p.products[0];
-      const sku = Number(first.sku);
-      if (sku && skuImageMap.has(sku)) {
-        p.product_image = skuImageMap.get(sku);
-      }
-      if (sku && skuTitleMap.has(sku)) {
-        first.name = skuTitleMap.get(sku);
-      }
-      if (sku && skuOfferIdMap.has(sku)) {
-        first.offer_id = skuOfferIdMap.get(sku);
-      }
-    }
+  } catch {
+    // Görsel tamamlama başarısız olursa senkron yine de geçerlidir.
   }
 }
 
 /**
  * POST /api/siparisler/sync
- * Ozon API'den her iki mağazanın en son siparişlerini çekip veri tabanına senkronize eder.
+ *
+ * Gövdede `year` ve `month` beklenir: o ay gerekiyorsa Ozon'dan indirilir.
+ *
+ * Karar kuralı:
+ *  - Dönem daha önce hiç indirilmemişse  → indirilir.
+ *  - Dönem içinde bulunulan aysa ve son indirme 5 dakikadan eskiyse → indirilir.
+ *  - Diğer durumlarda                    → hiç Ozon'a gidilmez, `skipped` döner.
+ *
+ * `force: true` gönderilirse kural atlanır ve dönem her hâlükârda indirilir.
+ *
+ * Elle girilen alanlara (alış fiyatı, tedarikçi, kart, not) dokunulmaz;
+ * upsert yalnızca Ozon'dan gelen alanları yazar.
  */
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const store1ClientId = process.env.OZON_CLIENT_ID || '';
-    const store1ApiKey = process.env.OZON_API_KEY || '';
+    let year: number | undefined;
+    let month: number | undefined;
+    let force = false;
 
-    // Sadece Avrupa / Polonya Mağazası (Store 1) çekilir
-    const postingsStore1 = await fetchStoreOrders(store1ClientId, store1ApiKey, 'store1');
-
-    // Tüm ürünlerin gerçek Ozon görsellerini, offer_id'lerini ve başlıklarını otomatik zenginleştir
-    await enrichPostingsWithProductDetails(postingsStore1, store1ClientId, store1ApiKey);
-
-    const res1 = await syncOzonOrdersToDb(postingsStore1, 'store1');
-
-    // Veritabanındaki tüm eksik görselleri offer_id veya sku eşleşmesiyle tamamla
     try {
-      const ordersWithImages = await prisma.ozonOrder.findMany({
-        where: { productImage: { not: null } },
-        select: { productOfferId: true, productImage: true },
-      });
-
-      for (const src of ordersWithImages) {
-        if (src.productOfferId && src.productImage) {
-          await prisma.ozonOrder.updateMany({
-            where: {
-              productOfferId: src.productOfferId,
-              productImage: null,
-            },
-            data: { productImage: src.productImage },
-          });
-        }
+      const body = await request.json();
+      const y = Number(body?.year);
+      const m = Number(body?.month);
+      if (Number.isInteger(y) && Number.isInteger(m) && m >= 1 && m <= 12) {
+        year = y;
+        month = m;
       }
-    } catch (e) {
-      // ignore
+      force = body?.force === true;
+    } catch {
+      // Gövde yok ya da JSON değil.
     }
+
+    if (!year || !month) {
+      // Dönem verilmediyse içinde bulunulan ay varsayılır.
+      const now = currentMonthMsk();
+      year = now.year;
+      month = now.month;
+    }
+
+    const current = currentMonthMsk();
+    const isCurrentMonth = year === current.year && month === current.month;
+
+    const existing = await prisma.orderPeriodSync.findUnique({
+      where: { storeId_year_month: { storeId: STORE_ID, year, month } },
+    });
+
+    if (!force && existing) {
+      const stale = Date.now() - existing.syncedAt.getTime() > CURRENT_MONTH_TTL_MS;
+      if (!isCurrentMonth || !stale) {
+        return NextResponse.json({
+          success: true,
+          skipped: true,
+          period: `${year}-${String(month).padStart(2, '0')}`,
+          syncedAt: existing.syncedAt.toISOString(),
+          fetchedCount: 0,
+          syncedCount: 0,
+        });
+      }
+    }
+
+    const headers = getOzonHeaders(STORE_ID);
+    if (!headers['Client-Id'] || !headers['Api-Key']) {
+      return NextResponse.json(
+        { success: false, error_message: 'Avrupa mağazası için API anahtarları tanımlı değil (.env kontrol edin).' },
+        { status: 400 }
+      );
+    }
+
+    const { sinceISO, toISO } = monthRangeMsk(year, month);
+
+    const postings = await fetchPostingsForRange(sinceISO, toISO, headers);
+    await enrichPostingsWithProductDetails(postings, headers);
+    const res = await syncOzonOrdersToDb(postings, STORE_ID);
+
+    await backfillMissingImages();
+
+    // İşareti yalnızca çekim başarıyla tamamlandıktan sonra koy; hata hâlinde
+    // dönem "indirildi" sayılmasın ki bir sonraki ziyarette yeniden denensin.
+    await prisma.orderPeriodSync.upsert({
+      where: { storeId_year_month: { storeId: STORE_ID, year, month } },
+      create: { storeId: STORE_ID, year, month, orderCount: postings.length },
+      update: { orderCount: postings.length, syncedAt: new Date() },
+    });
 
     return NextResponse.json({
       success: true,
-      syncedCount: res1.count || 0,
-      store1Count: res1.count || 0,
+      skipped: false,
+      period: `${year}-${String(month).padStart(2, '0')}`,
+      fetchedCount: postings.length,
+      syncedCount: res.count || 0,
     });
   } catch (error: any) {
     console.error('API /api/siparisler/sync Error:', error);
+
+    if (error instanceof OzonRateLimitError) {
+      return NextResponse.json({ success: false, error_message: error.message }, { status: 429 });
+    }
+
     return NextResponse.json(
       { success: false, error_message: error.message || 'Senkronizasyon başarısız.' },
       { status: 500 }
