@@ -107,11 +107,13 @@ export function buildOrderColumns({
     helper.display({
       id: 'product',
       header: 'Ürün',
+      // Görsel ve ad sabit genişlikte bir kutuda; kutu ortalanır ama içerik sola
+      // hizalı kalır, böylece görseller ve adlar satırlar arasında aynı hizada durur.
       cell: ({ row }) => (
-        <div className="flex items-center justify-center gap-3">
+        <div className="mx-auto flex w-44 items-center gap-3 text-left">
           <ProductImageCell order={row.original} />
           <div
-            className="max-w-28 truncate text-xs font-medium"
+            className="min-w-0 flex-1 truncate text-xs font-medium"
             title={row.original.productTitle || row.original.productOfferId || undefined}
           >
             {row.original.productOfferId || row.original.productTitle || '—'}
@@ -146,7 +148,7 @@ export function buildOrderColumns({
           label="Ödeme kartı"
           emptyAsNull
           onUpdate={onUpdate}
-          className="w-20"
+          className="w-24"
         />
       ),
     }),
@@ -154,7 +156,7 @@ export function buildOrderColumns({
       id: 'supplier',
       header: 'Tedarik',
       cell: ({ row }) => (
-        <InlineTextCell order={row.original} field="supplier" label="Tedarikçi" onUpdate={onUpdate} className="w-20" />
+        <InlineTextCell order={row.original} field="supplier" label="Tedarikçi" onUpdate={onUpdate} className="w-24" />
       ),
     }),
     helper.display({
