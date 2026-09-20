@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { AlertCircle, AlertTriangle, X } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Loader2, Sparkles, X } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/shadcn/alert';
 import { Badge } from '@/components/shadcn/badge';
 import { Button } from '@/components/shadcn/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shadcn/card';
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shadcn/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select';
 import { useDocuments } from './useDocuments';
 import { DocumentKpiCards } from './_components/DocumentKpiCards';
@@ -28,6 +28,10 @@ export default function BelgelerPage() {
     uploads,
     uploadFiles,
     dismissUpload,
+    orderDocuments,
+    readingOrders,
+    readOrderDocument,
+    readAllOrderDocuments,
     selected,
     setSelectedId,
     saving,
@@ -141,6 +145,55 @@ export default function BelgelerPage() {
           </CardContent>
         </Card>
       </div>
+
+      {orderDocuments.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              Siparişlere yüklenmiş faturalar
+              <Badge variant="secondary">{orderDocuments.length}</Badge>
+            </CardTitle>
+            <CardDescription>
+              Siparişler sayfasından yüklediğiniz alış faturaları. Okunduğunda bilgileri çıkarılır ve onayınıza sunulur;
+              dosya siparişte kalır.
+            </CardDescription>
+            <CardAction>
+              <Button size="sm" variant="outline" onClick={readAllOrderDocuments} disabled={readingOrders.length > 0}>
+                {readingOrders.length > 0 ? <Loader2 className="animate-spin" /> : <Sparkles />}
+                Tümünü oku
+              </Button>
+            </CardAction>
+          </CardHeader>
+          <CardContent>
+            <ul className="divide-y rounded-md border">
+              {orderDocuments.map((doc) => {
+                const busy = readingOrders.includes(doc.postingNumber);
+                return (
+                  <li key={doc.postingNumber} className="flex items-center gap-3 p-3 text-sm">
+                    <div className="min-w-0 flex-1">
+                      <span className="font-mono text-xs">{doc.postingNumber}</span>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {[doc.supplier, doc.fileName, formatIsoDate(doc.uploadedAt?.slice(0, 10) ?? null)]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => readOrderDocument(doc.postingNumber)}
+                      disabled={busy}
+                    >
+                      {busy ? <Loader2 className="animate-spin" /> : null}
+                      {busy ? 'Okunuyor…' : 'Oku'}
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
 
       <DocumentsTable documents={documents} loading={loading} onOpen={setSelectedId} />
 

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { MONTHS, type DocumentItem } from './utils';
+import { MONTHS, type DocumentItem, type OrderDocumentItem } from './utils';
 
 export interface UploadItem {
   key: string;
@@ -26,11 +26,15 @@ export type DocumentPatch = Partial<
     | 'currency'
     | 'totalAmount'
     | 'orderNumber'
+    | 'postingNumber'
     | 'servicePeriodStart'
     | 'servicePeriodEnd'
     | 'notes'
   >
->;
+> & {
+  /** Kalem kategorileri; yalnızca gönderilen kalemler güncellenir. */
+  lines?: { id: string; category: string | null }[];
+};
 
 const isInMonth = (doc: DocumentItem, year: number, month: number) =>
   !!doc.documentDate && doc.documentDate.startsWith(`${year}-${String(month).padStart(2, '0')}`);
@@ -41,6 +45,8 @@ export function useDocuments() {
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [pending, setPending] = useState<DocumentItem[]>([]);
+  const [orderDocuments, setOrderDocuments] = useState<OrderDocumentItem[]>([]);
+  const [readingOrders, setReadingOrders] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [uploads, setUploads] = useState<UploadItem[]>([]);
@@ -61,6 +67,7 @@ export function useDocuments() {
       if (!res.ok || !data.success) throw new Error(data.error_message || 'Belgeler alınamadı.');
       setDocuments(data.documents);
       setPending(data.pending);
+      setOrderDocuments(data.orderDocuments ?? []);
       setError(null);
     } catch (err: any) {
       if (err.name !== 'AbortError') setError(err.message);
@@ -111,6 +118,42 @@ export function useDocuments() {
   const dismissUpload = useCallback((key: string) => {
     setUploads((prev) => prev.filter((u) => u.key !== key));
   }, []);
+
+  /** Siparişe yüklenmiş faturayı okuyup listeye taslak olarak ekler. */
+  const readOrderDocument = useCallback(async (postingNumber: string, silent = false): Promise<boolean> => {
+    setReadingOrders((prev) => [...prev, postingNumber]);
+    try {
+      const res = await fetch('/api/belgeler/siparis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postingNumber }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error_message || 'Belge okunamadı.');
+
+      setPending((prev) => [data.document, ...prev]);
+      setOrderDocuments((prev) => prev.filter((o) => o.postingNumber !== postingNumber));
+      return true;
+    } catch (err: any) {
+      if (!silent) toast.error(`${postingNumber}: ${err.message}`);
+      return false;
+    } finally {
+      setReadingOrders((prev) => prev.filter((p) => p !== postingNumber));
+    }
+  }, []);
+
+  /** Hepsini sırayla okur; her belge bir Gemini çağrısı olduğu için paralel gönderilmez. */
+  const readAllOrderDocuments = useCallback(async () => {
+    const queue = orderDocuments.map((o) => o.postingNumber);
+    let ok = 0;
+    let failed = 0;
+    for (const postingNumber of queue) {
+      if (await readOrderDocument(postingNumber, true)) ok += 1;
+      else failed += 1;
+    }
+    if (ok) toast.success(`${ok} sipariş belgesi okundu, onayınızı bekliyor.`);
+    if (failed) toast.error(`${failed} belge okunamadı.`);
+  }, [orderDocuments, readOrderDocument]);
 
   const save = useCallback(
     async (id: string, patch: DocumentPatch, confirm = false): Promise<boolean> => {
@@ -187,6 +230,10 @@ export function useDocuments() {
     uploads,
     uploadFiles,
     dismissUpload,
+    orderDocuments,
+    readingOrders,
+    readOrderDocument,
+    readAllOrderDocuments,
     selected,
     setSelectedId,
     saving,

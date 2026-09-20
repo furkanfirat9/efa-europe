@@ -8,6 +8,7 @@ import {
   buildDedupKey,
   buildWarnings,
   computeFx,
+  isCategorised,
   isOwnBuyer,
   parseIsoDate,
   toDto,
@@ -30,6 +31,7 @@ const TEXT_FIELDS = [
   'sellerTaxId',
   'buyerName',
   'orderNumber',
+  'postingNumber',
   'notes',
 ] as const;
 const DATE_FIELDS = ['documentDate', 'servicePeriodStart', 'servicePeriodEnd'] as const;
@@ -71,6 +73,23 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<'/api/belgel
       data.category = body.category || null;
     }
 
+    // Çok kalemli belgelerde (Ozon UPD'si gibi) her kalemin kendi kategorisi olabilir.
+    let lines = existing.lines;
+    if (Array.isArray(body.lines)) {
+      const byId = new Map<string, string | null>();
+      for (const line of body.lines) {
+        if (typeof line?.id !== 'string') continue;
+        if (line.category && !isCategoryKey(line.category)) return fail(400, 'Geçersiz kalem kategorisi.');
+        byId.set(line.id, line.category || null);
+      }
+      await Promise.all(
+        [...byId].map(([lineId, category]) =>
+          prisma.accountingDocumentLine.updateMany({ where: { id: lineId, documentId: id }, data: { category } })
+        )
+      );
+      lines = existing.lines.map((l) => (byId.has(l.id) ? { ...l, category: byId.get(l.id)! } : l));
+    }
+
     const merged = { ...existing, ...data } as typeof existing;
     data.buyerIsOwn = isOwnBuyer(merged.buyerName);
     data.dedupKey = buildDedupKey(merged);
@@ -90,14 +109,14 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<'/api/belgel
     }
 
     const next = { ...merged, ...data } as typeof existing;
-    const warnings = await buildWarnings(next);
+    const warnings = await buildWarnings(next, [], lines);
 
     if (body.confirm === true) {
       const blocking = [
         !next.documentDate && 'belge tarihi',
         !next.currency && 'para birimi',
         next.totalAmount == null && 'toplam tutar',
-        !next.category && 'kategori',
+        !isCategorised({ category: next.category, lines }) && 'kategori',
         next.fxRate == null && 'TL kuru',
       ].filter(Boolean);
       if (blocking.length) return fail(422, `Onaylamak için eksik: ${blocking.join(', ')}.`);
@@ -131,16 +150,19 @@ export async function DELETE(_request: NextRequest, ctx: RouteContext<'/api/belg
     const { id } = await ctx.params;
     const existing = await prisma.accountingDocument.findFirst({
       where: { id, store: CURRENT_STORE },
-      select: { fileUrl: true },
+      select: { fileUrl: true, fileShared: true },
     });
     if (!existing) return fail(404, 'Belge bulunamadı.');
 
     await prisma.accountingDocument.delete({ where: { id } });
     // Kayıt silindikten sonra dosya kaldırılır; dosya silinemezse yalnızca günlüğe yazılır.
-    try {
-      await del(existing.fileUrl, { token: process.env.BLOB_READ_WRITE_TOKEN || undefined });
-    } catch (err) {
-      console.error('Belge dosyası silinemedi:', existing.fileUrl, err);
+    // Siparişten gelen belgelerde dosya siparişindir, dokunulmaz.
+    if (!existing.fileShared) {
+      try {
+        await del(existing.fileUrl, { token: process.env.BLOB_READ_WRITE_TOKEN || undefined });
+      } catch (err) {
+        console.error('Belge dosyası silinemedi:', existing.fileUrl, err);
+      }
     }
     return NextResponse.json({ success: true });
   } catch (error: any) {

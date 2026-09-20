@@ -3,20 +3,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { prisma } from '@/lib/db/prisma';
 import { extractDocument, type ExtractedDocument } from '@/lib/documents/extract';
-import {
-  CURRENT_STORE,
-  buildDedupKey,
-  buildWarnings,
-  computeFx,
-  isOwnBuyer,
-  parseIsoDate,
-  toDto,
-} from '@/lib/documents/service';
+import { CURRENT_STORE, isOtherStoreBuyer, saveExtractedDocument, toDto } from '@/lib/documents/service';
 
 /**
  * Belgeler
  *
- *   GET  ?year=2026&month=9  → ayın belgeleri + onay bekleyen tüm taslaklar
+ *   GET  ?year=2026&month=9  → ayın belgeleri, onay bekleyen taslaklar ve
+ *                              siparişlere yüklenmiş ama henüz okunmamış faturalar
  *   POST form-data: file     → yükle, Gemini ile oku, taslak olarak kaydet
  *
  * Taslak, kullanıcı onay ekranında kontrol edip onaylayana kadar toplamlara girmez.
@@ -52,7 +45,7 @@ export async function GET(request: NextRequest) {
       return fail(400, 'Geçerli bir yıl ve ay gerekli.');
     }
 
-    const [documents, pending] = await Promise.all([
+    const [documents, pending, orders] = await Promise.all([
       prisma.accountingDocument.findMany({
         where: {
           store: CURRENT_STORE,
@@ -67,9 +60,43 @@ export async function GET(request: NextRequest) {
         include: { lines: true },
         orderBy: { createdAt: 'desc' },
       }),
+      // Siparişler sayfasına yüklenen alış faturaları
+      prisma.ozonOrder.findMany({
+        where: { documentUrl: { not: null } },
+        select: {
+          postingNumber: true,
+          documentName: true,
+          documentSize: true,
+          documentUploadedAt: true,
+          supplierOrderId: true,
+          supplier: true,
+          inProcessAt: true,
+        },
+        orderBy: { documentUploadedAt: 'desc' },
+      }),
     ]);
 
-    return NextResponse.json({ success: true, documents: documents.map(toDto), pending: pending.map(toDto) });
+    // Okunmuş sipariş belgeleri listede zaten var; kalanlar "okunmadı" olarak gösterilir.
+    const known = new Set(
+      [...documents, ...pending].map((d) => d.postingNumber).filter((p): p is string => !!p)
+    );
+
+    return NextResponse.json({
+      success: true,
+      documents: documents.map(toDto),
+      pending: pending.map(toDto),
+      orderDocuments: orders
+        .filter((o) => !known.has(o.postingNumber))
+        .map((o) => ({
+          postingNumber: o.postingNumber,
+          fileName: o.documentName,
+          fileSize: o.documentSize,
+          uploadedAt: o.documentUploadedAt?.toISOString() ?? null,
+          supplier: o.supplier,
+          supplierOrderId: o.supplierOrderId,
+          orderDate: o.inProcessAt?.toISOString() ?? null,
+        })),
+    });
   } catch (error: any) {
     console.error('API /api/belgeler GET Error:', error);
     return fail(500, 'Belgeler alınamadı: ' + (error.message || 'bilinmeyen hata'));
@@ -113,8 +140,8 @@ export async function POST(request: NextRequest) {
     if (extracted?.documentKind === 'income_report') {
       return fail(422, 'Bu bir gelir belgesi (satış / tazminat raporu); Belgeler sayfasına yüklenmez.');
     }
-    if (extracted?.documentKind === 'ozon_upd' || extracted?.documentKind === 'ozon_report') {
-      return fail(422, 'Ozon belgeleri bir sonraki aşamada desteklenecek; şimdilik yüklenmez.');
+    if (isOtherStoreBuyer(extracted?.buyerName)) {
+      return fail(422, `Bu belge diğer mağazaya ait (alıcı: ${extracted?.buyerName}); Lenora'nın giderine yazılmaz.`);
     }
     if (extracted?.uncertainFields.length) {
       extraWarnings.push(`Emin olunamayan alanlar: ${extracted.uncertainFields.join(', ')}.`);
@@ -127,63 +154,11 @@ export async function POST(request: NextRequest) {
       token: process.env.BLOB_READ_WRITE_TOKEN || undefined,
     });
 
-    const documentDate = parseIsoDate(extracted?.documentDate);
-    const fields = {
-      kind: extracted?.documentKind ?? 'invoice',
-      platform: extracted?.platform ?? null,
-      category: extracted?.suggestedCategory ?? null,
-      documentNo: extracted?.documentNo ?? null,
-      ksefNo: extracted?.ksefNo ?? null,
-      documentDate,
-      sellerName: extracted?.sellerName ?? null,
-      sellerCountry: extracted?.sellerCountry ?? null,
-      sellerTaxId: extracted?.sellerTaxId ?? null,
-      buyerName: extracted?.buyerName ?? null,
-      buyerIsOwn: isOwnBuyer(extracted?.buyerName),
-      currency: extracted?.currency ?? null,
-      totalAmount: extracted?.totalAmount ?? null,
-      orderNumber: extracted?.orderNumber ?? null,
-      servicePeriodStart: parseIsoDate(extracted?.servicePeriodStart),
-      servicePeriodEnd: parseIsoDate(extracted?.servicePeriodEnd),
-      notes: extracted?.notes ?? null,
-    };
-    const dedupKey = buildDedupKey(fields);
-    const fx = await computeFx(fields).catch((err) => {
-      console.error('Kur alınamadı:', err);
-      return computeFx({});
-    });
-
-    const created = await prisma.accountingDocument.create({
-      data: {
-        store: CURRENT_STORE,
-        status: 'draft',
-        ...fields,
-        ...fx,
-        dedupKey,
-        aiModel,
-        fileUrl: blob.url,
-        fileName: file.name,
-        fileContentType: contentType,
-        fileSize: file.size,
-        fileHash,
-        lines: {
-          create: (extracted?.lines ?? []).map((line, position) => ({
-            position,
-            description: line.description,
-            quantity: line.quantity,
-            amount: line.amount,
-            isShipping: line.isShipping,
-          })),
-        },
-      },
-      include: { lines: true },
-    });
-
-    const warnings = await buildWarnings(created, extraWarnings);
-    const saved = await prisma.accountingDocument.update({
-      where: { id: created.id },
-      data: { warnings },
-      include: { lines: true },
+    const saved = await saveExtractedDocument({
+      extracted,
+      aiModel,
+      extraWarnings,
+      file: { url: blob.url, name: file.name, contentType, size: file.size, hash: fileHash },
     });
 
     return NextResponse.json({ success: true, document: toDto(saved) });

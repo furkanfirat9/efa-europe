@@ -13,6 +13,8 @@ export interface ExtractedLine {
   quantity: number | null;
   amount: number | null;
   isShipping: boolean;
+  /** Ozon belgeleri gibi çok kalemli belgelerde satırın kendi kategorisi */
+  category: string | null;
 }
 
 export interface ExtractedDocument {
@@ -68,8 +70,9 @@ const RESPONSE_SCHEMA = {
           quantity: nullable('number'),
           amount: nullable('number'),
           isShipping: { type: 'boolean' },
+          category: nullable('string', { enum: [...CATEGORY_KEYS, null] }),
         },
-        required: ['description', 'quantity', 'amount', 'isShipping'],
+        required: ['description', 'quantity', 'amount', 'isShipping', 'category'],
       },
     },
     uncertainFields: { type: 'array', items: { type: 'string' } },
@@ -117,6 +120,21 @@ Tuzaklar:
 - Kargo satırlarını ("Versandkosten", "Allegro Kurier", "DPD", "InPost", "Dostawa" vb.) lines içinde isShipping=true
   olarak işaretle; bunlar ürün değildir.
 - lines: belgedeki ürün/hizmet satırları; amount her satırın KDV dahil tutarıdır. Satır yoksa boş dizi döndür.
+
+Ozon belgeleri:
+- Ozon'un UPD'si ("Unified Transfer Document", "Универсальный передаточный документ") tek belgede birden çok hizmeti
+  toplar. Satıcı "Internet solutions LLC"dir, para birimi genelde USD'dir, toplam "In total for payment" satırındadır.
+- Her satırı KENDİ kategorisine ata (lines[].category):
+  • "Ozon agency fee", "agency fee", komisyon → ozon.komisyon
+  • nakliye/teslimat acenteliği ("freight forwarding", "delivery", "logistics") → ozon.lojistik
+  • "Premium", "Premium Pro Subscription" (yüzdelik olanı dahil) → ozon.premium
+  • "acquiring", banka/POS tahsilat komisyonu → ozon.araci_banka
+  • ceza, "penalty", "штраф" → ozon.ceza
+  • reklam, tanıtım, "Star products", "продвижение" → ozon.reklam
+  Emin olamadığın satırda category null bırak.
+- Belgenin tamamı tek bir kategoriye giriyorsa suggestedCategory'yi de doldur; farklı kategorilerde satırlar varsa
+  suggestedCategory null olsun, satır kategorileri yeterlidir.
+- Ozon UPD'sinde alıcı ("Buyer") mağaza sahibinin adıdır; belgede yazdığı gibi aktar.
 
 Alanlar:
 - documentNo: fatura numarası ("Numer faktury", "Faktura VAT sprzedaży FS …", "Rechnungsnummer", "Invoice №").
@@ -202,6 +220,7 @@ export async function extractDocument(
             quantity: normalizeNumber(l?.quantity),
             amount: normalizeNumber(l?.amount),
             isShipping: l?.isShipping === true,
+            category: CATEGORY_KEYS.includes(l?.category) ? l.category : null,
           }))
           .filter((l: ExtractedLine) => l.description)
       : [],

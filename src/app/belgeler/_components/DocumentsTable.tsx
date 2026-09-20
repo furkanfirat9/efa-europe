@@ -18,7 +18,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { FilterCombobox } from '@/app/siparisler/_components/FilterCombobox';
 import { categoryLabel, platformLabel } from '@/lib/documents/categories';
 import { formatTL } from '@/lib/format';
-import { formatAmount, formatIsoDate, type DocumentItem } from '../utils';
+import { documentCategoryLabel, formatAmount, formatIsoDate, type DocumentItem } from '../utils';
 
 const features = tableFeatures({
   columnVisibilityFeature,
@@ -97,8 +97,12 @@ export function DocumentsTable({
           id: 'category',
           header: 'Kategori',
           cell: ({ row }) => (
-            <Badge variant="secondary" className="whitespace-nowrap">
-              {row.original.categoryLabel}
+            <Badge
+              variant="secondary"
+              className="whitespace-nowrap"
+              title={row.original.lines.map((l) => l.description).join('\n') || undefined}
+            >
+              {documentCategoryLabel(row.original)}
             </Badge>
           ),
         }),
@@ -122,8 +126,21 @@ export function DocumentsTable({
         }),
         helper.display({
           id: 'orderNumber',
-          header: 'Sipariş no',
-          cell: ({ row }) => <span className="font-mono text-xs">{row.original.orderNumber ?? '—'}</span>,
+          header: 'Sipariş',
+          cell: ({ row }) =>
+            row.original.postingNumber ? (
+              <a
+                href={`/siparisler?search=${encodeURIComponent(row.original.postingNumber)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="font-mono text-xs underline-offset-4 hover:underline"
+                title="Siparişler sayfasında aç"
+              >
+                {row.original.postingNumber}
+              </a>
+            ) : (
+              <span className="font-mono text-xs text-muted-foreground">{row.original.orderNumber ?? '—'}</span>
+            ),
         }),
         helper.display({
           id: 'actions',
