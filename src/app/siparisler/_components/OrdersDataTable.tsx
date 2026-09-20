@@ -245,7 +245,7 @@ export function OrdersDataTable(props: OrdersDataTableProps) {
                 {group.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className={cn('whitespace-nowrap', header.column.id === 'actions' && STICKY_HEAD)}
+                    className={cn('whitespace-nowrap text-center', header.column.id === 'actions' && STICKY_HEAD)}
                   >
                     {header.isPlaceholder ? null : <table.FlexRender header={header} />}
                   </TableHead>
@@ -273,7 +273,7 @@ export function OrdersDataTable(props: OrdersDataTableProps) {
               rows.map((row) => (
                 <TableRow key={row.id} className="group">
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className={cn(cell.column.id === 'actions' && STICKY_CELL)}>
+                    <TableCell key={cell.id} className={cn('text-center', cell.column.id === 'actions' && STICKY_CELL)}>
                       <table.FlexRender cell={cell} />
                     </TableCell>
                   ))}
