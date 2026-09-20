@@ -77,7 +77,7 @@ export function DocumentsTable({
           id: 'seller',
           header: 'Satıcı',
           cell: ({ row }) => (
-            <div className="max-w-56">
+            <div className="mx-auto max-w-56 text-center">
               <div className="truncate font-medium" title={row.original.sellerName ?? undefined}>
                 {row.original.sellerName ?? '—'}
               </div>
@@ -108,18 +108,18 @@ export function DocumentsTable({
         }),
         helper.display({
           id: 'amount',
-          header: () => <div className="text-right">Tutar</div>,
+          header: () => <div className="text-center">Tutar</div>,
           cell: ({ row }) => (
-            <div className="text-right tabular-nums whitespace-nowrap">
+            <div className="text-center tabular-nums whitespace-nowrap">
               {formatAmount(row.original.totalAmount, row.original.currency)}
             </div>
           ),
         }),
         helper.display({
           id: 'totalTry',
-          header: () => <div className="text-right">TL karşılığı</div>,
+          header: () => <div className="text-center">TL karşılığı</div>,
           cell: ({ row }) => (
-            <div className="text-right font-medium tabular-nums whitespace-nowrap">
+            <div className="text-center font-medium tabular-nums whitespace-nowrap">
               {row.original.totalTry == null ? '—' : formatTL(row.original.totalTry)}
             </div>
           ),
@@ -146,7 +146,7 @@ export function DocumentsTable({
           id: 'actions',
           header: () => <span className="sr-only">İşlemler</span>,
           cell: ({ row }) => (
-            <div className="flex justify-end gap-1">
+            <div className="flex justify-center gap-1">
               <Button variant="ghost" size="icon" className="size-8" asChild>
                 <a
                   href={`/api/belgeler/${row.original.id}/file`}
@@ -255,7 +255,7 @@ export function DocumentsTable({
             {table.getHeaderGroups().map((group) => (
               <TableRow key={group.id} className="hover:bg-transparent">
                 {group.headers.map((header) => (
-                  <TableHead key={header.id} className="whitespace-nowrap">
+                  <TableHead key={header.id} className="whitespace-nowrap text-center">
                     {header.isPlaceholder ? null : <table.FlexRender header={header} />}
                   </TableHead>
                 ))}
@@ -282,7 +282,7 @@ export function DocumentsTable({
               rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="text-center">
                       <table.FlexRender cell={cell} />
                     </TableCell>
                   ))}
