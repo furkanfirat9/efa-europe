@@ -32,3 +32,6 @@ next-env.d.ts
 
 # scratch dumps
 scratch_amazon.html
+
+# claude code personal settings
+.claude/settings.local.json
