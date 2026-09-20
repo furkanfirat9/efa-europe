@@ -66,7 +66,7 @@ function SortableHeader({ field, label, sort }: { field: SortField; label: strin
       variant="ghost"
       size="sm"
       onClick={sort.onToggle[field]}
-      className="-ml-3 h-8 data-[active=true]:text-foreground"
+      className="h-8 data-[active=true]:text-foreground"
       data-active={active}
       aria-label={`${label} kolonuna göre sırala`}
     >
@@ -108,7 +108,7 @@ export function buildOrderColumns({
       id: 'product',
       header: 'Ürün',
       cell: ({ row }) => (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-center gap-3">
           <ProductImageCell order={row.original} />
           <div
             className="max-w-28 truncate text-xs font-medium"

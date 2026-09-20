@@ -22,7 +22,7 @@ export type UpdateOrder = (postingNumber: string, payload: Record<string, any>) 
 
 /** Tablo içi düzenleme kutusu: kenarlığı yalnızca üzerine gelince veya odakta görünür. */
 const inlineInput =
-  'h-8 border-transparent bg-transparent text-center text-xs shadow-none hover:border-input focus-visible:bg-background';
+  'mx-auto h-8 border-transparent bg-transparent text-center text-xs shadow-none hover:border-input focus-visible:bg-background';
 
 const blurOnEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (e.key === 'Enter') e.currentTarget.blur();
@@ -43,7 +43,7 @@ function useInlineValue(source: string) {
 export function PostingNumberCell({ order }: { order: OrderItem }) {
   if (!order.postingNumber) return <span className="text-muted-foreground">—</span>;
   return (
-    <div className="flex items-center gap-1.5 font-mono text-xs">
+    <div className="flex items-center justify-center gap-1.5 font-mono text-xs">
       <span className="whitespace-nowrap">{order.postingNumber}</span>
       <a
         href={getOzonPostingUrl(order.postingNumber, order.status)}
