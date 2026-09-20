@@ -1,0 +1,2970 @@
+[
+  {
+    "offer_id": "EP5447/90",
+    "product_id": 6029615698,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA550/00",
+    "product_id": 6029756418,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA552/00",
+    "product_id": 6033020018,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA555/00",
+    "product_id": 6033067485,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA460/00",
+    "product_id": 6033132365,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA462/70",
+    "product_id": 6033149311,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA229/00",
+    "product_id": 6033208399,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA230/00",
+    "product_id": 6033256088,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA320/00",
+    "product_id": 6033340060,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA330/00",
+    "product_id": 6033390540,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA340/00",
+    "product_id": 6033426335,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA350/00",
+    "product_id": 6033465980,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA350/03",
+    "product_id": 6033488722,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA352/00",
+    "product_id": 6033508650,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA353/10",
+    "product_id": 6033542394,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA154/00",
+    "product_id": 6033566604,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EY2458",
+    "product_id": 6033593542,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EY145A",
+    "product_id": 6033602574,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EY831GE0",
+    "product_id": 6033739472,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EY8558E0",
+    "product_id": 6033781667,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FW4018E0",
+    "product_id": 6033809271,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EY9018",
+    "product_id": 6033881982,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EY7528E0",
+    "product_id": 6033986066,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EY756HE0",
+    "product_id": 6033995155,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EY9228",
+    "product_id": 6034006146,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EY8018",
+    "product_id": 6034039182,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "AF170EU",
+    "product_id": 6034060194,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "AF180EUCP",
+    "product_id": 6034069990,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "SL451EUSD",
+    "product_id": 6034093270,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "SL400EUCP",
+    "product_id": 6034115622,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FN101EUGY",
+    "product_id": 6034149552,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FN103EUGN",
+    "product_id": 6034219128,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FN101EUSG",
+    "product_id": 6034681598,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FN101EUSTGD",
+    "product_id": 6035062219,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FN102EU",
+    "product_id": 6035170167,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "TB401EU",
+    "product_id": 6035208888,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips PSG6022/20",
+    "product_id": 6035389139,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips PSG7300/80",
+    "product_id": 6035481482,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips GC7844/20",
+    "product_id": 6035497828,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips PSG6064/80",
+    "product_id": 6035497996,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "PSG3000/20",
+    "product_id": 6035930484,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "GV9567",
+    "product_id": 6042921534,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "PSG8200/80",
+    "product_id": 6042952261,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "PSG7200/60",
+    "product_id": 6042986990,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "DST8030/70",
+    "product_id": 6043112774,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "DST8050/20",
+    "product_id": 6043133223,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FV9844",
+    "product_id": 6043312531,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "DST7020/20",
+    "product_id": 6043428785,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FV9E50E0",
+    "product_id": 6045477636,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NA540/00",
+    "product_id": 6045543439,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EP3347/90",
+    "product_id": 6045610934,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EP2333/40",
+    "product_id": 6045680834,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EP5546/70",
+    "product_id": 6046414656,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EP2330/10",
+    "product_id": 6046481794,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EP5544/50",
+    "product_id": 6046501680,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "ECAM22.110.B",
+    "product_id": 6046522020,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "ECAM11.112.B",
+    "product_id": 6046546897,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "ECAM230.13.B",
+    "product_id": 6046562034,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "ECAM292.33.SB",
+    "product_id": 6046638134,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EP2220/10",
+    "product_id": 6046670465,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "ECAM292.81.B",
+    "product_id": 6046753078,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "ECAM292.52.GB",
+    "product_id": 6046892860,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "ECAM292.81.SB",
+    "product_id": 6046962741,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "EP3326/90",
+    "product_id": 6047006428,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BC151EUBK",
+    "product_id": 6047082959,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "KT201EUSTGD",
+    "product_id": 6047119736,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "KT201EU",
+    "product_id": 6047173982,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "KT200EU",
+    "product_id": 6047181364,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "JC151EU",
+    "product_id": 6047628865,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "0644416030",
+    "product_id": 6048807898,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "MAFD661B0",
+    "product_id": 6062473958,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Profi 28 cm (0794689991)",
+    "product_id": 6063701742,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "11.2000.9002",
+    "product_id": 6063701743,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "1871556030",
+    "product_id": 6063701773,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "18.7920.6100",
+    "product_id": 6063701794,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "11.2091.6040",
+    "product_id": 6063701826,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Profi 24 cm",
+    "product_id": 6063701827,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "0733556040",
+    "product_id": 6064148891,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "18.7670.9990",
+    "product_id": 6064148898,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "0761406380",
+    "product_id": 6064148904,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "18.7332.9990",
+    "product_id": 6064148905,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "06.4689.9990",
+    "product_id": 6064148916,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "0617706040",
+    "product_id": 6064148939,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "0416950071",
+    "product_id": 6064148943,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "12.7291.9991",
+    "product_id": 6064148949,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "0733706299",
+    "product_id": 6064148955,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "1871016030",
+    "product_id": 6064148956,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "0658776040",
+    "product_id": 6064148962,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "18.7998.4500",
+    "product_id": 6064148967,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "0741426040",
+    "product_id": 6064148999,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "0760556380",
+    "product_id": 6064149009,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "0580774291",
+    "product_id": 6064153080,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "0413020012",
+    "product_id": 6064153109,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "WMF Function Bowls Rührschüssel Edelstahl mit Deck",
+    "product_id": 6064170158,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "WMF Nuova Salatbesteck Edelstahl 25 cm, klein, Sal",
+    "product_id": 6064172774,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "18.7108.6030",
+    "product_id": 6064172779,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "WMF Nuova Kuchenheber Tortenheber Edelstahl 23 cm,",
+    "product_id": 6064172786,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Profi Resist 28 cm",
+    "product_id": 6064172860,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "QP2824/31",
+    "product_id": 6064334492,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "MG9561/30",
+    "product_id": 6064334545,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HS9980/15",
+    "product_id": 6064334555,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "MG7962/30",
+    "product_id": 6064334557,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "STH3020/10",
+    "product_id": 6064334559,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BRI951/00",
+    "product_id": 6064334565,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX6068/88",
+    "product_id": 6064334566,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips Sonicare DiamondClean Prestige 9900 elektr",
+    "product_id": 6064334583,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "QP1924/30",
+    "product_id": 6064334596,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "GC026/80",
+    "product_id": 6064334602,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "QP6552/30",
+    "product_id": 6064334641,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "QP2834/31",
+    "product_id": 6064334647,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips Sonicare DiamondClean 9000",
+    "product_id": 6064334685,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX7101/01",
+    "product_id": 6064334694,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CA6903/22",
+    "product_id": 6064334697,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "MG9556/15",
+    "product_id": 6064334708,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BRR454/00",
+    "product_id": 6064334710,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX9911/89",
+    "product_id": 6064334731,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CA6903/10",
+    "product_id": 6064334748,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "QP440/50",
+    "product_id": 6064334755,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "QP6652/35",
+    "product_id": 6064334757,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX3826/33",
+    "product_id": 6064334797,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HD9350/90",
+    "product_id": 6064334802,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "AC3210/12",
+    "product_id": 6064334804,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "S7887/35",
+    "product_id": 6064334811,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BHD510/20",
+    "product_id": 6064334851,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "TT2000/43",
+    "product_id": 6064334859,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BRI955/00",
+    "product_id": 6064334861,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "AC0651/10",
+    "product_id": 6064334866,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "AC4221/11",
+    "product_id": 6064334869,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX6064/88",
+    "product_id": 6064334873,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BRI946/00",
+    "product_id": 6064334880,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "STH3010/70",
+    "product_id": 6064334884,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "QP6652/30",
+    "product_id": 6064334901,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BRI921/00",
+    "product_id": 6064334909,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "AWP175/10",
+    "product_id": 6064334923,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX3675/13",
+    "product_id": 6064334929,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BRI949/00",
+    "product_id": 6064334943,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "MG7931/15",
+    "product_id": 6064334962,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "NT5650/16",
+    "product_id": 6064334975,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX9046/87",
+    "product_id": 6064334980,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips Water Ersatzfilter für Wasserdispenser mit",
+    "product_id": 6064335018,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "XP9204/10",
+    "product_id": 6064335026,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "XP9405/31",
+    "product_id": 6064335040,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "S3145/00",
+    "product_id": 6064335042,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "SCY933/02",
+    "product_id": 6064335045,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX7110/01",
+    "product_id": 6064335048,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BG7485/30",
+    "product_id": 6064335053,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "XP9404/31",
+    "product_id": 6064335076,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX9046/88",
+    "product_id": 6064335099,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "MG1100/16",
+    "product_id": 6064335102,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "AC0951/13",
+    "product_id": 6064335104,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "QP4631/65",
+    "product_id": 6064335105,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "SCD657/11",
+    "product_id": 6064335106,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "MG7961/15",
+    "product_id": 6064335107,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "AWP1775CH/10",
+    "product_id": 6064335108,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "XB9154/09",
+    "product_id": 6064335110,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FC9745/09",
+    "product_id": 6064335112,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX9914/57",
+    "product_id": 6064335113,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "S5465/18",
+    "product_id": 6064335115,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips HC5630/15",
+    "product_id": 6064335119,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "SH91/50",
+    "product_id": 6064335123,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FC8021/03",
+    "product_id": 6064335128,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX6034/90",
+    "product_id": 6064335143,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BRI957/00",
+    "product_id": 6064335162,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "XP9205/30",
+    "product_id": 6064335166,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "SCF293/00",
+    "product_id": 6064335169,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal OptiGrill GC705D",
+    "product_id": 6064529736,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "L897SK04",
+    "product_id": 6064529738,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "E304S344",
+    "product_id": 6064529743,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal Duetto 3-teiliges Pfannenset 20,24 und 28cm,",
+    "product_id": 6064529777,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "E3040644",
+    "product_id": 6064529778,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "C38806",
+    "product_id": 6064529785,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "L828SB04",
+    "product_id": 6064529832,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "K13304",
+    "product_id": 6064529838,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "B5550633",
+    "product_id": 6064529879,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "L966S344",
+    "product_id": 6064529885,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Duetto Plus G719S734",
+    "product_id": 6064529889,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal Duetto Topfset Induktion 9-teilig, robuster",
+    "product_id": 6064529899,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "GV9225",
+    "product_id": 6064529902,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "C26732",
+    "product_id": 6064529925,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CY7548",
+    "product_id": 6064529934,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "GC722D16",
+    "product_id": 6064529939,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "SW854D",
+    "product_id": 6064529945,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "C38804",
+    "product_id": 6064529972,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal Ingenio Comfort Max 4-tlg. Pfannen-Set, unve",
+    "product_id": 6064529973,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "L39593",
+    "product_id": 6064529992,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "L827SB04",
+    "product_id": 6064529997,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal Virtuoso 2-teiliges Pfannenset 24 + 28 cm, P",
+    "product_id": 6064530040,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "L8974S45",
+    "product_id": 6064530041,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "L898S3",
+    "product_id": 6064530061,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "D52602",
+    "product_id": 6064530110,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal Ingenio Easy On 13-teiliges Topf und Pfannen",
+    "product_id": 6064530130,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FR8040",
+    "product_id": 6064530145,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "H81506",
+    "product_id": 6064530221,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "GC712D12",
+    "product_id": 6064530242,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "L3959143",
+    "product_id": 6064530270,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal OptiGrill Elite XL Kontaktgrill, automatisch",
+    "product_id": 6064530273,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "L72390",
+    "product_id": 6064530281,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "K23209",
+    "product_id": 6064530296,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "G726S204",
+    "product_id": 6064530302,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal EverSharp Pro 5-teiliges Messer-Set mit selb",
+    "product_id": 6064530319,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal Explore Stone G7 Pfannen-Set 24/28 cm, Antih",
+    "product_id": 6064530346,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "L15992",
+    "product_id": 6064530377,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "P2530738",
+    "product_id": 6064530414,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal KO6931 Sense Wasserkocher, 1,5 L Kapazität,",
+    "product_id": 6064530417,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "DT6130",
+    "product_id": 6064530440,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "G25991",
+    "product_id": 6064530459,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "GV9550",
+    "product_id": 6064530482,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "C38504",
+    "product_id": 6064530503,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FV6842",
+    "product_id": 6064530505,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "L98491",
+    "product_id": 6064530514,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "8523.31",
+    "product_id": 6064530528,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "GC760D12",
+    "product_id": 6064530529,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "SV6115",
+    "product_id": 6064530531,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal Snack Collection SW8674F0",
+    "product_id": 6064530542,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "GC750D16",
+    "product_id": 6064530570,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "IG8024E0",
+    "product_id": 6064530596,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "SV8152",
+    "product_id": 6064530616,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "DT2022",
+    "product_id": 6064530630,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "KI1R0DE0",
+    "product_id": 6064530655,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Jamie Oliver Cook's Classics 28 см E3060635",
+    "product_id": 6064530662,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "G0229032",
+    "product_id": 6064530688,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "DT9810",
+    "product_id": 6064530692,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BL771BF0",
+    "product_id": 6064530710,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "L1509202",
+    "product_id": 6064530713,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FV6846",
+    "product_id": 6064530726,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BC50U0V0",
+    "product_id": 6064530734,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "XA8103F0",
+    "product_id": 6064530800,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal Ingenio L897SJ04",
+    "product_id": 6064530802,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "JF4031E0",
+    "product_id": 6064530803,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BI8125",
+    "product_id": 6064530823,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "K122S2",
+    "product_id": 6064530836,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "L7239143",
+    "product_id": 6064530845,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "G713SB74",
+    "product_id": 6064530865,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "G7260244",
+    "product_id": 6064530871,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal Ice Force Messerblock aus Holz, 5 Messer, Br",
+    "product_id": 6064530887,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "XA7248",
+    "product_id": 6064530895,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BL19H4F0",
+    "product_id": 6064530909,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FV1710",
+    "product_id": 6064530933,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "DT3041E1",
+    "product_id": 6064530948,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "GV9810",
+    "product_id": 6064530951,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "GC271810",
+    "product_id": 6064530984,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal Crêpe-Pfanne, Aluminium, Schwarz, 25 cm (ohn",
+    "product_id": 6064531000,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "PF240E",
+    "product_id": 6064531015,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "A705A8",
+    "product_id": 6064531073,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "K267S556",
+    "product_id": 6064531076,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "E21872",
+    "product_id": 6064531096,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FR3140",
+    "product_id": 6064531098,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FF1078",
+    "product_id": 6064531101,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "C38506",
+    "product_id": 6064531139,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "XA7278",
+    "product_id": 6064531147,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "E24906",
+    "product_id": 6064531149,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FV2838",
+    "product_id": 6064531151,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "G720S674",
+    "product_id": 6064531184,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal Duetto On Bratpfanne 28 cm, Go Ceram keramis",
+    "product_id": 6064531203,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "GC510DE0",
+    "product_id": 6064531208,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "K1984634",
+    "product_id": 6064531218,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "C27802",
+    "product_id": 6064531252,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FV5716E0",
+    "product_id": 6064531254,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Tefal XL Force Bratpfanne 32 cm extragroß, Antihaf",
+    "product_id": 6064531270,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CERA BRIGHT ON 7tlg.",
+    "product_id": 6064531287,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FC9332/09",
+    "product_id": 6085180141,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "DiamondClean 9900 Prestige",
+    "product_id": 6085180152,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "XP9401/38",
+    "product_id": 6085180182,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX6018/87",
+    "product_id": 6085180191,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX7119/01",
+    "product_id": 6085180213,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX9096/88",
+    "product_id": 6085180231,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX6064/87",
+    "product_id": 6085180325,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips Sonicare Power Flosser 3000, Munddusche mi",
+    "product_id": 6085180346,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "X3001/00",
+    "product_id": 6085180353,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "JC302/50",
+    "product_id": 6085180355,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HC9450/20",
+    "product_id": 6085180360,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "S7886/55",
+    "product_id": 6085180393,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX9992/11",
+    "product_id": 6085180399,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips Water Wasserfilterkanne +6 Geschmack+ Ersa",
+    "product_id": 6085180405,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "PHILIPS AquaTrio Nass-Trockensauger 9000 Serie, Sc",
+    "product_id": 6085180415,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "QC5115/15",
+    "product_id": 6085180440,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FC8010/02",
+    "product_id": 6085180448,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX7429/01",
+    "product_id": 6085180455,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX9044/88",
+    "product_id": 6085180466,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "MG3946/15",
+    "product_id": 6085180505,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "GC9642/60",
+    "product_id": 6085180506,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "QP430/60",
+    "product_id": 6085180623,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips Sonicare DiamondClean Smart 9400",
+    "product_id": 6085180648,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HF3531/01",
+    "product_id": 6085180652,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "GC7844/20",
+    "product_id": 6085180657,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HS5980/15",
+    "product_id": 6085180663,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "FY2401/30",
+    "product_id": 6085180715,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips Sonicare DiamondClean 9900 Prestige",
+    "product_id": 6085180725,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "STH7020/20",
+    "product_id": 6085180744,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BT7670/15",
+    "product_id": 6085180755,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HC7650/15",
+    "product_id": 6085180785,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "QP2724/31",
+    "product_id": 6085180791,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CX3550/01",
+    "product_id": 6085180830,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BRL149/00",
+    "product_id": 6085180864,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "MG3930/15",
+    "product_id": 6085180869,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CSA210/60",
+    "product_id": 6085180902,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HD2350/80",
+    "product_id": 6085180931,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HR1921/20",
+    "product_id": 6085180974,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HU5600/03",
+    "product_id": 6085180977,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BRL159/00",
+    "product_id": 6085180979,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips Quick Clean Reinigungskartusche (Modell CC",
+    "product_id": 6085181036,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "X5004/00",
+    "product_id": 6085181040,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX4072/42",
+    "product_id": 6085181045,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HP8280/00",
+    "product_id": 6085181097,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips Sonicare S2 Sensitive, Original Ersatzbürs",
+    "product_id": 6085181133,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BRE257/00",
+    "product_id": 6085181137,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "SCD923/26",
+    "product_id": 6085181156,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX4021/01",
+    "product_id": 6085181159,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "TAR3306/12",
+    "product_id": 6085181168,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "XD3110/09",
+    "product_id": 6085181174,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX9911/94",
+    "product_id": 6085181183,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HD5416/60",
+    "product_id": 6085181243,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HD2581/90",
+    "product_id": 6085181249,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX3886/43",
+    "product_id": 6085181291,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "X9000/10",
+    "product_id": 6085181304,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "PHILIPS Senseo Switch Pad- und Filterkaffeemaschin",
+    "product_id": 6085181317,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "STH5030/80",
+    "product_id": 6085181366,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "DST7040/80",
+    "product_id": 6085181444,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BHD500/20",
+    "product_id": 6085181455,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips DryCare Pro Haartrockner mit leistungsstar",
+    "product_id": 6085181500,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "PHILIPS Senseo Maestro Kaffeepadmaschine, Schwarz,",
+    "product_id": 6085181507,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HP6341/00",
+    "product_id": 6085181530,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BHB878/00",
+    "product_id": 6085181542,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "AC2210/10",
+    "product_id": 6085181603,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "ADD6921DG/10",
+    "product_id": 6085181616,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "ADD912",
+    "product_id": 6085181623,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HC3530/15",
+    "product_id": 6085181662,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HR2291/41",
+    "product_id": 6085181714,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BHD837/10",
+    "product_id": 6085181724,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX6352/42",
+    "product_id": 6085181787,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX4044/52",
+    "product_id": 6085181794,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "AIS8530/20",
+    "product_id": 6085181797,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "XP9207/30",
+    "product_id": 6085181821,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX3603/01",
+    "product_id": 6085181830,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "S3241/12",
+    "product_id": 6085181855,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Philips Shaver 5000 – Elektrischer Rasierer für He",
+    "product_id": 6085181903,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "QP1324/30",
+    "product_id": 6085181911,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BT3619/15",
+    "product_id": 6085181968,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX9914/54",
+    "product_id": 6085181975,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BHS732/00",
+    "product_id": 6085181981,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "S5887/13",
+    "product_id": 6085182010,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "ASH138/10",
+    "product_id": 6085182014,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "PSA3228/41",
+    "product_id": 6085182116,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "AWP230P6/31",
+    "product_id": 6085182150,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX6044/90",
+    "product_id": 6085182168,
+    "price": "199",
+    "old_price": "249",
+    "min_price": "189",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "HX7400/02",
+    "product_id": 6085182207,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BHB968/10",
+    "product_id": 6085182240,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CX5120/11",
+    "product_id": 6085182243,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "BRL129/00",
+    "product_id": 6085182259,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "XP9404/38",
+    "product_id": 6086078382,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "XP9402/46",
+    "product_id": 6086116937,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "COSORI Turbo Tower Pro Smart Airfryer, 10,8L Keram",
+    "product_id": 6115611853,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CAF-R901-AEU",
+    "product_id": 6115611893,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Cosori Airfryer, neue Generation 2026, Chip Testsi",
+    "product_id": 6115611894,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Cosori Airfryer, Dual Blaze Twinfry, Flexiblen Kam",
+    "product_id": 6115611903,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CAF-DC113S-ADE",
+    "product_id": 6115611904,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CAF-DC601-KEU",
+    "product_id": 6115611938,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Cosori Airfryer, mit Sichtfenster, 12-in-1 6,2L He",
+    "product_id": 6115611939,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CAF-P583S-AEUR",
+    "product_id": 6115611959,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "TurboBlaze 6.0L (CAF-DC601-WEU)",
+    "product_id": 6115611965,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CP158-AF-RXB",
+    "product_id": 6115611973,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CAF-TF801-CEUR",
+    "product_id": 6115611976,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CNS-R101S",
+    "product_id": 6115612012,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CMC-CO601-SEU",
+    "product_id": 6115612015,
+    "price": "999",
+    "old_price": "1149",
+    "min_price": "989",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CEK-S152-VEU",
+    "product_id": 6115612025,
+    "price": "499",
+    "old_price": "549",
+    "min_price": "489",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CAF-SE601S-CEU",
+    "product_id": 6115612031,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "Dual Blaze TwinFry CAF-TF101S 10L",
+    "product_id": 6115612042,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CP267-FD-RXS",
+    "product_id": 6115612045,
+    "price": "1160",
+    "old_price": "1249",
+    "min_price": "1129",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CRC-R501-KEU",
+    "product_id": 6115612053,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CP158-AF-RXW",
+    "product_id": 6115612100,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  },
+  {
+    "offer_id": "CAF-L501-GEU",
+    "product_id": 6115612115,
+    "price": "699",
+    "old_price": "749",
+    "min_price": "689",
+    "currency_code": "USD"
+  }
+]
