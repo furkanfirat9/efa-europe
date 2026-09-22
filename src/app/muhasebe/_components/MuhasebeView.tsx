@@ -10,9 +10,6 @@ import { formatTL, formatUSD } from '@/lib/format';
 import { Button } from '@/components/shadcn/button';
 import { Badge } from '@/components/shadcn/badge';
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/shadcn/card';
-import { Input } from '@/components/shadcn/input';
-import { Label } from '@/components/shadcn/label';
-import { Progress } from '@/components/shadcn/progress';
 import { Separator } from '@/components/shadcn/separator';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select';
@@ -34,8 +31,6 @@ function Loading({ className = 'h-7 w-28' }: { className?: string }) {
 
 export function MuhasebeView() {
   const d = useEuropeAccounting();
-  const buyTotal = d.ordersPageTotalCount || d.totalOrdersCount;
-  const coverage = buyTotal > 0 ? Math.round((d.recordedBuyCount / buyTotal) * 100) : 0;
 
   const chartData = [
     { name: 'Hasılat', value: d.invoiceTotalTry, color: 'var(--chart-2)' },
@@ -47,7 +42,7 @@ export function MuhasebeView() {
 
   const taxRows = [
     { item: 'Fatura tutarı', note: 'Brüt hasılat', rate: '—', amount: d.invoiceTotalTry },
-    { item: 'Toplam giderler', note: 'Alış + diğer masraflar', rate: '—', amount: -d.totalExpenses },
+    { item: 'Toplam giderler', note: "Belgeler'deki onaylı faturalar", rate: '—', amount: -d.totalExpenses },
     { item: 'Net ticari kâr', note: 'Hasılat − giderler', rate: '—', amount: d.commercialProfit },
     { item: 'Kazanç istisnası', note: 'KVK 10/1-i', rate: '%95', amount: -d.exemptAmount95 },
     { item: 'Vergi matrahı', note: 'Vergilendirilen kısım', rate: '%5', amount: d.taxableBase5 },
@@ -103,7 +98,7 @@ export function MuhasebeView() {
             <RefreshCw className={d.loading ? 'animate-spin' : ''} />
           </Button>
           <Button asChild>
-            <Link href="/siparisler">Alış maliyetleri</Link>
+            <Link href="/belgeler">Belgeler</Link>
           </Button>
         </div>
       </div>
@@ -138,19 +133,25 @@ export function MuhasebeView() {
           </CardContent>
         </Card>
 
+        {/* Gider, Belgeler sayfasındaki onaylı faturalardan gelir; onay bekleyenler toplama girmez. */}
         <Card className="gap-2">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardDescription className="font-medium text-foreground">Ürün alış maliyeti</CardDescription>
+            <CardDescription className="font-medium text-foreground">Toplam gider</CardDescription>
             <Package className="size-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="space-y-1">
             <div className="text-2xl font-bold tabular-nums">
-              {d.siparisLoading ? <Loading /> : formatTL(d.ordersBuyCostTry, true)}
+              {d.expensesLoading ? <Loading /> : formatTL(d.expenses.total, true)}
             </div>
-            <Progress value={coverage} aria-label="Alış fiyatı girilen sipariş oranı" />
-            <p className="text-xs text-muted-foreground">
-              {d.recordedBuyCount} / {buyTotal} siparişe alış fiyatı girildi
+            <p className="text-xs text-muted-foreground tabular-nums">
+              {d.expenses.documentCount} belge · mal alımı {formatTL(d.expenses.goods, true)} · Ozon{' '}
+              {formatTL(d.expenses.ozon, true)}
             </p>
+            {!d.expensesLoading && d.expenses.pendingCount > 0 && (
+              <Link href="/belgeler" className="block text-xs font-medium underline-offset-4 hover:underline">
+                {d.expenses.pendingCount} belge onay bekliyor, toplama girmedi
+              </Link>
+            )}
           </CardContent>
         </Card>
 
@@ -251,19 +252,6 @@ export function MuhasebeView() {
         <CardHeader>
           <CardTitle>Kurumlar vergisi hesabı</CardTitle>
           <CardDescription>7582 sayılı kanun kapsamında %95 kazanç istisnası · efektif vergi %1,25</CardDescription>
-          <CardAction className="flex items-center gap-2">
-            <Label htmlFor="other-expenses" className="whitespace-nowrap text-muted-foreground">
-              Diğer masraflar
-            </Label>
-            <Input
-              id="other-expenses"
-              inputMode="decimal"
-              placeholder="0,00 ₺"
-              className="w-36"
-              value={d.otherExpensesInput}
-              onChange={(e) => d.handleOtherExpensesChange(e.target.value)}
-            />
-          </CardAction>
         </CardHeader>
         <CardContent>
           <Table>
