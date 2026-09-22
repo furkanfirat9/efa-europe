@@ -197,6 +197,91 @@ model AccountingDocumentLine {
   @@index([documentId])
 }
 
+// Lenora'nın kestiği satış faturası (e-Arşiv / e-Fatura, UBL-TR).
+//
+// Faturanın XML'i doğrudan okunur, yapay zekâ kullanılmaz; bu yüzden taslak /
+// onay adımı yoktur. Sık kullanılan alanlar ayrı sütunlardadır, faturadaki her
+// bilgi ise `data` içinde durur (gömülü şablon, logo ve imza hariç; onlar
+// orijinal dosyada saklı).
+model SalesInvoice {
+  id               String    @id @default(cuid())
+  store            String    @default("lenora")
+
+  invoiceNo        String
+  // ETTN: faturanın benzersiz kimliği; mükerrer kontrolü bununla yapılır.
+  uuid             String
+  // EARSIVFATURA, TEMELFATURA, TICARIFATURA …
+  profile          String?
+  // SATIS, ISTISNA, IADE …
+  typeCode         String?
+  issueDate        DateTime  @db.Date
+  issueTime        String?
+
+  customerName     String?
+  customerCountry  String?
+  customerCity     String?
+
+  currency         String
+  // Ödenecek tutar (KDV dahil)
+  totalAmount      Float
+  taxExclusive     Float?
+  taxAmount        Float?
+  allowanceTotal   Float?
+  exemptionCode    String?
+  exemptionReason  String?
+
+  // Faturanın üzerindeki kur; TL faturada 1.
+  fxRate           Float?
+  fxSource         String?
+  totalTry         Float?
+
+  // Notlardaki "Gönderi No: …" ile gelen Ozon gönderi numarası; tahmin yürütülmez.
+  postingNumber    String?
+  // Faturadaki notlar (string[])
+  notes            Json?
+  // Faturanın tamamı
+  data             Json
+
+  // Yüklenen orijinal dosya (GİB ZIP'i ya da UBL XML)
+  fileUrl          String
+  fileName         String
+  fileContentType  String
+  fileSize         Int
+  fileHash         String
+
+  // Kullanıcının sonradan eklediği PDF
+  pdfUrl           String?
+  pdfName          String?
+  pdfSize          Int?
+
+  lines            SalesInvoiceLine[]
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([store, uuid])
+  @@index([store, issueDate])
+  @@index([postingNumber])
+}
+
+model SalesInvoiceLine {
+  id           String       @id @default(cuid())
+  invoiceId    String
+  invoice      SalesInvoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  position     Int
+  name         String
+  quantity     Float?
+  unitCode     String?
+  unitPrice    Float?
+  // KDV hariç satır tutarı
+  amount       Float?
+  taxPercent   Float?
+  gtip         String?
+  originCountry String?
+
+  @@index([invoiceId])
+}
+
 // Panel kullanıcısı. Kullanıcı adı ve şifre terminalden `npm run kullanici` ile
 // belirlenir; şifre yalnızca scrypt özeti olarak saklanır, düz metin tutulmaz.
 model PanelUser {

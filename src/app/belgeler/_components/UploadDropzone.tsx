@@ -11,10 +11,14 @@ export function UploadDropzone({
   uploads,
   onFiles,
   onDismiss,
+  accept = DOC_ACCEPT,
+  hint = 'PDF veya görsel, dosya başına en fazla 4 MB. Bilgiler otomatik okunur, onayınızdan sonra kaydedilir.',
 }: {
   uploads: UploadItem[];
   onFiles: (files: File[]) => void;
   onDismiss: (key: string) => void;
+  accept?: string;
+  hint?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -48,14 +52,12 @@ export function UploadDropzone({
       >
         <FileUp className="size-6 text-muted-foreground" />
         <div className="text-sm font-medium">Faturaları sürükleyip bırakın ya da seçin</div>
-        <p className="text-xs text-muted-foreground">
-          PDF veya görsel, dosya başına en fazla 4 MB. Bilgiler otomatik okunur, onayınızdan sonra kaydedilir.
-        </p>
+        <p className="text-xs text-muted-foreground">{hint}</p>
         <input
           ref={inputRef}
           type="file"
           multiple
-          accept={DOC_ACCEPT}
+          accept={accept}
           className="hidden"
           onChange={(e) => {
             onFiles(Array.from(e.target.files ?? []));
