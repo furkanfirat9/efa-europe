@@ -26,11 +26,42 @@ export function currentMonthMsk(): { year: number; month: number } {
 }
 
 /**
- * Verilen aralıktaki tüm FBS gönderilerini sayfalayarak çeker.
+ * v4 gönderisini v3 biçimine çevirir; veri tabanına yazılan ve ekranların okuduğu
+ * alanlar (fiyat, para birimi, komisyon) eskisiyle aynı kalır, eski kayıtlarla
+ * yenileri arasında fark oluşmaz. v4'ün eklediği alanlar olduğu gibi durur.
  *
- * Ozon tek istekte en fazla 1000 kayıt veriyor ve devamı olup olmadığını
- * `has_next` ile bildiriyor. Çağrılar ozonFetch kapısından geçtiği için
- * mağaza bazlı hız sınırı ve 429 yeniden denemesi otomatik uygulanır.
+ * v4'te `price`, `customer_price` ve komisyon `{ amount, currency }` nesnesi olarak
+ * geliyor; ürünlerdeki ayrı `currency_code` alanı kaldırıldı.
+ */
+function toV3Posting(p: any) {
+  for (const prod of p.products || []) {
+    if (prod.price && typeof prod.price === 'object') {
+      prod.currency_code = prod.price.currency;
+      prod.price = prod.price.amount;
+    }
+  }
+  for (const fin of p.financial_data?.products || []) {
+    if (fin.customer_price && typeof fin.customer_price === 'object') {
+      fin.customer_currency_code = fin.customer_price.currency;
+      fin.customer_price = Number(fin.customer_price.amount);
+    }
+    if (fin.commission && typeof fin.commission === 'object') {
+      fin.commission_amount = fin.commission.amount;
+      fin.commission_percent = fin.commission.percent;
+      fin.currency_code = fin.commission.currency;
+      delete fin.commission;
+    }
+  }
+  return p;
+}
+
+/**
+ * Verilen aralıktaki tüm FBS gönderilerini sayfalayarak çeker (`/v4/posting/fbs/list`).
+ *
+ * v4 tek istekte en fazla 100 kayıt veriyor; devamı `has_next` ile bildiriliyor ve
+ * sonraki sayfa dönen `cursor` ile isteniyor (v3'teki `offset` kalktı). Çağrılar
+ * ozonFetch kapısından geçtiği için mağaza bazlı hız sınırı ve 429 yeniden
+ * denemesi otomatik uygulanır.
  */
 export async function fetchPostingsForRange(
   sinceISO: string,
@@ -39,31 +70,31 @@ export async function fetchPostingsForRange(
   options: { maxPostings?: number; dir?: 'ASC' | 'DESC' } = {}
 ): Promise<any[]> {
   const { maxPostings = 20000, dir = 'DESC' } = options;
-  const pageSize = 1000;
+  const pageSize = 100;
   const postings: any[] = [];
-  let offset = 0;
+  let cursor = '';
 
   while (true) {
     const json = await ozonFetch<any>(
-      '/v3/posting/fbs/list',
+      '/v4/posting/fbs/list',
       {
-        dir,
+        sort_dir: dir,
         filter: { since: sinceISO, to: toISO },
         limit: pageSize,
-        offset,
+        ...(cursor ? { cursor } : {}),
         with: { analytics_data: true, financial_data: true },
       },
       headers
     );
 
-    const batch = json.result?.postings || [];
-    postings.push(...batch);
+    const batch = json.postings || [];
+    postings.push(...batch.map(toV3Posting));
 
-    if (!json.result?.has_next || batch.length === 0 || postings.length >= maxPostings) {
+    if (!json.has_next || !json.cursor || batch.length === 0 || postings.length >= maxPostings) {
       break;
     }
 
-    offset += batch.length;
+    cursor = json.cursor;
   }
 
   return postings;

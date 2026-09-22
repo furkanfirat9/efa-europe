@@ -71,13 +71,13 @@ Mağazada daha önce yüklenmiş olan ürünleri takip etmek, mükerrer yükleme
 - **API Endpoint:** `POST https://api-seller.ozon.ru/v1/analytics/data`
 - **Rate Limit Kalkanı:** Ozon'a giden **her** çağrı `src/lib/ozon/gate.ts` içindeki `ozonFetch` kapısından geçer; doğrudan `fetch` yazılmaz. Şerit tablosu bu modülde yaşar — yeni bir uç kendi sınırlayıcısını yazarsa aynı Client-Id'yi iki bağımsız kapı döver ve sınır yine aşılır. Kapının garantileri:
   - İstekler mağaza (Client-Id) bazlı bir şeritte sıraya girer, başlangıçları arasında en az **650ms** bırakılır (~1,5 istek/sn).
-  - `/v1/analytics/data` **ağır** uçtur: ölçümde tek çağrı ~4 saniye sürüyor ve üst üste bindirildiğinde Ozon yanıtı 4 → 6 → 8 saniyeye çıkarıp bazen reddediyor. Bu yüzden aynı anda uçuşta en fazla 2 analitik çağrısı bulunur. Ucuz uçlar (`/v3/posting/fbs/list` ~135ms, `/v3/product/info/list`) yalnızca hız sınırına tabidir.
+  - `/v1/analytics/data` **ağır** uçtur: ölçümde tek çağrı ~4 saniye sürüyor ve üst üste bindirildiğinde Ozon yanıtı 4 → 6 → 8 saniyeye çıkarıp bazen reddediyor. Bu yüzden aynı anda uçuşta en fazla 2 analitik çağrısı bulunur. Ucuz uçlar (`/v4/posting/fbs/list` ~140ms, `/v3/product/info/list`) yalnızca hız sınırına tabidir.
   - `429` / `code: 8` durumunda üstel geri çekilme + jitter ile 3 kez yeniden denenir ve geri çekilme boyunca **tüm şerit** duraklatılır.
   - Sınır aşımı yutulmaz: `fetchRealOrders` eskiden 429 aldığında boş liste dönüp ekrana "sipariş yok" yazdırıyordu; artık hata yukarı taşınır ve route `429` + okunur mesaj döner.
 - **Önbellekler:** Analitik yanıtları `store_tarih_limit_mode` anahtarıyla **5 dakika** tutulur (yenile butonu `force_refresh` gönderir). Ürün adı/görseli `Client-Id:sku` anahtarıyla **15 dakika** tutulur; mağazalar arası gidip gelirken aynı SKU'lar tekrar sorulmaz. `/v3/product/info/list` çağrıları 500'lük paketler hâlinde yapılır.
 - **İstemci tarafı:** `useAnalytics` her turda önceki isteği `AbortController` ile iptal eder — sıraya alma yüzünden geciken eski yanıtın yeni mağazanın verisini ezmesini engeller.
 - **Arka Plan Tazeleme (Sessiz Polling):** `/analitik` kendini iki farklı ritimde günceller, çünkü iki veri farklı maliyet ve tazelikte:
-  - **Siparişler 60 saniyede bir** — `mode: 'orders'` hafif ucundan (~195ms ölçüldü). Yalnızca `/v3/posting/fbs/list` çağrılır, ürün bilgisi önbellekten karşılanır, analitik ucuna hiç dokunulmaz. Harita ve sipariş tablosu buradan beslenir.
+  - **Siparişler 60 saniyede bir** — `mode: 'orders'` hafif ucundan (~195ms ölçüldü). Yalnızca `/v4/posting/fbs/list` çağrılır, ürün bilgisi önbellekten karşılanır, analitik ucuna hiç dokunulmaz. Harita ve sipariş tablosu buradan beslenir.
   - **Analitik 5,5 dakikada bir** — sunucudaki 5 dakikalık önbelleğin üzerinde tutuldu, aksi hâlde yoklama önbelleğe çarpıp aynı sayıyı geri getirirdi.
   - **Sekme arkadayken ikisi de durur** (`visibilitychange`); sekmeye dönüldüğünde beklemeden bir kez tazelenip ritme girilir.
   - **Sessizlik şart:** arka plan turunda `silent` bayrağı iskelet/spinner göstermez ve hata banner'ı açmaz — ekrandaki veri yerinde kalır, yeni veri geldiğinde sessizce değişir. Yalnızca başlıktaki "… itibarıyla" damgası güncellenir. Elle yenile butonu bunun tersidir: iskelet gösterir ve hatayı banner'la bildirir.
@@ -148,9 +148,13 @@ panelde yalnızca dashboard kartı ile `/analitik` sayfasında görünür.
   - İstemci önce veri tabanından gösterir, sonra arka planda indirir; indirme
     sessizdir (iskelet/banner yok), yalnızca "Ozon ile eşitleniyor" rozeti çıkar.
     Ay hızlı değiştirilirse uçuştaki eski tur sonucunu uygulamaz.
-- **Sayfalama:** `/v3/posting/fbs/list` tek istekte en fazla 1000 kayıt verir;
-  `has_next` bitene kadar `offset` ilerletilir (`fetchPostingsForRange`).
-  Sabit `limit: 50` ile çekmek geçmiş ayları yarım bırakıyordu.
+- **Sayfalama:** `/v4/posting/fbs/list` tek istekte en fazla 100 kayıt verir;
+  `has_next` bitene kadar dönen `cursor` ile devam edilir (`fetchPostingsForRange`).
+  Tek sayfayla yetinmek geçmiş ayları yarım bırakıyordu.
+- **v4 → v3 biçimi:** v4 fiyat, müşteri fiyatı ve komisyonu `{ amount, currency }`
+  nesnesi olarak veriyor ve ürünlerdeki `currency_code`'u kaldırdı. `toV3Posting`
+  gönderiyi v3 biçimine çevirir; veri tabanındaki `productsJson` / `financialDataJson`
+  ve bunları okuyan ekranlar eski ve yeni kayıtlarda aynı alanları görür.
 - **Ay sınırı UTC+3'tür** (`monthRangeMsk`). Sunucunun yerel saatine bırakmak,
   aynı kodun geliştirme makinesinde (UTC+3) ve Vercel'de (UTC) farklı aylar
   üretmesine yol açıyordu. Ozon'dan çekme ve veri tabanı filtresi **aynı**
