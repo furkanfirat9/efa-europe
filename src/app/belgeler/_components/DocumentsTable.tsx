@@ -59,7 +59,7 @@ export function DocumentsTable({
         (category === 'all' || d.category === category) &&
         (seller === 'all' || d.sellerName === seller) &&
         (!q ||
-          [d.sellerName, d.documentNo, d.orderNumber, d.fileName, ...d.lines.map((l) => l.description)]
+          [d.sellerName, d.documentNo, d.orderNumber, d.fileName, ...d.postingNumbers, ...d.lines.map((l) => l.description)]
             .filter(Boolean)
             .some((v) => v!.toLocaleLowerCase('tr-TR').includes(q)))
     );
@@ -127,17 +127,23 @@ export function DocumentsTable({
         helper.display({
           id: 'orderNumber',
           header: 'Sipariş',
+          // Tek faturada birden fazla siparişin ürünü olabilir; hepsi alt alta listelenir.
           cell: ({ row }) =>
-            row.original.postingNumber ? (
-              <a
-                href={`/siparisler?search=${encodeURIComponent(row.original.postingNumber)}`}
-                target="_blank"
-                rel="noreferrer"
-                className="font-mono text-xs underline-offset-4 hover:underline"
-                title="Siparişler sayfasında aç"
-              >
-                {row.original.postingNumber}
-              </a>
+            row.original.postingNumbers.length ? (
+              <div className="flex flex-col items-center gap-0.5">
+                {row.original.postingNumbers.map((posting) => (
+                  <a
+                    key={posting}
+                    href={`/siparisler?search=${encodeURIComponent(posting)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-mono text-xs underline-offset-4 hover:underline"
+                    title="Siparişler sayfasında aç"
+                  >
+                    {posting}
+                  </a>
+                ))}
+              </div>
             ) : (
               <span className="font-mono text-xs text-muted-foreground">{row.original.orderNumber ?? '—'}</span>
             ),

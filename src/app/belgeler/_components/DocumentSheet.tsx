@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, CheckCircle2, ExternalLink, Loader2, Trash2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ExternalLink, Loader2, Trash2, X } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/shadcn/alert';
 import {
   AlertDialog,
@@ -42,6 +42,7 @@ import { formatTL, formatTrNumber, parseTrNumber } from '@/lib/format';
 import type { DocumentPatch } from '../useDocuments';
 import { CURRENCIES, formatAmount, formatIsoDate, formatRate, type DocumentItem } from '../utils';
 import { DateField } from './DateField';
+import { PickPostingButton } from './PostingPicker';
 
 type FormState = Record<
   | 'platform'
@@ -56,7 +57,6 @@ type FormState = Record<
   | 'currency'
   | 'totalAmount'
   | 'orderNumber'
-  | 'postingNumber'
   | 'servicePeriodStart'
   | 'servicePeriodEnd'
   | 'notes',
@@ -76,7 +76,6 @@ const toForm = (d: DocumentItem): FormState => ({
   currency: d.currency ?? '',
   totalAmount: d.totalAmount == null ? '' : formatTrNumber(d.totalAmount),
   orderNumber: d.orderNumber ?? '',
-  postingNumber: d.postingNumber ?? '',
   servicePeriodStart: d.servicePeriodStart ?? '',
   servicePeriodEnd: d.servicePeriodEnd ?? '',
   notes: d.notes ?? '',
@@ -95,7 +94,6 @@ const toPatch = (f: FormState): DocumentPatch => ({
   currency: f.currency || null,
   totalAmount: parseTrNumber(f.totalAmount),
   orderNumber: f.orderNumber || null,
-  postingNumber: f.postingNumber || null,
   servicePeriodStart: f.servicePeriodStart || null,
   servicePeriodEnd: f.servicePeriodEnd || null,
   notes: f.notes || null,
@@ -132,6 +130,8 @@ export function DocumentSheet({
   const [form, setForm] = useState<FormState | null>(current ? toForm(current) : null);
   // Çok kalemli belgelerde (Ozon UPD'si) her kalemin kategorisi ayrı tutulur.
   const [lineCategories, setLineCategories] = useState<Record<string, string>>({});
+  // Belgenin siparişleri; diğer alanlar gibi Kaydet / Onayla ile yazılır.
+  const [postings, setPostings] = useState<string[]>(current?.postingNumbers ?? []);
 
   // Başka bir belge açıldığında ya da sunucudan güncel hâli geldiğinde formu yenile.
   useEffect(() => {
@@ -139,6 +139,7 @@ export function DocumentSheet({
     setDoc(current);
     setForm(toForm(current));
     setLineCategories(Object.fromEntries(current.lines.map((l) => [l.id, l.category ?? ''])));
+    setPostings(current.postingNumbers);
   }, [current]);
 
   const set = (key: keyof FormState) => (value: string) => setForm((prev) => (prev ? { ...prev, [key]: value } : prev));
@@ -157,6 +158,7 @@ export function DocumentSheet({
     if (!doc || !form) return;
     const patch = {
       ...toPatch(form),
+      postingNumbers: postings,
       lines: doc.lines.map((l) => ({ id: l.id, category: lineCategories[l.id] || null })),
     };
     const ok = await onSave(doc.id, patch, confirm);
@@ -306,23 +308,43 @@ export function DocumentSheet({
                 <Field label="Sipariş no (platform)" htmlFor="doc-orderNumber">
                   <Input {...input('orderNumber')} className="font-mono text-xs" />
                 </Field>
-                <Field label="Eşleşen gönderi no" htmlFor="doc-postingNumber" className="col-span-2">
-                  <div className="flex items-center gap-2">
-                    <Input {...input('postingNumber')} className="font-mono text-xs" placeholder="Ozon gönderi no" />
-                    {doc.postingNumber && (
-                      <Button variant="outline" size="icon" className="size-9 shrink-0" asChild>
+                <Field label="Siparişler" className="col-span-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {postings.map((posting) => (
+                      <Badge key={posting} variant="secondary" className="gap-1 py-1 pr-1 font-mono text-xs">
                         <a
-                          href={`/siparisler?search=${encodeURIComponent(doc.postingNumber)}`}
+                          href={`/siparisler?search=${encodeURIComponent(posting)}`}
                           target="_blank"
                           rel="noreferrer"
-                          aria-label="Siparişi aç"
+                          className="underline-offset-4 hover:underline"
                           title="Siparişler sayfasında aç"
                         >
-                          <ExternalLink />
+                          {posting}
                         </a>
-                      </Button>
-                    )}
+                        <button
+                          type="button"
+                          className="rounded-sm p-0.5 hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          onClick={() => setPostings((prev) => prev.filter((p) => p !== posting))}
+                          aria-label={`${posting} bağlantısını kaldır`}
+                        >
+                          <X className="size-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                    <PickPostingButton
+                      endpoint={`/api/belgeler/${doc.id}/siparisler`}
+                      exclude={postings}
+                      label={postings.length ? 'Sipariş ekle' : 'Seç'}
+                      align="start"
+                      onSelect={async (posting) => {
+                        setPostings((prev) => (prev.includes(posting) ? prev : [...prev, posting]));
+                        return true;
+                      }}
+                    />
                   </div>
+                  {postings.join() !== doc.postingNumbers.join() && (
+                    <p className="mt-1.5 text-xs text-muted-foreground">Sipariş değişikliği kaydedince yazılır.</p>
+                  )}
                 </Field>
                 <Field label="Alıcı" htmlFor="doc-buyerName" className="col-span-2">
                   <Input {...input('buyerName')} />

@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       return fail(400, 'Geçerli bir yıl ve ay gerekli.');
     }
 
-    const [documents, pending, orders] = await Promise.all([
+    const [documents, pending, orders, linked] = await Promise.all([
       prisma.accountingDocument.findMany({
         where: {
           store: CURRENT_STORE,
@@ -74,12 +74,15 @@ export async function GET(request: NextRequest) {
         },
         orderBy: { documentUploadedAt: 'desc' },
       }),
+      // Herhangi bir belgeye (hangi ayda olursa olsun) bağlanmış siparişler
+      prisma.accountingDocument.findMany({
+        where: { store: CURRENT_STORE, NOT: { postingNumbers: { isEmpty: true } } },
+        select: { postingNumbers: true },
+      }),
     ]);
 
-    // Okunmuş sipariş belgeleri listede zaten var; kalanlar "okunmadı" olarak gösterilir.
-    const known = new Set(
-      [...documents, ...pending].map((d) => d.postingNumber).filter((p): p is string => !!p)
-    );
+    // Bir belgeye bağlanmış siparişlerin faturası okunmuştur; kalanlar "okunmadı" olarak gösterilir.
+    const known = new Set(linked.flatMap((d) => d.postingNumbers));
 
     return NextResponse.json({
       success: true,

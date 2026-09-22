@@ -26,7 +26,7 @@ export type DocumentPatch = Partial<
     | 'currency'
     | 'totalAmount'
     | 'orderNumber'
-    | 'postingNumber'
+    | 'postingNumbers'
     | 'servicePeriodStart'
     | 'servicePeriodEnd'
     | 'notes'
@@ -39,10 +39,10 @@ export type DocumentPatch = Partial<
 const isInMonth = (doc: DocumentItem, year: number, month: number) =>
   !!doc.documentDate && doc.documentDate.startsWith(`${year}-${String(month).padStart(2, '0')}`);
 
-export function useDocuments() {
+export function useDocuments(initial?: { year: number; month: number }) {
   const now = new Date();
-  const [year, setYear] = useState(now.getFullYear());
-  const [month, setMonth] = useState(now.getMonth() + 1);
+  const [year, setYear] = useState(initial?.year ?? now.getFullYear());
+  const [month, setMonth] = useState(initial?.month ?? now.getMonth() + 1);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [pending, setPending] = useState<DocumentItem[]>([]);
   const [orderDocuments, setOrderDocuments] = useState<OrderDocumentItem[]>([]);
@@ -73,6 +73,21 @@ export function useDocuments() {
       if (err.name !== 'AbortError') setError(err.message);
     } finally {
       if (requestRef.current === controller) setLoading(false);
+    }
+  }, [year, month]);
+
+  /**
+   * "Siparişlere yüklenmiş faturalar" kartını sessizce tazeler. Belgeye sipariş
+   * bağlanınca o sipariş karttan düşer, bağlantı kaldırılınca ya da belge silinince
+   * geri gelir; hangi siparişin açıkta kaldığına tüm aylara bakan sunucu karar verir.
+   */
+  const refreshOrderDocuments = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/belgeler?year=${year}&month=${month}`);
+      const data = await res.json();
+      if (res.ok && data.success) setOrderDocuments(data.orderDocuments ?? []);
+    } catch (err) {
+      console.error('Sipariş belgeleri tazelenemedi:', err);
     }
   }, [year, month]);
 
@@ -119,7 +134,10 @@ export function useDocuments() {
     setUploads((prev) => prev.filter((u) => u.key !== key));
   }, []);
 
-  /** Siparişe yüklenmiş faturayı okuyup listeye taslak olarak ekler. */
+  /**
+   * Siparişe yüklenmiş faturayı okur. Uyarısız okunan belge sunucuda doğrudan
+   * onaylanır ve tabloya, diğerleri onay bekleyenlere gelir.
+   */
   const readOrderDocument = useCallback(async (postingNumber: string, silent = false): Promise<boolean> => {
     setReadingOrders((prev) => [...prev, postingNumber]);
     try {
@@ -131,7 +149,24 @@ export function useDocuments() {
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error_message || 'Belge okunamadı.');
 
-      setPending((prev) => [data.document, ...prev]);
+      const doc: DocumentItem = data.document;
+      if (data.merged) {
+        // Aynı fatura başka bir siparişte zaten okunmuştu; sipariş o belgeye eklendi.
+        const swap = (list: DocumentItem[]) => list.map((d) => (d.id === doc.id ? doc : d));
+        setPending(swap);
+        setDocuments(swap);
+        if (!silent) toast.success(`${postingNumber} mevcut belgeye eklendi (${doc.documentNo ?? doc.fileName})`);
+      } else if (doc.status === 'confirmed') {
+        if (isInMonth(doc, year, month)) {
+          setDocuments((prev) =>
+            [doc, ...prev].sort((a, b) => (b.documentDate ?? '').localeCompare(a.documentDate ?? ''))
+          );
+        }
+        if (!silent) toast.success(`${postingNumber} okundu ve tabloya eklendi`);
+      } else {
+        setPending((prev) => [doc, ...prev]);
+        if (!silent) toast.warning(`${postingNumber} okundu; kontrol edilecek noktalar var, onayınızı bekliyor`);
+      }
       setOrderDocuments((prev) => prev.filter((o) => o.postingNumber !== postingNumber));
       return true;
     } catch (err: any) {
@@ -140,7 +175,7 @@ export function useDocuments() {
     } finally {
       setReadingOrders((prev) => prev.filter((p) => p !== postingNumber));
     }
-  }, []);
+  }, [year, month]);
 
   /** Hepsini sırayla okur; her belge bir Gemini çağrısı olduğu için paralel gönderilmez. */
   const readAllOrderDocuments = useCallback(async () => {
@@ -151,7 +186,7 @@ export function useDocuments() {
       if (await readOrderDocument(postingNumber, true)) ok += 1;
       else failed += 1;
     }
-    if (ok) toast.success(`${ok} sipariş belgesi okundu, onayınızı bekliyor.`);
+    if (ok) toast.success(`${ok} sipariş belgesi okundu. Sorunsuz olanlar tabloya, diğerleri onay bekleyenlere eklendi.`);
     if (failed) toast.error(`${failed} belge okunamadı.`);
   }, [orderDocuments, readOrderDocument]);
 
@@ -189,6 +224,7 @@ export function useDocuments() {
         } else {
           toast.success('Değişiklikler kaydedildi');
         }
+        if ('postingNumbers' in patch) refreshOrderDocuments();
         return true;
       } catch (err: any) {
         toast.error(err.message);
@@ -197,7 +233,7 @@ export function useDocuments() {
         setSaving(false);
       }
     },
-    [year, month]
+    [year, month, refreshOrderDocuments]
   );
 
   const remove = useCallback(async (id: string): Promise<boolean> => {
@@ -208,12 +244,14 @@ export function useDocuments() {
       setPending((prev) => prev.filter((d) => d.id !== id));
       setDocuments((prev) => prev.filter((d) => d.id !== id));
       toast.success('Belge silindi');
+      // Silinen belgenin siparişleri yeniden "okunmadı" kartına düşebilir.
+      refreshOrderDocuments();
       return true;
     } catch (err: any) {
       toast.error(err.message);
       return false;
     }
-  }, []);
+  }, [refreshOrderDocuments]);
 
   const selected = [...pending, ...documents].find((d) => d.id === selectedId) ?? null;
 
