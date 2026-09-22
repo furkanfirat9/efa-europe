@@ -97,3 +97,21 @@ export const YEARS = (() => {
   for (let y = 2024; y <= new Date().getFullYear(); y++) years.push(y);
   return years;
 })();
+
+export const SALES_ACCEPT = '.zip,.xml,application/zip,application/x-zip-compressed,application/xml,text/xml';
+
+const INVOICE_TYPE_LABELS: Record<string, string> = {
+  SATIS: 'Satış',
+  ISTISNA: 'İstisna',
+  IADE: 'İade',
+  TEVKIFAT: 'Tevkifat',
+  IHRACKAYITLI: 'İhraç kayıtlı',
+  OZELMATRAH: 'Özel matrah',
+};
+
+/** "ISTISNA" → "İstisna"; bilinmeyen tip olduğu gibi gösterilir. */
+export const invoiceTypeLabel = (code?: string | null) => (code ? INVOICE_TYPE_LABELS[code] ?? code : '—');
+
+/** Satış toplamlarında iade faturası eksiye yazılır. */
+export const signedTry = (inv: { typeCode: string | null; totalTry: number | null }) =>
+  (inv.totalTry ?? 0) * (inv.typeCode === 'IADE' ? -1 : 1);
