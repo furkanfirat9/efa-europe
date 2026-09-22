@@ -142,8 +142,12 @@ model AccountingDocument {
   // KDV dahil belge toplamı
   totalAmount        Float?
   orderNumber        String?
-  // Eşleştiği Ozon siparişinin gönderi numarası (OzonOrder.postingNumber)
+  // ESKİ: tek gönderi no. Yerini postingNumbers aldı; yayındaki sürüm hâlâ okuduğu
+  // için yeni sürüm yayına alınana kadar tabloda kalır, sonra kaldırılır.
   postingNumber      String?
+  // Belgenin ait olduğu Ozon siparişleri (OzonOrder.postingNumber). Tek faturada
+  // birden fazla siparişin ürünü olabilir.
+  postingNumbers     String[]  @default([])
   // Dosya siparişe yüklenmiş belgeye aitse true olur; belge silinirken dosyaya dokunulmaz.
   fileShared         Boolean   @default(false)
   servicePeriodStart DateTime? @db.Date

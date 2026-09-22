@@ -57,16 +57,35 @@ export async function computeFx(input: { currency?: string | null; documentDate?
   };
 }
 
+/** Faturadaki ürün adedi (kargo satırları hariç; adedi okunamayan satır 1 sayılır). */
+export const productUnits = (lines: Pick<AccountingDocumentLine, 'quantity' | 'isShipping'>[]) =>
+  Math.round(lines.filter((l) => !l.isShipping).reduce((acc, l) => acc + (l.quantity ?? 1), 0));
+
 /** Onaydan önce eksik ya da şüpheli olan her şey; kayıt sırasında yeniden hesaplanır. */
 export async function buildWarnings(
   doc: Pick<
     AccountingDocument,
-    'id' | 'store' | 'kind' | 'documentDate' | 'currency' | 'totalAmount' | 'category' | 'buyerName' | 'fxRate' | 'dedupKey'
+    | 'id'
+    | 'store'
+    | 'kind'
+    | 'documentDate'
+    | 'currency'
+    | 'totalAmount'
+    | 'category'
+    | 'buyerName'
+    | 'fxRate'
+    | 'dedupKey'
+    | 'postingNumbers'
   >,
   extra: string[] = [],
-  lines: Pick<AccountingDocumentLine, 'amount' | 'category'>[] = []
+  lines: Pick<AccountingDocumentLine, 'amount' | 'category' | 'quantity' | 'isShipping'>[] = []
 ): Promise<string[]> {
   const warnings = [...extra];
+  // Bir fatura içindeki ürün adedinden fazla siparişe ait olamaz; yanlış bağlantı işaretidir.
+  const units = productUnits(lines);
+  if (units > 0 && doc.postingNumbers.length > units) {
+    warnings.push(`Faturada ${units} ürün var ama ${doc.postingNumbers.length} siparişe bağlı; siparişleri kontrol edin.`);
+  }
   if (!doc.documentDate) warnings.push('Belge tarihi okunamadı.');
   if (!doc.currency) warnings.push('Para birimi okunamadı.');
   if (doc.totalAmount == null) warnings.push('Toplam tutar okunamadı.');
@@ -134,7 +153,7 @@ export function toDto(doc: DocumentWithLines) {
     currency: doc.currency,
     totalAmount: doc.totalAmount,
     orderNumber: doc.orderNumber,
-    postingNumber: doc.postingNumber,
+    postingNumbers: doc.postingNumbers,
     fileShared: doc.fileShared,
     servicePeriodStart: isoDate(doc.servicePeriodStart),
     servicePeriodEnd: isoDate(doc.servicePeriodEnd),
@@ -163,16 +182,25 @@ export function toDto(doc: DocumentWithLines) {
 
 export type AccountingDocumentDto = ReturnType<typeof toDto>;
 
-/** Faturadaki platform sipariş numarasına göre siparişi bulur (tedarikçi sipariş no alanı). */
-export async function findOrderByOrderNumber(orderNumber?: string | null): Promise<string | null> {
+/**
+ * Eski tek gönderi no alanı; yayındaki eski sürüm okuduğu için ilk sipariş oraya da yazılır.
+ * Yeni sürüm yayına alınıp alan kaldırıldığında bu yardımcı da kalkar.
+ */
+export const legacyPostingNumber = (postingNumbers: string[]) => postingNumbers[0] ?? null;
+
+/**
+ * Faturadaki platform sipariş numarasına göre siparişleri bulur (tedarikçi sipariş no alanı).
+ * Tek Amazon siparişinde birden fazla Ozon siparişinin ürünü alınmış olabilir; hepsi döner.
+ */
+export async function findOrdersByOrderNumber(orderNumber?: string | null): Promise<string[]> {
   const value = orderNumber?.trim();
-  if (!value || value.length < 4) return null;
-  const order = await prisma.ozonOrder.findFirst({
+  if (!value || value.length < 4) return [];
+  const orders = await prisma.ozonOrder.findMany({
     where: { supplierOrderId: { contains: value } },
     select: { postingNumber: true },
     orderBy: { inProcessAt: 'desc' },
   });
-  return order?.postingNumber ?? null;
+  return orders.map((o) => o.postingNumber);
 }
 
 /**
@@ -210,9 +238,12 @@ export async function saveExtractedDocument(input: {
   };
 
   const extraWarnings = [...(input.extraWarnings ?? [])];
-  const postingNumber = input.postingNumber ?? (await findOrderByOrderNumber(fields.orderNumber));
-  if (!input.postingNumber && postingNumber) {
-    extraWarnings.push(`Sipariş ${postingNumber} ile eşleştirildi; kontrol edin.`);
+  // Siparişten okunan belge o siparişe aittir; faturadaki sipariş no başka siparişleri de getirebilir.
+  const found = await findOrdersByOrderNumber(fields.orderNumber);
+  const postingNumbers = [...new Set([...(input.postingNumber ? [input.postingNumber] : []), ...found])];
+  const guessed = postingNumbers.filter((p) => p !== input.postingNumber);
+  if (guessed.length) {
+    extraWarnings.push(`Sipariş ${guessed.join(', ')} ile eşleştirildi; kontrol edin.`);
   }
 
   const fx = await computeFx(fields).catch((err) => {
@@ -226,7 +257,8 @@ export async function saveExtractedDocument(input: {
       status: 'draft',
       ...fields,
       ...fx,
-      postingNumber,
+      postingNumbers,
+      postingNumber: legacyPostingNumber(postingNumbers),
       dedupKey: buildDedupKey(fields),
       aiModel,
       fileUrl: file.url,

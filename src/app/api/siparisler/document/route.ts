@@ -1,6 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { createHash } from 'node:crypto';
+import { after, NextRequest, NextResponse } from 'next/server';
 import { del, get, put } from '@vercel/blob';
 import { prisma } from '@/lib/db/prisma';
+import { checkSharedInvoice, IngestError, ingestOrderDocument, READABLE_TYPES } from '@/lib/documents/order-ingest';
+import { CURRENT_STORE } from '@/lib/documents/service';
 
 /**
  * Sipariş belgesi (fatura vb.)
@@ -12,7 +15,13 @@ import { prisma } from '@/lib/db/prisma';
  *   POST   form-data: postingNumber, file, onlyIfEmpty? → yükle / değiştir
  *   GET    ?postingNumber=…                           → dosyayı aç
  *   DELETE ?postingNumber=…                           → sil
+ *
+ * Yüklenen PDF / görsel, yanıt döndükten sonra arka planda yapay zekâyla okunup
+ * Belgeler'e (Alış / Gider) o siparişle birlikte işlenir.
  */
+
+// Arka plandaki okuma (Gemini) birkaç saniye sürer; fonksiyon onun bitmesini bekler.
+export const maxDuration = 60;
 
 // Vercel fonksiyonlarında istek gövdesi 4,5 MB ile sınırlı.
 const MAX_BYTES = 4 * 1024 * 1024;
@@ -67,6 +76,9 @@ function documentFields(order: {
 
 async function deleteBlobQuietly(url: string | null) {
   if (!url) return;
+  // Belgeler'e işlenmiş belge aynı dosyayı kullanır; orada duruyorsa dosya silinmez.
+  const inUse = await prisma.accountingDocument.count({ where: { fileUrl: url } });
+  if (inUse) return;
   try {
     await del(url, { token: token() });
   } catch (err) {
@@ -95,8 +107,25 @@ export async function POST(request: NextRequest) {
     // Tarayıcıdaki eski belgeler taşınırken sunucudaki belge ezilmez.
     if (onlyIfEmpty && order.documentUrl) return fail(409, 'Siparişin zaten bir belgesi var.');
 
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    // Bu dosya Belgeler'de başka bir siparişin faturası olarak zaten varsa: faturadaki
+    // ürün adedi yetmiyorsa yükleme reddedilir (yanlış dosya), yetiyorsa kullanıcıya söylenir.
+    let notice: string | null = null;
+    if (READABLE_TYPES.has(contentType)) {
+      const alreadyLinked = await prisma.accountingDocument.count({
+        where: { store: CURRENT_STORE, postingNumbers: { has: postingNumber } },
+      });
+      if (!alreadyLinked) {
+        const fileHash = createHash('sha256').update(buffer).digest('hex');
+        const shared = await checkSharedInvoice(fileHash, postingNumber);
+        if (shared?.blocked) return fail(409, shared.blocked);
+        notice = shared?.notice ?? null;
+      }
+    }
+
     const safeName = file.name.replace(/[^\p{L}\p{N}._-]+/gu, '_').slice(-120) || 'belge';
-    const blob = await put(`order-documents/${postingNumber}/${Date.now()}-${safeName}`, file, {
+    const blob = await put(`order-documents/${postingNumber}/${Date.now()}-${safeName}`, buffer, {
       access: 'private',
       contentType,
       token: token(),
@@ -117,7 +146,21 @@ export async function POST(request: NextRequest) {
     // siparişi belgesiz bırakabilirdi.
     await deleteBlobQuietly(order.documentUrl);
 
-    return NextResponse.json({ success: true, ...documentFields(updated) });
+    // Belgeler'e işleme yanıtı bekletmez. Siparişin zaten bir belgesi varsa ya da
+    // dosya okunamayan bir türse (Word, Excel) atlanır.
+    if (READABLE_TYPES.has(contentType)) {
+      after(async () => {
+        try {
+          const { document, merged } = await ingestOrderDocument(postingNumber);
+          console.log(`Sipariş belgesi Belgeler'e işlendi: ${postingNumber} → ${document.id} (${merged ? 'mevcut belgeye eklendi' : document.status})`);
+        } catch (err) {
+          if (err instanceof IngestError) console.log(`Sipariş belgesi Belgeler'e işlenmedi: ${postingNumber} → ${err.message}`);
+          else console.error("Sipariş belgesi Belgeler'e işlenemedi:", postingNumber, err);
+        }
+      });
+    }
+
+    return NextResponse.json({ success: true, notice, ...documentFields(updated) });
   } catch (error: any) {
     console.error('API /api/siparisler/document POST Error:', error);
     return fail(500, 'Belge yüklenemedi: ' + (error.message || 'bilinmeyen hata'));

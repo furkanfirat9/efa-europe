@@ -10,6 +10,7 @@ import {
   computeFx,
   isCategorised,
   isOwnBuyer,
+  legacyPostingNumber,
   parseIsoDate,
   toDto,
 } from '@/lib/documents/service';
@@ -31,7 +32,6 @@ const TEXT_FIELDS = [
   'sellerTaxId',
   'buyerName',
   'orderNumber',
-  'postingNumber',
   'notes',
 ] as const;
 const DATE_FIELDS = ['documentDate', 'servicePeriodStart', 'servicePeriodEnd'] as const;
@@ -67,6 +67,35 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<'/api/belgel
       const amount = body.totalAmount === null || body.totalAmount === '' ? null : Number(body.totalAmount);
       if (amount !== null && !Number.isFinite(amount)) return fail(400, 'Tutar geçersiz.');
       data.totalAmount = amount === null ? null : Math.round(amount * 100) / 100;
+    }
+    // Belgenin siparişleri; her biri gerçekten var olan bir sipariş olmalı.
+    if ('postingNumbers' in body) {
+      if (!Array.isArray(body.postingNumbers)) return fail(400, 'Sipariş listesi geçersiz.');
+      const postings = [
+        ...new Set(body.postingNumbers.map(text).filter((p: string | null): p is string => !!p)),
+      ] as string[];
+      const found = await prisma.ozonOrder.findMany({
+        where: { postingNumber: { in: postings } },
+        select: { postingNumber: true },
+      });
+      const known = new Set(found.map((o) => o.postingNumber));
+      const missing = postings.filter((p) => !known.has(p));
+      if (missing.length) return fail(404, `Sipariş bulunamadı: ${missing.join(', ')}.`);
+
+      // Bir sipariş yalnızca bir alış belgesine bağlanır; yalnızca yeni eklenenlere bakılır.
+      const added = postings.filter((p) => !existing.postingNumbers.includes(p));
+      const taken = added.length
+        ? await prisma.accountingDocument.findFirst({
+            where: { store: CURRENT_STORE, NOT: { id }, postingNumbers: { hasSome: added } },
+            select: { documentNo: true, fileName: true, postingNumbers: true },
+          })
+        : null;
+      if (taken) {
+        const clash = added.filter((p) => taken.postingNumbers.includes(p));
+        return fail(409, `${clash.join(', ')} zaten ${taken.documentNo ?? taken.fileName} belgesine bağlı.`);
+      }
+      data.postingNumbers = postings;
+      data.postingNumber = legacyPostingNumber(postings);
     }
     if ('category' in body) {
       if (body.category && !isCategoryKey(body.category)) return fail(400, 'Geçersiz kategori.');
@@ -156,8 +185,12 @@ export async function DELETE(_request: NextRequest, ctx: RouteContext<'/api/belg
 
     await prisma.accountingDocument.delete({ where: { id } });
     // Kayıt silindikten sonra dosya kaldırılır; dosya silinemezse yalnızca günlüğe yazılır.
-    // Siparişten gelen belgelerde dosya siparişindir, dokunulmaz.
-    if (!existing.fileShared) {
+    // Siparişten gelen belgelerde dosya siparişindir: sipariş hâlâ kullanıyorsa dokunulmaz,
+    // siparişin belgesi o arada değiştirildiyse artık kimse kullanmadığı için silinir.
+    const stillUsed = existing.fileShared
+      ? (await prisma.ozonOrder.count({ where: { documentUrl: existing.fileUrl } })) > 0
+      : false;
+    if (!stillUsed) {
       try {
         await del(existing.fileUrl, { token: process.env.BLOB_READ_WRITE_TOKEN || undefined });
       } catch (err) {

@@ -63,7 +63,9 @@ export function useOrderDocument(order: OrderItem | null | undefined, onChange: 
           documentSize: data.documentSize,
           documentUploadedAt: data.documentUploadedAt,
         });
-        toast.success('Belge kaydedildi', { description: file.name });
+        // Aynı fatura Belgeler'de başka bir siparişe de bağlıysa kullanıcı uyarılır.
+        if (data.notice) toast.warning('Belge kaydedildi', { description: data.notice, duration: 10000 });
+        else toast.success('Belge kaydedildi', { description: file.name });
       } catch (err: any) {
         toast.error('Belge yüklenemedi', { description: err.message });
       } finally {
