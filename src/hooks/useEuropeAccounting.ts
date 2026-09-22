@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { categoryTotals, type DocumentItem } from '@/app/belgeler/utils';
 
 export interface MonthOption {
   key: string;        // YYYY-MM
@@ -55,8 +56,9 @@ function generateMonthOptions(): MonthOption[] {
 
 /**
  * Avrupa mağazasının aylık fatura ve kurumlar vergisi hesabı.
- * Ozon siparişleri (USD), TCMB döviz alış kuru ve Siparişler sayfasına
- * girilen alış maliyetleri seçilen ay için birlikte çekilir.
+ * Ozon siparişleri (USD), TCMB döviz alış kuru ve Belgeler sayfasındaki onaylı
+ * gider belgeleri (mal alımı, Ozon giderleri, üyelikler …) seçilen ay için birlikte
+ * çekilir. Gider, siparişlere girilen tahmini alış fiyatlarından değil faturalardan gelir.
  */
 export function useEuropeAccounting() {
   const monthOptions = useMemo(() => generateMonthOptions(), []);
@@ -76,37 +78,17 @@ export function useEuropeAccounting() {
   const [tcmbDate, setTcmbDate] = useState<string>('');
   const [rateLoading, setRateLoading] = useState<boolean>(true);
 
-  // Siparişler Sayfasından Çekilen Alış Maliyeti
-  const [ordersBuyCostTry, setOrdersBuyCostTry] = useState<number>(0);
-  const [recordedBuyCount, setRecordedBuyCount] = useState<number>(0);
-  const [ordersPageTotalCount, setOrdersPageTotalCount] = useState<number>(0);
-  const [siparisLoading, setSiparisLoading] = useState<boolean>(true);
+  // Belgeler sayfasındaki onaylı gider belgeleri (TL)
+  const [expenses, setExpenses] = useState({ total: 0, goods: 0, ozon: 0, documentCount: 0, pendingCount: 0 });
+  const [expensesLoading, setExpensesLoading] = useState<boolean>(true);
 
-  // Kullanıcının Girdiği Diğer Giderler (Kargo, komisyon vb.)
-  const [otherExpensesInput, setOtherExpensesInput] = useState<string>('');
-
-  // Ay değişince kayıtlı diğer giderleri localStorage'dan yükle
-  useEffect(() => {
-    if (typeof window !== 'undefined' && activeMonth) {
-      const savedOther = localStorage.getItem(`ozon_other_exp_${activeMonth.key}`) || '';
-      setOtherExpensesInput(savedOther);
-    }
-  }, [selectedMonthKey, activeMonth]);
-
-  const handleOtherExpensesChange = (val: string) => {
-    setOtherExpensesInput(val);
-    if (typeof window !== 'undefined' && activeMonth) {
-      localStorage.setItem(`ozon_other_exp_${activeMonth.key}`, val);
-    }
-  };
-
-  // Siparişleri, TCMB Kurunu ve Siparişler Sayfasından Alış Fiyatlarını Çek
+  // Siparişleri, TCMB kurunu ve Belgeler'deki giderleri çek
   const fetchData = useCallback(async () => {
     if (!activeMonth) return;
 
     setOrdersLoading(true);
     setRateLoading(true);
-    setSiparisLoading(true);
+    setExpensesLoading(true);
 
     try {
       // 1. Ozon Avrupa Mağazası Siparişleri
@@ -151,19 +133,27 @@ export function useEuropeAccounting() {
     }
 
     try {
-      // 3. Siparişler Sayfasından İlgili Ayın Alış Maliyeti
-      const siparisRes = await fetch(`/api/siparisler?year=${activeMonth.year}&month=${activeMonth.month}`);
-      if (siparisRes.ok) {
-        const siparisData = await siparisRes.json();
-        const autoBuyCost = Number(siparisData.stats?.totalBuyCostTry || 0);
-        setOrdersBuyCostTry(autoBuyCost);
-        setRecordedBuyCount(Number(siparisData.stats?.recordedBuyCount || 0));
-        setOrdersPageTotalCount(Number(siparisData.stats?.totalOrders || 0));
+      // 3. Belgeler sayfasındaki ayın onaylı gider belgeleri. Onay bekleyenler toplama girmez.
+      const docsRes = await fetch(`/api/belgeler?year=${activeMonth.year}&month=${activeMonth.month}`);
+      if (docsRes.ok) {
+        const docsData = await docsRes.json();
+        const documents: DocumentItem[] = docsData.documents ?? [];
+        // Çok kalemli belgelerde (Ozon UPD'si) tutar kalem kategorilerine dağıtılır.
+        const totals = categoryTotals(documents);
+        const sumOf = (prefix: string) =>
+          totals.filter((t) => t.key === prefix || t.key.startsWith(`${prefix}.`)).reduce((acc, t) => acc + t.total, 0);
+        setExpenses({
+          total: totals.reduce((acc, t) => acc + t.total, 0),
+          goods: sumOf('tedarik'),
+          ozon: sumOf('ozon'),
+          documentCount: documents.length,
+          pendingCount: (docsData.pending ?? []).length,
+        });
       }
     } catch (err) {
-      console.error('Siparişler sayfasından alış fiyatı alınamadı:', err);
+      console.error('Belgeler sayfasından giderler alınamadı:', err);
     } finally {
-      setSiparisLoading(false);
+      setExpensesLoading(false);
     }
   }, [activeMonth]);
 
@@ -175,9 +165,7 @@ export function useEuropeAccounting() {
   const invoiceTotalTry = totalRevenueUsd * tcmbUsdRate;
 
   // Dinamik Vergi & Kâr Hesaplaması
-  const buyCost = ordersBuyCostTry;
-  const otherExpenses = parseFloat(otherExpensesInput.replace(/\./g, '').replace(',', '.')) || 0;
-  const totalExpenses = buyCost + otherExpenses;
+  const totalExpenses = expenses.total;
 
   // Ticari Kazanç / Kâr (Zarar durumunda 0)
   const commercialProfit = Math.max(0, invoiceTotalTry - totalExpenses);
@@ -200,19 +188,15 @@ export function useEuropeAccounting() {
     setSelectedMonthKey,
     activeMonth,
     fetchData,
-    loading: ordersLoading || rateLoading || siparisLoading,
+    loading: ordersLoading || rateLoading || expensesLoading,
     ordersLoading,
     rateLoading,
-    siparisLoading,
+    expensesLoading,
     totalRevenueUsd,
     totalOrdersCount,
     tcmbUsdRate,
     tcmbDate,
-    ordersBuyCostTry,
-    recordedBuyCount,
-    ordersPageTotalCount,
-    otherExpensesInput,
-    handleOtherExpensesChange,
+    expenses,
     invoiceTotalTry,
     totalExpenses,
     commercialProfit,
