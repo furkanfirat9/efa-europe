@@ -142,9 +142,6 @@ model AccountingDocument {
   // KDV dahil belge toplamı
   totalAmount        Float?
   orderNumber        String?
-  // ESKİ: tek gönderi no. Yerini postingNumbers aldı; yayındaki sürüm hâlâ okuduğu
-  // için yeni sürüm yayına alınana kadar tabloda kalır, sonra kaldırılır.
-  postingNumber      String?
   // Belgenin ait olduğu Ozon siparişleri (OzonOrder.postingNumber). Tek faturada
   // birden fazla siparişin ürünü olabilir.
   postingNumbers     String[]  @default([])
@@ -179,7 +176,6 @@ model AccountingDocument {
   @@index([store, documentDate])
   @@index([store, status])
   @@index([store, dedupKey])
-  @@index([postingNumber])
 }
 
 model AccountingDocumentLine {

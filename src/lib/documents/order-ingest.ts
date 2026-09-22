@@ -6,7 +6,6 @@ import {
   CURRENT_STORE,
   isCategorised,
   isOtherStoreBuyer,
-  legacyPostingNumber,
   productUnits,
   saveExtractedDocument,
   type DocumentWithLines,
@@ -118,7 +117,6 @@ export async function ingestOrderDocument(
       where: { id: shared.doc.id },
       data: {
         postingNumbers,
-        postingNumber: legacyPostingNumber(postingNumbers),
         status: 'draft',
         warnings: [
           ...previous,

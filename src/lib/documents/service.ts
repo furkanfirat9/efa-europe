@@ -183,12 +183,6 @@ export function toDto(doc: DocumentWithLines) {
 export type AccountingDocumentDto = ReturnType<typeof toDto>;
 
 /**
- * Eski tek gönderi no alanı; yayındaki eski sürüm okuduğu için ilk sipariş oraya da yazılır.
- * Yeni sürüm yayına alınıp alan kaldırıldığında bu yardımcı da kalkar.
- */
-export const legacyPostingNumber = (postingNumbers: string[]) => postingNumbers[0] ?? null;
-
-/**
  * Faturadaki platform sipariş numarasına göre siparişleri bulur (tedarikçi sipariş no alanı).
  * Tek Amazon siparişinde birden fazla Ozon siparişinin ürünü alınmış olabilir; hepsi döner.
  */
@@ -258,7 +252,6 @@ export async function saveExtractedDocument(input: {
       ...fields,
       ...fx,
       postingNumbers,
-      postingNumber: legacyPostingNumber(postingNumbers),
       dedupKey: buildDedupKey(fields),
       aiModel,
       fileUrl: file.url,

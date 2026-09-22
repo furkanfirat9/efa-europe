@@ -10,7 +10,6 @@ import {
   computeFx,
   isCategorised,
   isOwnBuyer,
-  legacyPostingNumber,
   parseIsoDate,
   toDto,
 } from '@/lib/documents/service';
@@ -95,7 +94,6 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<'/api/belgel
         return fail(409, `${clash.join(', ')} zaten ${taken.documentNo ?? taken.fileName} belgesine bağlı.`);
       }
       data.postingNumbers = postings;
-      data.postingNumber = legacyPostingNumber(postings);
     }
     if ('category' in body) {
       if (body.category && !isCategoryKey(body.category)) return fail(400, 'Geçersiz kategori.');
