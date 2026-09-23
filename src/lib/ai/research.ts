@@ -641,7 +641,10 @@ Format:
         let singleStr = '';
         if (Array.isArray(rawVal)) {
           singleStr = String(rawVal[0] || '').trim();
-        } else if (typeof rawVal === 'string' && rawVal.includes(',')) {
+        } else if (typeof rawVal === 'string' && rawVal.includes(',') && attr.dictionary_id > 0) {
+          // Yalnızca listeden seçilen alanlar bölünür ("Китай, Германия" → "Китай"). Serbest metin
+          // bölünmez: açıklama (4191) ve Комплектация (4384) eskiden ilk virgülde kesiliyordu; mağazadaki
+          // 427 açıklamanın 394'ü cümle ortasında bitiyor ve madde listesi hiç gitmemiş.
           singleStr = rawVal.split(/[,;\n]+/)[0].trim();
         } else {
           singleStr = String(rawVal).trim();
