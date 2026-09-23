@@ -1,3 +1,6 @@
+/** Ozon fiyatı = Amazon € × ECB EUR/USD kuru × bu çarpan (tam sayıya yuvarlanır). */
+export const OZON_PRICE_MULTIPLIER = 4;
+
 export interface AmazonProductItem {
   asin: string;
   title: string;
@@ -5,7 +8,7 @@ export interface AmazonProductItem {
   brand: string;
   buyPriceNum: number;
   buyPriceStr: string;
-  ozonPrice: number; // 3x rounded integer
+  ozonPrice: number; // € × kur × OZON_PRICE_MULTIPLIER, tam sayı
   ozonOldPrice: number; // ~1.2x old price rounded integer
   imageUrl: string;
   galleryImages?: string[];

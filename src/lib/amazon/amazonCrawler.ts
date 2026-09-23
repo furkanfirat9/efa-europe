@@ -1,6 +1,6 @@
 import https from 'https';
 import zlib from 'zlib';
-import { AmazonProductItem, AmazonCrawlOptions, AmazonCrawlResponse } from './types';
+import { AmazonProductItem, AmazonCrawlOptions, AmazonCrawlResponse, OZON_PRICE_MULTIPLIER } from './types';
 import { checkIsProductInOzon, getUploadedOzonProducts, prepareStoreCodes } from '@/lib/ozon/duplicateDetector';
 import { loadCatalogMemory } from '@/lib/db/catalogMemory';
 import { getStoreOfferIds } from '@/lib/ozon/storeOfferIds';
@@ -563,8 +563,8 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
         pageRawItems.map(async (item) => {
           const status = await verifyImageUrl(item.image);
           if (status === 200) {
-            // Amazon € fiyatı ECB kuruyla dolara çevrilir, 3 katı alınır; Ozon tam sayı ister.
-            const ozonPrice = Math.round(item.priceNum * fx.rate * 3);
+            // Amazon € fiyatı ECB kuruyla dolara çevrilir, çarpanla çarpılır; Ozon tam sayı ister.
+            const ozonPrice = Math.round(item.priceNum * fx.rate * OZON_PRICE_MULTIPLIER);
             const ozonOldPrice = Math.round(ozonPrice * 1.2);
             const modelCode = extractModelCode(item.title, brand);
 
