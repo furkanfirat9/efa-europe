@@ -66,7 +66,9 @@ Mağazada daha önce yüklenmiş olan ürünleri takip etmek, mükerrer yükleme
 - **Anti-Reklam Kalkanı:** Sponsorlu reklamlar (`AdHolder`, `Gesponsert`) ve yabancı marka kartları elenir.
 - **Fiyat Tavan Sınırı:** Amazon alış fiyatı $0 - 550 € arası hedeflenir.
 - **Ozon Tam Sayı Fiyat Kuralı (Integer Price):**
-  - Ozon API'si kuruşlu/ondalıklı değer kabul etmediğinden ve Amazon alış fiyatı Euro (€) olup Ozon fiyatı USD ($) olarak yüklendiğinden; kur tamponuyla birlikte Amazon alış fiyatının 3 katına ek %15 artış eklenerek tam sayıya yuvarlanır (`Math.round(buyPrice * 3 * 1.15)` yani `3.45x`).
+  - Ozon API'si kuruşlu/ondalıklı değer kabul etmediğinden ve Amazon alış fiyatı Euro (€) olup Ozon fiyatı USD ($) olarak yüklendiğinden; Amazon fiyatı günlük ECB EUR/USD referans kuruyla dolara çevrilir, 3 katı alınıp tam sayıya yuvarlanır: `Math.round(buyPriceEur * ecbRate * 3)` (`src/lib/fx/ecb.ts`, 3 saat önbellek). Eskiden kur yerine sabit `1.15` vardı; kur ondan uzaklaştıkça oran ×3'ten sapıyordu. ECB'ye ulaşılamazsa `1.15` ile hesaplanır ve tarama sonucu uyarı taşır; kullanılan kur ekranda gösterilir.
+  - **Fiyatı okunamayan ürün alınmaz:** Kartta Amazon'un satış fiyatı (`<span class="a-price">`) yoksa ürün Amazon'dan satın alınamıyordur (stokta yok ya da yalnızca başka satıcı / "Seçenekleri gör"). Eskiden 50 € varsayılıyordu ve maliyetin altında satışa yol açtı.
+  - **Stok:** "Stokta sadece N adet kaldı" elenir; yanında "(daha fazla ürün gelecektir)" varsa kabul edilir.
   - Üstü çizili eski liste fiyatı: $\text{Satış} \times 1.20$ tam sayıya yuvarlanır.
 - **Görsel Doğrulaması:** Çekilen Amazon yüksek çözünürlüklü `.jpg` linkleri `HTTP 200 OK` kontrolünden geçirilir; açılmayan linkler elenir.
 

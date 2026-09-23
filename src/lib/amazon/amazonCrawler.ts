@@ -4,6 +4,10 @@ import { AmazonProductItem, AmazonCrawlOptions, AmazonCrawlResponse } from './ty
 import { checkIsProductInOzon, getUploadedOzonProducts, prepareStoreCodes } from '@/lib/ozon/duplicateDetector';
 import { loadCatalogMemory } from '@/lib/db/catalogMemory';
 import { getStoreOfferIds } from '@/lib/ozon/storeOfferIds';
+import { getEcbEurUsd } from '@/lib/fx/ecb';
+
+/** ECB'ye ulaşılamadığında kullanılan EUR/USD kuru (eski sabit çarpan). */
+const FALLBACK_EUR_USD = 1.15;
 
 // Amazon.de Türkçe arayüzü: arama kelimeleri ve başlıklar Türkçe. Kullanıcı siteyi Türkçe kullanıyor
 // ve aramalarını Türkçe yapıyor; Almanca oturumla Türkçe kelimeler sonuç vermiyordu.
@@ -356,11 +360,23 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
   // uyarıyla döner; kontrol yapılamadığı hâlde ürünler sessizce "yüklü değil" sayılmaz.
   let storeCodes: string[] = [];
   let warning: string | undefined;
+
+  // EUR → USD: ECB günlük kuru. Alınamazsa eski sabit 1,15 ile devam edilir ve söylenir.
+  let fx: AmazonCrawlResponse['fx'] = { rate: FALLBACK_EUR_USD, date: null, source: 'fallback' };
+  try {
+    const ecb = await getEcbEurUsd();
+    fx = { rate: ecb.rate, date: ecb.date, source: 'ECB' };
+  } catch (err) {
+    console.error('ECB kuru alınamadı:', err);
+    warning = `Günlük ECB kuru alınamadı; fiyatlar sabit ${FALLBACK_EUR_USD} kuruyla hesaplandı.`;
+  }
   try {
     storeCodes = prepareStoreCodes(await getStoreOfferIds());
   } catch (err) {
     console.error('Mağaza ürün kodları alınamadı:', err);
-    warning = 'Ozon mağazası kontrol edilemedi; listede zaten yüklü ürünler olabilir.';
+    warning = [warning, 'Ozon mağazası kontrol edilemedi; listede zaten yüklü ürünler olabilir.']
+      .filter(Boolean)
+      .join(' ');
   }
   // Yükleme hafızasındaki ASIN'ler (daha önce panelden yüklenenler)
   let memory = getUploadedOzonProducts([]);
@@ -547,8 +563,8 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
         pageRawItems.map(async (item) => {
           const status = await verifyImageUrl(item.image);
           if (status === 200) {
-            // Amazon EUR alış fiyatının 3 katına ek %15 USD kur tamponu
-            const ozonPrice = Math.round(item.priceNum * 3 * 1.15);
+            // Amazon € fiyatı ECB kuruyla dolara çevrilir, 3 katı alınır; Ozon tam sayı ister.
+            const ozonPrice = Math.round(item.priceNum * fx.rate * 3);
             const ozonOldPrice = Math.round(ozonPrice * 1.2);
             const modelCode = extractModelCode(item.title, brand);
 
@@ -600,5 +616,6 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
     pagesScanned: maxPages,
     items: finalItems,
     warning,
+    fx,
   };
 }

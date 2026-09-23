@@ -57,6 +57,8 @@ export default function AmazonHunterPage() {
   const [isScanning, setIsScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const [scanWarning, setScanWarning] = useState<string | null>(null);
+  // Fiyatlarda kullanılan EUR/USD kuru (ECB günlük ya da sabit yedek)
+  const [fx, setFx] = useState<{ rate: number; date: string | null; source: string } | null>(null);
   const [products, setProducts] = useState<AmazonProductItem[]>([]);
 
   // Selection & Stats
@@ -98,6 +100,7 @@ export default function AmazonHunterPage() {
 
       setProducts(data.items || []);
       setScanWarning(data.warning || null);
+      setFx(data.fx || null);
     } catch (err: any) {
       setScanError(err.message || 'Amazon sunucularına bağlanırken hata oluştu.');
     } finally {
@@ -251,8 +254,8 @@ export default function AmazonHunterPage() {
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-slate-900">3.45 Katı (3x + %15) Tam Sayı</h4>
-              <p className="text-[11px] text-slate-500 mt-0.5">Ozon USD kur farkı tamponuyla virgülsüz tam sayı hesaplanır.</p>
+              <h4 className="text-xs font-bold text-slate-900">ECB Kuru × 3, Tam Sayı</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">Amazon € fiyatı günlük ECB kuruyla dolara çevrilir, 3 katı alınır.</p>
             </div>
           </div>
 
@@ -481,7 +484,12 @@ export default function AmazonHunterPage() {
                 </div>
                 <div className="border-l border-slate-200 pl-4 sm:pl-6">
                   <span className="text-[11px] font-semibold text-slate-500 block uppercase">Tahmini Ozon Satış (3x)</span>
-                  <span className="text-lg font-bold text-emerald-600">{totalOzonEur} €</span>
+                  <span className="text-lg font-bold text-emerald-600">${totalOzonEur}</span>
+                  {fx && (
+                    <span className="text-[11px] text-slate-500 block">
+                      Kur: {fx.rate.toFixed(4)} {fx.source === 'ECB' ? `(ECB, ${fx.date})` : '(sabit yedek)'}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -587,11 +595,11 @@ export default function AmazonHunterPage() {
                               onChange={(e) => updatePrice(item.asin, Number(e.target.value))}
                               className="w-full bg-transparent text-emerald-600 font-bold focus:outline-hidden text-right"
                             />
-                            <span className="text-[10px] text-slate-400 font-bold">€</span>
+                            <span className="text-[10px] text-slate-400 font-bold">$</span>
                           </div>
                         </td>
                         <td className="p-3.5 font-mono text-slate-400 line-through">
-                          {item.ozonOldPrice} €
+                          ${item.ozonOldPrice}
                         </td>
                         <td className="p-3.5 text-center">
                           {item.isAlreadyInOzon ? (
