@@ -23,6 +23,18 @@ const ALLOWED_ROOT_DEPARTMENTS = new Set([
   17027492, // Kırtasiye ürünleri (Makaslar vb.)
 ]);
 
+// Kapalı ana bölümlerden yalnızca satılan ürünlerin dalları açılır. Bölümün tamamı açılmaz: Строительство
+// и ремонт 1316, Автотовары 1180 kategori; zaten ~95k token olan istem ikiye katlanırdı. Bu dallar yokken
+// yapay zekâ doğru kategoriyi göremiyor ve en yakın açık olanı seçiyordu: araba ampulleri ve GU10
+// ampuller "Украшение на машину" (araba süsü), gömme spot "Интерьерное украшение" oldu.
+const ALLOWED_EXTRA_CATEGORIES = new Set([
+  17028609, // Лампочка (Строительство и ремонт)
+  17028941, // Бытовое освещение (Строительство и ремонт)
+]);
+const ALLOWED_EXTRA_TYPES = new Set([
+  367249974, // Лампа автомобильная (Автотовары > Запчасти для легковых автомобилей, 422 kategorilik dal)
+]);
+
 export async function POST(request: NextRequest) {
   try {
     const body: BulkCategoryDetectionRequest = await request.json();
@@ -66,13 +78,14 @@ export async function POST(request: NextRequest) {
     }
 
     const allowedLeaves: FilteredLeaf[] = [];
-    const traverseRU = (node: OzonCategoryNode, path: string[], lastCatId: number, lastCatName: string) => {
+    const traverseRU = (node: OzonCategoryNode, path: string[], lastCatId: number, lastCatName: string, allowed: boolean) => {
       const name = node.category_name || node.type_name || '';
       const newPath = [...path, name];
       const currentCatId = node.description_category_id || lastCatId || 0;
       const currentCatName = node.category_name || lastCatName || '';
+      const inAllowedBranch = allowed || (!!node.description_category_id && ALLOWED_EXTRA_CATEGORIES.has(node.description_category_id));
 
-      if (node.type_id && node.type_name) {
+      if (node.type_id && node.type_name && (inAllowedBranch || ALLOWED_EXTRA_TYPES.has(node.type_id))) {
         allowedLeaves.push({
           categoryId: currentCatId,
           categoryName: currentCatName,
@@ -85,15 +98,13 @@ export async function POST(request: NextRequest) {
 
       if (node.children && node.children.length > 0) {
         for (const child of node.children) {
-          traverseRU(child, newPath, currentCatId, currentCatName);
+          traverseRU(child, newPath, currentCatId, currentCatName, inAllowedBranch);
         }
       }
     };
 
     for (const root of categoryTreeRU) {
-      if (root.description_category_id && ALLOWED_ROOT_DEPARTMENTS.has(root.description_category_id)) {
-        traverseRU(root, [], root.description_category_id, root.category_name || '');
-      }
+      traverseRU(root, [], root.description_category_id || 0, root.category_name || '', !!root.description_category_id && ALLOWED_ROOT_DEPARTMENTS.has(root.description_category_id));
     }
 
     // 2. Gemini 2.5 Flash için Odaklı Seçenek Listesi
@@ -146,6 +157,10 @@ KESİN KURALLAR VE ALTIN STANDART REFERANS ÖRNEKLER:
 16. SÜT KÖPÜRTÜCÜ: "Lono Milchaufschäumer", "süt köpürtücü", "süt köpürtme makinesi" -> typeId: 94747 ("Капучинатор" / Süt Köpürtücü).
 17. TOST / EKMEK KIZARTMA: "Stelio Toaster", "ekmek kızartma makinesi", "tost makinesi (ekmek kızartıcı)" -> typeId: 94979 ("Тостер" / Ekmek Kızartma Makinesi).
 18. KADIN TIRAŞ MAKİNESİ: "Lady Shaver", "Damenrasierer", "kadın tıraş makinesi", "kadınlar için elektrikli tıraş makinesi" kılı yüzeyden keser, EPİLATÖR DEĞİLDİR (epilatör kökten çeker) -> typeId: 91687 ("Электробритва" / Tıraş makinesi). Эпилятор (91688) SEÇİLMEZ.
+19. AYDINLATMA VE AMPULLER: "Украшение на машину" (araba süsü) ve "Интерьерное украшение" (iç mekân süsü) ampul veya lamba için ASLA SEÇİLMEZ.
+    - Araç ampulü ("far ampulü", "sinyal ampulü", "H1", "H4", "H7", "HB4", "P21W", "W5W", "Autolampe", "Scheinwerferlampe", "Ultinon", "X-tremeVision", "WhiteVision", "Easy Kit") -> typeId: 367249974 ("Лампа автомобильная").
+    - Ev ampulü ("LED ampul", "GU10", "E27", "E14", "spot ampul", "LED-Lampe", "Glühbirne", "Leuchtmittel") -> typeId: 91309 ("Лампочка").
+    - Gömme spot / tavan lambası ("tavan lambası", "gömme spot", "Einbauleuchte", "Deckenleuchte", "Deckenstrahler") -> typeId: 970589574 ("Потолочный светильник"). Duvar lambası 91647, masa lambası 91637, lambader 91645.
 
 GEÇMİŞTE MAĞAZAYA YÜKLENMİŞ ÜRÜN VE KATEGORİ HAFIZASI (Referans olarak incele ve benzer ürünlerde aynı kategoriyi kullan):
 ${JSON.stringify(relevantMemory, null, 2)}
