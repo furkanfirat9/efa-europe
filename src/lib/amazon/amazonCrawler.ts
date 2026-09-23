@@ -3,15 +3,20 @@ import zlib from 'zlib';
 import { AmazonProductItem, AmazonCrawlOptions, AmazonCrawlResponse } from './types';
 import { checkIsProductInOzon } from '@/lib/ozon/duplicateDetector';
 
+// Amazon.de Türkçe arayüzü: arama kelimeleri ve başlıklar Türkçe. Kullanıcı siteyi Türkçe kullanıyor
+// ve aramalarını Türkçe yapıyor; Almanca oturumla Türkçe kelimeler sonuç vermiyordu.
+const AMAZON_LANG_COOKIE = 'i18n-prefs=EUR; lc-acbde=tr_TR';
+const ACCEPT_LANGUAGE = 'tr-TR,tr;q=0.9';
+
 const POSTAL_POST_DATA = 'locationType=LOCATION_INPUT&zipCode=69-108&countryCode=PL&deviceType=web&pageType=Search&actionSource=glow';
 
 async function getAmazonSessionCookies(): Promise<string> {
   try {
     const initRes = await new Promise<{ cookies: string[] }>((resolve) => {
-      const req = https.get('https://www.amazon.de/', {
+      const req = https.get('https://www.amazon.de/-/tr/', {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-          'Accept-Language': 'de-DE,de;q=0.9',
+          'Accept-Language': ACCEPT_LANGUAGE,
         }
       }, (res) => {
         resolve({ cookies: res.headers['set-cookie'] || [] });
@@ -20,7 +25,7 @@ async function getAmazonSessionCookies(): Promise<string> {
     });
 
     let cookies = initRes.cookies.map(c => c.split(';')[0]).join('; ');
-    cookies += '; i18n-prefs=EUR; lc-acbde=de_DE';
+    cookies += '; ' + AMAZON_LANG_COOKIE;
 
     const zipRes = await new Promise<{ cookies: string[] }>((resolve) => {
       const req = https.request('https://www.amazon.de/portal-migration/hz/glow/address-change?actionSource=glow', {
@@ -47,7 +52,7 @@ async function getAmazonSessionCookies(): Promise<string> {
     return cookies;
   } catch (err) {
     console.error('Amazon cookie session error:', err);
-    return 'i18n-prefs=EUR; lc-acbde=de_DE;';
+    return AMAZON_LANG_COOKIE;
   }
 }
 
@@ -69,6 +74,27 @@ async function verifyImageUrl(url: string): Promise<number> {
   });
 }
 
+/** Amazon görsel adresinin dosya kimliği: .../images/I/61wr9k6x2kL._AC_SL1500_.jpg → "61wr9k6x2kL". */
+function amazonImageId(url: string): string {
+  return (url.match(/\/images\/I\/([A-Za-z0-9+%-]+)/) || [])[1] || '';
+}
+
+/**
+ * Amazon.de fiyat metnini sayıya çevirir: "37,10€" → 37.1, "1.299,99 €" → 1299.99.
+ * Nokta binlik, virgül ondalık ayracıdır; okunamazsa 0 döner.
+ */
+export function parseEuroPrice(text: string): number {
+  const raw = (text || '').replace(/[^\d,.]/g, '');
+  if (!raw) return 0;
+  const normalized = raw.includes(',')
+    ? raw.replace(/\./g, '').replace(',', '.')
+    : /^\d{1,3}(\.\d{3})+$/.test(raw)
+    ? raw.replace(/\./g, '')
+    : raw;
+  const value = parseFloat(normalized);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
 /**
  * Verilen Amazon ASIN kodunun ürün detay sayfasından (PDP)
  * YALNIZCA VE KESİNLİKLE ana ürünün kendi stüdyo görsellerini çeker (4-8 adet).
@@ -82,7 +108,7 @@ export async function fetchAmazonProductGallery(asin: string, primaryFallbackImg
   const url = `https://www.amazon.de/dp/${asin}`;
   const headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-    'Accept-Language': 'de-DE,de;q=0.9',
+    'Accept-Language': ACCEPT_LANGUAGE,
     'Cookie': cookies,
   };
 
@@ -119,72 +145,95 @@ export async function fetchAmazonProductGallery(asin: string, primaryFallbackImg
       return primaryFallbackImg ? [primaryFallbackImg] : [];
     }
 
+    // Amazon aynı görselin küçük ("large") ve büyük ("hiRes") hâline FARKLI dosya kimlikleri veriyor.
+    // Aynı görselin kopyası iki kez eklenmesin diye bir görsele ait bütün kimlikler birlikte "görüldü"
+    // sayılır. Eskiden ana görselin düşük çözünürlüklü kopyası başa, yüksek çözünürlüklüsü sona
+    // düşüyordu: MAIN girdisinde hiRes boşken "large" ana görselin yerine geçiyor, sol sütun
+    // taraması da büyük kopyayı listenin sonuna ekliyordu.
+    const seenIds = new Set<string>();
+    const markSeen = (urls: string[]) => urls.forEach((u) => { const id = amazonImageId(u); if (id) seenIds.add(id); });
+    const isSeen = (url: string) => { const id = amazonImageId(url); return !!id && seenIds.has(id); };
+    const cleanImg = (url: string) => (url || '').replace(/\._[A-Z0-9_,]+_\.jpg$/i, '.jpg');
+
     let primaryHeroImage = '';
     const otherGalleryImages: string[] = [];
 
-    // 1. ÖNCELİK: Doğrudan #landingImage üzerinden ANA VİTRİN görselini tespit et
+    // 1. ÖNCELİK: #landingImage üzerinden yüksek çözünürlüklü ana vitrin görseli
     const oldHiresMatch = html.match(/id="landingImage"[^>]*data-old-hires="([^"]+)"/i) ||
                           html.match(/data-old-hires="([^"]+)"[^>]*id="landingImage"/i);
     if (oldHiresMatch && oldHiresMatch[1].startsWith('http')) {
-      primaryHeroImage = oldHiresMatch[1].replace(/\._[A-Z0-9_,]+_\.jpg$/i, '.jpg');
+      primaryHeroImage = cleanImg(oldHiresMatch[1]);
     }
 
-    if (!primaryHeroImage) {
-      const dynMatch = html.match(/id="landingImage"[^>]*data-a-dynamic-image="([^"]+)"/i);
-      if (dynMatch) {
-        try {
-          const decoded = dynMatch[1].replace(/&quot;/g, '"');
-          const obj = JSON.parse(decoded);
-          let maxPixels = 0;
-          let bestUrl = '';
-          for (const [imgUrl, dims] of Object.entries(obj)) {
-            const dimsArr = dims as number[];
-            const pixels = (dimsArr[0] || 0) * (dimsArr[1] || 0);
-            if (pixels >= maxPixels) {
-              maxPixels = pixels;
-              bestUrl = imgUrl;
-            }
+    // Ana görselin bütün boyutları (farklı kimliklerle) data-a-dynamic-image içinde durur.
+    const dynMatch = html.match(/id="landingImage"[^>]*data-a-dynamic-image="([^"]+)"/i);
+    if (dynMatch) {
+      try {
+        const obj = JSON.parse(dynMatch[1].replace(/&quot;/g, '"'));
+        let maxPixels = 0;
+        let bestUrl = '';
+        for (const [imgUrl, dims] of Object.entries(obj)) {
+          const dimsArr = dims as number[];
+          const pixels = (dimsArr[0] || 0) * (dimsArr[1] || 0);
+          if (pixels >= maxPixels) {
+            maxPixels = pixels;
+            bestUrl = imgUrl;
           }
-          if (bestUrl) primaryHeroImage = bestUrl.replace(/\._[A-Z0-9_,]+_\.jpg$/i, '.jpg');
-        } catch {}
-      }
+        }
+        markSeen(Object.keys(obj));
+        if (!primaryHeroImage && bestUrl) primaryHeroImage = cleanImg(bestUrl);
+      } catch {}
     }
+    if (primaryHeroImage) markSeen([primaryHeroImage]);
 
-    // 2. ÖNCELİK: colorImages.initial içerisindeki MAIN ve PT... varyantları
-    const colorImagesMatch =
-      html.match(/ImageBlockATF['"]?\s*,\s*\{[\s\S]*?'colorImages'\s*:\s*\{\s*'initial'\s*:\s*(\[\s*\{[\s\S]*?\}\s*\])/) ||
-      html.match(/'colorImages'\s*:\s*\{\s*'initial'\s*:\s*(\[\s*\{[\s\S]*?\}\s*\])\s*[,}]/);
+    // 2. ÖNCELİK: colorImages.initial — her girdi tek bir görselin bütün boyutlarını taşır.
+    // Amazon listeyi artık `'initial': A.$.parseJSON('[...]')` biçiminde yazıyor; eski kalıp yalnızca
+    // `'initial': [...]` tanıyordu, liste hiç okunamıyor ve sol sütundaki 500px kopyalara düşülüyordu.
+    const colorImagesMatch = html.match(
+      /'colorImages'\s*:\s*\{\s*'initial'\s*:\s*(?:A\.\$\.parseJSON\(\s*')?(\[\s*\{[\s\S]*?\}\s*\])/
+    );
 
+    let colorImagesParsed = false;
     if (colorImagesMatch) {
       try {
-        const parsed = JSON.parse(colorImagesMatch[1]);
+        // parseJSON('...') içindeki metin tek tırnaklı JS dizesi; kaçışlı tırnaklar düzeltilir.
+        const parsed = JSON.parse(colorImagesMatch[1].replace(/\\'/g, "'"));
         for (const item of parsed) {
           if (item.variant === 'SWCH' || item.variant === 'MAIN_SWATCH' || item.variant === 'VIDEO') continue;
-          const img = ((item.hiRes || item.large || item.main?.[Object.keys(item.main || {})[0]] || '') as string).replace(/\._[A-Z0-9_,]+_\.jpg$/i, '.jpg');
-          if (!img || !img.startsWith('http')) continue;
+          const sizes: string[] = [item.hiRes, item.large, item.thumb, ...Object.keys(item.main || {})].filter(
+            (u): u is string => typeof u === 'string' && u.startsWith('http')
+          );
+          if (sizes.length === 0) continue;
+          colorImagesParsed = true;
+          const best = cleanImg(item.hiRes || sizes.find((u) => u !== item.thumb) || sizes[0]);
 
           if (item.variant === 'MAIN') {
-            primaryHeroImage = img;
-          } else {
-            otherGalleryImages.push(img);
+            // Yüksek çözünürlük bulunduysa daha düşük kaliteli bir kopya onun yerine geçemez.
+            if (item.hiRes || !primaryHeroImage) primaryHeroImage = best;
+            markSeen([...sizes, primaryHeroImage]);
+            continue;
           }
+          if (sizes.some(isSeen)) continue;
+          markSeen(sizes);
+          otherGalleryImages.push(best);
         }
       } catch {}
     }
 
-    // 3. ÖNCELİK: Sol Galeri Kapsayıcısı (<div id="leftCol" ...> veya <div id="altImages" ...>)
-    const leftColMatch =
-      html.match(/id="leftCol"[^>]*>([\s\S]*?)(?:id="centerCol"|id="rightCol"|id="twisterContainer"|$)/i) ||
-      html.match(/<div id="altImages"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i) ||
-      html.match(/<div id="imageBlock"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i);
+    // 3. YEDEK: colorImages okunamadıysa sol galeri sütunu taranır; görülen kimlikler atlanır.
+    if (!colorImagesParsed) {
+      const leftColMatch =
+        html.match(/id="leftCol"[^>]*>([\s\S]*?)(?:id="centerCol"|id="rightCol"|id="twisterContainer"|$)/i) ||
+        html.match(/<div id="altImages"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i) ||
+        html.match(/<div id="imageBlock"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i);
 
-    if (leftColMatch) {
-      const scopedSection = leftColMatch[1];
-      const imgs = scopedSection.match(/https:\/\/m\.media-amazon\.com\/images\/I\/[A-Za-z0-9_\-+%]+(?:\._[A-Z0-9_,]+_)?\.jpg/g) || [];
-      for (const rawImg of imgs) {
-        if (rawImg.includes('play-icon') || rawImg.includes('video') || rawImg.includes('sprite') || rawImg.includes('grey-pixel') || rawImg.includes('transparent-pixel')) continue;
-        const clean = rawImg.replace(/\._[A-Z0-9_,]+_\.jpg$/i, '.jpg');
-        if (clean && clean.startsWith('https://m.media-amazon.com/images/I/')) {
+      if (leftColMatch) {
+        const imgs = leftColMatch[1].match(/https:\/\/m\.media-amazon\.com\/images\/I\/[A-Za-z0-9_\-+%]+(?:\._[A-Z0-9_,]+_)?\.jpg/g) || [];
+        for (const rawImg of imgs) {
+          if (rawImg.includes('play-icon') || rawImg.includes('video') || rawImg.includes('sprite') || rawImg.includes('grey-pixel') || rawImg.includes('transparent-pixel')) continue;
+          const clean = cleanImg(rawImg);
+          if (!clean.startsWith('https://m.media-amazon.com/images/I/') || isSeen(clean)) continue;
+          markSeen([clean]);
           otherGalleryImages.push(clean);
         }
       }
@@ -252,8 +301,11 @@ function extractModelCode(title: string, brand: string): string {
 
   if (seriesMatch && seriesMatch[1]) {
     const series = seriesMatch[1].trim();
-    // Almanca genel ürün kelimelerini filtrele
-    const stopWords = ['set', 'teilig', 'mit', 'für', 'und', 'aus', 'edelstahl', 'schwarz', 'induktion', 'küchenhelfer', 'pfanne', 'topf', 'kochlöffel', 'reibe', 'rührschüssel', 'messer', 'schere', 'besteckset'];
+    // Genel ürün kelimelerini filtrele (başlıklar Türkçe arayüzde Türkçe, bazen Almanca gelir)
+    const stopWords = [
+      'set', 'teilig', 'mit', 'für', 'und', 'aus', 'edelstahl', 'schwarz', 'induktion', 'küchenhelfer', 'pfanne', 'topf', 'kochlöffel', 'reibe', 'rührschüssel', 'messer', 'schere', 'besteckset',
+      'seti', 'takım', 'takımı', 'parçalı', 'için', 've', 'ile', 'paslanmaz', 'çelik', 'siyah', 'beyaz', 'orijinal', 'yedek', 'başlık', 'başlığı', 'bıçak', 'tava', 'tencere', 'kase', 'adet', 'paket',
+    ];
     const parts = series.split(/\s+/).filter(p => !stopWords.includes(p.toLowerCase()));
     if (parts.length > 0) {
       return parts.join(' ');
@@ -278,7 +330,8 @@ const CATEGORY_MAP: Record<string, string> = {
 
 export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<AmazonCrawlResponse> {
   const {
-    brand = 'Philips',
+    brand = '',
+    keyword = '',
     category = 'all',
     maxPages = 2,
     maxItems = 5, // Varsayılan 5 ürün canlı test sınırı
@@ -292,7 +345,7 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
 
   const headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-    'Accept-Language': 'de-DE,de;q=0.9',
+    'Accept-Language': ACCEPT_LANGUAGE,
     'Cookie': cookies,
   };
 
@@ -307,8 +360,10 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
       const separator = customUrl.includes('?') ? '&' : '?';
       pageUrl = `${customUrl}${separator}page=${page}&currency=EUR`;
     } else {
+      // Marka ve arama kelimesi ayrı: kelime ("yedek başlık") aramaya eklenir ama marka
+      // filtresine karışmaz. Eskiden kelime marka yerine geçiyor ve başlıkta aranıyordu.
       const cleanBrand = brand.trim();
-      const searchKeyword = encodeURIComponent(cleanBrand);
+      const searchKeyword = encodeURIComponent([cleanBrand, keyword.trim()].filter(Boolean).join(' '));
       const iParam = CATEGORY_MAP[category] && CATEGORY_MAP[category] !== 'aps' ? `&i=${CATEGORY_MAP[category]}` : '';
 
       let brandFacet = '';
@@ -324,7 +379,7 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
       if (brandFacet) rhParts.unshift(brandFacet);
       if (maxPriceEur) rhParts.push(`p_36%3A0-${maxPriceEur * 100}`);
 
-      pageUrl = `https://www.amazon.de/s?k=${searchKeyword}${iParam}&rh=${rhParts.join('%2C')}&page=${page}&currency=EUR`;
+      pageUrl = `https://www.amazon.de/-/tr/s?k=${searchKeyword}${iParam}&rh=${rhParts.join('%2C')}&page=${page}&currency=EUR`;
     }
 
     try {
@@ -382,8 +437,12 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
         const isAd =
           chunk.includes('AdHolder') ||
           chunk.includes('Gesponsert') ||
+          chunk.includes('Sponsorlu') ||
           chunk.includes('Sponsored') ||
           chunk.includes('puis-sponsored-label');
+
+        // Kartın düz metni: stok uyarıları etiketlere bölünmüş olabilir.
+        const cardText = chunk.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
 
         const titleMatch =
           chunk.match(/<h2[^>]*>[\s\S]*?<span[^>]*>([\s\S]*?)<\/span>/i) ||
@@ -392,23 +451,19 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
           ? titleMatch[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
           : '';
 
-        const priceWhole = chunk.match(/class="a-price-whole">([^<]+)<\/span>/i);
-        const priceFrac = chunk.match(/class="a-price-fraction">([^<]+)<\/span>/i);
-        const priceOff = chunk.match(/class="a-offscreen">([^<]+)<\/span>/i);
+        // Satış fiyatı, sınıfı tam olarak "a-price" olan kutudadır. Üstü çizili eski fiyat ve birim
+        // fiyat "a-price a-text-price" taşır; kartta ilk bulunan fiyatı almak onları yakalayabiliyordu.
+        const mainPrice = chunk.match(/<span class="a-price"[^>]*>\s*<span class="a-offscreen">([^<]+)<\/span>/i);
+        const priceNum = mainPrice ? parseEuroPrice(mainPrice[1]) : 0;
+        const priceStr = mainPrice ? mainPrice[1].trim() : '';
 
-        let priceNum = 0;
-        let priceStr = 'Stokta';
-
-        if (priceWhole) {
-          const wholeClean = priceWhole[1].replace(/\./g, '').trim();
-          const fracClean = priceFrac ? priceFrac[1].trim() : '00';
-          priceNum = parseFloat(`${wholeClean}.${fracClean}`);
-          priceStr = `${priceWhole[1].trim()},${fracClean} €`;
-        } else if (priceOff) {
-          const cleaned = priceOff[1].replace(/[^\d,.-]/g, '').replace(',', '.').trim();
-          priceNum = parseFloat(cleaned) || 0;
-          priceStr = priceOff[1].trim();
-        }
+        // Stok elemesi. Fiyatı olmayan ürün (stokta yok / "Şu anda mevcut değil") satın alınamaz;
+        // eskiden 50 € varsayılıp listeye giriyordu ve maliyetin altında satışa yol açtı.
+        // "Stokta sadece N adet kaldı" elenir; yanında "daha fazla ürün gelecektir" varsa Amazon
+        // yeni stok bekliyor, kullanıcının kararıyla kabul edilir.
+        const isLowStock = /Stokta sadece \d+ adet kald|Nur noch \d+ (?:Stück )?auf Lager/i.test(cardText);
+        const isRestocking = /daha fazla ürün gelecektir|mehr ist unterwegs/i.test(cardText);
+        if (priceNum <= 0 || (isLowStock && !isRestocking)) continue;
 
         const imgMatch =
           chunk.match(/<img [^>]*src="(https:\/\/m\.media-amazon\.com\/images\/I\/[^"]+)"/i) ||
@@ -419,6 +474,8 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
         const isBlacklisted =
           title.toLowerCase().includes('monitor') ||
           title.toLowerCase().includes('fernseher') ||
+          title.toLowerCase().includes('monitör') ||
+          title.toLowerCase().includes('televizyon') ||
           title.toLowerCase().includes('television') ||
           title.toLowerCase().includes('oled tv');
 
@@ -440,8 +497,8 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
           pageRawItems.push({
             asin,
             title,
-            priceNum: priceNum || 50,
-            priceStr: priceStr || 'Stokta',
+            priceNum,
+            priceStr,
             image: highResImg,
           });
 

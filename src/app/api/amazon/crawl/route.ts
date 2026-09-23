@@ -8,9 +8,19 @@ export const maxDuration = 60;
 export async function POST(request: NextRequest) {
   try {
     const body: AmazonCrawlOptions = await request.json();
+    const brand = (body.brand || '').trim();
+    const keyword = (body.keyword || '').trim();
+
+    if (!brand && !keyword && !body.customUrl) {
+      return NextResponse.json(
+        { success: false, totalFound: 0, pagesScanned: 0, items: [], error: 'Bir marka ya da arama kelimesi girin.' },
+        { status: 400 }
+      );
+    }
 
     const result = await crawlAmazonProducts({
-      brand: body.brand || 'Philips',
+      brand,
+      keyword,
       category: body.category || 'all',
       maxPages: Number(body.maxPages) || 1,
       maxItems: body.maxItems !== undefined ? Number(body.maxItems) : 5,
