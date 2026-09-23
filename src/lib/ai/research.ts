@@ -9,6 +9,9 @@ import {
   isCountryOfOriginAttribute,
   isStrictSingleValueAttribute,
   sanitizeOzonSeriesName,
+  stripOriginalityClaims,
+  capNamingTemplate,
+  NAMING_TEMPLATE_MAX_LENGTH,
   PreFilledAttribute,
   AttributeSelectedValue,
 } from './filler';
@@ -292,6 +295,8 @@ export async function deepCategoryProductResearch(
         type: attr.type,
         isRequired: attr.is_required,
         isCollection: attr.is_collection,
+        maxValues: attr.is_collection && attr.max_value_count > 0 ? attr.max_value_count : undefined,
+        maxLength: isNamingTemplateAttribute(attr) ? NAMING_TEMPLATE_MAX_LENGTH : undefined,
         hasDictionary: attr.dictionary_id > 0,
         options: opts.length > 0 ? opts : undefined,
       };
@@ -371,6 +376,7 @@ KESİN KURALLAR:
    Ozon'un vitrin başlığında müşteriye göstereceği model adıdır.
    - KURAL 1 (Marka Tekrarını Önleme): Ozon zaten marka adını başlığın en başına otomatik eklemektedir. Çift marka yazılmaması için ("Philips Airfryer Philips NA350" olmaması için) BURAYA KESİNLİKLE MARKA ADI EKLEME!
    - KURAL 2 (SEO & Arama Sıralama Gücü): Ozon arama motorunda (SEO) en üst sıralara çıkmak ve tıklama oranını (CTR) artırmak için; Model numarasının yanına ürünün en can alıcı 1-2 teknik ayırt edici özelliğini (Hacim, Güç, Hazne türü, Basınç vb.) Rusça olarak ekle.
+   - KURAL 3 (Uzunluk): EN FAZLA ${NAMING_TEMPLATE_MAX_LENGTH} KARAKTER (boşluklar dahil). Ozon daha uzununu reddediyor; sığmıyorsa özellik sayısını azalt, seri adını kısalt.
    - Format: "[Model Numarası] [En Önemli 1-2 Teknik Özellik / Rusça Parametre]"
    - Örnekler:
      * Philips NA350/00 (9L çift hazneli airfryer) -> "NA350/00 9 л с двумя чашами 2750 Вт"
@@ -378,13 +384,14 @@ KESİN KURALLAR:
      * Philips EP2220/10 (Kahve makinesi) -> "EP2220/10 15 бар с капучинатором"
      * Tefal Ingenio 26cm Tava -> "Ingenio 26 см с антипригарным покрытием"
      * Philips S5588/30 (Tıraş makinesi) -> "S5588/30 для сухого и влажного бритья"
-     * Philips Sonicare (Elektrikli diş fırçası / HX7113 / HX3675 vb.) -> "Sonicare 5300 HX7113/01 звуковая с датчиком давления"
+     * Philips Sonicare (Elektrikli diş fırçası / HX7113 / HX3675 vb.) -> "Sonicare 5300 HX7113/01 с датчиком давления"
      * Braun Series 9 Pro -> "Series 9 Pro 9465cc для влажного и сухого бритья"
 5. ID 4381 ("Parça numarası" / "Партномер"):
    Ürünün fabrika saf model/parça numarasıdır. Buraya yalnızca temiz model kodunu yaz (Örn: "${modelHint}").
 6. Eğer bir nitelik için "options" (seçenekler) listesi verilmişse, ürünün gerçek özelliklerine göre YALNIZCA VE KESİNLİKLE O LİSTEDEKİ EN UYGUN SEÇENEĞİ AYNEN SEÇ. (Listede olmayan uydurma kelimeler yazma).
    - Örneğin Kahve Makinesi Türü için seçeneklerde "Автоматическая кофемашина" varsa ve ürün tam otomatik bir makineyse KESİNLİKLE "Автоматическая кофемашина" seç.
-7. Çoklu seçim ("isCollection": true) alanlarında birden fazla seçenek geçerliyse dizi ["seçenek1", "seçenek2"] olarak ver (Örn: Çift renkli ise Renk alanına ["черный", "серый"]).
+   - "hasDictionary": true olan alanlar Ozon'un sabit listesinden seçilir; cümle, açıklama veya kendi ifaden YAZMA. "options" verilmemişse Ozon listesinde bulunabilecek kısa, standart tek bir Rusça terim yaz (Örn: "Пластик", "Для всей поверхности"). Emin değilsen boş bırak.
+7. Çoklu seçim ("isCollection": true) alanlarında birden fazla seçenek geçerliyse dizi ["seçenek1", "seçenek2"] olarak ver (Örn: Çift renkli ise Renk alanına ["черный", "серый"]). "maxValues" verilmişse en fazla o kadar değer ver, en önemlilerini seç.
    ÖNEMLİ KURAL (TEKİL DEĞER ZORUNLU ALANLAR):
    - ID 12619 ("Ev aletleri türü" / "Вид бытовой техники" / "Тип прибора") -> KESİNLİKLE YALNIZCA 1 TEKİL DEĞER (örn: "Триммер" veya "Электробритва" - ASLA 2-3 seçenek gönderme!)
    - ID 4389 ("Üretim ülkesi" / "Страна-изготовитель") -> YALNIZCA 1 ÜLKE (örn: "Германия" veya "Китай")
@@ -395,6 +402,11 @@ KESİN KURALLAR:
    OZON BU ALANLARDA KESİNLİKLE YALNIZCA 1 TEKİL DEĞER KABUL EDER. ASLA birden fazla değer veya dizi/virgül gönderme!
 8. "modelNo": Ürünün fabrikanın verdiği saf model / parça kodu (örn: "HD9350/90", "EP5447/90", "0761406380"). Ozon'da ürün kodu (offer_id) olarak kullanılır: ürün başlığı, seri adı ya da cümle YAZMA.
 9. "summaryBullets": Ürünün araştırılan en önemli 5 özelliğini Türkçe kısa maddeler halinde özetle.
+10. ORİJİNALLİK VE REKLAM YASAĞI (Ozon bu ürünleri engelliyor):
+   - "оригинал", "оригинальный", "Original", "Orijinal" kelimelerini HİÇBİR ALANDA ve HİÇBİR ÇEKİMİYLE kullanma (başlık, açıklama 4191, Комплектация 4384 dahil). Amazon başlığında "Orijinal" yazması bunu değiştirmez.
+   - Kelime ürünün resmi adının parçası olsa da yazma, o kelimeyi atla: "Senseo Original Plus" -> "Senseo Plus".
+   - Reklam ve pazarlama ifadeleri yazma: "лучший", "хит продаж", "№1", "скидка", "акция", "гарантия качества", "100% подлинный" vb.
+   - Комплектация (ID 4384) yalnızca kutudan çıkanların sade listesidir: "Фильтр — 1 шт." veya "Насадка — 4 шт., инструкция". Sıfat ve övgü ekleme.
 
 Format:
 {
@@ -554,6 +566,17 @@ Format:
     if (attr.id === 85 && !rawVal && brand) rawVal = brand;
     if (attr.id === 9048 && !rawVal && resolvedModel) rawVal = resolvedModel;
 
+    // Serbest metin alanlarında "оригинальный" talimata rağmen gelirse temizlenir. Sözlüklü alanların
+    // değeri zaten Ozon'un kendi listesinden seçiliyor.
+    if (attr.dictionary_id === 0) {
+      if (typeof rawVal === 'string') rawVal = stripOriginalityClaims(rawVal);
+      else if (Array.isArray(rawVal)) rawVal = rawVal.map((v) => (typeof v === 'string' ? stripOriginalityClaims(v) : v));
+    }
+
+    // Marka sözlüğünde bulunamayan marka elle düzeltilmek üzere görünür kalır; diğer sözlüklü alanlarda
+    // listede karşılığı olmayan değer Ozon'a gitmez (warning_attribute_values_out_of_range).
+    const keepUnmatchedDictValue = attr.id === 85 || attr.dictionary_id === 28732849;
+
     // Naming template ve Part number alanlarında marka adını temizle ve ASLA boş kalmasına izin verme
     if (attr.id === 12141 || attr.id === 20776 || attr.id === 4381 || isNamingTemplateAttribute(attr)) {
       if (!rawVal || String(rawVal).trim().length === 0) {
@@ -563,6 +586,7 @@ Format:
         const cleaned = rawVal.replace(brandRegex, '').trim();
         rawVal = cleaned.length > 0 ? cleaned : resolvedModel.replace(brandRegex, '').trim() || resolvedModel;
       }
+      if (attr.id !== 4381 && typeof rawVal === 'string') rawVal = capNamingTemplate(rawVal);
     }
 
     if (rawVal !== undefined && rawVal !== null && String(rawVal).trim().length > 0) {
@@ -603,9 +627,13 @@ Format:
               } catch (e) {}
             }
 
+            if (attr.dictionary_id > 0 && !dictId && !keepUnmatchedDictValue) continue;
+            if (dictId && selectedValues.some((v) => v.dictionaryValueId === dictId)) continue;
             selectedValues.push({ value: finalVal, dictionaryValueId: dictId });
           }
         }
+        // Ozon fazlasını kendisi silip ATTRIBUTE_VALUE_COUNT_EXCEEDED uyarısı veriyor (Материал: en fazla 3)
+        if (attr.max_value_count > 0) selectedValues = selectedValues.slice(0, attr.max_value_count);
         valueToAssign = selectedValues.map((v) => v.value).join(', ');
         matchStatus = selectedValues.some((v) => v.dictionaryValueId) || attr.dictionary_id === 0 ? 'matched' : 'manual_needed';
       } else {
@@ -642,12 +670,15 @@ Format:
                 valueToAssign = searchRes[0].value;
                 matchStatus = 'matched';
                 selectedValues = [{ value: valueToAssign, dictionaryValueId }];
-              } else {
+              } else if (keepUnmatchedDictValue) {
                 matchStatus = 'manual_needed';
                 selectedValues = [{ value: valueToAssign }];
+              } else {
+                valueToAssign = '';
               }
             } catch (e) {
-              selectedValues = [{ value: valueToAssign }];
+              if (keepUnmatchedDictValue) selectedValues = [{ value: valueToAssign }];
+              else valueToAssign = '';
             }
           }
         } else {
@@ -676,7 +707,7 @@ Format:
   return {
     brand: aiResult.brand || brand,
     modelNo: aiResult.modelNo || modelNo,
-    russianSeoTitle: aiResult.russianSeoTitle || `${brand} ${modelNo}`,
+    russianSeoTitle: stripOriginalityClaims(aiResult.russianSeoTitle || `${brand} ${modelNo}`),
     turkishTitle: aiResult.turkishTitle || productQuery,
     barcode: finalBarcode,
     isBarcodeGenerated,

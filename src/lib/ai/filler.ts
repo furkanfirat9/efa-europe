@@ -67,7 +67,7 @@ export function isStrictSingleValueAttribute(attr: { id?: number; attributeId?: 
   const nameLower = (attr.name || '').toLowerCase();
   return (
     id === 4389 || // Страна-изготовитель (Üretim ülkesi)
-    id === 4384 || // Страна бренда
+    id === 4384 || // Комплектация
     id === 8448 || // Праздник (Tatil / Bayram / Kutlama)
     id === 8449 || // Для кого (Kimin için / Hedef kitle)
     id === 9390 || // Hedef kitle
@@ -125,6 +125,43 @@ export function sanitizeOzonSeriesName(text: string): string {
   };
   const cleaned = text.replace(/[çÇğĞıIİöÖşŞüÜ]/g, (m) => trMap[m] || m);
   return cleaned.replace(/[^a-zA-Z0-9а-яА-ЯёЁ!?,:;()\-/\&"\s]/g, '').trim();
+}
+
+/**
+ * Ozon "orijinal ürün" ifadesini yasaklıyor (FB_ORIGINAL; Комплектация'da BR_attribute_advertising).
+ * Amazon başlıkları "Orijinal" dediği için yapay zekâ "Оригинальный фильтр…" yazıyordu; 25 ürün bu yüzden
+ * hata aldı. Kelime ürün adının parçası olsa da (Senseo Original Plus) Ozon itiraz ediyor, o yüzden her
+ * durumda çıkarılır. "неоригинальный" gibi kelimenin içinde geçen hâller eşleşmez.
+ */
+export function stripOriginalityClaims(text: string): string {
+  if (!text) return text;
+  let startsWithClaim = false;
+  const out = text
+    .replace(/(?<![\p{L}\p{N}])(?:оригинал|original|orijinal)\p{L}*/giu, (_m, offset: number) => {
+      if (text.slice(0, offset).trim() === '') startsWithClaim = true;
+      return '';
+    })
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/[ \t]+([,.;:!?)])/g, '$1')
+    .replace(/^[ \t]+/gm, '');
+  // "Оригинальные сменные насадки…" → "Сменные насадки…"
+  return startsWithClaim ? out.charAt(0).toUpperCase() + out.slice(1) : out;
+}
+
+/**
+ * Vitrin model adının (12141/20776) üst sınırı. Sınır kategoriye göre değişiyor: diş fırçasında 49 karakter
+ * kabul edildi, 53 reddedildi (VALUE_MAX_LENGTH_LIMIT); tıraş makinesinde 76 geçti. 50 her yerde güvenli.
+ */
+export const NAMING_TEMPLATE_MAX_LENGTH = 50;
+
+export function capNamingTemplate(text: string, max = NAMING_TEMPLATE_MAX_LENGTH): string {
+  const clean = text.replace(/\s+/g, ' ').trim();
+  if (clean.length <= max) return clean;
+  const words = clean.slice(0, max + 1).split(' ');
+  if (words.length > 1) words.pop(); // yarım kalan son kelime
+  // Sonda asılı kalan edat/bağlaç ("… с") ya da birimi kesilmiş sayı ("… 5 режимов" → "… 5") anlamsız görünür
+  while (words.length > 1 && /^(с|со|для|и|в|во|на|из|без|по|от|к|а|,|-|—|[\d.,]+)$/i.test(words[words.length - 1])) words.pop();
+  return words.join(' ').replace(/[,;:\-—]+$/, '').trim() || clean.slice(0, max).trim();
 }
 
 /**
