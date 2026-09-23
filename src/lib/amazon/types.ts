@@ -37,4 +37,6 @@ export interface AmazonCrawlResponse {
   error?: string;
   /** Tarama tamamlandı ama bir kontrol yapılamadı (ör. Ozon mağazasına ulaşılamadı). */
   warning?: string;
+  /** Ozon fiyatında kullanılan EUR/USD kuru */
+  fx?: { rate: number; date: string | null; source: 'ECB' | 'fallback' };
 }
