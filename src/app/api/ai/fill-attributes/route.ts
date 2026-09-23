@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { categoryId, typeId, brand, modelNo, productQuery, language = 'RU', categoryName, typeName } = body;
+    const { categoryId, typeId, brand, modelNo, productQuery, language = 'RU', categoryName, typeName, asin } = body;
 
     if (!categoryId || !typeId) {
       return NextResponse.json(
@@ -27,7 +27,8 @@ export async function POST(request: NextRequest) {
       productQuery || '',
       language as OzonLanguage,
       categoryName,
-      typeName
+      typeName,
+      asin || undefined
     );
 
     return NextResponse.json({
