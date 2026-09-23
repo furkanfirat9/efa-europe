@@ -1,6 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-
 interface CatalogMemoryItem {
   asin?: string;
   brand?: string;
@@ -10,111 +7,86 @@ interface CatalogMemoryItem {
   ozonTaskId?: string;
 }
 
-interface OzonLiveCatalogItem {
-  productId?: number;
-  offerId?: string;
-  name?: string;
-  barcode?: string;
-  status?: string;
-  isArchived?: boolean;
-}
-
 const ASIN_REGEX = /\b(B0[0-9A-Z]{8})\b/i;
 
 /**
- * Mağazada veya yükleme hafızasında bulunan tüm bilinen ASIN'leri ve ürünleri çeker.
+ * Yükleme hafızasındaki (CatalogMemory tablosu) ASIN'ler ve model kodları. Hafıza çağıran tarafta
+ * bir kez yüklenir (getAllCatalogMemory) ve buraya verilir; mağazanın kendisi Ozon'dan canlı
+ * sorulur (getStoreOfferIds).
  */
-export function getUploadedOzonProducts(): {
+export function getUploadedOzonProducts(memoryItems: CatalogMemoryItem[]): {
   memoryItems: CatalogMemoryItem[];
-  liveCatalogItems: OzonLiveCatalogItem[];
   knownAsinSet: Set<string>;
 } {
-  let memoryItems: CatalogMemoryItem[] = [];
-  let liveCatalogItems: OzonLiveCatalogItem[] = [];
   const knownAsinSet = new Set<string>();
+  memoryItems.forEach((m) => {
+    if (m.asin) knownAsinSet.add(m.asin.toUpperCase().trim());
+    const matchModel = m.modelNo?.match(ASIN_REGEX);
+    if (matchModel) knownAsinSet.add(matchModel[1].toUpperCase());
+    const matchQuery = m.productQuery?.match(ASIN_REGEX);
+    if (matchQuery) knownAsinSet.add(matchQuery[1].toUpperCase());
+  });
+  return { memoryItems, knownAsinSet };
+}
 
-  try {
-    const memoryPath = path.join(process.cwd(), 'data', 'catalog_memory.json');
-    if (fs.existsSync(memoryPath)) {
-      const content = fs.readFileSync(memoryPath, 'utf8');
-      memoryItems = JSON.parse(content || '[]');
-      
-      memoryItems.forEach((m) => {
-        if (m.asin) knownAsinSet.add(m.asin.toUpperCase().trim());
-        const matchModel = m.modelNo?.match(ASIN_REGEX);
-        if (matchModel) knownAsinSet.add(matchModel[1].toUpperCase());
-        const matchQuery = m.productQuery?.match(ASIN_REGEX);
-        if (matchQuery) knownAsinSet.add(matchQuery[1].toUpperCase());
-      });
-    }
-  } catch (e) {
-    console.warn('[Duplicate Detector] catalog_memory.json okunamadı:', e);
+const isWordChar = (ch: string | undefined) => !!ch && /[\p{L}\p{N}]/u.test(ch);
+
+/**
+ * Kod başlıkta ayrı bir parça olarak geçiyor mu: "HX9094/88" → "…4'lü Paket, HX9094/88" evet,
+ * "HX9094/880" hayır. Karşılaştırma küçük harfle yapılır.
+ */
+function titleContainsCode(titleLower: string, codeLower: string): boolean {
+  let i = titleLower.indexOf(codeLower);
+  while (i >= 0) {
+    if (!isWordChar(titleLower[i - 1]) && !isWordChar(titleLower[i + codeLower.length])) return true;
+    i = titleLower.indexOf(codeLower, i + 1);
   }
-
-  try {
-    const livePath = path.join(process.cwd(), 'data', 'ozon_live_catalog.json');
-    if (fs.existsSync(livePath)) {
-      const content = fs.readFileSync(livePath, 'utf8');
-      liveCatalogItems = JSON.parse(content || '[]');
-
-      liveCatalogItems.forEach((live) => {
-        if (live.isArchived) return;
-        if (live.offerId) {
-          const matchOffer = live.offerId.match(ASIN_REGEX);
-          if (matchOffer) knownAsinSet.add(matchOffer[1].toUpperCase());
-        }
-        if (live.barcode) {
-          const matchBar = live.barcode.match(ASIN_REGEX);
-          if (matchBar) knownAsinSet.add(matchBar[1].toUpperCase());
-        }
-      });
-    }
-  } catch (e) {
-    console.warn('[Duplicate Detector] ozon_live_catalog.json okunamadı:', e);
-  }
-
-  return { memoryItems, liveCatalogItems, knownAsinSet };
+  return false;
 }
 
 /**
- * Bir Amazon ürününün ASIN odaklı mükerrer kontrolünü yapar.
+ * Başlıkta aranacak mağaza kodları. Rakam içermeyen ya da 5 karakterden kısa kodlar atlanır
+ * (sıradan kelimelerle yanlış eşleşmesinler). Başlığın kesilmiş hâli olan bozuk kodlar da
+ * hiçbir başlıkta birebir geçmediği için zararsızdır.
+ */
+export function prepareStoreCodes(offerIds: string[]): string[] {
+  return offerIds.map((id) => id.trim().toLowerCase()).filter((id) => id.length >= 5 && /\d/.test(id));
+}
+
+/**
+ * Bir Amazon ürününün mağazada ya da yükleme hafızasında olup olmadığını bulur.
+ *
+ * Mağaza kontrolü tersinden yapılır: başlıktan model kodu tahmin edilip mağazada aranmaz,
+ * mağazadaki her kod başlığın içinde aranır. Tahmin yanlış çıktığında ("CC13/50" yerine
+ * "Quick Clean") yüklü ürün kaçıyordu; Amazon başlıkları model kodunu neredeyse hep içerir.
  */
 export function checkIsProductInOzon(
   amazonTitle: string,
   asin: string,
   modelCode: string,
-  brand: string
+  storeCodes: string[] = [],
+  memory: ReturnType<typeof getUploadedOzonProducts> = getUploadedOzonProducts([])
 ): { isUploaded: boolean; reason?: string } {
-  const { memoryItems, liveCatalogItems, knownAsinSet } = getUploadedOzonProducts();
+  const { memoryItems, knownAsinSet } = memory;
 
   const cleanAsin = (asin || '').toUpperCase().trim();
   const cleanModel = (modelCode || '').toLowerCase().trim();
-  const cleanTitle = (amazonTitle || '').toLowerCase();
+  // Amazon başlıkları model kodunu bazen boşluklu yazar ("HD9350 / 90"); mağazada "HD9350/90".
+  const cleanTitle = (amazonTitle || '').toLowerCase().replace(/\s*\/\s*/g, '/');
 
-  // 1. ÖNCELİKLİ & KESİN KONTROL: ASIN PARMAK İZİ EŞLEŞMESİ (Zero False-Positive)
+  // 1. ASIN hafızada kayıtlı
   if (cleanAsin && knownAsinSet.has(cleanAsin)) {
-    return {
-      isUploaded: true,
-      reason: `ASIN Ozon mağazasında zaten yüklü (${cleanAsin})`,
-    };
+    return { isUploaded: true, reason: `ASIN daha önce yüklenmiş (${cleanAsin})` };
   }
 
-  // 2. Ozon Canlı Mağaza Offer ID Kontrolü
-  for (const live of liveCatalogItems) {
-    if (live.isArchived) continue;
-
-    if (live.offerId) {
-      const offLower = live.offerId.toLowerCase().trim();
-      if (cleanAsin && offLower === cleanAsin.toLowerCase()) {
-        return { isUploaded: true, reason: `Ozon Offer ID eşleşti (${live.offerId})` };
-      }
-      if (cleanModel && offLower === cleanModel && cleanModel.length > 5) {
-        return { isUploaded: true, reason: `Model kodu mağazada aktif (${live.offerId})` };
-      }
+  // 2. Mağazadaki bir ürün kodu başlıkta ya da ASIN/model koduyla birebir geçiyor
+  for (const code of storeCodes) {
+    if (code === cleanAsin.toLowerCase() || code === cleanModel || titleContainsCode(cleanTitle, code)) {
+      return { isUploaded: true, reason: `Mağazada yüklü (${code.toUpperCase()})` };
     }
   }
 
-  // 3. Yerel Hafıza Model Kodu Kontrolü
+  // 3. Yükleme hafızasındaki model kodu
   for (const item of memoryItems) {
     if (cleanModel && item.modelNo) {
       const mLower = item.modelNo.toLowerCase().trim();

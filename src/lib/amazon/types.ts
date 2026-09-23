@@ -35,4 +35,6 @@ export interface AmazonCrawlResponse {
   pagesScanned: number;
   items: AmazonProductItem[];
   error?: string;
+  /** Tarama tamamlandı ama bir kontrol yapılamadı (ör. Ozon mağazasına ulaşılamadı). */
+  warning?: string;
 }

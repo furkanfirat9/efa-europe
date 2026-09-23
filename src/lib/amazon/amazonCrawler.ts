@@ -1,7 +1,9 @@
 import https from 'https';
 import zlib from 'zlib';
 import { AmazonProductItem, AmazonCrawlOptions, AmazonCrawlResponse } from './types';
-import { checkIsProductInOzon } from '@/lib/ozon/duplicateDetector';
+import { checkIsProductInOzon, getUploadedOzonProducts, prepareStoreCodes } from '@/lib/ozon/duplicateDetector';
+import { loadCatalogMemory } from '@/lib/db/catalogMemory';
+import { getStoreOfferIds } from '@/lib/ozon/storeOfferIds';
 
 // Amazon.de Türkçe arayüzü: arama kelimeleri ve başlıklar Türkçe. Kullanıcı siteyi Türkçe kullanıyor
 // ve aramalarını Türkçe yapıyor; Almanca oturumla Türkçe kelimeler sonuç vermiyordu.
@@ -72,6 +74,17 @@ async function verifyImageUrl(url: string): Promise<number> {
       resolve(500);
     }
   });
+}
+
+/** Başlıktaki HTML karakter kodlarını çözer: "4&#x27;lü" → "4'lü". */
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(Number(dec)))
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
 }
 
 /** Amazon görsel adresinin dosya kimliği: .../images/I/61wr9k6x2kL._AC_SL1500_.jpg → "61wr9k6x2kL". */
@@ -339,6 +352,27 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
     customUrl,
   } = options;
 
+  // Mağazadaki ürün kodları Ozon'dan canlı alınır. Ozon'a ulaşılamazsa tarama sürer ama sonuç
+  // uyarıyla döner; kontrol yapılamadığı hâlde ürünler sessizce "yüklü değil" sayılmaz.
+  let storeCodes: string[] = [];
+  let warning: string | undefined;
+  try {
+    storeCodes = prepareStoreCodes(await getStoreOfferIds());
+  } catch (err) {
+    console.error('Mağaza ürün kodları alınamadı:', err);
+    warning = 'Ozon mağazası kontrol edilemedi; listede zaten yüklü ürünler olabilir.';
+  }
+  // Yükleme hafızasındaki ASIN'ler (daha önce panelden yüklenenler)
+  let memory = getUploadedOzonProducts([]);
+  try {
+    memory = getUploadedOzonProducts(await loadCatalogMemory());
+  } catch (err) {
+    console.error('Yükleme hafızası okunamadı:', err);
+    warning = [warning, 'Yükleme hafızası okunamadı; daha önce yüklenen ürünler tanınmayabilir.']
+      .filter(Boolean)
+      .join(' ');
+  }
+
   const cookies = await getAmazonSessionCookies();
   const allItems: AmazonProductItem[] = [];
   const visitedAsins = new Set<string>();
@@ -448,7 +482,7 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
           chunk.match(/<h2[^>]*>[\s\S]*?<span[^>]*>([\s\S]*?)<\/span>/i) ||
           chunk.match(/class="a-text-normal"[^>]*>([\s\S]*?)<\/span>/i);
         const title = titleMatch
-          ? titleMatch[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+          ? decodeHtmlEntities(titleMatch[1].replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim()
           : '';
 
         // Satış fiyatı, sınıfı tam olarak "a-price" olan kutudadır. Üstü çizili eski fiyat ve birim
@@ -519,7 +553,7 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
             const modelCode = extractModelCode(item.title, brand);
 
             // Mükerrer Ozon Kontrolü (Hafıza + Canlı Mağaza)
-            const dup = checkIsProductInOzon(item.title, item.asin, modelCode, brand);
+            const dup = checkIsProductInOzon(item.title, item.asin, modelCode, storeCodes, memory);
 
             return {
               asin: item.asin,
@@ -565,5 +599,6 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
     totalFound: finalItems.length,
     pagesScanned: maxPages,
     items: finalItems,
+    warning,
   };
 }

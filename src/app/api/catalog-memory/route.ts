@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get('query');
 
     if (brand || categoryId) {
-      const records = findRelevantCatalogMemory(
+      const records = await findRelevantCatalogMemory(
         brand || '',
         categoryId ? parseInt(categoryId, 10) : undefined,
         typeId ? parseInt(typeId, 10) : undefined,
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: true, count: records.length, data: records });
     }
 
-    const allRecords = getAllCatalogMemory();
+    const allRecords = await getAllCatalogMemory();
     return NextResponse.json({ success: true, count: allRecords.length, data: allRecords });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const saved = saveProductToMemory(body);
+    const saved = await saveProductToMemory(body);
     return NextResponse.json({ success: true, data: saved });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -56,7 +56,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'ID parametresi zorunludur.' }, { status: 400 });
     }
 
-    const deleted = deleteCatalogMemory(id);
+    const deleted = await deleteCatalogMemory(id);
     return NextResponse.json({ success: deleted });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

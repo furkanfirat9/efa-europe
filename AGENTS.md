@@ -55,8 +55,11 @@ Mağazada daha önce yüklenmiş olan ürünleri takip etmek, mükerrer yükleme
     - Tüm ürünleri listeleme: `node scripts/fetch_ozon_products.js`
     - Model/Offer ID araması: `node scripts/fetch_ozon_products.js --search=NA350`
     - Kategori bazlı filtreleme: `node scripts/fetch_ozon_products.js --category=17039629`
-- **Yerel Katalog Hafızası:**
-  - `data/catalog_memory.json`: Bu panelden yapılan geçmiş yüklemelerin `seriesMergeCode`, `namingTemplateModel` ve varyant özelliklerini saklar ve yeni yüklemelerde yapay zekaya referans oluşturur.
+- **Katalog Hafızası (`CatalogMemory` tablosu, `src/lib/db/catalogMemory.ts`):**
+  - Bu panelden yapılan yüklemelerin ASIN'ini, `seriesMergeCode`, `namingTemplateModel` ve varyant özelliklerini saklar; yeni yüklemelerde yapay zekâya referans olur ve Amazon avcısında "bu ASIN zaten yüklendi mi" kontrolünü besler.
+  - Eskiden `data/catalog_memory.json` dosyasındaydı; Vercel'de dosyaya yazılamadığı için canlı siteden yapılan yüklemeler hafızaya girmiyordu. Kayıtlar `scripts/seed_catalog_memory.mjs` ile tabloya aktarıldı. Dosya yalnızca eski yerel script'ler (`scripts/update_store_galleries.js` vb.) için duruyor, uygulama onu okumaz.
+  - Mükerrer kontrolleri `loadCatalogMemory()` kullanır (okunamazsa hata fırlatır; boş hafıza "hiçbiri yüklü değil" demek olurdu). Hata yutan `getAllCatalogMemory()` yalnızca hafıza olmadan da sürebilen işler (AI referansı) içindir.
+- **Amazon avcısında mağaza kontrolü:** Mağazanın offer_id'leri `/v3/product/list` ile canlı çekilir (`src/lib/ozon/storeOfferIds.ts`, 10 dk önbellek) ve Amazon başlığında aranır. Türkçe başlıkların çoğunda model kodu olmadığı için asıl koruma ASIN hafızasıdır; kod araması ek güvencedir.
 
 ## 5. Amazon Otonom Keşif ve Fiyatlandırma Kuralları (Amazon Sourcing Engine)
 - **Satıcı Filtresi:** Sadece doğrudan Amazon.de (`p_6:A3JWKAKR8XB7XF`) veya Amazon Business (`p_6:A29D61YZMYPL6V`) ürünleri çekilir; 3. taraf pazar yeri satıcıları elenir.

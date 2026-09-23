@@ -1,6 +1,6 @@
 ﻿import fs from 'fs';
 import path from 'path';
-import { getAllCatalogMemory, CatalogProductRecord } from '../db/catalogMemory';
+import type { CatalogProductRecord } from '../db/catalogMemory';
 
 export interface OzonLiveProduct {
   productId: number;
@@ -188,10 +188,15 @@ export async function syncOzonCatalogFromApi(): Promise<OzonLiveProduct[]> {
   }
 }
 
+/**
+ * memoryRecords: getAllCatalogMemory() sonucu. Hafıza veri tabanında olduğu için çağıran bir kez
+ * yükleyip verir; kontrolün kendisi eşzamanlı kalır.
+ */
 export function checkDuplicateProduct(
   query: string,
   modelNo?: string,
-  brand?: string
+  brand?: string,
+  memoryRecords: CatalogProductRecord[] = []
 ): DuplicateCheckMatch {
   if (!query || !query.trim()) {
     return { isDuplicate: false, matchType: null, confidence: 0 };
@@ -205,7 +210,6 @@ export function checkDuplicateProduct(
   const tokens = rawQuery.split(/[\s,/-]+/).map(normalizeStr).filter(isModelLikeToken);
 
   const ozonProducts = getOzonLiveCatalog();
-  const memoryRecords = getAllCatalogMemory();
 
   // 1. ONCE CANLI OZON MAGAZASINDA ARAMA
   for (const p of ozonProducts) {
@@ -356,12 +360,15 @@ export function checkDuplicateProduct(
   return { isDuplicate: false, matchType: null, confidence: 0 };
 }
 
-export function checkBulkDuplicates(queries: string[]): Array<{
+export function checkBulkDuplicates(
+  queries: string[],
+  memoryRecords: CatalogProductRecord[] = []
+): Array<{
   query: string;
   result: DuplicateCheckMatch;
 }> {
   return queries.map((q) => ({
     query: q,
-    result: checkDuplicateProduct(q),
+    result: checkDuplicateProduct(q, undefined, undefined, memoryRecords),
   }));
 }
