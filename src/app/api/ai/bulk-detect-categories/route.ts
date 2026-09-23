@@ -145,6 +145,7 @@ KESİN KURALLAR VE ALTIN STANDART REFERANS ÖRNEKLER:
 15. YUMURTA PİŞİRİCİ: "Küchenminis Eierkocher", "yumurta pişirici", "yumurta haşlama makinesi" -> typeId: 91438 ("Яйцеварка" / Yumurta Pişirici).
 16. SÜT KÖPÜRTÜCÜ: "Lono Milchaufschäumer", "süt köpürtücü", "süt köpürtme makinesi" -> typeId: 94747 ("Капучинатор" / Süt Köpürtücü).
 17. TOST / EKMEK KIZARTMA: "Stelio Toaster", "ekmek kızartma makinesi", "tost makinesi (ekmek kızartıcı)" -> typeId: 94979 ("Тостер" / Ekmek Kızartma Makinesi).
+18. KADIN TIRAŞ MAKİNESİ: "Lady Shaver", "Damenrasierer", "kadın tıraş makinesi", "kadınlar için elektrikli tıraş makinesi" kılı yüzeyden keser, EPİLATÖR DEĞİLDİR (epilatör kökten çeker) -> typeId: 91687 ("Электробритва" / Tıraş makinesi). Эпилятор (91688) SEÇİLMEZ.
 
 GEÇMİŞTE MAĞAZAYA YÜKLENMİŞ ÜRÜN VE KATEGORİ HAFIZASI (Referans olarak incele ve benzer ürünlerde aynı kategoriyi kullan):
 ${JSON.stringify(relevantMemory, null, 2)}
