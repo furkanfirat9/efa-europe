@@ -22,7 +22,7 @@ import {
   RefreshCw,
   ShoppingBag,
 } from 'lucide-react';
-import { AmazonProductItem } from '@/lib/amazon/types';
+import { AmazonProductItem, OZON_PRICE_MULTIPLIER } from '@/lib/amazon/types';
 
 const POPULAR_BRANDS = [
   { name: 'Philips', icon: '⚡', category: 'kitchen' },
@@ -217,7 +217,7 @@ export default function AmazonHunterPage() {
                     </span>
                   </h1>
                   <p className="text-sm text-slate-500 mt-0.5">
-                    Amazon.de üzerindeki stoklu marka ürünlerini reklamsız tara, 3x tam sayı fiyatla Ozon formatına aktar.
+                    Amazon.de üzerindeki stoklu marka ürünlerini reklamsız tara, {OZON_PRICE_MULTIPLIER}x tam sayı fiyatla Ozon formatına aktar.
                   </p>
                 </div>
               </div>
@@ -254,8 +254,8 @@ export default function AmazonHunterPage() {
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-slate-900">ECB Kuru × 3, Tam Sayı</h4>
-              <p className="text-[11px] text-slate-500 mt-0.5">Amazon € fiyatı günlük ECB kuruyla dolara çevrilir, 3 katı alınır.</p>
+              <h4 className="text-xs font-bold text-slate-900">ECB Kuru × {OZON_PRICE_MULTIPLIER}, Tam Sayı</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">Amazon € fiyatı günlük ECB kuruyla dolara çevrilir, {OZON_PRICE_MULTIPLIER} katı alınır.</p>
             </div>
           </div>
 
@@ -483,7 +483,7 @@ export default function AmazonHunterPage() {
                   <span className="text-lg font-bold text-slate-700">{totalBuyEur.toFixed(2)} €</span>
                 </div>
                 <div className="border-l border-slate-200 pl-4 sm:pl-6">
-                  <span className="text-[11px] font-semibold text-slate-500 block uppercase">Tahmini Ozon Satış (3x)</span>
+                  <span className="text-[11px] font-semibold text-slate-500 block uppercase">Tahmini Ozon Satış ({OZON_PRICE_MULTIPLIER}x)</span>
                   <span className="text-lg font-bold text-emerald-600">${totalOzonEur}</span>
                   {fx && (
                     <span className="text-[11px] text-slate-500 block">
@@ -533,7 +533,7 @@ export default function AmazonHunterPage() {
                       <th className="p-3.5 w-32">Model No</th>
                       <th className="p-3.5">Ürün Başlığı (Amazon.de)</th>
                       <th className="p-3.5 w-28">Amazon Alış</th>
-                      <th className="p-3.5 w-32">Ozon Satış (3x)</th>
+                      <th className="p-3.5 w-32">Ozon Satış ({OZON_PRICE_MULTIPLIER}x)</th>
                       <th className="p-3.5 w-28">Eski Liste</th>
                       <th className="p-3.5 w-20 text-center">Durum</th>
                     </tr>

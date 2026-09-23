@@ -2,8 +2,8 @@
  * Avrupa Merkez Bankası (ECB) günlük EUR/USD referans kuru.
  *
  * Amazon alış fiyatı Euro, Ozon satış fiyatı dolar olduğu için avcı fiyatı
- * `Amazon € × ECB kuru × 3` ile hesaplar. Eskiden kur yerine sabit 1,15 kullanılıyordu;
- * kur ondan uzaklaştıkça oran ×3'ten sapıyordu.
+ * `Amazon € × ECB kuru × OZON_PRICE_MULTIPLIER` ile hesaplar. Eskiden kur yerine sabit 1,15 kullanılıyordu;
+ * kur ondan uzaklaştıkça çarpan kayıyordu.
  *
  * ECB kuru iş günlerinde ~16:00 CET'te bir kez yayımlar; hafta sonu son iş gününün kuru
  * geçerlidir. Bu yüzden birkaç saat önbellekte tutulması yeterli.
