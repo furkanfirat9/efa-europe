@@ -56,6 +56,7 @@ export default function AmazonHunterPage() {
   // Execution State
   const [isScanning, setIsScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
+  const [scanWarning, setScanWarning] = useState<string | null>(null);
   const [products, setProducts] = useState<AmazonProductItem[]>([]);
 
   // Selection & Stats
@@ -71,6 +72,7 @@ export default function AmazonHunterPage() {
   const handleStartCrawl = async () => {
     setIsScanning(true);
     setScanError(null);
+    setScanWarning(null);
 
     try {
       const response = await fetch('/api/amazon/crawl', {
@@ -95,6 +97,7 @@ export default function AmazonHunterPage() {
       }
 
       setProducts(data.items || []);
+      setScanWarning(data.warning || null);
     } catch (err: any) {
       setScanError(err.message || 'Amazon sunucularına bağlanırken hata oluştu.');
     } finally {
@@ -447,6 +450,13 @@ export default function AmazonHunterPage() {
             <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm flex items-center gap-3">
               <AlertCircle className="w-5 h-5 shrink-0" />
               <span>{scanError}</span>
+            </div>
+          )}
+
+          {scanWarning && (
+            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <span>{scanWarning}</span>
             </div>
           )}
         </div>

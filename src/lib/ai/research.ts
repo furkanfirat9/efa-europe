@@ -297,7 +297,7 @@ export async function deepCategoryProductResearch(
     });
 
   // 4. Katalog Hafızasını Sorgula (Daha önce kaydedilmiş aynı marka/kategori ürünleri)
-  const relevantHistory = findRelevantCatalogMemory(brand, categoryId, typeId, productQuery, 5);
+  const relevantHistory = await findRelevantCatalogMemory(brand, categoryId, typeId, productQuery, 5);
   let memoryPromptSection = '';
   if (relevantHistory.length > 0) {
     memoryPromptSection = `

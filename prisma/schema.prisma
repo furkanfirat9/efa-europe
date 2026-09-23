@@ -310,3 +310,41 @@ model OrderPeriodSync {
 
   @@unique([storeId, year, month])
 }
+
+// Panelden yüklenen ürünlerin hafızası (eskiden data/catalog_memory.json).
+//
+// İki işe yarar: yapay zekâya aynı marka/kategorideki geçmiş yüklemeleri
+// (kart birleştirme kodu, vitrin model adı) referans olarak vermek ve Amazon
+// avcısında "bu ASIN zaten yüklendi mi" kontrolü. Dosyada tutulduğu sürece
+// Vercel'den yapılan yüklemeler hafızaya yazılamıyordu; veri tabanı her
+// ortamdan yazılabilir.
+model CatalogMemory {
+  id                  String    @id @default(cuid())
+  asin                String?
+  brand               String
+  modelNo             String
+  categoryId          Int?
+  typeId              Int?
+  categoryName        String?
+  typeName            String?
+  // ID 9048 (örn: ph-3000-airfryer)
+  seriesMergeCode     String?
+  // ID 12141 / 20776 (örn: NA350/00 9 л с двумя чашами 2750 Вт)
+  namingTemplateModel String?
+  // ID 4381
+  partNumber          String?
+  aspects             Json?
+  finalTitle          String?
+  productQuery        String?
+  ozonTaskId          String?
+  // Mağazadaki ürünle eşleştirilmiş kayıtlarda (ASIN eşleştirme script'i)
+  offerId             String?
+  ozonProductId       String?
+  source              String?
+  verifiedAt          DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([asin])
+  @@index([brand, modelNo])
+}

@@ -5,6 +5,7 @@ import {
   syncOzonCatalogFromApi,
   getOzonLiveCatalog,
 } from '@/lib/ozon/duplicateChecker';
+import { loadCatalogMemory } from '@/lib/db/catalogMemory';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,9 +20,11 @@ export async function POST(request: NextRequest) {
       liveCatalog = await syncOzonCatalogFromApi();
     }
 
+    const memoryRecords = await loadCatalogMemory();
+
     // Toplu kontrol (Bulk)
     if (Array.isArray(queries) && queries.length > 0) {
-      const results = checkBulkDuplicates(queries);
+      const results = checkBulkDuplicates(queries, memoryRecords);
       const duplicateCount = results.filter((r) => r.result.isDuplicate).length;
       return NextResponse.json({
         success: true,
@@ -40,7 +43,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const matchResult = checkDuplicateProduct(query || modelNo || '', modelNo, brand);
+    const matchResult = checkDuplicateProduct(query || modelNo || '', modelNo, brand, memoryRecords);
 
     return NextResponse.json({
       success: true,

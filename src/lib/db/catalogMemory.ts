@@ -1,5 +1,12 @@
-import fs from 'fs';
-import path from 'path';
+import type { CatalogMemory, Prisma } from '@prisma/client';
+import { prisma } from '@/lib/db/prisma';
+
+/*
+  Panelden yüklenen ürünlerin hafızası. Eskiden data/catalog_memory.json dosyasında
+  tutuluyordu; Vercel'de dosyaya yazılamadığı için canlı siteden yapılan yüklemeler
+  hafızaya hiç girmiyordu. Artık CatalogMemory tablosundadır; eski kayıtlar
+  scripts/seed_catalog_memory.mjs ile bir kez aktarıldı.
+*/
 
 export interface CatalogProductRecord {
   id: string;
@@ -26,27 +33,45 @@ export interface CatalogProductRecord {
   updatedAt: string;
 }
 
-const DB_DIR = path.join(process.cwd(), 'data');
-const DB_FILE = path.join(DB_DIR, 'catalog_memory.json');
-
-// Dizin ve dosya yoksa oluştur
-function ensureDbFile(): void {
-  if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
-  }
-  if (!fs.existsSync(DB_FILE)) {
-    fs.writeFileSync(DB_FILE, JSON.stringify([], null, 2), 'utf-8');
-  }
+function toRecord(row: CatalogMemory): CatalogProductRecord {
+  return {
+    id: row.id,
+    asin: row.asin ?? undefined,
+    brand: row.brand,
+    modelNo: row.modelNo,
+    categoryId: row.categoryId ?? 0,
+    typeId: row.typeId ?? 0,
+    categoryName: row.categoryName ?? '',
+    typeName: row.typeName ?? '',
+    seriesMergeCode: row.seriesMergeCode ?? '',
+    namingTemplateModel: row.namingTemplateModel ?? '',
+    partNumber: row.partNumber ?? undefined,
+    aspects: (row.aspects as CatalogProductRecord['aspects']) ?? undefined,
+    finalTitle: row.finalTitle ?? undefined,
+    ozonTaskId: row.ozonTaskId ?? undefined,
+    productQuery: row.productQuery ?? undefined,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+  };
 }
 
 /**
- * Tüm kayıtları oku
+ * Tüm kayıtlar, en yeni başta (dosyadaki sırayla aynı: yeni kayıt başa eklenirdi).
+ * Okunamazsa hata fırlatır; mükerrer kontrolleri bunu kullanır, çünkü boş hafıza
+ * "hiçbiri yüklü değil" demek olur.
  */
-export function getAllCatalogMemory(): CatalogProductRecord[] {
+export async function loadCatalogMemory(): Promise<CatalogProductRecord[]> {
+  const rows = await prisma.catalogMemory.findMany({ orderBy: { createdAt: 'desc' } });
+  return rows.map(toRecord);
+}
+
+/**
+ * loadCatalogMemory'nin hata yutan hâli: yapay zekâya referans gibi, hafıza olmadan da
+ * sürebilen işler için.
+ */
+export async function getAllCatalogMemory(): Promise<CatalogProductRecord[]> {
   try {
-    ensureDbFile();
-    const data = fs.readFileSync(DB_FILE, 'utf-8');
-    return JSON.parse(data || '[]');
+    return await loadCatalogMemory();
   } catch (error) {
     console.error('Katalog hafızası okunurken hata:', error);
     return [];
@@ -54,72 +79,54 @@ export function getAllCatalogMemory(): CatalogProductRecord[] {
 }
 
 /**
- * Atomik olarak kayıtları kaydet
- */
-function saveAllCatalogMemory(records: CatalogProductRecord[]): void {
-  ensureDbFile();
-  const tempFile = `${DB_FILE}.tmp.${Date.now()}`;
-  fs.writeFileSync(tempFile, JSON.stringify(records, null, 2), 'utf-8');
-  fs.renameSync(tempFile, DB_FILE);
-}
-
-/**
  * Yeni ürün kaydet veya var olanı güncelle (Marka + Model No + Kategori bazlı)
  */
-export function saveProductToMemory(
+export async function saveProductToMemory(
   record: Omit<CatalogProductRecord, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }
-): CatalogProductRecord {
-  const records = getAllCatalogMemory();
-  const now = new Date().toISOString();
+): Promise<CatalogProductRecord> {
+  const data = {
+    asin: record.asin || null,
+    brand: record.brand,
+    modelNo: record.modelNo,
+    categoryId: record.categoryId ?? null,
+    typeId: record.typeId ?? null,
+    categoryName: record.categoryName ?? null,
+    typeName: record.typeName ?? null,
+    seriesMergeCode: record.seriesMergeCode ?? null,
+    namingTemplateModel: record.namingTemplateModel ?? null,
+    partNumber: record.partNumber ?? null,
+    aspects: (record.aspects ?? undefined) as Prisma.InputJsonValue | undefined,
+    finalTitle: record.finalTitle ?? null,
+    productQuery: record.productQuery ?? null,
+    ozonTaskId: record.ozonTaskId ?? null,
+  };
 
-  // Var olan kaydı bul (Marka ve ModelNo eşleşmesi)
-  const existingIndex = records.findIndex(
-    (r) =>
-      r.brand.toLowerCase() === record.brand.toLowerCase() &&
-      r.modelNo.toLowerCase() === record.modelNo.toLowerCase() &&
-      r.categoryId === record.categoryId
-  );
+  // Var olan kaydı bul (Marka ve ModelNo eşleşmesi, büyük/küçük harf duyarsız)
+  const existing = await prisma.catalogMemory.findFirst({
+    where: {
+      brand: { equals: record.brand, mode: 'insensitive' },
+      modelNo: { equals: record.modelNo, mode: 'insensitive' },
+      categoryId: record.categoryId ?? null,
+    },
+  });
 
-  let savedRecord: CatalogProductRecord;
-
-  if (existingIndex >= 0) {
-    // Güncelle
-    savedRecord = {
-      ...records[existingIndex],
-      ...record,
-      id: records[existingIndex].id,
-      updatedAt: now,
-    };
-    records[existingIndex] = savedRecord;
-  } else {
-    // Yeni Ekle
-    const newId = `${record.brand.toLowerCase().replace(/[^a-z0-9]/g, '')}-${record.modelNo
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, '')}-${Date.now()}`;
-    savedRecord = {
-      ...record,
-      id: newId,
-      createdAt: now,
-      updatedAt: now,
-    };
-    records.unshift(savedRecord); // En başa ekle
-  }
-
-  saveAllCatalogMemory(records);
-  return savedRecord;
+  const saved = existing
+    ? await prisma.catalogMemory.update({ where: { id: existing.id }, data })
+    : await prisma.catalogMemory.create({ data });
+  return toRecord(saved);
 }
 
 /**
  * Yapay zekaya referans sunmak için marka, kategori ve modele göre en alakalı geçmiş kayıtları bul
  */
-export function findRelevantCatalogMemory(
+export async function findRelevantCatalogMemory(
   brand: string,
   categoryId?: number,
   typeId?: number,
   query?: string,
   limit = 5
-): CatalogProductRecord[] {
-  const records = getAllCatalogMemory();
+): Promise<CatalogProductRecord[]> {
+  const records = await getAllCatalogMemory();
   if (records.length === 0) return [];
 
   const brandLower = (brand || '').toLowerCase().trim();
@@ -165,12 +172,7 @@ export function findRelevantCatalogMemory(
 /**
  * Belirli bir kaydı sil
  */
-export function deleteCatalogMemory(id: string): boolean {
-  const records = getAllCatalogMemory();
-  const filtered = records.filter((r) => r.id !== id);
-  if (filtered.length !== records.length) {
-    saveAllCatalogMemory(filtered);
-    return true;
-  }
-  return false;
+export async function deleteCatalogMemory(id: string): Promise<boolean> {
+  const { count } = await prisma.catalogMemory.deleteMany({ where: { id } });
+  return count > 0;
 }

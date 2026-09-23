@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     }));
 
     // 3. Geçmiş Yükleme Hafızasından (catalog_memory.json) Canlı Referansları Çek
-    const memoryRecords = getAllCatalogMemory();
+    const memoryRecords = await getAllCatalogMemory();
     const relevantMemory = memoryRecords
       .filter((m) => m.typeId && (m.productQuery || m.modelNo))
       .slice(-60)
