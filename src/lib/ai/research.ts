@@ -189,7 +189,9 @@ export async function deepCategoryProductResearch(
   productQuery: string,
   language: OzonLanguage = 'RU',
   categoryName?: string,
-  typeName?: string
+  typeName?: string,
+  /** Amazon'dan aktarılan üründe ASIN: aramayı doğru ürüne sabitler. */
+  asin?: string
 ): Promise<DeepCategoryResearchResult> {
   const geminiApiKey = process.env.GEMINI_API_KEY;
   const modelName = process.env.DEFAULT_AI_MODEL || 'gemini-3.8-flash';
@@ -230,10 +232,9 @@ export async function deepCategoryProductResearch(
         effectiveTypeId = match.typeId;
         rawAttributesTR = await fetchCategoryAttributes(effectiveCatId, effectiveTypeId, 'TR');
       } else {
-        // Fallback: Mutfak Gereçleri genel nitelikleri (Tava)
-        rawAttributesTR = await fetchCategoryAttributes(17028732, 92462, 'TR');
-        effectiveCatId = 17028732;
-        effectiveTypeId = 92462;
+        // Eskiden burada "Tava" (92462) niteliklerine düşülüyordu; kahve makinesi gibi bir ürün
+        // sessizce tava nitelikleriyle doldurulabiliyordu. Kategori bulunamıyorsa kullanıcı seçer.
+        throw new Error('Seçilen kategori Ozon ağacında bulunamadı; kategoriyi elle seçin.');
       }
     } catch (fallbackErr) {
       console.error('Kategori fallback hatası:', fallbackErr);
@@ -315,9 +316,13 @@ ${relevantHistory
 `;
   }
 
+  // İstemdeki örneklerde gösterilecek model kodu. Eskiden Toplu Yükleme ürünün tam başlığını model
+  // kodu olarak veriyordu; yapay zekâ bu örneği kopyalayınca offer_id başlığın ilk 50 harfi oluyordu.
+  const modelHint = modelNo || 'HD9350/90';
+
   // 5. Gemini 3.8 Flash High Effort Thinking ile Derinlemesine Soru-Cevap Araştırması
   const prompt = `Sen Ozon Marketplace için uzman bir Rusça ürün yöneticisi ve teknik analistisin.
-Araştırılacak Ürün: "${brand} ${modelNo} (${productQuery})"
+Araştırılacak Ürün: "${[brand, modelNo].filter(Boolean).join(' ')} (${productQuery})"${asin ? `\nAmazon.de ASIN: ${asin} (https://www.amazon.de/dp/${asin}) — araştırmayı bu ürüne sabitle.` : ''}
 ${memoryPromptSection}
 GÖREV:
 Bu ürünün gerçek teknik dökümanlarını, fabrika özelliklerini ve pazar verilerini derinlemesine araştır:
@@ -376,7 +381,7 @@ KESİN KURALLAR:
      * Philips Sonicare (Elektrikli diş fırçası / HX7113 / HX3675 vb.) -> "Sonicare 5300 HX7113/01 звуковая с датчиком давления"
      * Braun Series 9 Pro -> "Series 9 Pro 9465cc для влажного и сухого бритья"
 5. ID 4381 ("Parça numarası" / "Партномер"):
-   Ürünün fabrika saf model/parça numarasıdır. Buraya yalnızca temiz model kodunu yaz (Örn: "${modelNo}").
+   Ürünün fabrika saf model/parça numarasıdır. Buraya yalnızca temiz model kodunu yaz (Örn: "${modelHint}").
 6. Eğer bir nitelik için "options" (seçenekler) listesi verilmişse, ürünün gerçek özelliklerine göre YALNIZCA VE KESİNLİKLE O LİSTEDEKİ EN UYGUN SEÇENEĞİ AYNEN SEÇ. (Listede olmayan uydurma kelimeler yazma).
    - Örneğin Kahve Makinesi Türü için seçeneklerde "Автоматическая кофемашина" varsa ve ürün tam otomatik bir makineyse KESİNLİKLE "Автоматическая кофемашина" seç.
 7. Çoklu seçim ("isCollection": true) alanlarında birden fazla seçenek geçerliyse dizi ["seçenek1", "seçenek2"] olarak ver (Örn: Çift renkli ise Renk alanına ["черный", "серый"]).
@@ -388,12 +393,13 @@ KESİN KURALLAR:
    - ID 8449 ("Kimin için" / "Для кого" / "Hedef Kitle") -> YALNIZCA 1 DEĞER (örn: "Универсально" или "Для всей семьи")
    - 'isCollection': false olan tüm alanlar -> YALNIZCA 1 DEĞER
    OZON BU ALANLARDA KESİNLİKLE YALNIZCA 1 TEKİL DEĞER KABUL EDER. ASLA birden fazla değer veya dizi/virgül gönderme!
-8. "summaryBullets": Ürünün araştırılan en önemli 5 özelliğini Türkçe kısa maddeler halinde özetle.
+8. "modelNo": Ürünün fabrikanın verdiği saf model / parça kodu (örn: "HD9350/90", "EP5447/90", "0761406380"). Ozon'da ürün kodu (offer_id) olarak kullanılır: ürün başlığı, seri adı ya da cümle YAZMA.
+9. "summaryBullets": Ürünün araştırılan en önemli 5 özelliğini Türkçe kısa maddeler halinde özetle.
 
 Format:
 {
   "brand": "${brand}",
-  "modelNo": "${modelNo}",
+  "modelNo": "${modelHint}",
   "russianSeoTitle": "...",
   "turkishTitle": "...",
   "barcode": "...",
@@ -410,7 +416,7 @@ Format:
   ],
   "filledAttributes": {
     "85": "${brand}",
-    "9048": "${modelNo}",
+    "9048": "${modelHint}",
     "4851": "2750"
   }
 }`;
@@ -468,6 +474,9 @@ Format:
   const results: PreFilledAttribute[] = [];
 
   // 5. Ozon Rusça Sözlük ID Eşleştirmeleri
+  // Boş kalan alanların yedeği: yapay zekânın bulduğu model kodu, yoksa gelen model kodu.
+  const resolvedModel = String(aiResult.modelNo || modelNo || '').trim();
+
   for (const attr of rawAttributesTR) {
     const isWarranty = isWarrantyAttribute(attr);
 
@@ -543,16 +552,16 @@ Format:
     let matchStatus: 'matched' | 'manual_needed' | 'free_text' = 'manual_needed';
 
     if (attr.id === 85 && !rawVal && brand) rawVal = brand;
-    if (attr.id === 9048 && !rawVal && modelNo) rawVal = modelNo;
+    if (attr.id === 9048 && !rawVal && resolvedModel) rawVal = resolvedModel;
 
     // Naming template ve Part number alanlarında marka adını temizle ve ASLA boş kalmasına izin verme
     if (attr.id === 12141 || attr.id === 20776 || attr.id === 4381 || isNamingTemplateAttribute(attr)) {
       if (!rawVal || String(rawVal).trim().length === 0) {
-        rawVal = modelNo.replace(new RegExp(`^${brand}\\s*`, 'i'), '').trim() || modelNo.trim() || productQuery.trim();
+        rawVal = resolvedModel.replace(new RegExp(`^${brand}\\s*`, 'i'), '').trim() || resolvedModel || productQuery.trim();
       } else if (typeof rawVal === 'string' && brand) {
         const brandRegex = new RegExp(`^${brand}\\s*`, 'i');
         const cleaned = rawVal.replace(brandRegex, '').trim();
-        rawVal = cleaned.length > 0 ? cleaned : modelNo.replace(brandRegex, '').trim() || modelNo.trim();
+        rawVal = cleaned.length > 0 ? cleaned : resolvedModel.replace(brandRegex, '').trim() || resolvedModel;
       }
     }
 

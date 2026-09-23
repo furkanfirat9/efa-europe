@@ -42,6 +42,8 @@ Ozon'da bazı nitelikler şemada `is_collection: true` olsa dahi, Ozon backend A
   - **2. Kart (Sağ):** Kategori seçildikten sonra aktifleşen özel model input kutusu (`productModelQuery`) ve Gemini 3.8 Flash derin araştırma butonu yer alır.
 - **Toplu Yükleme (`/toplu-yukle`):**
   - Çok satırlı model girişi + 6 departmanlı hazır kategori seçimi + Paralel Google Search destekli Gemini araştırması + Excel tarzı tablo düzenleyici ve tek tıkla Ozon API gönderimi (`/v3/product/import`).
+  - **Model kodu = offer_id:** Araştırmaya ürün başlığı model kodu olarak verilmez. Amazon'dan gelen ürünün markası, model kodu ve ASIN'i gönderilir; kod, model koduna benzemiyorsa (`looksLikeModelCode`, `src/lib/ozon/offerId.ts`) boş gider ve yapay zekâ ASIN'den bulur. Eskiden başlığın ilk 50 harfi offer_id oluyordu; mağazada 33 böyle bozuk kod var. Geçerli model kodu olmayan ürün Ozon'a gönderilmez, tablodaki kırmızı "Model kodu" kutusundan girilir.
+  - **Kategori bulunamazsa boş kalır:** Yapay zekâ geçerli kategori seçmezse ürün "Kategori Seç" olarak kalır; eskiden sessizce "Tava" (92462) atanıyordu. Kategori kuralları Türkçe ve Almanca anahtar kelimeleri birlikte içerir (avcı başlıkları Türkçe gelir).
 - **Hazır Kategoriler (`PRESET_CATEGORIES`):**
   - 6 ana grupta toplanır: Mutfak & Pişirme, Gıda Hazırlama & Mikserler, Ütü & Buhar, Kişisel Bakım & Güzellik, Sofra & Mutfak Eşyaları (Züccaciye), Temizlik & Ev Bakımı.
 

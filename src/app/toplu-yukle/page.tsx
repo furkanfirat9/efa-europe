@@ -37,6 +37,7 @@ import { PRESET_CATEGORIES, PresetCategory } from '@/lib/constants/presetCategor
 import PresetCategorySelector from '@/components/PresetCategorySelector';
 import CategoryTreeModal from '@/components/CategoryTreeModal';
 import { toast } from 'sonner';
+import { looksLikeModelCode } from '@/lib/ozon/offerId';
 
 export interface SelectedCategoryInfo {
   categoryId: number;
@@ -214,6 +215,9 @@ export default function TopluYuklePage() {
       });
 
       let totalProcessed = 0;
+      // Kategorisi bulunamayan ya da isteği başarısız olan ürünler; mesajda söylenir.
+      let notFound = 0;
+      let failed = 0;
 
       // 4 Eşzamanlı Paralel Kategori Kanalı
       await runConcurrentPool(
@@ -233,14 +237,17 @@ export default function TopluYuklePage() {
             body: JSON.stringify(payload),
           });
 
-          const data = await res.json();
+          const data = await res.json().catch(() => ({}));
           if (data.success && data.results) {
+            notFound += data.results.filter((r: any) => !r.category).length;
             setItems((prev) =>
               prev.map((item) => {
                 const found = data.results.find((r: any) => r.id === item.id);
                 return found ? { ...item, category: found.category } : item;
               })
             );
+          } else {
+            failed += chunkItems.length;
           }
 
           totalProcessed += chunkItems.length;
@@ -272,10 +279,22 @@ export default function TopluYuklePage() {
         });
       }, 100);
 
-      setGlobalMessage({
-        type: 'success',
-        text: `✅ ${items.length} ürünün Ozon kategorisi 15-20 kanallı yüksek hızlı paralel havuz ile tespit edildi!`,
-      });
+      const detected = items.length - notFound - failed;
+      const problems = [
+        notFound > 0 && `${notFound} ürünün kategorisi bulunamadı`,
+        failed > 0 && `${failed} ürün için tespit başarısız oldu`,
+      ].filter(Boolean);
+      setGlobalMessage(
+        problems.length > 0
+          ? {
+              type: 'error',
+              text: `${detected} ürünün kategorisi bulundu; ${problems.join(', ')}. Bunları tablodaki "Kategori Seç" ile seçin ya da tespiti tekrar çalıştırın.`,
+            }
+          : {
+              type: 'success',
+              text: `✅ ${items.length} ürünün Ozon kategorisi 15-20 kanallı yüksek hızlı paralel havuz ile tespit edildi!`,
+            }
+      );
     } catch (err: any) {
       setGlobalMessage({
         type: 'error',
@@ -418,8 +437,11 @@ export default function TopluYuklePage() {
   // Tek Bir Ürünü Araştır (Helper)
   const researchSingleItem = async (item: BulkProductItem, targetCat: SelectedCategoryInfo): Promise<Partial<BulkProductItem>> => {
     // 1. Marka ve Model Tespiti
-    const brandGuess = item.rawQuery.split(' ')[0] || 'Genel';
-    const modelGuess = item.rawQuery;
+    // Amazon'dan gelen üründe marka ve model kodu avcıdan gelir. Eskiden marka başlığın ilk kelimesi,
+    // model kodu başlığın tamamıydı; yapay zekâ temiz kod döndürmeyince offer_id başlığın ilk 50 harfi
+    // oluyordu. Model kodu gibi görünmeyen değer gönderilmez; kodu yapay zekâ bulur.
+    const brandGuess = item.brand || item.rawQuery.split(' ')[0] || 'Genel';
+    const modelGuess = looksLikeModelCode(item.modelNo) ? item.modelNo.trim() : '';
 
     // 2. Canlı Google Search Grounding ile Nitelik Doldurma
     const fillRes = await fetch('/api/ai/fill-attributes', {
@@ -433,6 +455,7 @@ export default function TopluYuklePage() {
         brand: brandGuess,
         modelNo: modelGuess,
         productQuery: item.rawQuery,
+        asin: item.asin || undefined,
         language: 'RU',
       }),
     });
@@ -442,12 +465,16 @@ export default function TopluYuklePage() {
     }
 
     const resData = fillData.data;
+    // Yapay zekânın bulduğu kod model kodu gibi değilse (başlık, seri adı) kullanılmaz; ikisi de
+    // yoksa model kodu boş kalır ve tablodaki kırmızı kutudan elle girilir.
+    const aiModel = String(resData.modelNo || '').trim();
+    const finalModel = looksLikeModelCode(aiModel) ? aiModel : modelGuess;
 
     return {
       brand: resData.brand || brandGuess,
-      modelNo: resData.modelNo || modelGuess,
+      modelNo: finalModel,
       category: targetCat,
-      russianSeoTitle: resData.russianSeoTitle || `${resData.brand || brandGuess} ${resData.modelNo || modelGuess}`,
+      russianSeoTitle: resData.russianSeoTitle || `${resData.brand || brandGuess} ${finalModel || item.rawQuery}`,
       barcode: resData.barcode || '',
       dimensions: resData.dimensions || { widthMm: 0, heightMm: 0, depthMm: 0 },
       weightG: resData.weightG || 0,
@@ -464,7 +491,7 @@ export default function TopluYuklePage() {
     if (unassigned.length > 0) {
       setGlobalMessage({
         type: 'error',
-        text: 'Bazı ürünlerin kategorisi belirlenmemiş. Lütfen önce "1. Adım: AI ile Kategorileri Tespit Et" butonuna basınız.',
+        text: `${unassigned.length} ürünün kategorisi yok. Tablodaki "Kategori Seç" ile seçin ya da önce "1. Adım: AI ile Kategorileri Tespit Et" butonuna basın.`,
       });
       return;
     }
@@ -720,8 +747,16 @@ export default function TopluYuklePage() {
       return;
     }
 
-    // Eksik alan kontrolü (Fiyat ve Görsel)
+    // Eksik alan kontrolü (Model kodu, Fiyat ve Görsel)
     for (const item of selectedItems) {
+      // offer_id model kodundan oluşur; başlık parçası mağazada bozuk ürün kodu bırakıyordu.
+      if (!looksLikeModelCode(item.modelNo)) {
+        setGlobalMessage({
+          type: 'error',
+          text: `"${item.rawQuery.slice(0, 50)}" için geçerli bir model kodu yok. Tablodaki kırmızı "Model kodu" kutusuna girin (örn: HD9350/90); Ozon'da ürün kodu olarak kullanılır.`,
+        });
+        return;
+      }
       if (!item.price || Number(item.price) <= 0) {
         setGlobalMessage({
           type: 'error',
@@ -1320,6 +1355,22 @@ export default function TopluYuklePage() {
                               </span>
                             )}
                           </div>
+                          <label className="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-slate-500">
+                            <span className="shrink-0">Model kodu</span>
+                            <input
+                              type="text"
+                              value={item.modelNo}
+                              onChange={(e) => handleUpdateItemField(item.id, 'modelNo', e.target.value)}
+                              placeholder="örn: HD9350/90"
+                              aria-invalid={!looksLikeModelCode(item.modelNo)}
+                              title="Ozon'da ürün kodu (offer_id) olarak kullanılır"
+                              className={`w-36 px-1.5 py-0.5 rounded-sm border font-mono text-[11px] text-slate-900 focus:outline-hidden focus:ring-1 ${
+                                looksLikeModelCode(item.modelNo)
+                                  ? 'border-slate-200 focus:ring-blue-500'
+                                  : 'border-red-400 bg-red-50 focus:ring-red-500'
+                              }`}
+                            />
+                          </label>
                           {item.duplicateMatch?.isDuplicate && (
                             <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm bg-amber-100 text-amber-900 text-[10px] font-bold border border-amber-300">
                               <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0" />
