@@ -35,3 +35,6 @@ scratch_amazon.html
 
 # claude code personal settings
 .claude/settings.local.json
+
+# tedarik taraması çıktıları (scripts/supply_scan.mjs)
+/data/supply-scans/

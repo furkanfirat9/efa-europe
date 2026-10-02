@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/shadcn/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/shadcn/tabs';
 import { cn } from '@/lib/utils';
 import type { Proposal } from '@/lib/pricing/proposals';
+import { ScanStatus } from './_components/ScanStatus';
 
 /**
  * Fiyat önerisi: otomatik fiyatlandırmanın ilk çalıştırması. Hiçbir şey yazmaz;
@@ -234,6 +235,8 @@ export default function FiyatOnerisiPage() {
           <RefreshCw className={loading ? 'animate-spin' : undefined} /> Yeniden hesapla
         </Button>
       </div>
+
+      <ScanStatus />
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {kpis.map((k) => (

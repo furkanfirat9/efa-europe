@@ -3,12 +3,17 @@
 // sonuç JSON olarak indirilir. Amazon.pl'de hesap Business değil: fiyat %23 KDV dahil zloti.
 //
 //   node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/amazon_pl_import.mjs <tarama.json> [--dry-run]
+//   --max-change 0.5   zloti fiyatı bu orandan fazla oynayan ürün yazılmaz, "bekletilen" olarak listelenir (otomatik tarama)
+//   --summary <dosya>  sayıları JSON olarak yazar (scripts/supply_scan.mjs okur)
 
 import fs from 'node:fs';
 import { PrismaClient } from '@prisma/client';
 
 const file = process.argv[2];
 const dryRun = process.argv.includes('--dry-run');
+const argVal = (name) => { const i = process.argv.indexOf(name); return i > -1 ? process.argv[i + 1] : null; };
+const maxChange = argVal('--max-change') != null ? Number(argVal('--max-change')) : null;
+const summaryFile = argVal('--summary');
 if (!file) throw new Error('Tarama dosyası verilmedi');
 const scanByAsin = new Map(JSON.parse(fs.readFileSync(file, 'utf8')).map((s) => [s.asin, s]));
 
@@ -45,12 +50,18 @@ function parsePl(s) {
 }
 
 const eur = (n) => (n == null ? '—' : n.toFixed(2) + ' €');
-const unreadable = [], cheaper = [], onlyPl = [], texts = {};
+const unreadable = [], cheaper = [], onlyPl = [], texts = {}, held = [], priceChanged = [], stockChanged = [];
 let written = 0, plBuyable = 0, gone = 0;
 for (const r of rows) {
   const s = scanByAsin.get(r.asin);
   if (!s || s.error || (s.blocked && s.status !== 404)) { unreadable.push(`${r.offerId} (${r.asin}): ${s?.error || (s ? 'engellendi' : 'taranmadı')}`); continue; }
   const pl = parsePl(s);
+  if (maxChange != null && r.plPricePln && pl.plPricePln && Math.abs(pl.plPricePln / r.plPricePln - 1) > maxChange) {
+    held.push(`${r.offerId} (${r.asin}): ${r.plPricePln} zł → ${pl.plPricePln} zł`);
+    continue;
+  }
+  if ((r.plPricePln ?? null) !== (pl.plPricePln ?? null)) priceChanged.push({ offer: r.offerId, from: r.plPricePln, to: pl.plPricePln });
+  if (r.plCheckedAt && !!r.plInStock !== !!pl.plInStock) stockChanged.push(`${r.offerId}: ${pl.plInStock ? 'stoğa girdi' : 'stoktan çıktı'} (${pl.plAvailability ?? '—'})`);
   if (s.status === 404) gone++;
   texts[pl.plAvailability ?? '(boş)'] = (texts[pl.plAvailability ?? '(boş)'] || 0) + 1;
   const plOk = pl.plInStock && pl.plSoldByAmazon;
@@ -73,5 +84,16 @@ console.log(`\nYalnız amazon.pl'den alınabilir: ${onlyPl.length}`);
 onlyPl.forEach((x) => console.log('  ' + x));
 console.log('\nStok yazıları:', texts);
 if (unreadable.length) { console.log(`\nOkunamayan: ${unreadable.length}`); unreadable.forEach((x) => console.log('  ' + x)); }
+console.log(`\nZloti fiyatı değişen: ${priceChanged.length} | stok değişen: ${stockChanged.length}`);
+stockChanged.forEach((x) => console.log('  ' + x));
+if (held.length) { console.log(`\nFiyatı %${Math.round(maxChange * 100)}'den fazla oynadığı için yazılmayan: ${held.length}`); held.forEach((x) => console.log('  ' + x)); }
 console.log(dryRun ? '\ndry-run: tabloya yazılmadı' : `\ntabloya yazıldı: ${written}`);
+if (summaryFile) {
+  fs.writeFileSync(summaryFile, JSON.stringify({
+    total: rows.length, scanned: rows.length - unreadable.length, unreadable: unreadable.length, written,
+    priceChanged: priceChanged.length, stockChanged: stockChanged.length, held: held.length,
+    gone, plBuyable, cheaper: cheaper.length, onlyPl: onlyPl.length,
+    price: priceChanged.slice(0, 30), stockList: stockChanged, heldList: held, unreadableList: unreadable.slice(0, 30),
+  }));
+}
 await prisma.$disconnect();
