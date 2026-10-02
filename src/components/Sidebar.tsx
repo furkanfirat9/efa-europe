@@ -20,6 +20,8 @@ import {
   Receipt,
   FileStack,
   LogOut,
+  ScanSearch,
+  SearchCheck,
 } from 'lucide-react';
 
 interface NavItem {
@@ -38,6 +40,7 @@ const PRIMARY_NAV: NavItem[] = [
   { name: 'Siparişler', href: '/siparisler', icon: Package },
   { name: 'Fulfillment', href: '/fulfillment', icon: Truck },
   { name: 'Fiyat endeksi', href: '/fiyat-endeksi', icon: LineChart },
+  { name: 'Fiyat önerisi', href: '/fiyat-onerisi', icon: TrendingUp },
 ];
 
 const PRODUCT_UPLOAD_SUBITEMS: NavItem[] = [
@@ -45,6 +48,8 @@ const PRODUCT_UPLOAD_SUBITEMS: NavItem[] = [
   { name: 'Toplu yükleme', href: '/toplu-yukle', icon: Layers },
   { name: 'Amazon avcısı', href: '/amazon-aktar', icon: Sparkles },
   { name: 'Kategori ağacı', href: '/kategori-agaci', icon: FolderTree },
+  { name: 'ASIN kontrol', href: '/asin-kontrol', icon: ScanSearch },
+  { name: 'Ceneo kontrol', href: '/ceneo-kontrol', icon: SearchCheck },
 ];
 
 const SECONDARY_NAV: NavItem[] = [

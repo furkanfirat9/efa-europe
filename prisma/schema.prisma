@@ -348,3 +348,81 @@ model CatalogMemory {
   @@index([asin])
   @@index([brand, modelNo])
 }
+
+// Mağazadaki her Ozon ürününün hangi Amazon ASIN'ine bağlı olduğunun tek kaynağı.
+// CatalogMemory yükleme anındaki yapay zekâ referansıdır; bu tablo ise ürünün
+// ASIN'inin Amazon sayfasıyla (marka + model numarası) doğrulanıp doğrulanmadığını,
+// son okunan fiyatı ve stoğu tutar.
+model ProductSource {
+  id              String    @id @default(cuid())
+  storeId         String    @default("store1")
+  ozonProductId   String
+  offerId         String
+  sku             String?
+  ozonName        String?
+  ozonBrand       String?
+  // Ozon ID 4381 (parça numarası)
+  ozonPartNumber  String?
+  ozonImage       String?
+  asin            String?
+  // VERIFIED (model no. birebir) | LIKELY (ek farkı / yalnız başlıkta) | MODEL_MISMATCH |
+  // SUSPECT | UNREADABLE | MISSING | MANUAL (elle onaylandı) | NOT_ON_AMAZON (elle: Amazon'da satılmıyor)
+  asinStatus      String    @default("MISSING")
+  // product_id | offer_id | model | search | manual
+  linkMethod      String?
+  // Karşılaştırma ayrıntısı: brand, modelExact, modelPrefix, modelInTitle, accessory, imageDist,
+  // ozonQty, amzQty, packMismatch
+  checks          Json?
+  amzTitle        String?
+  amzBrand        String?
+  amzModel        String?
+  amzImage        String?
+  // Amazon "Artikelgewicht" ve (varsa) "Verpackungsabmessungen … ; N Gramm"; kargo fiziksel ağırlıktan hesaplanır
+  amzItemWeightG    Int?
+  amzPackageWeightG Int?
+  // Amazon Business sayfasında görünen "Neu" teklifi; KDV oranı ürünün gönderildiği
+  // depoya göre değişebildiği için iki fiyat da sayfadan olduğu gibi alınır.
+  priceNetEur     Float?
+  priceGrossEur   Float?
+  listPriceEur    Float?
+  availability    String?
+  inStock         Boolean?
+  soldBy          String?
+  soldByAmazon    Boolean?
+  deliveryText    String?
+  checkedAt       DateTime?
+  verifiedAt      DateTime?
+  // Ceneo.pl (Polonya fiyat karşılaştırma): tarama uygulamanın tarayıcısında yapılır (skill ceneo-scan).
+  // EXACT (kod birebir) | VARIANT (aynı ana model, farklı "/" eki; elle onay) | NOT_FOUND (taramada bulunamadı)
+  // | MANUAL (elle bağlandı) | NOT_IN_POLAND (elle: Ceneo'da yok → Amazon.de / amazon.pl; eski adıyla kaldı) | ERROR
+  // Boş: hiç eşleşmedi. Kararlar /ceneo-kontrol ekranında verilir.
+  ceneoStatus     String?
+  ceneoProductId  String?
+  ceneoName       String?
+  // Eşleşen kod: Ozon parça no. değil Amazon modeliyse kart ile kaynak farklı olabilir (NA352/00 ↔ NA552/00)
+  ceneoMatchedCode String?
+  // Ceneo ürün sayfasındaki "Waga"; Amazon ağırlığı yoksa kargo hesabına yedek
+  ceneoWeightG    Int?
+  // Tüm teklifler olduğu gibi; kaynak seçimi okurken yapılır (src/lib/sourcing/ceneoRules.ts), kural değişince tarama gerekmez
+  ceneoOffers     Json?
+  // VARIANT / NOT_FOUND kararı için aramada çıkan adaylar
+  ceneoCandidates Json?
+  ceneoCheckedAt  DateTime?
+  // Amazon.pl (3. tedarik kanalı): aynı ASIN'in Polonya sayfası, tarayıcıda okunur (skill amazon-scan, __runScanPl).
+  // Hesap orada Business değil: fiyat yalnız %23 KDV dahil zloti.
+  plTitle         String?
+  plPricePln      Float?
+  plListPricePln  Float?
+  plAvailability  String?
+  plInStock       Boolean?
+  plSoldBy        String?
+  plSoldByAmazon  Boolean?
+  plDeliveryText  String?
+  plCheckedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([storeId, ozonProductId])
+  @@index([asin])
+  @@index([asinStatus])
+}

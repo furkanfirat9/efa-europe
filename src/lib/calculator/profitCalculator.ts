@@ -24,9 +24,9 @@ export interface FulfillmentBreakdown {
 }
 
 export interface ShippingBreakdown {
-  baseFee: number;         // İlk 500g Taban Ücreti (€ 10.30)
-  extra500gUnits: number;  // Ek 500g Birim Sayısı
-  extraFee: number;        // Ek Ağırlık Tutarı (€)
+  baseFee: number;         // Sabit Gönderi Ücreti (€ 10.30)
+  weightUnits: number;     // Başlanan 500g Birim Sayısı (ilk 500g dahil)
+  weightFee: number;       // Ağırlık Tutarı (€ 2.50 / 500g)
   totalShipping: number;   // Toplam Kargo (€)
 }
 
@@ -76,7 +76,7 @@ export function calculateFulfillmentCosts(
   isIntegrated = true,
   isSplitting = false
 ): FulfillmentBreakdown {
-  if (weightG <= 0 || (!isIntegrated && !isSplitting)) {
+  if (weightG <= 0) {
     return { receptionCost: 0, dispatchCost: 0, packagingCost: 0, totalFulfillment: 0 };
   }
 
@@ -128,28 +128,26 @@ export function calculateFulfillmentCosts(
 }
 
 /**
- * 🚚 Kargo Maliyetini Hesaplar (10.30€ + 2.50€ / 500g)
+ * 🚚 Kargo Maliyetini Hesaplar (LS Economy PL Parcel: 10.30€ + 2.50€ / 500g)
+ *
+ * 2.50€ ilk 500g dahil her başlanan 500g için eklenir: 0,68 kg → 10.30 + 2 × 2.50 = 15.30€.
+ * Ozon'un 42703766-0246-1 gönderisinden (0,68 kg) kestiği 1.538,71 ₽ (~15.9€) bu okumaya
+ * yakın; eskiden ilk 500g taban ücrete dahil sayılıyordu ve her siparişte kargo 2.50€ eksik çıkıyordu.
  */
 export function calculateShippingCosts(weightG: number): ShippingBreakdown {
   if (weightG <= 0) {
-    return { baseFee: 0, extra500gUnits: 0, extraFee: 0, totalShipping: 0 };
+    return { baseFee: 0, weightUnits: 0, weightFee: 0, totalShipping: 0 };
   }
 
   const baseFee = 10.30;
-  let extra500gUnits = 0;
-  let extraFee = 0;
-
-  if (weightG > 500) {
-    extra500gUnits = Math.ceil((weightG - 500) / 500);
-    extraFee = extra500gUnits * 2.50;
-  }
-
-  const totalShipping = baseFee + extraFee;
+  const weightUnits = Math.ceil(weightG / 500);
+  const weightFee = weightUnits * 2.50;
+  const totalShipping = baseFee + weightFee;
 
   return {
     baseFee,
-    extra500gUnits,
-    extraFee,
+    weightUnits,
+    weightFee,
     totalShipping,
   };
 }
@@ -182,8 +180,8 @@ export function calculateOzonProfit(inputs: ProfitCalculatorInputs): ProfitCalcu
   const shipping: ShippingBreakdown = isCustomShipping
     ? {
         baseFee: Math.max(0, inputs.customShippingCost!),
-        extra500gUnits: 0,
-        extraFee: 0,
+        weightUnits: 0,
+        weightFee: 0,
         totalShipping: Math.max(0, inputs.customShippingCost!),
       }
     : calculateShippingCosts(weight);
