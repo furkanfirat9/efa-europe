@@ -1,11 +1,18 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { RefreshCw, Search, ArrowUpDown, ChevronLeft, ChevronRight, ImageOff } from 'lucide-react';
-import { Panel, SegmentedControl } from '@/components/ui/Panel';
-import { StatusDot } from '@/components/ui/StatusDot';
-import { Button } from '@/components/ui/Field';
-import styles from '@/styles/console.module.css';
+import { AlertCircle, ArrowUpDown, ChevronLeft, ChevronRight, History, ImageOff, RefreshCw, Search } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/shadcn/alert';
+import { Button } from '@/components/shadcn/button';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/shadcn/card';
+import { Input } from '@/components/shadcn/input';
+import { Skeleton } from '@/components/shadcn/skeleton';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table';
+import { Tabs, TabsList, TabsTrigger } from '@/components/shadcn/tabs';
+import { cn } from '@/lib/utils';
+import { ChangesView, type ProductLookup } from './_components/ChangesView';
+import { HistorySheet } from './_components/HistorySheet';
+import { money, STATUS, STATUS_ORDER, StatusBadge, type ColorIndex } from './_components/status';
 
 interface CurrencyRate {
   rate: number;
@@ -34,33 +41,70 @@ export interface PriceIndexProduct {
   sku: number;
   name: string;
   image: string;
+  /** Kampanyalar dahil satış fiyatı */
   price: number;
+  /** Kampanyasız fiyat */
+  basePrice: number;
+  /** Sitedeki fiyat, Ozon indirimi dahil. Mağazada uç kapalıysa null. */
+  sitePrice: number | null;
   oldPrice: number;
   currency: string;
   colorIndex: 'GREEN' | 'YELLOW' | 'RED' | 'WITHOUT_INDEX';
+  /** Rakibin fiyatı, ruble */
   ozonMinPrice: number;
+  /** Aynı fiyat, mağaza para biriminde (Ozon'un çevirdiği) */
+  ozonMinPriceSeller: number;
   ozonIndexValue: number;
   externalMinPrice: number;
+  externalMinPriceSeller: number;
   externalIndexValue: number;
   stock: number;
   commissionPercent: number;
 }
 
+type StatusFilter = 'ALL' | ColorIndex;
+type SortField = 'index' | 'price' | 'ozonDiff' | 'name';
+
+/**
+ * Fiyatımızın en ucuz Ozon rakibine oranı. İki USD fiyattan hesaplanır:
+ * Ozon'un price_index_value'su üstten kırpılıyor (399 $ / 37,83 $ için 1,90 dönüyor).
+ */
+function ozonRatioOf(p: PriceIndexProduct): number | null {
+  const ours = p.sitePrice ?? p.price;
+  if (p.ozonMinPriceSeller > 0 && ours > 0) return ours / p.ozonMinPriceSeller;
+  return p.ozonIndexValue > 0 ? p.ozonIndexValue : null;
+}
+
+/** Rakip fiyatı mağaza para biriminde; Ozon çevirmemişse rubleye düşer. */
+function sellerPrice(seller: number, rub: number, currency: string) {
+  if (seller > 0) return `${seller.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} ${currency}`;
+  return `${rub.toLocaleString('tr-TR')} ₽`;
+}
+
 export default function FiyatEndeksiPage() {
-  const [rates, setRates] = useState<{ usd?: CurrencyRate; eur?: CurrencyRate; cny?: CurrencyRate } | null>(null);
+  const [rates, setRates] = useState<{
+    usd?: CurrencyRate;
+    eur?: CurrencyRate;
+    cny?: CurrencyRate;
+  } | null>(null);
   const [loadingRates, setLoadingRates] = useState<boolean>(true);
   const [rateError, setRateError] = useState<string | null>(null);
 
   const [selectedStore, setSelectedStore] = useState<'store1' | 'store2'>('store2');
   const [indexSummary, setIndexSummary] = useState<PriceIndexSummary | null>(null);
   const [products, setProducts] = useState<PriceIndexProduct[]>([]);
+  const [sitePriceAvailable, setSitePriceAvailable] = useState<boolean>(true);
   const [loadingIndex, setLoadingIndex] = useState<boolean>(true);
   const [indexError, setIndexError] = useState<string | null>(null);
+  const [view, setView] = useState<'products' | 'changes'>('products');
+  const [historyProduct, setHistoryProduct] = useState<ProductLookup | null>(null);
+  /** Her endeks yüklemesinde artar: Değişimler sekmesi yeni kaydı çeker */
+  const [loadCount, setLoadCount] = useState(0);
 
   // Filtreleme ve Sıralama
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'GREEN' | 'YELLOW' | 'RED' | 'WITHOUT_INDEX'>('ALL');
-  const [sortBy, setSortBy] = useState<'index' | 'price' | 'ozonDiff' | 'name'>('ozonDiff');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
+  const [sortBy, setSortBy] = useState<SortField>('ozonDiff');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 25;
@@ -95,6 +139,8 @@ export default function FiyatEndeksiPage() {
       if (data.success && data.summary) {
         setIndexSummary(data.summary);
         setProducts(data.products || []);
+        setSitePriceAvailable(data.sitePriceAvailable !== false);
+        setLoadCount((n) => n + 1);
       } else {
         throw new Error(data.error || 'Fiyat endeksi alınamadı.');
       }
@@ -117,34 +163,36 @@ export default function FiyatEndeksiPage() {
 
   // Filtrelenmiş ve Sıralanmış Ürünler
   const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      // Durum Filtresi
-      if (statusFilter !== 'ALL' && p.colorIndex !== statusFilter) {
-        return false;
-      }
-      // Arama Filtresi
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const matchName = (p.name || '').toLowerCase().includes(q);
-        const matchOffer = (p.offerId || '').toLowerCase().includes(q);
-        const matchSku = String(p.sku || '').includes(q);
-        if (!matchName && !matchOffer && !matchSku) return false;
-      }
-      return true;
-    }).sort((a, b) => {
-      let comparison = 0;
-      if (sortBy === 'ozonDiff') {
-        comparison = (b.ozonIndexValue || 0) - (a.ozonIndexValue || 0);
-      } else if (sortBy === 'price') {
-        comparison = (b.price || 0) - (a.price || 0);
-      } else if (sortBy === 'name') {
-        comparison = (a.name || '').localeCompare(b.name || '');
-      } else if (sortBy === 'index') {
-        const orderWeight = { RED: 3, YELLOW: 2, GREEN: 1, WITHOUT_INDEX: 0 };
-        comparison = orderWeight[b.colorIndex] - orderWeight[a.colorIndex];
-      }
-      return sortOrder === 'desc' ? comparison : -comparison;
-    });
+    return products
+      .filter((p) => {
+        // Durum Filtresi
+        if (statusFilter !== 'ALL' && p.colorIndex !== statusFilter) {
+          return false;
+        }
+        // Arama Filtresi
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase().trim();
+          const matchName = (p.name || '').toLowerCase().includes(q);
+          const matchOffer = (p.offerId || '').toLowerCase().includes(q);
+          const matchSku = String(p.sku || '').includes(q);
+          if (!matchName && !matchOffer && !matchSku) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        let comparison = 0;
+        if (sortBy === 'ozonDiff') {
+          comparison = (ozonRatioOf(b) || 0) - (ozonRatioOf(a) || 0);
+        } else if (sortBy === 'price') {
+          comparison = (b.price || 0) - (a.price || 0);
+        } else if (sortBy === 'name') {
+          comparison = (a.name || '').localeCompare(b.name || '');
+        } else if (sortBy === 'index') {
+          const orderWeight = { RED: 3, YELLOW: 2, GREEN: 1, WITHOUT_INDEX: 0 };
+          comparison = orderWeight[b.colorIndex] - orderWeight[a.colorIndex];
+        }
+        return sortOrder === 'desc' ? comparison : -comparison;
+      });
   }, [products, statusFilter, searchQuery, sortBy, sortOrder]);
 
   // Sayfalama
@@ -154,7 +202,19 @@ export default function FiyatEndeksiPage() {
     return filteredProducts.slice(start, start + pageSize);
   }, [filteredProducts, currentPage, pageSize]);
 
-  const handleSort = (field: 'index' | 'price' | 'ozonDiff' | 'name') => {
+  const lookups = useMemo<ProductLookup[]>(
+    () =>
+      products.map((p) => ({
+        productId: p.productId,
+        offerId: p.offerId,
+        name: p.name,
+        image: p.image,
+        currency: p.currency,
+      })),
+    [products]
+  );
+
+  const handleSort = (field: SortField) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -163,591 +223,399 @@ export default function FiyatEndeksiPage() {
     }
   };
 
+  const selectStatus = (value: StatusFilter) => {
+    setStatusFilter(value);
+    setCurrentPage(1);
+  };
+
+  const rateText = (r?: CurrencyRate) => (r ? `${r.rate.toFixed(4)} ₽` : loadingRates ? '…' : '—');
+
+  const sortableHead = (field: SortField, label: string) => (
+    <TableHead>
+      <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => handleSort(field)}>
+        {label}
+        <ArrowUpDown className={sortBy === field ? 'text-foreground' : 'text-muted-foreground'} />
+      </Button>
+    </TableHead>
+  );
+
   return (
-    <div className="flex min-h-screen flex-col bg-canvas text-ink">
-      {/* 1. Üst Bar (Sticky Header) */}
-      <header className="sticky top-0 z-30 flex min-h-[60px] items-center justify-between border-b border-hairline bg-canvas px-5 py-3 lg:px-8">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-sm font-semibold tracking-[-0.01em] text-ink lg:text-base">
-              Fiyat Endeksi
-            </h1>
-            <span className="rounded-sm border border-hairline bg-panel-sunken px-2 py-0.5 text-2xs font-medium text-ink-subtle">
-              Piyasa Takibi
+    <div className="flex-1 space-y-4 bg-background p-4 pt-6 text-foreground md:p-8">
+      {/* Başlık + Ozon kurları */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Fiyat endeksi</h1>
+          <p className="text-muted-foreground">Ürünlerimizin fiyatının Ozon ve dış piyasadaki en iyi fiyatlarla karşılaştırması.</p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 items-center gap-3 rounded-md border px-3 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <span className={cn('size-1.5 rounded-full', rateError ? 'bg-destructive' : 'bg-emerald-500')} />
+              Ozon kuru
+            </span>
+            <span>
+              1 $ = <span className="font-medium tabular-nums text-foreground">{rateText(rates?.usd)}</span>
+            </span>
+            <span>
+              1 € = <span className="font-medium tabular-nums text-foreground">{rateText(rates?.eur)}</span>
             </span>
           </div>
-        </div>
-
-        {/* Sağ Üst: Günün Ozon Dönüşüm Kurları (USD & EUR) */}
-        <div className="flex shrink-0 items-center gap-2.5 sm:gap-3">
-          <div className="flex items-center gap-2.5 rounded-lg border border-hairline bg-panel px-3 py-1.5 text-2xs font-medium text-ink-muted">
-            <StatusDot tone={rateError ? 'loss' : 'brand'} label="Ozon Kuru" />
-            
-            {/* 1 Dolar Karşılığı */}
-            <div className="flex items-baseline gap-1">
-              <span>1$ =</span>
-              <span className="tabular-nums font-semibold text-ink">
-                {rates?.usd ? `${rates.usd.rate.toFixed(4)} ₽` : loadingRates ? '...' : '-'}
-              </span>
-            </div>
-
-            <span className="text-hairline-strong">|</span>
-
-            {/* 1 Euro Karşılığı */}
-            <div className="flex items-baseline gap-1">
-              <span>1€ =</span>
-              <span className="tabular-nums font-semibold text-ink">
-                {rates?.eur ? `${rates.eur.rate.toFixed(4)} ₽` : loadingRates ? '...' : '-'}
-              </span>
-            </div>
-          </div>
-
-          {/* Kurları Yenile Butonu */}
-          <Button
-            variant="secondary"
-            onClick={fetchExchangeRates}
-            disabled={loadingRates}
-            className="h-8 px-2.5"
-            title="Ozon canlı kurlarını güncelle"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${loadingRates ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Kurları Yenile</span>
+          <Button variant="outline" size="sm" onClick={fetchExchangeRates} disabled={loadingRates} title="Ozon canlı kurlarını güncelle">
+            <RefreshCw className={loadingRates ? 'animate-spin' : undefined} />
+            <span className="hidden sm:inline">Kurları yenile</span>
           </Button>
         </div>
-      </header>
+      </div>
 
-      {/* 2. Ana Gövde */}
-      <main className="flex-1 p-5 lg:p-8">
-        <div className="mx-auto max-w-7xl space-y-6">
+      {/* Mağaza seçimi */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Tabs value={selectedStore} onValueChange={(v) => setSelectedStore(v as 'store1' | 'store2')}>
+          <TabsList>
+            <TabsTrigger value="store2">Türkiye mağazası</TabsTrigger>
+            <TabsTrigger value="store1">Avrupa mağazası</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <Button variant="outline" size="sm" onClick={() => fetchPriceIndex(selectedStore)} disabled={loadingIndex}>
+          <RefreshCw className={loadingIndex ? 'animate-spin' : undefined} />
+          Endeksi yenile
+        </Button>
+      </div>
 
-          {/* Mağaza Seçimi & Canlı Durum Başlığı */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <SegmentedControl
-              options={[
-                { value: 'store2', label: 'Türkiye Mağazası' },
-                { value: 'store1', label: 'Avrupa Mağazası' },
-              ]}
-              value={selectedStore}
-              onChange={(val) => setSelectedStore(val as 'store1' | 'store2')}
-            />
+      {!loadingIndex && !indexError && !sitePriceAvailable && (
+        <p className="text-sm text-muted-foreground">
+          Bu mağazada sitedeki fiyat (Ozon indirimi dahil) alınamıyor; Ozon bu veriyi yalnızca Premium Pro mağazalara veriyor. Satış fiyatı
+          olarak kampanyalı fiyat gösteriliyor.
+        </p>
+      )}
 
-            <div className="flex items-center gap-2">
-              <Button
-                variant="secondary"
-                onClick={() => fetchPriceIndex(selectedStore)}
-                disabled={loadingIndex}
-                className="h-8 text-2xs"
-              >
-                <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${loadingIndex ? 'animate-spin' : ''}`} />
-                Endeksi Yenile
-              </Button>
-            </div>
+      {indexError && (
+        <Alert variant="destructive">
+          <AlertCircle />
+          <AlertTitle>Fiyat endeksi alınamadı</AlertTitle>
+          <AlertDescription>{indexError}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Dağılım barı + durum kartları */}
+      {loadingIndex && !indexSummary ? (
+        <div className="space-y-4">
+          <Skeleton className="h-2 w-full" />
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {STATUS_ORDER.map((s) => (
+              <Skeleton key={s} className="h-28" />
+            ))}
           </div>
-
-          {/* Üst Kısım: Ozon Fiyat Endeksi Dağılım Barı & Kartları */}
-          <div className="rounded-panel border border-hairline bg-panel p-5">
-            {loadingIndex && !indexSummary ? (
-              <div className="space-y-4 py-2">
-                <div className="skeleton h-3 w-full rounded-full" />
-                <div className={styles.hairlineRow}>
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className={styles.hairlineCell}>
-                      <div className="skeleton h-4 w-20" />
-                      <div className="skeleton mt-2 h-7 w-16" />
-                      <div className="skeleton mt-2 h-3 w-32" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : indexError ? (
-              <div className="rounded-panel border border-loss/30 bg-loss-soft p-4 text-xs text-loss">
-                {indexError}
-              </div>
-            ) : indexSummary ? (
-              <div className="space-y-5">
-                {/* 1. Yüzdesel Çok Segmentli Endeks Barı */}
-                <div className="flex h-3 w-full overflow-hidden rounded-full border border-hairline bg-panel-sunken p-0.5">
-                  {/* Kazançlı */}
-                  {indexSummary.green.percent > 0 && (
-                    <div
-                      style={{ width: `${indexSummary.green.percent}%` }}
-                      className="h-full bg-gain transition-all duration-300 first:rounded-l-full last:rounded-r-full"
-                      title={`Kazançlı: %${indexSummary.green.percent} (${indexSummary.green.count} ürün)`}
-                    />
-                  )}
-
-                  {/* Orta Düzey */}
-                  {indexSummary.yellow.percent > 0 && (
-                    <div
-                      style={{ width: `${indexSummary.yellow.percent}%` }}
-                      className="h-full bg-caution transition-all duration-300 first:rounded-l-full last:rounded-r-full"
-                      title={`Orta Düzey: %${indexSummary.yellow.percent} (${indexSummary.yellow.count} ürün)`}
-                    />
-                  )}
-
-                  {/* Kazançsız */}
-                  {indexSummary.red.percent > 0 && (
-                    <div
-                      style={{ width: `${indexSummary.red.percent}%` }}
-                      className="h-full bg-loss transition-all duration-300 first:rounded-l-full last:rounded-r-full"
-                      title={`Kazançsız: %${indexSummary.red.percent} (${indexSummary.red.count} ürün)`}
-                    />
-                  )}
-
-                  {/* Endekssiz */}
-                  {indexSummary.withoutIndex.percent > 0 && (
-                    <div
-                      style={{ width: `${indexSummary.withoutIndex.percent}%` }}
-                      className="h-full bg-ink-faint/30 transition-all duration-300 first:rounded-l-full last:rounded-r-full"
-                      title={`Endekssiz: %${indexSummary.withoutIndex.percent} (${indexSummary.withoutIndex.count} ürün)`}
-                    />
-                  )}
-                </div>
-
-                {/* 2. 4'lü KPI Kartları (Renkli Çerçeveli) */}
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                  
-                  {/* 1. KAZANÇLI */}
-                  <div
-                    onClick={() => setStatusFilter(statusFilter === 'GREEN' ? 'ALL' : 'GREEN')}
-                    className={`flex cursor-pointer flex-col justify-between rounded-xl border bg-panel p-4 transition-all ${
-                      statusFilter === 'GREEN'
-                        ? 'border-gain ring-1 ring-gain'
-                        : 'border-gain/40 hover:border-gain'
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <StatusDot tone="gain" label="Kazançlı" />
-                        <span className="tabular-nums text-xs font-semibold text-gain">
-                          %{indexSummary.green.percent}
-                        </span>
-                      </div>
-                      <div className="mt-2.5 text-2xl font-semibold tabular-nums text-ink">
-                        {indexSummary.green.count}{' '}
-                        <span className="text-xs font-normal text-ink-subtle">ürün</span>
-                      </div>
-                    </div>
-                    <p className="mt-3 text-2xs leading-relaxed text-ink-subtle">
-                      Piyasadaki en iyi fiyata eşit veya daha ucuz.
-                    </p>
-                  </div>
-
-                  {/* 2. ORTA DÜZEY */}
-                  <div
-                    onClick={() => setStatusFilter(statusFilter === 'YELLOW' ? 'ALL' : 'YELLOW')}
-                    className={`flex cursor-pointer flex-col justify-between rounded-xl border bg-panel p-4 transition-all ${
-                      statusFilter === 'YELLOW'
-                        ? 'border-caution ring-1 ring-caution'
-                        : 'border-caution/40 hover:border-caution'
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <StatusDot tone="caution" label="Orta Düzey" />
-                        <span className="tabular-nums text-xs font-semibold text-caution">
-                          %{indexSummary.yellow.percent}
-                        </span>
-                      </div>
-                      <div className="mt-2.5 text-2xl font-semibold tabular-nums text-ink">
-                        {indexSummary.yellow.count}{' '}
-                        <span className="text-xs font-normal text-ink-subtle">ürün</span>
-                      </div>
-                    </div>
-                    <p className="mt-3 text-2xs leading-relaxed text-ink-subtle">
-                      Piyasa fiyatının %0 ile %5 üzerinde.
-                    </p>
-                  </div>
-
-                  {/* 3. KAZANÇSIZ */}
-                  <div
-                    onClick={() => setStatusFilter(statusFilter === 'RED' ? 'ALL' : 'RED')}
-                    className={`flex cursor-pointer flex-col justify-between rounded-xl border bg-panel p-4 transition-all ${
-                      statusFilter === 'RED'
-                        ? 'border-loss ring-1 ring-loss'
-                        : 'border-loss/40 hover:border-loss'
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <StatusDot tone="loss" label="Kazançsız" />
-                        <span className="tabular-nums text-xs font-semibold text-loss">
-                          %{indexSummary.red.percent}
-                        </span>
-                      </div>
-                      <div className="mt-2.5 text-2xl font-semibold tabular-nums text-ink">
-                        {indexSummary.red.count}{' '}
-                        <span className="text-xs font-normal text-ink-subtle">ürün</span>
-                      </div>
-                    </div>
-                    <p className="mt-3 text-2xs leading-relaxed text-ink-subtle">
-                      Piyasa fiyatının %5 üzerinde (revizyon önerilir).
-                    </p>
-                  </div>
-
-                  {/* 4. ENDEKSSİZ */}
-                  <div
-                    onClick={() => setStatusFilter(statusFilter === 'WITHOUT_INDEX' ? 'ALL' : 'WITHOUT_INDEX')}
-                    className={`flex cursor-pointer flex-col justify-between rounded-xl border bg-panel p-4 transition-all ${
-                      statusFilter === 'WITHOUT_INDEX'
-                        ? 'border-ink-muted ring-1 ring-ink-muted'
-                        : 'border-hairline hover:border-hairline-strong'
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <StatusDot tone="neutral" label="Endekssiz" />
-                        <span className="tabular-nums text-xs font-semibold text-ink-muted">
-                          %{indexSummary.withoutIndex.percent}
-                        </span>
-                      </div>
-                      <div className="mt-2.5 text-2xl font-semibold tabular-nums text-ink">
-                        {indexSummary.withoutIndex.count}{' '}
-                        <span className="text-xs font-normal text-ink-subtle">ürün</span>
-                      </div>
-                    </div>
-                    <p className="mt-3 text-2xs leading-relaxed text-ink-subtle">
-                      Piyasada eşleşen ürün bulunamadı.
-                    </p>
-                  </div>
-
-                </div>
-
-              </div>
-            ) : null}
-          </div>
-
-          {/* 3. Ürün Fiyat ve Endeks Karşılaştırma Tablosu */}
-          <div className="rounded-panel border border-hairline bg-panel p-5 space-y-4">
-            
-            {/* Filtre ve Arama Araç Çubuğu */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              
-              {/* Sol: Arama Kutusu */}
-              <div className="relative min-w-[280px] max-w-md flex-1">
-                <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-subtle" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  placeholder="Model kodu, SKU veya ürün adı ara..."
-                  className="h-8 w-full rounded-lg border border-hairline bg-panel-sunken pl-9 pr-3 text-xs text-ink placeholder:text-ink-subtle focus:border-hairline-strong focus:outline-hidden"
+        </div>
+      ) : indexSummary && !indexError ? (
+        <div className="space-y-4">
+          <div className="flex h-2 w-full overflow-hidden rounded-full bg-muted">
+            {STATUS_ORDER.map((s) => {
+              const g = indexSummary[STATUS[s].key];
+              return g.percent > 0 ? (
+                <div
+                  key={s}
+                  style={{ width: `${g.percent}%` }}
+                  className={cn('h-full transition-all', STATUS[s].dot)}
+                  title={`${STATUS[s].label}: %${g.percent} (${g.count} ürün)`}
                 />
-              </div>
+              ) : null;
+            })}
+          </div>
 
-              {/* Sağ: Durum Filtre Butonları */}
-              <div className="flex flex-wrap items-center gap-1.5 text-2xs">
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {STATUS_ORDER.map((s) => {
+              const g = indexSummary[STATUS[s].key];
+              const active = statusFilter === s;
+              // Ozon'un satıcı panelindeki gibi: renkler endeksi olan ürünler içindeki pay; endekssiz, tüm ürünlerin payı.
+              const indexed = indexSummary.total - indexSummary.withoutIndex.count;
+              const share =
+                s === 'WITHOUT_INDEX' ? g.percent : indexed > 0 ? Number(((g.count / indexed) * 100).toFixed(1)) : 0;
+              return (
                 <button
-                  onClick={() => {
-                    setStatusFilter('ALL');
-                    setCurrentPage(1);
-                  }}
-                  className={`rounded-md border px-2.5 py-1 font-medium transition-colors ${
-                    statusFilter === 'ALL'
-                      ? 'border-hairline-strong bg-panel-sunken text-ink'
-                      : 'border-hairline text-ink-muted hover:border-hairline-strong hover:text-ink'
-                  }`}
+                  key={s}
+                  type="button"
+                  onClick={() => selectStatus(active ? 'ALL' : s)}
+                  aria-pressed={active}
+                  className="rounded-xl text-left outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 >
-                  Tümü ({products.length})
+                  <Card
+                    className={cn('h-full gap-1 py-4 transition-colors hover:bg-muted/50', active && 'border-foreground/40 bg-muted/50')}
+                  >
+                    <CardHeader className="px-4">
+                      <CardDescription className="flex items-center justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <span className={cn('size-1.5 rounded-full', STATUS[s].dot)} />
+                          {STATUS[s].label}
+                        </span>
+                        <span
+                          className="tabular-nums"
+                          title={s === 'WITHOUT_INDEX' ? 'Tüm ürünlerin payı' : `Endeksi olan ${indexed} ürün içindeki pay`}
+                        >
+                          %{share.toLocaleString('tr-TR')}
+                        </span>
+                      </CardDescription>
+                      <CardTitle className="text-2xl tabular-nums">
+                        {g.count} <span className="text-sm font-normal text-muted-foreground">ürün</span>
+                      </CardTitle>
+                      <p className="text-xs text-muted-foreground">{STATUS[s].hint}</p>
+                    </CardHeader>
+                  </Card>
                 </button>
-                <button
-                  onClick={() => {
-                    setStatusFilter('GREEN');
-                    setCurrentPage(1);
-                  }}
-                  className={`rounded-md border px-2.5 py-1 font-medium transition-colors ${
-                    statusFilter === 'GREEN'
-                      ? 'border-gain/50 bg-gain/10 text-gain'
-                      : 'border-hairline text-ink-muted hover:border-gain/40 hover:text-gain'
-                  }`}
-                >
-                  Kazançlı ({indexSummary?.green.count || 0})
-                </button>
-                <button
-                  onClick={() => {
-                    setStatusFilter('YELLOW');
-                    setCurrentPage(1);
-                  }}
-                  className={`rounded-md border px-2.5 py-1 font-medium transition-colors ${
-                    statusFilter === 'YELLOW'
-                      ? 'border-caution/50 bg-caution/10 text-caution'
-                      : 'border-hairline text-ink-muted hover:border-caution/40 hover:text-caution'
-                  }`}
-                >
-                  Orta ({indexSummary?.yellow.count || 0})
-                </button>
-                <button
-                  onClick={() => {
-                    setStatusFilter('RED');
-                    setCurrentPage(1);
-                  }}
-                  className={`rounded-md border px-2.5 py-1 font-medium transition-colors ${
-                    statusFilter === 'RED'
-                      ? 'border-loss/50 bg-loss/10 text-loss'
-                      : 'border-hairline text-ink-muted hover:border-loss/40 hover:text-loss'
-                  }`}
-                >
-                  Kazançsız ({indexSummary?.red.count || 0})
-                </button>
-                <button
-                  onClick={() => {
-                    setStatusFilter('WITHOUT_INDEX');
-                    setCurrentPage(1);
-                  }}
-                  className={`rounded-md border px-2.5 py-1 font-medium transition-colors ${
-                    statusFilter === 'WITHOUT_INDEX'
-                      ? 'border-hairline-strong bg-panel-sunken text-ink'
-                      : 'border-hairline text-ink-muted hover:border-hairline-strong hover:text-ink'
-                  }`}
-                >
-                  Endekssiz ({indexSummary?.withoutIndex.count || 0})
-                </button>
-              </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
+      <Tabs value={view} onValueChange={(v) => setView(v as 'products' | 'changes')}>
+        <TabsList>
+          <TabsTrigger value="products">Ürünler</TabsTrigger>
+          <TabsTrigger value="changes">Değişimler</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      {view === 'changes' ? (
+        <ChangesView store={selectedStore} products={lookups} refreshKey={loadCount} onOpenHistory={setHistoryProduct} />
+      ) : (
+        <>
+          {/* Filtre ve arama */}
+          <div className="flex flex-wrap items-center gap-2">
+            <Tabs value={statusFilter} onValueChange={(v) => selectStatus(v as StatusFilter)}>
+              <TabsList className="flex-wrap">
+                <TabsTrigger value="ALL">Tümü ({products.length})</TabsTrigger>
+                {STATUS_ORDER.map((s) => (
+                  <TabsTrigger key={s} value={s}>
+                    {STATUS[s].short} ({indexSummary?.[STATUS[s].key].count || 0})
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+            <div className="relative">
+              <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+                placeholder="Model kodu, SKU veya ürün adı"
+                className="h-9 w-72 pl-8"
+                aria-label="Ürün ara"
+              />
             </div>
+          </div>
 
-            {/* Ürün Tablosu */}
-            <div className="overflow-x-auto rounded-lg border border-hairline">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-hairline bg-panel-sunken text-2xs font-medium text-ink-muted">
-                    <th className="py-2.5 pl-4 pr-3">Ürün</th>
-                    <th
-                      onClick={() => handleSort('price')}
-                      className="cursor-pointer py-2.5 px-3 hover:text-ink"
-                    >
-                      <div className="flex items-center gap-1">
-                        <span>Satış Fiyatımız</span>
-                        <ArrowUpDown className="h-3 w-3" />
-                      </div>
-                    </th>
-                    <th
-                      onClick={() => handleSort('ozonDiff')}
-                      className="cursor-pointer py-2.5 px-3 hover:text-ink"
-                    >
-                      <div className="flex items-center gap-1">
-                        <span>Ozon En İyi Fiyat</span>
-                        <ArrowUpDown className="h-3 w-3" />
-                      </div>
-                    </th>
-                    <th className="py-2.5 px-3">Dış Piyasa</th>
-                    <th
-                      onClick={() => handleSort('index')}
-                      className="cursor-pointer py-2.5 px-3 hover:text-ink"
-                    >
-                      <div className="flex items-center gap-1">
-                        <span>Endeks Durumu</span>
-                        <ArrowUpDown className="h-3 w-3" />
-                      </div>
-                    </th>
-                    <th className="py-2.5 px-3">Komisyon</th>
-                    <th className="py-2.5 pl-3 pr-4 text-right">Stok</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-hairline">
-                  {loadingIndex ? (
-                    Array.from({ length: 8 }).map((_, i) => (
-                      <tr key={i} className="animate-pulse">
-                        <td className="py-3 pl-4 pr-3">
+          {/* Ürün tablosu */}
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Ürün</TableHead>
+                  {sortableHead('price', 'Satış fiyatımız')}
+                  {sortableHead('ozonDiff', 'Ozon en iyi fiyat')}
+                  <TableHead>Dış piyasa</TableHead>
+                  {sortableHead('index', 'Endeks durumu')}
+                  <TableHead className="text-right">Komisyon</TableHead>
+                  <TableHead className="text-right">Stok</TableHead>
+                  <TableHead className="w-10" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loadingIndex ? (
+                  Array.from({ length: 8 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="size-10 shrink-0" />
+                          <div className="space-y-1.5">
+                            <Skeleton className="h-3 w-28" />
+                            <Skeleton className="h-3 w-48" />
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-16" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-20" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-20" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-5 w-20" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="ml-auto h-4 w-10" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="ml-auto h-4 w-8" />
+                      </TableCell>
+                      <TableCell />
+                    </TableRow>
+                  ))
+                ) : paginatedProducts.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
+                      Aradığınız kriterlere uygun ürün bulunamadı.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  paginatedProducts.map((p) => {
+                    const ozonRatio = ozonRatioOf(p);
+                    const extRatio = p.externalIndexValue > 0 ? p.externalIndexValue : null;
+
+                    return (
+                      <TableRow key={p.productId}>
+                        {/* Ürün görseli, model ve başlık */}
+                        <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 shrink-0 rounded-md bg-panel-sunken" />
-                            <div className="space-y-1.5">
-                              <div className="h-3 w-28 rounded-sm bg-panel-sunken" />
-                              <div className="h-2.5 w-48 rounded-sm bg-panel-sunken" />
+                            <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border bg-white">
+                              {p.image ? (
+                                <img src={p.image} alt={p.name} className="size-full object-contain p-0.5" loading="lazy" />
+                              ) : (
+                                <ImageOff className="size-4 text-muted-foreground" />
+                              )}
+                            </div>
+                            <div className="min-w-0 max-w-72">
+                              <div className="flex items-baseline gap-2">
+                                <span className="truncate font-mono text-xs font-medium">{p.offerId}</span>
+                                <span className="shrink-0 text-xs text-muted-foreground">SKU {p.sku}</span>
+                              </div>
+                              <div className="truncate text-xs text-muted-foreground" title={p.name}>
+                                {p.name}
+                              </div>
                             </div>
                           </div>
-                        </td>
-                        <td className="py-3 px-3"><div className="h-4 w-16 rounded-sm bg-panel-sunken" /></td>
-                        <td className="py-3 px-3"><div className="h-4 w-20 rounded-sm bg-panel-sunken" /></td>
-                        <td className="py-3 px-3"><div className="h-4 w-20 rounded-sm bg-panel-sunken" /></td>
-                        <td className="py-3 px-3"><div className="h-4 w-16 rounded-sm bg-panel-sunken" /></td>
-                        <td className="py-3 px-3"><div className="h-4 w-10 rounded-sm bg-panel-sunken" /></td>
-                        <td className="py-3 pl-3 pr-4"><div className="ml-auto h-4 w-8 rounded-sm bg-panel-sunken" /></td>
-                      </tr>
-                    ))
-                  ) : paginatedProducts.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="py-12 text-center text-ink-subtle text-xs">
-                        Aradığınız kriterlere uygun ürün bulunamadı.
-                      </td>
-                    </tr>
-                  ) : (
-                    paginatedProducts.map((p) => {
-                      const ozonRatio = p.ozonIndexValue > 0 ? p.ozonIndexValue : null;
-                      const extRatio = p.externalIndexValue > 0 ? p.externalIndexValue : null;
+                        </TableCell>
 
-                      let statusTone: 'gain' | 'caution' | 'loss' | 'neutral' = 'neutral';
-                      let statusLabel = 'Endekssiz';
-
-                      if (p.colorIndex === 'GREEN') {
-                        statusTone = 'gain';
-                        statusLabel = 'Kazançlı';
-                      } else if (p.colorIndex === 'YELLOW') {
-                        statusTone = 'caution';
-                        statusLabel = 'Orta Düzey';
-                      } else if (p.colorIndex === 'RED') {
-                        statusTone = 'loss';
-                        statusLabel = 'Kazançsız';
-                      }
-
-                      return (
-                        <tr key={p.productId} className="transition-colors hover:bg-panel-sunken/40">
-                          {/* Ürün Görseli, Model ve Başlık */}
-                          <td className="py-3 pl-4 pr-3">
-                            <div className="flex items-center gap-3">
-                              <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-hairline bg-white/3">
-                                {p.image ? (
-                                  <img
-                                    src={p.image}
-                                    alt={p.name}
-                                    className="h-full w-full object-contain p-1"
-                                    loading="lazy"
-                                  />
-                                ) : (
-                                  <div className="flex h-full w-full items-center justify-center text-ink-faint">
-                                    <ImageOff className="h-4 w-4" />
-                                  </div>
-                                )}
-                              </div>
-                              <div className="min-w-0 max-w-[260px] sm:max-w-xs">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="font-semibold text-ink truncate">{p.offerId}</span>
-                                  <span className="text-2xs text-ink-subtle">SKU: {p.sku}</span>
-                                </div>
-                                <p className="truncate text-2xs text-ink-subtle mt-0.5">{p.name}</p>
-                              </div>
+                        {/* Bizim satış fiyatımız */}
+                        <TableCell className="tabular-nums">
+                          <div
+                            className="font-medium"
+                            title={p.sitePrice != null ? 'Sitedeki fiyat (Ozon indirimi dahil)' : 'Kampanyalı fiyat'}
+                          >
+                            {money(p.sitePrice ?? p.price)} {p.currency}
+                          </div>
+                          {p.sitePrice != null && p.sitePrice < p.price && (
+                            <div className="text-xs text-muted-foreground">
+                              Kampanyalı {money(p.price)} {p.currency}
                             </div>
-                          </td>
-
-                          {/* Bizim Satış Fiyatımız */}
-                          <td className="py-3 px-3">
-                            <div className="tabular-nums font-semibold text-ink">
-                              {p.price} {p.currency}
+                          )}
+                          {p.basePrice > p.price && (
+                            <div className="text-xs text-muted-foreground">
+                              Kampanyasız {money(p.basePrice)} {p.currency}
                             </div>
-                            {p.oldPrice > p.price && (
-                              <div className="tabular-nums text-2xs text-ink-faint line-through">
-                                {p.oldPrice} {p.currency}
-                              </div>
-                            )}
-                          </td>
+                          )}
+                        </TableCell>
 
-                          {/* Ozon İçi En İyi Fiyat */}
-                          <td className="py-3 px-3">
-                            {p.ozonMinPrice > 0 ? (
-                              <div>
-                                <div className="tabular-nums font-medium text-ink">
-                                  {p.ozonMinPrice.toLocaleString('tr-TR')} ₽
+                        {/* Ozon içi en iyi fiyat */}
+                        <TableCell className="tabular-nums">
+                          {p.ozonMinPrice > 0 ? (
+                            <>
+                              <div title={`${p.ozonMinPrice.toLocaleString('tr-TR')} ₽`}>
+                                {sellerPrice(p.ozonMinPriceSeller, p.ozonMinPrice, p.currency)}
+                              </div>
+                              {ozonRatio !== null && (
+                                <div
+                                  className={cn(
+                                    'text-xs',
+                                    ozonRatio > 1.05 ? 'text-destructive' : ozonRatio >= 1.0 ? 'text-amber-600' : 'text-emerald-600'
+                                  )}
+                                >
+                                  {ozonRatio > 1.0
+                                    ? `+${((ozonRatio - 1) * 100).toFixed(0)}% pahalı`
+                                    : `${((1 - ozonRatio) * 100).toFixed(0)}% ucuz`}
                                 </div>
-                                {ozonRatio !== null && (
-                                  <div
-                                    className={`tabular-nums text-2xs font-medium ${
-                                      ozonRatio > 1.05
-                                        ? 'text-loss'
-                                        : ozonRatio >= 1.0
-                                        ? 'text-caution'
-                                        : 'text-gain'
-                                    }`}
-                                  >
-                                    {ozonRatio > 1.0
-                                      ? `+${((ozonRatio - 1) * 100).toFixed(0)}% pahalı`
-                                      : `${((1 - ozonRatio) * 100).toFixed(0)}% ucuz`}
-                                  </div>
-                                )}
+                              )}
+                            </>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+
+                        {/* Dış piyasa en iyi fiyat */}
+                        <TableCell className="tabular-nums">
+                          {p.externalMinPrice > 0 ? (
+                            <>
+                              <div title={`${p.externalMinPrice.toLocaleString('tr-TR')} ₽`}>
+                                {sellerPrice(p.externalMinPriceSeller, p.externalMinPrice, p.currency)}
                               </div>
-                            ) : (
-                              <span className="text-2xs text-ink-faint">—</span>
-                            )}
-                          </td>
+                              {extRatio !== null && <div className="text-xs text-muted-foreground">{extRatio.toFixed(2)}x endeks</div>}
+                            </>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
 
-                          {/* Dış Piyasa En İyi Fiyat */}
-                          <td className="py-3 px-3">
-                            {p.externalMinPrice > 0 ? (
-                              <div>
-                                <div className="tabular-nums font-medium text-ink">
-                                  {p.externalMinPrice.toLocaleString('tr-TR')} ₽
-                                </div>
-                                {extRatio !== null && (
-                                  <div className="tabular-nums text-2xs text-ink-subtle">
-                                    {extRatio.toFixed(2)}x endeks
-                                  </div>
-                                )}
-                              </div>
-                            ) : (
-                              <span className="text-2xs text-ink-faint">—</span>
-                            )}
-                          </td>
+                        <TableCell>
+                          <StatusBadge index={p.colorIndex} />
+                        </TableCell>
 
-                          {/* Endeks Durumu */}
-                          <td className="py-3 px-3">
-                            <StatusDot tone={statusTone} label={statusLabel} />
-                          </td>
+                        <TableCell className="text-right tabular-nums text-muted-foreground">%{p.commissionPercent}</TableCell>
 
-                          {/* Ozon Satış Komisyonu */}
-                          <td className="py-3 px-3 tabular-nums text-ink-muted">
-                            %{p.commissionPercent}
-                          </td>
+                        <TableCell className="text-right font-medium tabular-nums">{p.stock}</TableCell>
 
-                          {/* Stok Adedi */}
-                          <td className="py-3 pl-3 pr-4 text-right tabular-nums font-medium text-ink">
-                            {p.stock}
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Sayfalama Kontrolleri */}
-            {!loadingIndex && filteredProducts.length > pageSize && (
-              <div className="flex items-center justify-between pt-2 text-2xs text-ink-muted">
-                <div>
-                  Toplam <span className="tabular-nums font-semibold text-ink">{filteredProducts.length}</span> üründen{' '}
-                  <span className="tabular-nums font-semibold text-ink">{(currentPage - 1) * pageSize + 1}</span> -{' '}
-                  <span className="tabular-nums font-semibold text-ink">
-                    {Math.min(currentPage * pageSize, filteredProducts.length)}
-                  </span>{' '}
-                  arası gösteriliyor
-                </div>
-
-                <div className="flex items-center gap-1.5">
-                  <Button
-                    variant="secondary"
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="h-7 px-2"
-                  >
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                    Önceki
-                  </Button>
-
-                  <span className="px-2 tabular-nums">
-                    {currentPage} / {totalPages}
-                  </span>
-
-                  <Button
-                    variant="secondary"
-                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="h-7 px-2"
-                  >
-                    Sonraki
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </div>
-            )}
-
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8"
+                            aria-label="Endeks geçmişi"
+                            title="Endeks geçmişi"
+                            onClick={() =>
+                              setHistoryProduct({
+                                productId: p.productId,
+                                offerId: p.offerId,
+                                name: p.name,
+                                image: p.image,
+                                currency: p.currency,
+                              })
+                            }
+                          >
+                            <History />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
           </div>
 
-        </div>
-      </main>
+          {/* Sayfalama */}
+          {!loadingIndex && filteredProducts.length > pageSize && (
+            <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
+              <div>
+                {filteredProducts.length} üründen {(currentPage - 1) * pageSize + 1}–
+                {Math.min(currentPage * pageSize, filteredProducts.length)} arası
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                  <ChevronLeft />
+                  Önceki
+                </Button>
+                <span className="tabular-nums">
+                  {currentPage} / {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Sonraki
+                  <ChevronRight />
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      <HistorySheet store={selectedStore} product={historyProduct} onClose={() => setHistoryProduct(null)} />
     </div>
   );
 }
-
-
-
