@@ -4,9 +4,12 @@
  *   npm run kullanici              → sorular sorulur
  *   npm run kullanici -- --liste   → kayıtlı kullanıcıları gösterir
  *   npm run kullanici -- --sil furkan
+ *   npm run kullanici -- --herkesi-cikar  → bütün kullanıcıların bütün oturumlarını kapatır
+ *   npm run kullanici -- --denemeler      → son 30 giriş denemesini gösterir
  *
  * Şifre ekrana yazılmaz ve veritabanına düz metin olarak kaydedilmez;
  * yalnızca scrypt özeti saklanır (src/lib/auth/password.ts).
+ * Şifre değişince o kullanıcının açık oturumları kapanır.
  */
 
 import { createInterface } from 'node:readline/promises';
@@ -55,6 +58,24 @@ async function remove(username) {
   console.log(deleted.count ? `"${username}" silindi.` : `"${username}" bulunamadı.`);
 }
 
+async function logoutEveryone() {
+  const updated = await prisma.panelUser.updateMany({ data: { sessionVersion: { increment: 1 } } });
+  console.log(`${updated.count} kullanıcının bütün oturumları kapatıldı.`);
+}
+
+async function attempts() {
+  const rows = await prisma.loginAttempt.findMany({ orderBy: { createdAt: 'desc' }, take: 30 });
+  if (!rows.length) {
+    console.log('Kayıtlı giriş denemesi yok.');
+    return;
+  }
+  for (const r of rows) {
+    const when = r.createdAt.toLocaleString('tr-TR');
+    const device = r.deviceId ? '  (tanıdık tarayıcı)' : '';
+    console.log(`  ${r.success ? 'başarılı' : 'HATALI  '}  ${when}  ${r.username}  ${r.ip}${device}`);
+  }
+}
+
 async function upsert() {
   const usernameRaw = await ask('Kullanıcı adı: ');
   const username = usernameRaw.trim().toLowerCase();
@@ -80,7 +101,8 @@ async function upsert() {
   const passwordHash = await hashPassword(password);
   await prisma.panelUser.upsert({
     where: { username },
-    update: { passwordHash },
+    // Oturum sürümü artar: eski şifreyle açılmış oturumlar ve tanıdık tarayıcılar geçersiz olur.
+    update: { passwordHash, sessionVersion: { increment: 1 } },
     create: { username, passwordHash },
   });
 
@@ -91,6 +113,10 @@ try {
   const args = argv.slice(2);
   if (args.includes('--liste')) {
     await list();
+  } else if (args.includes('--herkesi-cikar')) {
+    await logoutEveryone();
+  } else if (args.includes('--denemeler')) {
+    await attempts();
   } else if (args.includes('--sil')) {
     const username = args[args.indexOf('--sil') + 1];
     if (!username) {

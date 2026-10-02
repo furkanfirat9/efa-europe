@@ -286,12 +286,33 @@ model SalesInvoiceLine {
 // Panel kullanıcısı. Kullanıcı adı ve şifre terminalden `npm run kullanici` ile
 // belirlenir; şifre yalnızca scrypt özeti olarak saklanır, düz metin tutulmaz.
 model PanelUser {
-  id           String    @id @default(cuid())
-  username     String    @unique
-  passwordHash String
-  lastLoginAt  DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  username       String    @unique
+  passwordHash   String
+  // Oturum ve tanıdık tarayıcı çerezleri bu numarayı taşır. Numara artınca kullanıcının
+  // bütün çerezleri geçersiz olur ("Tüm cihazlardan çık", şifre değişikliği).
+  sessionVersion Int       @default(0)
+  lastLoginAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+// Giriş denemeleri. Hatalı denemeler IP, kullanıcı adı ve tanıdık tarayıcı başına
+// sayılır (src/lib/auth/loginLimit.ts); başarılı giriş o anahtarların sayacını sıfırlar.
+// Sayaç bellekte değil burada: Vercel'de panelin birden fazla kopyası aynı anda çalışır.
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  ip        String
+  // Küçük harfe çevrilmiş; var olmayan kullanıcı adları da sayılır
+  username  String
+  // Tanıdık tarayıcı çerezindeki kimlik (çerez yoksa boş)
+  deviceId  String?
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+  @@index([username, createdAt])
+  @@index([deviceId, createdAt])
 }
 
 // Bir ayın Ozon'dan çekilip çekilmediğini işaretler.

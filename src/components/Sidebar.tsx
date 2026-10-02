@@ -22,7 +22,25 @@ import {
   LogOut,
   ScanSearch,
   SearchCheck,
+  MonitorSmartphone,
 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/shadcn/alert-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/shadcn/dropdown-menu';
 
 interface NavItem {
   name: string;
@@ -251,10 +269,17 @@ function SidebarAccount() {
     };
   }, []);
 
-  const logout = async () => {
+  const [confirmAll, setConfirmAll] = useState(false);
+
+  /** all: true → bütün cihazlardaki oturumlar ve tanıdık tarayıcılar kapanır. */
+  const logout = async (all = false) => {
     setBusy(true);
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ all }),
+      });
       router.replace('/login');
       router.refresh();
     } finally {
@@ -268,16 +293,48 @@ function SidebarAccount() {
         <span className="truncate text-[13px] text-zinc-300">{username ?? '—'}</span>
         <span className="text-2xs leading-tight text-zinc-500">Oturum açık</span>
       </span>
-      <button
-        type="button"
-        onClick={logout}
-        disabled={busy}
-        title="Çıkış yap"
-        aria-label="Çıkış yap"
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/8 hover:text-white disabled:opacity-60"
-      >
-        <LogOut className="h-4 w-4" />
-      </button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            disabled={busy}
+            title="Çıkış yap"
+            aria-label="Çıkış seçenekleri"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/8 hover:text-white disabled:opacity-60"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="top" align="end" className="w-52">
+          <DropdownMenuItem onSelect={() => logout()}>
+            <LogOut />
+            Çıkış yap
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem variant="destructive" onSelect={() => setConfirmAll(true)}>
+            <MonitorSmartphone />
+            Tüm cihazlardan çık
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog open={confirmAll} onOpenChange={setConfirmAll}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tüm cihazlardan çıkılsın mı?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bu cihaz dahil açık olan bütün oturumların kapanacak. Tanıdık tarayıcılar da unutulur; her cihazda
+              yeniden giriş yapman gerekir.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Vazgeç</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={() => logout(true)}>
+              Tüm cihazlardan çık
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

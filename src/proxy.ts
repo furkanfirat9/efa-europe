@@ -1,25 +1,39 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { readSessionToken, SESSION_COOKIE } from '@/lib/auth/session';
+import { getValidSession } from '@/lib/auth/guard';
+import { SESSION_COOKIE, sessionCookieOptions, sessionNeedsTouch, touchSessionToken } from '@/lib/auth/session';
 
 /**
- * Panelin giriş kapısı (Next 16'da middleware'in yeni adı: proxy).
+ * Panelin giriş kapısı (Next 16'da middleware'in yeni adı: proxy; Node.js üzerinde çalışır).
  *
  * Oturumu olmayan istek hiçbir sayfaya ya da API ucuna ulaşamaz:
  *   - sayfa isteği → /login adresine yönlendirilir (nereye gitmek istediği korunur)
  *   - API isteği   → 401 ve kısa bir JSON hata
  *
- * Burada yalnızca çerezin imzası ve süresi kontrol edilir (veritabanına gidilmez).
+ * Oturum çerezinin imzası ve süresi kontrol edilir, ardından veritabanından oturumun
+ * iptal edilip edilmediğine bakılır (guard.ts). Panel kullanıldıkça son işlem zamanı
+ * birkaç dakikada bir yenilenir; 12 saat işlem olmazsa oturum kapanır.
  */
 
 // /api/cron: Vercel Cron'un çerezi yoktur; bu adresler CRON_SECRET'ı kendileri kontrol eder.
-const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/auth/logout', '/api/cron'];
+// /api/hava-durumu: giriş sayfasının hava durumu; yalnızca herkese açık veri döner.
+const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/auth/logout', '/api/auth/device', '/api/hava-durumu', '/api/cron'];
 
 const isPublic = (pathname: string) => PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
-  const session = await readSessionToken(request.cookies.get(SESSION_COOKIE)?.value);
+
+  let session;
+  try {
+    session = await getValidSession(request.cookies.get(SESSION_COOKIE)?.value);
+  } catch (error) {
+    console.error('proxy: oturum kontrol edilemedi', error);
+    return NextResponse.json(
+      { success: false, error_message: 'Oturum kontrol edilemedi. Biraz sonra tekrar deneyin.' },
+      { status: 503 }
+    );
+  }
 
   if (isPublic(pathname)) {
     // Girişi olan kullanıcı giriş sayfasına gelirse panele alınır.
@@ -29,7 +43,13 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (session) return NextResponse.next();
+  if (session) {
+    const response = NextResponse.next();
+    if (sessionNeedsTouch(session)) {
+      response.cookies.set(SESSION_COOKIE, await touchSessionToken(session), sessionCookieOptions(session));
+    }
+    return response;
+  }
 
   if (pathname.startsWith('/api/')) {
     return NextResponse.json(
