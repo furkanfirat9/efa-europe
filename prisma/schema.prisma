@@ -91,6 +91,11 @@ model OzonOrder {
   productTitle        String?
   netProfit           Float?
   netProfitTry        Float?
+  // Kâr dökümü (src/lib/orders/profit.ts). 'ozon': Ozon'un gerçek kesintileri tahakkuk etti,
+  // 'estimate': kesintiler tarifeden tahmin. profitCheckedAt: Ozon'a en son ne zaman soruldu.
+  profitSource        String?
+  profitJson          Json?
+  profitCheckedAt     DateTime?
   notes               String?
 
   // Siparişe yüklenen fatura / belge (Vercel Blob, private). Dosya yalnızca
