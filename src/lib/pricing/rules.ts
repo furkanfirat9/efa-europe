@@ -145,8 +145,9 @@ export function decidePrice(
   netPurchaseUsd: number,
   storefrontFactor: number = PRICING.storefrontRateFactor
 ): PriceDecision {
-  const targetPrice = priceForProfit(c.landedUsd * PRICING.targetMargin, c);
   const floorPrice = priceForProfit(minProfitUsd(c.landedUsd), c);
+  // Ucuz üründe %25 kâr "en az 5 $" tabanının altında kalabiliyor (1871016030: 35 $ < 37 $); fiyat tabanın altına inmez
+  const targetPrice = Math.max(priceForProfit(c.landedUsd * PRICING.targetMargin, c), floorPrice);
   const withOld = (price: number, rule: PriceRule, rivalTarget: number | null): PriceDecision => ({
     price,
     oldPrice: Math.round(price * PRICING.oldPriceMultiplier),
@@ -157,7 +158,7 @@ export function decidePrice(
     rivalTarget,
   });
 
-  const noRival = priceForProfit(c.landedUsd * PRICING.noRivalMargin, c);
+  const noRival = Math.max(priceForProfit(c.landedUsd * PRICING.noRivalMargin, c), floorPrice);
   const tooHigh = (price: number) => price > Math.max(amazonGrossUsd * PRICING.sanityMultiple, targetPrice * PRICING.sanityTargetMultiple);
 
   const fakeRival = !!rivalUsd && rivalUsd < netPurchaseUsd;

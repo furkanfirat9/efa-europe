@@ -104,6 +104,8 @@ export interface Proposal {
   currentProfit: number | null;
   currentMargin: number | null;
   rivalUsd: number | null;
+  /** Ozon'un kendi endeksi (bizim fiyat ÷ en ucuz rakip, vitrin kuruyla); > 1 = rakipten pahalıyız. Saatler gecikebilir. */
+  ozonIndex: number | null;
   /** factor: Ozon'un bu ürünün endeksinde kullandığı oran (storefrontFactorFor) */
   rival: { price: number; rubPerUsd: number; factor: number } | null;
   rule: PriceRule | null;
@@ -114,6 +116,8 @@ export interface Proposal {
   newMargin: number | null;
   targetPrice: number | null;
   floorPrice: number | null;
+  /** Rakibin 11 ₽ altı (tam dolar); rakip yoksa null */
+  rivalTarget: number | null;
   stock: number;
   stockAction: StockAction;
   /** Fiyat değişikliği önerilmiyorsa nedeni */
@@ -247,6 +251,7 @@ export async function buildProposals(
       currentProfit: null,
       currentMargin: null,
       rivalUsd: rival?.price ?? null,
+      ozonIndex: idx?.price_index_value && idx.price_index_value > 0 ? idx.price_index_value : null,
       rival,
       rule: null,
       newPrice: null,
@@ -256,6 +261,7 @@ export async function buildProposals(
       newMargin: null,
       targetPrice: null,
       floorPrice: null,
+      rivalTarget: null,
       stock,
       stockAction,
       skipReason: null,
@@ -283,6 +289,7 @@ export async function buildProposals(
       newMargin: next.margin,
       targetPrice: d.targetPrice,
       floorPrice: d.floorPrice,
+      rivalTarget: d.rivalTarget,
     };
   });
 

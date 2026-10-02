@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/shadcn/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/shadcn/tabs';
 import { cn } from '@/lib/utils';
 import type { Proposal } from '@/lib/pricing/proposals';
+import { CampaignView } from './_components/CampaignView';
 import { ScanStatus } from './_components/ScanStatus';
 
 /**
@@ -76,7 +77,12 @@ function ExtLink({ href, children }: { href: string; children: React.ReactNode }
 }
 
 function ProductImage({ src, alt }: { src: string | null; alt: string }) {
-  if (!src) return <div className="flex size-28 shrink-0 items-center justify-center rounded-md border bg-muted text-xs text-muted-foreground">Görsel yok</div>;
+  if (!src)
+    return (
+      <div className="flex size-28 shrink-0 items-center justify-center rounded-md border bg-muted text-xs text-muted-foreground">
+        Görsel yok
+      </div>
+    );
   return <img src={src} alt={alt} loading="lazy" className="size-28 shrink-0 rounded-md border bg-white object-contain p-1" />;
 }
 
@@ -138,7 +144,10 @@ function ProposalCard({ p }: { p: Proposal }) {
               const chosen = ch.source === p.source;
               const url = channelUrl(p, ch.source);
               return (
-                <div key={ch.source} className={cn('flex items-center justify-between gap-3 rounded-md border px-3 py-2', chosen && 'border-primary')}>
+                <div
+                  key={ch.source}
+                  className={cn('flex items-center justify-between gap-3 rounded-md border px-3 py-2', chosen && 'border-primary')}
+                >
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-medium">{SOURCE_LABEL[ch.source]}</span>
@@ -150,7 +159,9 @@ function ProposalCard({ p }: { p: Proposal }) {
                     </p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className={cn('tabular-nums', chosen && 'font-semibold', !ch.buyable && 'text-muted-foreground line-through')}>{eur(ch.eur)}</p>
+                    <p className={cn('tabular-nums', chosen && 'font-semibold', !ch.buyable && 'text-muted-foreground line-through')}>
+                      {eur(ch.eur)}
+                    </p>
                     {url && <ExtLink href={url}>Aç</ExtLink>}
                   </div>
                 </div>
@@ -172,12 +183,15 @@ function ProposalCard({ p }: { p: Proposal }) {
 }
 
 export default function FiyatOnerisiPage() {
-  const [data, setData] = useState<{ proposals: Proposal[]; eurUsd: number; eurUsdDate: string; eurPln: number; vatMode: string } | null>(null);
+  const [data, setData] = useState<{ proposals: Proposal[]; eurUsd: number; eurUsdDate: string; eurPln: number; vatMode: string } | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
   const [query, setQuery] = useState('');
   const [shown, setShown] = useState(PAGE_SIZE);
+  const [view, setView] = useState<'proposals' | 'campaign'>('proposals');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -206,7 +220,10 @@ export default function FiyatOnerisiPage() {
     const q = query.trim().toLowerCase();
     return all
       .filter((p) => matches(p, filter))
-      .filter((p) => !q || p.offerId.toLowerCase().includes(q) || (p.name ?? '').toLowerCase().includes(q) || (p.asin ?? '').toLowerCase().includes(q));
+      .filter(
+        (p) =>
+          !q || p.offerId.toLowerCase().includes(q) || (p.name ?? '').toLowerCase().includes(q) || (p.asin ?? '').toLowerCase().includes(q)
+      );
   }, [all, filter, query]);
 
   const priced = all.filter((p) => p.newPrice != null);
@@ -222,12 +239,12 @@ export default function FiyatOnerisiPage() {
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Fiyat önerisi</h1>
-          <p className="text-muted-foreground">En ucuz Ozon rakibine göre önerilen fiyatlar. Bu ekran hiçbir fiyatı değiştirmez.</p>
+          <p className="text-muted-foreground">En ucuz Ozon rakibine göre önerilen fiyatlar. Öneriler sekmesi hiçbir fiyatı değiştirmez; Kampanyaya gönder sekmesi yalnız senin onayınla Elastik boosting kampanya fiyatını yazar.</p>
           {data && (
             <p className="text-xs text-muted-foreground">
-              Kur: 1 € = {data.eurUsd} $ = {data.eurPln} zł (ECB {data.eurUsdDate}) · Alış: Amazon.de, amazon.pl ve Ceneo'daki güvenilir tekliften
-              alınabilen en ucuzu, KDV {data.vatMode === 'net' ? 'hariç' : 'dahil'}; kargo .de 5,99 €, .pl ücretsiz teslimatta 0, Ceneo teklifin
-              kargosu (Allegro 0).
+              Kur: 1 € = {data.eurUsd} $ = {data.eurPln} zł (ECB {data.eurUsdDate}) · Alış: Amazon.de, amazon.pl ve Ceneo'daki güvenilir
+              tekliften alınabilen en ucuzu, KDV {data.vatMode === 'net' ? 'hariç' : 'dahil'}; kargo .de 5,99 €, .pl ücretsiz teslimatta 0,
+              Ceneo teklifin kargosu (Allegro 0).
             </p>
           )}
         </div>
@@ -238,64 +255,83 @@ export default function FiyatOnerisiPage() {
 
       <ScanStatus />
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {kpis.map((k) => (
-          <Card key={k.label} className="gap-1 py-4">
-            <CardHeader className="px-4">
-              <CardDescription>{k.label}</CardDescription>
-              <CardTitle className="text-2xl tabular-nums">{data ? k.value : '—'}</CardTitle>
-            </CardHeader>
-          </Card>
-        ))}
-      </div>
+      <Tabs value={view} onValueChange={(v) => setView(v as 'proposals' | 'campaign')}>
+        <TabsList>
+          <TabsTrigger value="proposals">Öneriler</TabsTrigger>
+          <TabsTrigger value="campaign">Kampanyaya gönder</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle />
-          <AlertTitle>Öneriler hesaplanamadı</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      <div className="flex flex-wrap items-center gap-2">
-        <Tabs value={filter} onValueChange={(v) => setFilter(v as Filter)}>
-          <TabsList className="h-auto flex-wrap">
-            {FILTERS.map((f) => (
-              <TabsTrigger key={f.key} value={f.key}>
-                {f.label} ({all.filter((p) => matches(p, f.key)).length})
-              </TabsTrigger>
+      {view === 'campaign' ? (
+        <CampaignView />
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {kpis.map((k) => (
+              <Card key={k.label} className="gap-1 py-4">
+                <CardHeader className="px-4">
+                  <CardDescription>{k.label}</CardDescription>
+                  <CardTitle className="text-2xl tabular-nums">{data ? k.value : '—'}</CardTitle>
+                </CardHeader>
+              </Card>
             ))}
-          </TabsList>
-        </Tabs>
-        <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Kod, ad ya da ASIN ara" className="h-9 w-56" aria-label="Ürün ara" />
-      </div>
+          </div>
 
-      {!data && !error && (
-        <div className="space-y-4">
-          {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-48 w-full" />
-          ))}
-        </div>
-      )}
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle />
+              <AlertTitle>Öneriler hesaplanamadı</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-      {data && visible.length === 0 && (
-        <Card className="py-8">
-          <CardContent className="text-center text-muted-foreground">Bu grupta ürün yok.</CardContent>
-        </Card>
-      )}
+          <div className="flex flex-wrap items-center gap-2">
+            <Tabs value={filter} onValueChange={(v) => setFilter(v as Filter)}>
+              <TabsList className="h-auto flex-wrap">
+                {FILTERS.map((f) => (
+                  <TabsTrigger key={f.key} value={f.key}>
+                    {f.label} ({all.filter((p) => matches(p, f.key)).length})
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Kod, ad ya da ASIN ara"
+              className="h-9 w-56"
+              aria-label="Ürün ara"
+            />
+          </div>
 
-      <div className="space-y-4">
-        {visible.slice(0, shown).map((p) => (
-          <ProposalCard key={p.productId} p={p} />
-        ))}
-      </div>
+          {!data && !error && (
+            <div className="space-y-4">
+              {[0, 1, 2].map((i) => (
+                <Skeleton key={i} className="h-48 w-full" />
+              ))}
+            </div>
+          )}
 
-      {visible.length > shown && (
-        <div className="flex justify-center">
-          <Button variant="outline" onClick={() => setShown((n) => n + PAGE_SIZE)}>
-            Daha fazla göster ({visible.length - shown} ürün kaldı)
-          </Button>
-        </div>
+          {data && visible.length === 0 && (
+            <Card className="py-8">
+              <CardContent className="text-center text-muted-foreground">Bu grupta ürün yok.</CardContent>
+            </Card>
+          )}
+
+          <div className="space-y-4">
+            {visible.slice(0, shown).map((p) => (
+              <ProposalCard key={p.productId} p={p} />
+            ))}
+          </div>
+
+          {visible.length > shown && (
+            <div className="flex justify-center">
+              <Button variant="outline" onClick={() => setShown((n) => n + PAGE_SIZE)}>
+                Daha fazla göster ({visible.length - shown} ürün kaldı)
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
