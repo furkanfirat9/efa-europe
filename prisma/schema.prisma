@@ -473,3 +473,26 @@ model PriceIndexSnapshot {
   @@index([storeId, productId, takenAt])
   @@index([storeId, takenAt])
 }
+
+// Tedarik fiyat taramalarının kaydı (scripts/supply_scan.mjs, Windows Görev Zamanlayıcı ile her sabah).
+// /fiyat-onerisi ve 17:00 hatırlatması son taramanın durumunu buradan okur.
+model SupplyScanRun {
+  id           String    @id @default(cuid())
+  // amazon-de | amazon-pl | ceneo
+  channel      String
+  startedAt    DateTime  @default(now())
+  finishedAt   DateTime?
+  // running | ok | partial (bir kısmı okunamadı / bekletildi) | error (oturum, CAPTCHA, engel)
+  status       String
+  total        Int       @default(0)
+  scanned      Int       @default(0)
+  unreadable   Int       @default(0)
+  priceChanged Int       @default(0)
+  stockChanged Int       @default(0)
+  // Fiyatı aşırı oynadığı için yazılmayan ürünler
+  held         Int       @default(0)
+  error        String?
+  summary      Json?
+
+  @@index([channel, startedAt])
+}

@@ -9,6 +9,8 @@
 //
 // --prices-only: haftalık tazeleme. Yalnızca fiyat, stok, satıcı ve ağırlık yazılır; ASIN durumları (kullanıcının
 // /asin-kontrol kararları dahil) ve Ozon karşılaştırması yeniden yapılmaz. Neyin değiştiğini listeler.
+//   --max-change 0.5   fiyatı bu orandan fazla oynayan ürün yazılmaz, "bekletilen" olarak listelenir (otomatik tarama)
+//   --summary <dosya>  sayıları JSON olarak yazar (scripts/supply_scan.mjs okur)
 
 import fs from 'node:fs';
 import sharp from 'sharp';
@@ -17,6 +19,9 @@ import { PrismaClient } from '@prisma/client';
 const scanFile = process.argv[2];
 const dryRun = process.argv.includes('--dry-run');
 const pricesOnly = process.argv.includes('--prices-only');
+const argVal = (name) => { const i = process.argv.indexOf(name); return i > -1 ? process.argv[i + 1] : null; };
+const maxChange = argVal('--max-change') != null ? Number(argVal('--max-change')) : null;
+const summaryFile = argVal('--summary');
 if (!scanFile) throw new Error('Tarama dosyası verilmedi');
 const scan = JSON.parse(fs.readFileSync(scanFile, 'utf8'));
 const scanByAsin = new Map((Array.isArray(scan) ? scan : Object.values(scan)).map(s => [s.asin, s]));
@@ -34,12 +39,17 @@ if (pricesOnly) {
 async function refreshPrices() {
   const rows = await prisma.productSource.findMany({ where: { storeId: STORE, asin: { not: null } }, orderBy: { offerId: 'asc' } });
   const eur = n => (n == null ? '—' : n.toFixed(2) + ' €');
-  const price = [], stockIn = [], stockOut = [], seller = [], unreadable = [];
+  const price = [], stockIn = [], stockOut = [], seller = [], unreadable = [], held = [];
   let written = 0;
   for (const r of rows) {
     const s = scanByAsin.get(r.asin);
     if (!s || s.error || s.blocked || !s.title) { unreadable.push(`${r.offerId} (${r.asin}): ${s?.error || (s ? 'engellendi' : 'taranmadı')}`); continue; }
     const next = parseStock(s);
+    // Otomatik taramada aşırı fiyat oynaması (yanlış teklif satırı, geçici kampanya, sayfa hatası) yazılmaz
+    if (maxChange != null && r.priceGrossEur && next.priceGrossEur && Math.abs(next.priceGrossEur / r.priceGrossEur - 1) > maxChange) {
+      held.push(`${r.offerId} (${r.asin}): ${eur(r.priceGrossEur)} → ${eur(next.priceGrossEur)}`);
+      continue;
+    }
     if ((r.priceGrossEur ?? null) !== (next.priceGrossEur ?? null) && Math.abs((r.priceGrossEur ?? 0) - (next.priceGrossEur ?? 0)) >= 0.01)
       price.push({ offer: r.offerId, from: r.priceGrossEur, to: next.priceGrossEur });
     if (!!r.inStock !== !!next.inStock) (next.inStock ? stockIn : stockOut).push(`${r.offerId} (${next.availability || (s.buyable ? 'sepete eklenebiliyor, stok metni yok' : 'fiyat/sepet yok')})`);
@@ -59,7 +69,15 @@ async function refreshPrices() {
   console.log(`\nStoktan çıkan / alınamaz olan: ${stockOut.length}`); stockOut.forEach(x => console.log('  ' + x));
   console.log(`\nSatıcısı değişen: ${seller.length}`); seller.forEach(x => console.log('  ' + x));
   if (unreadable.length) { console.log(`\nOkunamayan (eski değerler korunur): ${unreadable.length}`); unreadable.forEach(x => console.log('  ' + x)); }
+  if (held.length) { console.log(`\nFiyatı %${Math.round(maxChange * 100)}'den fazla oynadığı için yazılmayan: ${held.length}`); held.forEach(x => console.log('  ' + x)); }
   console.log(dryRun ? '\ndry-run: tabloya yazılmadı' : `\ntabloya yazıldı: ${written}`);
+  if (summaryFile) {
+    fs.writeFileSync(summaryFile, JSON.stringify({
+      total: rows.length, scanned: rows.length - unreadable.length, unreadable: unreadable.length, written,
+      priceChanged: price.length, stockChanged: stockIn.length + stockOut.length, held: held.length,
+      price: price.slice(0, 30), stockIn, stockOut, seller, heldList: held, unreadableList: unreadable.slice(0, 30),
+    }));
+  }
 }
 
 // 1. Ozon ürünleri
