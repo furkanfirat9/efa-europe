@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { AlertCircle, ArrowRight, ImageOff, TrendingDown, TrendingUp } from 'lucide-react';
-import type { PriceIndexRun } from '@prisma/client';
-import type { ColorChange } from '@/lib/pricing/indexHistory';
+import type { ColorChange, SharePoint } from '@/lib/pricing/indexHistory';
 import { Alert, AlertDescription, AlertTitle } from '@/components/shadcn/alert';
 import { Badge } from '@/components/shadcn/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shadcn/card';
@@ -23,16 +22,41 @@ export interface ProductLookup {
 }
 
 type Dir = 'ALL' | 'WORSE' | 'BETTER';
-type Run = Omit<PriceIndexRun, 'takenAt'> & { takenAt: string };
+type Share = { now: SharePoint | null; dayAgo: SharePoint | null; weekAgo: SharePoint | null };
 
 const DAYS = [1, 7, 30] as const;
 
-/** Ozon'un "kazançlı payı" endeksi olan ürünler üzerinden hesaplanıyor (satıcı panelindeki % ile aynı). */
-const greenShare = (r: Run) => {
-  const indexed = r.total - r.withoutIndex;
-  return indexed > 0 ? (r.green / indexed) * 100 : 0;
-};
 const pctText = (n: number) => `%${n.toLocaleString('tr-TR', { maximumFractionDigits: 1 })}`;
+
+function ShareCell({ label, point, now }: { label: string; point: SharePoint | null; now?: SharePoint | null }) {
+  const diff = point && now ? now.pct - point.pct : null;
+  return (
+    <div className="min-w-36 flex-1 rounded-md border px-3 py-2">
+      <div className="text-xs text-muted-foreground">
+        {label}
+        {point && ` · ${when(point.at)}`}
+      </div>
+      {point ? (
+        <div className="flex items-baseline gap-2">
+          <span className={cn('tabular-nums', now ? 'text-base' : 'text-2xl font-semibold')}>{pctText(point.pct)}</span>
+          {diff != null && Math.abs(diff) >= 0.05 && (
+            // Fark "o zamandan bugüne": şimdiki pay daha yüksekse iyileşme
+            <span className={cn('text-xs tabular-nums', diff > 0 ? 'text-emerald-600' : 'text-destructive')}>
+              {diff > 0 ? '▲' : '▼'} {Math.abs(diff).toLocaleString('tr-TR', { maximumFractionDigits: 1 })} puan
+            </span>
+          )}
+        </div>
+      ) : (
+        <div className="text-sm text-muted-foreground">kayıt yok</div>
+      )}
+      {point && (
+        <div className="text-xs text-muted-foreground tabular-nums">
+          {point.green} / {point.indexed} ürün
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function ChangesView({
   store,
@@ -48,7 +72,7 @@ export function ChangesView({
 }) {
   const [days, setDays] = useState<(typeof DAYS)[number]>(7);
   const [dir, setDir] = useState<Dir>('ALL');
-  const [data, setData] = useState<{ changes: ColorChange[]; runs: Run[] } | null>(null);
+  const [data, setData] = useState<{ changes: ColorChange[]; share: Share } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,7 +84,7 @@ export function ChangesView({
       .then((r) => r.json())
       .then((j) => {
         if (!j.success) throw new Error(j.error || 'Değişimler alınamadı.');
-        setData({ changes: j.changes, runs: j.runs });
+        setData({ changes: j.changes, share: j.share });
       })
       .catch((e) => {
         if (e.name !== 'AbortError') setError(e.message || 'Hata');
@@ -78,7 +102,7 @@ export function ChangesView({
     [changes]
   );
   const shown = changes.filter((c) => dir === 'ALL' || (dir === 'WORSE' ? direction(c) > 0 : direction(c) < 0));
-  const runs = data?.runs ?? [];
+  const share = data?.share;
 
   return (
     <div className="space-y-4">
@@ -94,32 +118,18 @@ export function ChangesView({
       <Card className="gap-3 py-4">
         <CardHeader className="px-4">
           <CardTitle className="text-base">Kazançlı payı</CardTitle>
-          <CardDescription>Endeksi olan ürünler içinde yeşil olanların oranı, her kontrolde.</CardDescription>
+          <CardDescription>Endeksi olan ürünler içinde yeşil olanların oranı; en yeni kayıt ve 24 saat / 7 gün öncesine en yakın kayıt.</CardDescription>
         </CardHeader>
         <CardContent className="px-4">
           {loading && !data ? (
-            <Skeleton className="h-10 w-full" />
-          ) : runs.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Bu dönemde kayıt yok.</p>
+            <Skeleton className="h-16 w-full" />
+          ) : !share?.now ? (
+            <p className="text-sm text-muted-foreground">Henüz kayıt yok.</p>
           ) : (
             <div className="flex flex-wrap gap-2">
-              {runs.slice(-12).map((r, i, arr) => {
-                const share = greenShare(r);
-                const prev = i > 0 ? greenShare(arr[i - 1]) : null;
-                return (
-                  <div key={r.id} className="rounded-md border px-3 py-1.5 text-sm" title={`${r.green} kazançlı · ${r.yellow} orta · ${r.red} kazançsız · ${r.withoutIndex} endekssiz`}>
-                    <div className="text-xs text-muted-foreground">{when(r.takenAt)}</div>
-                    <div className="flex items-center gap-1 font-medium tabular-nums">
-                      {pctText(share)}
-                      {prev != null && Math.abs(share - prev) >= 0.05 && (
-                        <span className={cn('text-xs', share > prev ? 'text-emerald-600' : 'text-destructive')}>
-                          {share > prev ? '▲' : '▼'} {Math.abs(share - prev).toLocaleString('tr-TR', { maximumFractionDigits: 1 })}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+              <ShareCell label="Şimdi" point={share.now} />
+              <ShareCell label="Dün" point={share.dayAgo} now={share.now} />
+              <ShareCell label="Geçen hafta" point={share.weekAgo} now={share.now} />
             </div>
           )}
         </CardContent>

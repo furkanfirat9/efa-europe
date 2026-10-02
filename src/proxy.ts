@@ -12,7 +12,8 @@ import { readSessionToken, SESSION_COOKIE } from '@/lib/auth/session';
  * Burada yalnızca çerezin imzası ve süresi kontrol edilir (veritabanına gidilmez).
  */
 
-const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/auth/logout'];
+// /api/cron: Vercel Cron'un çerezi yoktur; bu adresler CRON_SECRET'ı kendileri kontrol eder.
+const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/auth/logout', '/api/cron'];
 
 const isPublic = (pathname: string) => PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 

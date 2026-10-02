@@ -1,5 +1,6 @@
 import type { PriceIndexSnapshot } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
+import { getOzonHeaders, ozonFetch, type OzonStore } from '@/lib/ozon/gate';
 
 /**
  * Fiyat endeksi geçmişi: kayıt ve renk değişimlerinin sebebi.
@@ -21,6 +22,24 @@ export interface V5PriceItem {
     ozon_index_data?: { min_price?: number; min_price_in_seller?: number; price_index_value?: number };
     external_index_data?: { min_price_in_seller?: number; price_index_value?: number };
   };
+}
+
+/** Mağazanın tüm ürünlerinin fiyat ve endeksi (cron ve script için; sayfa kendi çağrısındaki listeyi kullanır). */
+export async function fetchPriceItems(store: OzonStore) {
+  const headers = getOzonHeaders(store);
+  const items: V5PriceItem[] = [];
+  let cursor = '';
+  for (;;) {
+    const res = await ozonFetch<{ items: V5PriceItem[]; cursor: string }>(
+      '/v5/product/info/prices',
+      { filter: { visibility: 'ALL' }, limit: 1000, cursor },
+      headers
+    );
+    items.push(...res.items);
+    if (!res.cursor || res.items.length < 1000) break;
+    cursor = res.cursor;
+  }
+  return items;
 }
 
 /** Sayfa her açıldığında kayıt düşmesin; bu süreden yeni kayıt varsa atlanır. */
@@ -192,8 +211,42 @@ export async function loadColorChanges(storeId: string, sinceDays: number) {
     .flatMap(colorChanges)
     .filter((c) => new Date(c.at) >= since)
     .sort((a, b) => b.at.localeCompare(a.at));
-  const runs = await prisma.priceIndexRun.findMany({ where: { storeId, takenAt: { gte: since } }, orderBy: { takenAt: 'asc' } });
-  return { changes, runs };
+  return { changes, share: await loadShareComparison(storeId) };
+}
+
+export interface SharePoint {
+  at: string;
+  green: number;
+  /** Endeksi olan ürün sayısı (toplam − endekssiz) */
+  indexed: number;
+  /** Kazançlı payı, % — Ozon satıcı panelindeki gibi endeksi olan ürünler üzerinden */
+  pct: number;
+}
+
+/** Karşılaştırma kaydı hedef zamandan en fazla bu kadar uzak olabilir; yoksa "kayıt yok". */
+const SHARE_MATCH_MS = 2 * 3600_000;
+
+/**
+ * Kazançlı payı: en yeni kayıt ve onun 24 saat / 7 gün öncesine en yakın kayıt.
+ * Cron dakikalarca kayabiliyor ve sayfa açılışları ara kayıt düşürüyor; bu yüzden tam saat değil en yakını alınır.
+ */
+export async function loadShareComparison(storeId: string) {
+  const toPoint = (r: { takenAt: Date; green: number; total: number; withoutIndex: number }): SharePoint => {
+    const indexed = r.total - r.withoutIndex;
+    return { at: r.takenAt.toISOString(), green: r.green, indexed, pct: indexed > 0 ? (r.green / indexed) * 100 : 0 };
+  };
+  const latest = await prisma.priceIndexRun.findFirst({ where: { storeId }, orderBy: { takenAt: 'desc' } });
+  if (!latest) return { now: null, dayAgo: null, weekAgo: null };
+  const nearest = async (agoMs: number) => {
+    const target = latest.takenAt.getTime() - agoMs;
+    const runs = await prisma.priceIndexRun.findMany({
+      where: { storeId, takenAt: { gte: new Date(target - SHARE_MATCH_MS), lte: new Date(target + SHARE_MATCH_MS) } },
+    });
+    const best = runs.sort((a, b) => Math.abs(a.takenAt.getTime() - target) - Math.abs(b.takenAt.getTime() - target))[0];
+    return best ? toPoint(best) : null;
+  };
+  const [dayAgo, weekAgo] = await Promise.all([nearest(86400_000), nearest(7 * 86400_000)]);
+  return { now: toPoint(latest), dayAgo, weekAgo };
 }
 
 export async function loadProductHistory(storeId: string, productId: string) {
