@@ -496,3 +496,24 @@ model SupplyScanRun {
 
   @@index([channel, startedAt])
 }
+
+// Panelden kampanyaya gönderilen fiyatlar (src/lib/pricing/campaign.ts). Ne zaman, hangi gruptan, hangi fiyattan
+// hangisine; Ozon kabul etti mi. Endeks değişimlerinde "fiyatımız değişti" sebebinin kaynağı ve geri dönüş için.
+model CampaignPriceChange {
+  id        String   @id @default(cuid())
+  storeId   String
+  actionId  Int
+  productId String
+  offerId   String
+  fromPrice Float?
+  toPrice   Float
+  // above-rival | below-floor | profit-up | cheaper (gönderilecek) | small | add
+  group     String
+  rule      String?
+  ok        Boolean
+  error     String?
+  createdAt DateTime @default(now())
+
+  @@index([storeId, productId, createdAt])
+  @@index([createdAt])
+}
