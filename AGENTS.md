@@ -170,3 +170,10 @@ panelde yalnızca dashboard kartı ile `/analitik` sayfasında görünür.
 - **Elle girilen alanlara dokunulmaz:** `syncOzonOrdersToDb` upsert'i yalnızca
   Ozon'dan gelen alanları yazar. Alış fiyatı, tedarikçi, kart, not ve belge
   alanları senkronla ezilmez.
+
+## 9. Panel Girişi ve Oturum Güvenliği
+
+- **Deneme sınırı** (`src/lib/auth/loginLimit.ts`, `LoginAttempt` tablosu): hatalı denemeler IP, kullanıcı adı ve tanıdık tarayıcı başına sayılır; 15 dakikada 5 hata o anahtarı 15 dakika kilitler. Sayaç bellekte tutulmaz: Vercel'de panelin birden fazla kopyası aynı anda çalışır ve bellekteki sayaç her kopyada ayrı olurdu.
+- **Tanıdık tarayıcı** (`panel_device` çerezi, 90 gün): başarılı girişte verilir. Bu tarayıcıdan gelen deneme yalnızca kendi sayacına bakar; saldırgan hesabı kilitlese de kullanıcı kendi tarayıcısından girebilir. Kullanıcı adı alanını da önceden doldurur (`/api/auth/device`).
+- **Oturum** (`panel_session`): 12 saat işlem olmazsa kapanır, her durumda en geç 7 gün. `proxy.ts` her istekte `PanelUser.sessionVersion`'a bakar (`guard.ts`); numara artınca kullanıcının bütün oturum ve tanıdık tarayıcı çerezleri geçersiz olur. Numarayı artıranlar: sol menüdeki "Tüm cihazlardan çık", `npm run kullanici` ile şifre değişikliği, `npm run kullanici -- --herkesi-cikar` (bütün kullanıcılar).
+- Giriş denemeleri 90 gün tutulur: `npm run kullanici -- --denemeler`.
