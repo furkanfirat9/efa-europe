@@ -1,3 +1,5 @@
+import type { OrderProfitBreakdown, ProfitSource } from '@/lib/orders/profit';
+
 export interface OrderItem {
   id: string;
   postingNumber: string;
@@ -27,6 +29,9 @@ export interface OrderItem {
   purchaseDate?: string | null;
   netProfit?: number | null;
   netProfitTry?: number | null;
+  /** 'ozon': Ozon'un gerçek kesintileri, 'estimate': tarifeden tahmin */
+  profitSource?: ProfitSource | null;
+  profitJson?: OrderProfitBreakdown | null;
   notes?: string | null;
   // Yüklü belge (dosya /api/siparisler/document üzerinden açılır)
   documentName?: string | null;

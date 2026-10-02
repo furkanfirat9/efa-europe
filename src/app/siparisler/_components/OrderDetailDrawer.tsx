@@ -27,7 +27,7 @@ import {
 } from '@/components/shadcn/sheet';
 import { Textarea } from '@/components/shadcn/textarea';
 import { cn } from '@/lib/utils';
-import { formatTL, formatUSD } from '@/lib/format';
+import { formatNumber, formatTL, formatTrNumber, formatUSD } from '@/lib/format';
 import { OrderItem } from '../types';
 import {
   formatDate,
@@ -64,6 +64,13 @@ function Section({ title, action, children }: { title: string; action?: React.Re
   );
 }
 
+function Hint({ children }: { children: React.ReactNode }) {
+  return <span className="block text-xs font-normal text-muted-foreground">{children}</span>;
+}
+
+const usd2 = (value: number) => `${value < 0 ? '−' : ''}$${formatTrNumber(Math.abs(value))}`;
+const rate4 = (value: number) => value.toLocaleString('tr-TR', { maximumFractionDigits: 4 });
+
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-4 text-sm">
@@ -84,6 +91,7 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
   onDocumentChange,
 }) => {
   const { docFile, busy, upload, remove, view } = useOrderDocument(order, onDocumentChange);
+  const profit = order?.buyPrice ? order.profitJson : null;
 
   const countdown = React.useMemo(
     () => (order ? getShipmentCountdown(order.shipmentDate, order.status) : null),
@@ -174,6 +182,104 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                 </dl>
                 {order.customerAddressTail && (
                   <p className="rounded-md bg-muted p-3 text-xs text-muted-foreground">{order.customerAddressTail}</p>
+                )}
+              </Section>
+
+              <Separator />
+
+              <Section
+                title="Finansal özet"
+                action={
+                  profit &&
+                  (order.profitSource === 'ozon' ? (
+                    <Badge variant="secondary">Ozon kesintileriyle</Badge>
+                  ) : (
+                    <Badge variant="outline">Tahmini</Badge>
+                  ))
+                }
+              >
+                {profit ? (
+                  <>
+                    <dl className="space-y-2">
+                      <Row label="Ozon satış tutarı">
+                        <span className="tabular-nums">{usd2(profit.saleUsd)}</span>
+                      </Row>
+                      <Row label="Ozon komisyonu">
+                        <span className="tabular-nums">− {usd2(profit.commissionUsd)}</span>
+                      </Row>
+                      <Row label="Ozon hizmet bedelleri">
+                        <span className="tabular-nums">− {usd2(profit.ozonServicesUsd)}</span>
+                        <Hint>Platform %2 (en fazla 200 ₽) + aracılık %0,33</Hint>
+                      </Row>
+                      <Row label="Uluslararası kargo">
+                        <span className="tabular-nums">− {usd2(profit.shippingUsd)}</span>
+                        <Hint>
+                          {order.profitSource === 'ozon'
+                            ? 'Ozon tahakkuku'
+                            : profit.weightG
+                              ? `${formatNumber(profit.weightG)} g paketli ağırlıkla`
+                              : 'Ağırlık bilinmiyor'}
+                        </Hint>
+                      </Row>
+                      <Row label="Aracı banka">
+                        <span className="tabular-nums">− {usd2(profit.acquiringUsd ?? 0)}</span>
+                        <Hint>
+                          {profit.acquiringRub != null
+                            ? `${formatTrNumber(profit.acquiringRub)} ₽, Ozon kesintisi`
+                            : 'Tahmini %1'}
+                        </Hint>
+                      </Row>
+                      {profit.otherOzonUsd !== 0 && (
+                        <Row label="Diğer Ozon kalemleri">
+                          <span className="tabular-nums">− {usd2(profit.otherOzonUsd)}</span>
+                        </Row>
+                      )}
+                      <Row label="LS depo ücreti">
+                        <span className="tabular-nums">− {usd2(profit.depotUsd)}</span>
+                        <Hint>Kabul + sevk + paket, tahmini</Hint>
+                      </Row>
+                      <Row label="Tedarik alış maliyeti">
+                        <span className="tabular-nums">− {usd2(profit.buyUsd)}</span>
+                        <Hint>{formatTL(profit.buyTry)}</Hint>
+                      </Row>
+                    </dl>
+                    <div className="flex items-center justify-between rounded-md bg-muted px-4 py-3">
+                      <span className="text-sm font-medium">Net kâr</span>
+                      <span className="text-right">
+                        <span
+                          className={cn(
+                            'block text-base font-semibold tabular-nums',
+                            profit.netProfitUsd < 0 && 'text-destructive'
+                          )}
+                        >
+                          {usd2(profit.netProfitUsd)}
+                        </span>
+                        <span className="block text-xs text-muted-foreground tabular-nums">
+                          {formatTL(profit.netProfitTry)}
+                        </span>
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      TCMB kuru ({formatDate(profit.rateDate)}): 1 $ = {rate4(profit.usdTry)} ₺, 1 € = {rate4(profit.eurUsd)} $.
+                      {profit.weightG === null && ' Ağırlık bilinmediği için kargo ve depo ücreti hesaba katılmadı.'}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <dl className="space-y-2">
+                      <Row label="Ozon satış tutarı">
+                        <span className="tabular-nums">{formatUSD(order.salePrice)}</span>
+                      </Row>
+                      <Row label="Tedarik alış maliyeti">
+                        <span className="tabular-nums">
+                          {order.buyPrice !== null && order.buyPrice !== undefined ? formatTL(order.buyPrice) : 'Henüz girilmedi'}
+                        </span>
+                      </Row>
+                    </dl>
+                    <p className="text-xs text-muted-foreground">
+                      {order.buyPrice ? 'Kâr henüz hesaplanmadı.' : 'Alış fiyatı girilince kâr hesaplanır.'}
+                    </p>
+                  </>
                 )}
               </Section>
 
@@ -276,38 +382,6 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                     <input type="file" className="hidden" accept={DOC_ACCEPT} onChange={handleUpload} />
                   </label>
                 )}
-              </Section>
-
-              <Separator />
-
-              <Section title="Finansal özet">
-                <dl className="space-y-2">
-                  <Row label="Ozon satış tutarı">
-                    <span className="tabular-nums">{formatUSD(order.salePrice)}</span>
-                    <span className="ml-1 text-xs font-normal text-muted-foreground">
-                      (~{formatTL((order.salePrice || 0) * 48.35)})
-                    </span>
-                  </Row>
-                  <Row label="Tedarik alış maliyeti">
-                    <span className="tabular-nums">
-                      {order.buyPrice !== null && order.buyPrice !== undefined ? formatTL(order.buyPrice) : 'Henüz girilmedi'}
-                    </span>
-                  </Row>
-                  <Row label="Ozon komisyonu (%5)">
-                    <span className="tabular-nums">− {formatUSD((order.salePrice || 0) * 0.05)}</span>
-                  </Row>
-                </dl>
-                <div className="flex items-center justify-between rounded-md bg-muted px-4 py-3">
-                  <span className="text-sm font-medium">Tahmini net kâr</span>
-                  <span
-                    className={cn(
-                      'text-base font-semibold tabular-nums',
-                      (order.netProfitTry || 0) < 0 && 'text-destructive'
-                    )}
-                  >
-                    {order.netProfitTry ? formatTL(order.netProfitTry) : '—'}
-                  </span>
-                </div>
               </Section>
 
               <Separator />

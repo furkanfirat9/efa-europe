@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { syncOzonOrdersToDb } from '@/lib/db/orders';
 import { prisma } from '@/lib/db/prisma';
+import { refreshPeriodProfits } from '@/lib/orders/profit';
 import { getOzonHeaders, OzonRateLimitError } from '@/lib/ozon/gate';
 import {
   fetchPostingsForRange,
@@ -43,6 +44,16 @@ async function backfillMissingImages() {
   }
 }
 
+/** Kâr tazeleme başarısız olursa senkron yine de geçerlidir; sonraki ziyarette yeniden denenir. */
+async function refreshProfits(start: Date, end: Date): Promise<number> {
+  try {
+    return await refreshPeriodProfits(STORE_ID, start, end);
+  } catch (err) {
+    console.warn('[Kâr] Dönem kârları tazelenemedi:', err instanceof Error ? err.message : err);
+    return 0;
+  }
+}
+
 /**
  * POST /api/siparisler/sync
  *
@@ -51,7 +62,11 @@ async function backfillMissingImages() {
  * Karar kuralı:
  *  - Dönem daha önce hiç indirilmemişse  → indirilir.
  *  - Dönem içinde bulunulan aysa ve son indirme 5 dakikadan eskiyse → indirilir.
- *  - Diğer durumlarda                    → hiç Ozon'a gidilmez, `skipped` döner.
+ *  - Diğer durumlarda                    → siparişler indirilmez, `skipped` döner.
+ *
+ * Her iki durumda da dönemin kesinleşmemiş kârları için Ozon'a tahakkuk sorulur
+ * (refreshPeriodProfits; sipariş başına en fazla 6 saatte bir). `profitsUpdated` > 0 ise
+ * istemci tabloyu yeniden çeker.
  *
  * `force: true` gönderilirse kural atlanır ve dönem her hâlükârda indirilir.
  *
@@ -91,9 +106,13 @@ export async function POST(request: NextRequest) {
       where: { storeId_year_month: { storeId: STORE_ID, year, month } },
     });
 
+    const { start, end, sinceISO, toISO } = monthRangeMsk(year, month);
+
     if (!force && existing) {
       const stale = Date.now() - existing.syncedAt.getTime() > CURRENT_MONTH_TTL_MS;
       if (!isCurrentMonth || !stale) {
+        // Siparişler yeniden indirilmese de kesinleşmemiş kârlar Ozon'un tahakkuklarıyla tazelenir.
+        const profitsUpdated = await refreshProfits(start, end);
         return NextResponse.json({
           success: true,
           skipped: true,
@@ -101,6 +120,7 @@ export async function POST(request: NextRequest) {
           syncedAt: existing.syncedAt.toISOString(),
           fetchedCount: 0,
           syncedCount: 0,
+          profitsUpdated,
         });
       }
     }
@@ -113,13 +133,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { sinceISO, toISO } = monthRangeMsk(year, month);
-
     const postings = await fetchPostingsForRange(sinceISO, toISO, headers);
     await enrichPostingsWithProductDetails(postings, headers);
     const res = await syncOzonOrdersToDb(postings, STORE_ID);
 
     await backfillMissingImages();
+    const profitsUpdated = await refreshProfits(start, end);
 
     // İşareti yalnızca çekim başarıyla tamamlandıktan sonra koy; hata hâlinde
     // dönem "indirildi" sayılmasın ki bir sonraki ziyarette yeniden denensin.
@@ -135,6 +154,7 @@ export async function POST(request: NextRequest) {
       period: `${year}-${String(month).padStart(2, '0')}`,
       fetchedCount: postings.length,
       syncedCount: res.count || 0,
+      profitsUpdated,
     });
   } catch (error: any) {
     console.error('API /api/siparisler/sync Error:', error);

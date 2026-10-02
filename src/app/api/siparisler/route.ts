@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { parseTrNumber } from '@/lib/format';
+import { recalcOrderProfits } from '@/lib/orders/profit';
 import { monthRangeMsk } from '@/lib/ozon/postings';
 
 export const dynamic = 'force-dynamic';
@@ -284,35 +286,10 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    let numBuyPrice =
-      buyPrice !== undefined && buyPrice !== null && buyPrice !== ''
-        ? parseTrNumber(buyPrice)
-        : null;
-
-    // Kur çevirme vs yok - Tabloya ne yazıldıysa alış maliyeti odur (10 ise 10, 500 ise 500)
-    let buyPriceTry: number | null = null;
-    let netProfit: number | null = null;
-    let netProfitTry: number | null = null;
-
-    if (buyPrice === null || buyPrice === '') {
-      numBuyPrice = null;
-      buyPriceTry = null;
-      netProfit = null;
-      netProfitTry = null;
-    } else if (numBuyPrice !== null && !isNaN(numBuyPrice)) {
-      buyPriceTry = numBuyPrice;
-
-      // Ozon Net Kâr Hesaplama
-      const salePrice = Number(existing.totalPrice) || parsePriceFromRaw(existing);
-      const usdRate = 48.35; // Ozon USD ödeme kuru
-      const salePriceTry = existing.currency === 'USD' ? salePrice * usdRate : salePrice;
-
-      // Ozon Komisyonu (%5)
-      const commissionTry = salePriceTry * 0.05;
-
-      netProfitTry = salePriceTry - commissionTry - numBuyPrice;
-      netProfit = netProfitTry / usdRate;
-    }
+    // Alış fiyatı TL'dir, tabloya ne yazıldıysa odur. Kâr kayıttan sonra recalcOrderProfits ile hesaplanır.
+    const parsedBuyPrice =
+      buyPrice !== undefined && buyPrice !== null && buyPrice !== '' ? parseTrNumber(buyPrice) : null;
+    const numBuyPrice = parsedBuyPrice !== null && !isNaN(parsedBuyPrice) ? parsedBuyPrice : null;
 
     // Satın alma / Karttan çekim tarihi (purchaseDate) belirleme
     let resolvedPurchaseDate: Date | null | undefined = undefined;
@@ -330,12 +307,17 @@ export async function PATCH(request: NextRequest) {
 
     const updateData: any = {
       ...(buyPrice !== undefined
-        ? {
-            buyPrice: numBuyPrice,
-            buyPriceTry,
-            netProfit,
-            netProfitTry,
-          }
+        ? numBuyPrice !== null
+          ? { buyPrice: numBuyPrice, buyPriceTry: numBuyPrice }
+          : {
+              buyPrice: null,
+              buyPriceTry: null,
+              netProfit: null,
+              netProfitTry: null,
+              profitSource: null,
+              profitJson: Prisma.DbNull,
+              profitCheckedAt: null,
+            }
         : {}),
       ...(resolvedPurchaseDate !== undefined ? { purchaseDate: resolvedPurchaseDate } : {}),
       buyCurrency: 'TRY',
@@ -361,13 +343,16 @@ export async function PATCH(request: NextRequest) {
       ));
     }
 
-    const [updated, stats] = await Promise.all([
-      prisma.ozonOrder.update({
-        where: { postingNumber: String(postingNumber).trim() },
-        data: updateData,
-      }),
-      computeStoreStats('store1', patchStartDate, patchEndDate),
-    ]);
+    const where = { postingNumber: String(postingNumber).trim() };
+    let updated = await prisma.ozonOrder.update({ where, data: updateData });
+
+    if (numBuyPrice !== null) {
+      // Ozon kesintisi tahakkuk ettiyse gerçek tutarlar, etmediyse tarife tahmini yazılır.
+      await recalcOrderProfits([updated], { checkOzon: true });
+      updated = await prisma.ozonOrder.findUniqueOrThrow({ where });
+    }
+
+    const stats = await computeStoreStats('store1', patchStartDate, patchEndDate);
 
     // Ürün başlığı ve offer_id'nin kaybolmaması için metadata zenginleştirmesi
     const meta = extractProductMeta(updated);
