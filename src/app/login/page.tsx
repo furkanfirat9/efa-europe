@@ -51,7 +51,7 @@ function LoginForm() {
         <div className="mx-auto mb-2 flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
           <ShoppingBag className="size-5" />
         </div>
-        <CardTitle className="text-xl">Ozon AI Studio</CardTitle>
+        <CardTitle className="text-xl">EFA Europe</CardTitle>
         <CardDescription>Devam etmek için yönetim paneline giriş yapın.</CardDescription>
       </CardHeader>
 

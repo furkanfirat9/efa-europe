@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ozon AI Studio",
+  title: "EFA Europe",
   description: "Ozon Marketplace Ürün Yükleme Sistemi",
   icons: {
     icon: [

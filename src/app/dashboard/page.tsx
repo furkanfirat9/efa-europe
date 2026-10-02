@@ -3,7 +3,7 @@ import { MonthlyRevenueCard } from './_components/MonthlyRevenueCard';
 import { AccountingSummaryCard } from './_components/AccountingSummaryCard';
 
 export const metadata = {
-  title: 'Dashboard | Ozon AI Studio',
+  title: 'Dashboard | EFA Europe',
 };
 
 /**

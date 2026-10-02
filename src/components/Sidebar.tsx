@@ -73,7 +73,7 @@ export default function Sidebar() {
         </div>
         <div className="hidden min-w-0 lg:block">
           <span className="block text-[13px] font-semibold tracking-[-0.01em] text-white">
-            Ozon AI
+            EFA Europe
           </span>
           <span className="block text-2xs leading-tight text-zinc-400">Yönetim paneli</span>
         </div>
