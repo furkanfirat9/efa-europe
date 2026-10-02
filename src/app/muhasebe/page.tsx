@@ -2,7 +2,7 @@ import React from 'react';
 import { MuhasebeView } from './_components/MuhasebeView';
 
 export const metadata = {
-  title: 'Muhasebe | Ozon AI Studio',
+  title: 'Muhasebe | EFA Europe',
 };
 
 export default function MuhasebePage() {
