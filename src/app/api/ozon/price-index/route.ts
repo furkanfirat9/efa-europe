@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { recordPriceIndex } from '@/lib/pricing/indexHistory';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,6 +74,15 @@ export async function GET(request: NextRequest) {
       lastId = nextLastId;
     }
 
+    // Geçmişe kayıt (Değişimler sekmesi). Kayıt hatası sayfayı düşürmez.
+    let history: Awaited<ReturnType<typeof recordPriceIndex>> | { error: string };
+    try {
+      history = await recordPriceIndex(store, allItems);
+    } catch (e: any) {
+      console.warn('Price index history record error:', e);
+      history = { error: e.message || 'kayıt hatası' };
+    }
+
     // İstatistik ve Endeks Dağılımı Hesaplama
     let greenCount = 0;
     let yellowCount = 0;
@@ -119,6 +129,38 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Sitedeki fiyat (Ozon'un kendi indirimi dahil, müşterinin gördüğü).
+    // /v1/product/prices/details yalnızca Premium Pro mağazada açık; kapalıysa
+    // 403 döner ve sayfa kampanyalı satıcı fiyatıyla yetinir. Uç ruble verir;
+    // USD'ye çevirmek için ruble fiyatlar arasındaki oran kullanılır.
+    const siteRatioBySku: Record<string, number> = {};
+    let sitePriceAvailable = true;
+    const skus = Object.values(productInfoMap).map((i: any) => String(i.sku)).filter((x) => x && x !== 'undefined');
+    for (let i = 0; i < skus.length; i += 1000) {
+      try {
+        const res = await fetch(`${BASE_URL}/v1/product/prices/details`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ skus: skus.slice(i, i + 1000) }),
+          cache: 'no-store',
+        });
+        if (!res.ok) {
+          sitePriceAvailable = false;
+          break;
+        }
+        const json = await res.json();
+        for (const pr of json.prices || []) {
+          const customer = Number(pr.customer_price?.amount || 0);
+          const base = Number(pr.price?.amount || 0);
+          if (customer > 0 && base > 0) siteRatioBySku[String(pr.sku)] = customer / base;
+        }
+      } catch (e) {
+        console.warn('Price details fetch error:', e);
+        sitePriceAvailable = false;
+        break;
+      }
+    }
+
     // Formatlanmış Ürün Listesi
     const formattedProducts = allItems.map((it) => {
       const info = productInfoMap[it.offer_id] || {};
@@ -142,13 +184,24 @@ export async function GET(request: NextRequest) {
         sku: info.sku || it.product_id,
         name: info.name || it.offer_id || 'İsimsiz Ürün',
         image: img,
-        price: Number(it.price?.price || 0),
+        // Müşterinin gördüğü fiyat: satıcı kampanyaları dahil (marketing_seller_price).
+        // Kampanya yoksa Ozon bu alanı boş ya da price'a eşit döner.
+        price: Number(it.price?.marketing_seller_price || 0) || Number(it.price?.price || 0),
+        basePrice: Number(it.price?.price || 0),
+        // prices/details'teki price, kampanyalı satıcı fiyatının ruble karşılığı.
+        sitePrice: siteRatioBySku[String(info.sku)]
+          ? Math.round((Number(it.price?.marketing_seller_price || 0) || Number(it.price?.price || 0)) * siteRatioBySku[String(info.sku)] * 100) / 100
+          : null,
         oldPrice: Number(it.price?.old_price || 0),
         currency: it.price?.currency_code || 'USD',
         colorIndex: (pIndexes.color_index || 'WITHOUT_INDEX') as 'GREEN' | 'YELLOW' | 'RED' | 'WITHOUT_INDEX',
+        // min_price rakibin ruble fiyatı; min_price_in_seller aynı fiyatın
+        // Ozon tarafından mağaza para birimine (USD) çevrilmiş hâli.
         ozonMinPrice: Number(ozonData.min_price || 0),
+        ozonMinPriceSeller: Number(ozonData.min_price_in_seller || 0),
         ozonIndexValue: Number(ozonData.price_index_value || 0),
         externalMinPrice: Number(extData.min_price || 0),
+        externalMinPriceSeller: Number(extData.min_price_in_seller || 0),
         externalIndexValue: Number(extData.price_index_value || 0),
         stock: totalStock,
         commissionPercent: it.commissions?.sales_percent_fbs || it.commissions?.sales_percent_fbo || 5,
@@ -166,6 +219,8 @@ export async function GET(request: NextRequest) {
         withoutIndex: { count: withoutIndexCount, percent: withoutIndexPercent, label: 'Endekssiz' },
       },
       products: formattedProducts,
+      sitePriceAvailable,
+      history,
       updatedAt: new Date().toISOString(),
     });
   } catch (error: any) {

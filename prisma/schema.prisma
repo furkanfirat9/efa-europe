@@ -431,3 +431,45 @@ model ProductSource {
   @@index([asin])
   @@index([asinStatus])
 }
+
+// Fiyat endeksi geçmişi. Ozon yalnızca anlık endeksi veriyor; renk değişimini ve sebebini
+// (biz mi, rakip mi, Ozon'un yeniden hesabı mı) görmek için durum kaydedilir.
+//
+// Her kontrol bir PriceIndexRun'dır (mağazanın renk dağılımı, ör. kazançlı %38 → %31).
+// Ürün satırı yalnızca durumu bir önceki kayda göre değiştiyse yazılır; böylece bir ürünün
+// satırları doğrudan o ürünün değişim geçmişidir.
+model PriceIndexRun {
+  id           String   @id @default(cuid())
+  storeId      String
+  takenAt      DateTime @default(now())
+  total        Int
+  green        Int
+  yellow       Int
+  red          Int
+  withoutIndex Int
+
+  @@index([storeId, takenAt])
+}
+
+model PriceIndexSnapshot {
+  id                 String   @id @default(cuid())
+  storeId            String
+  runId              String
+  productId          String
+  offerId            String
+  takenAt            DateTime
+  // GREEN | YELLOW | RED | WITHOUT_INDEX
+  color              String
+  // Müşterinin gördüğü fiyat (kampanya dahil, marketing_seller_price), mağaza para biriminde
+  price              Float
+  basePrice          Float
+  // En ucuz Ozon rakibi: ruble ve Ozon'un mağaza para birimine çevirdiği hâli
+  ozonMinPrice       Float?
+  ozonMinPriceSeller Float?
+  ozonIndex          Float?
+  extMinPriceSeller  Float?
+  extIndex           Float?
+
+  @@index([storeId, productId, takenAt])
+  @@index([storeId, takenAt])
+}
