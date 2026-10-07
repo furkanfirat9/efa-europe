@@ -9,6 +9,8 @@ const BASE_URL = process.env.LS_API_BASE_URL || 'https://lpw.betta.ru:8084/grh/a
 const DEFAULT_PARTNER_ID = process.env.LS_PARTNER_ID || '6117';
 const DEFAULT_PASSWORD = process.env.LS_PASSWORD || '305:1v[(73y6Bd?';
 
+const LS_TIMEOUT_MS = 20000;
+
 function getAuthHeader(): string {
   const credentials = `${DEFAULT_PARTNER_ID}:${DEFAULT_PASSWORD}`;
   const encoded = Buffer.from(credentials).toString('base64');
@@ -36,7 +38,20 @@ export async function lsRequest<T = any>(
     options.body = JSON.stringify(body);
   }
 
-  const response = await fetch(url, options);
+  // Depo API'si yanıt vermezse istek sonsuza kadar asılı kalmasın
+  options.signal = AbortSignal.timeout(LS_TIMEOUT_MS);
+
+  let response: Response;
+  try {
+    response = await fetch(url, options);
+  } catch (err: any) {
+    if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
+      throw new Error(
+        `Depo API'sine ${LS_TIMEOUT_MS / 1000} sn içinde ulaşılamadı (${BASE_URL}). Sunucu bu ortamdan gelen bağlantıyı engelliyor olabilir.`
+      );
+    }
+    throw new Error(`Depo API'sine bağlanılamadı (${BASE_URL}): ${err?.cause?.code || err?.message || err}`);
+  }
 
   if (!response.ok) {
     let errorDetail = '';
