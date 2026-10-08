@@ -109,8 +109,10 @@ export function buildOrderColumns({
       header: 'Ürün',
       // Görsel ve ad sabit genişlikte bir kutuda; kutu ortalanır ama içerik sola
       // hizalı kalır, böylece görseller ve adlar satırlar arasında aynı hizada durur.
+      // Kutu, tipik model kodu (~14 karakter) kadar dar tutulur; geniş kutuda kısa kodların
+      // sağında boşluk kalıyor ve sütun sola yatık görünüyordu. Uzun kodlar kısalır, başlıkta tamamı.
       cell: ({ row }) => (
-        <div className="mx-auto flex w-44 items-center gap-3 text-left">
+        <div className="mx-auto flex w-36 items-center gap-3 text-left">
           <ProductImageCell order={row.original} />
           <div
             className="min-w-0 flex-1 truncate text-xs font-medium"
