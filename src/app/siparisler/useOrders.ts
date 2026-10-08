@@ -485,8 +485,8 @@ export function useOrders() {
           return;
         }
 
-        // Ozon'a gidilmediyse ve hiçbir kâr tazelenmediyse tabloyu tekrar çekmenin anlamı yok.
-        if (data.skipped && !data.profitsUpdated) return;
+        // Ozon'a gidilmediyse ve hiçbir kâr ya da durum tazelenmediyse tabloyu tekrar çekmenin anlamı yok.
+        if (data.skipped && !data.profitsUpdated && !data.statusesUpdated) return;
 
         await fetchOrdersRef.current(yr, mo);
       } catch (err) {

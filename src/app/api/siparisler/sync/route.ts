@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { syncOzonOrdersToDb } from '@/lib/db/orders';
 import { prisma } from '@/lib/db/prisma';
+import { refreshOpenOrderStatuses } from '@/lib/orders/openStatus';
 import { refreshPeriodProfits } from '@/lib/orders/profit';
 import { getOzonHeaders, OzonRateLimitError } from '@/lib/ozon/gate';
 import {
@@ -44,6 +45,19 @@ async function backfillMissingImages() {
   }
 }
 
+/**
+ * Geçmiş aylardaki açık siparişlerin durumu (ör. ay bittikten sonra teslim edilen).
+ * Başarısız olursa senkron yine de geçerlidir; sonraki ziyarette yeniden denenir.
+ */
+async function refreshStatuses(): Promise<number> {
+  try {
+    return (await refreshOpenOrderStatuses(STORE_ID)).updated;
+  } catch (err) {
+    console.warn('[Durum] Açık siparişler tazelenemedi:', err instanceof Error ? err.message : err);
+    return 0;
+  }
+}
+
 /** Kâr tazeleme başarısız olursa senkron yine de geçerlidir; sonraki ziyarette yeniden denenir. */
 async function refreshProfits(start: Date, end: Date): Promise<number> {
   try {
@@ -65,8 +79,9 @@ async function refreshProfits(start: Date, end: Date): Promise<number> {
  *  - Diğer durumlarda                    → siparişler indirilmez, `skipped` döner.
  *
  * Her iki durumda da dönemin kesinleşmemiş kârları için Ozon'a tahakkuk sorulur
- * (refreshPeriodProfits; sipariş başına en fazla 6 saatte bir). `profitsUpdated` > 0 ise
- * istemci tabloyu yeniden çeker.
+ * (refreshPeriodProfits; sipariş başına en fazla 6 saatte bir) ve hangi ayda olursa
+ * olsun açık siparişlerin durumu tazelenir (refreshOpenOrderStatuses, en sık 10 dakikada
+ * bir). `profitsUpdated` ya da `statusesUpdated` > 0 ise istemci tabloyu yeniden çeker.
  *
  * `force: true` gönderilirse kural atlanır ve dönem her hâlükârda indirilir.
  *
@@ -111,7 +126,8 @@ export async function POST(request: NextRequest) {
     if (!force && existing) {
       const stale = Date.now() - existing.syncedAt.getTime() > CURRENT_MONTH_TTL_MS;
       if (!isCurrentMonth || !stale) {
-        // Siparişler yeniden indirilmese de kesinleşmemiş kârlar Ozon'un tahakkuklarıyla tazelenir.
+        // Siparişler yeniden indirilmese de açık siparişlerin durumu ve kesinleşmemiş kârlar tazelenir.
+        const statusesUpdated = await refreshStatuses();
         const profitsUpdated = await refreshProfits(start, end);
         return NextResponse.json({
           success: true,
@@ -121,6 +137,7 @@ export async function POST(request: NextRequest) {
           fetchedCount: 0,
           syncedCount: 0,
           profitsUpdated,
+          statusesUpdated,
         });
       }
     }
@@ -138,6 +155,7 @@ export async function POST(request: NextRequest) {
     const res = await syncOzonOrdersToDb(postings, STORE_ID);
 
     await backfillMissingImages();
+    const statusesUpdated = await refreshStatuses();
     const profitsUpdated = await refreshProfits(start, end);
 
     // İşareti yalnızca çekim başarıyla tamamlandıktan sonra koy; hata hâlinde
@@ -155,6 +173,7 @@ export async function POST(request: NextRequest) {
       fetchedCount: postings.length,
       syncedCount: res.count || 0,
       profitsUpdated,
+      statusesUpdated,
     });
   } catch (error: any) {
     console.error('API /api/siparisler/sync Error:', error);
