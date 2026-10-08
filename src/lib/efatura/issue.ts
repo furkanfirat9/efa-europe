@@ -3,6 +3,7 @@ import { put } from '@vercel/blob';
 import type { EArchiveIssue, OzonOrder, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { getTryRate } from '@/lib/fx/evds';
+import { refreshOpenOrderStatuses } from '@/lib/orders/openStatus';
 import { parseUblInvoice, type ParsedInvoice } from '@/lib/sales-invoices/ubl';
 import { CURRENT_STORE, OWN_TAX_ID, ORDER_STORE_ID, saveParsedInvoice } from '@/lib/sales-invoices/service';
 import {
@@ -438,6 +439,12 @@ const REFRESH_LIMIT = 10;
 export async function listInvoiceOrders(): Promise<{ env: EfaturaEnv; startDate: string; pending: InvoiceOrderRow[]; invoiced: InvoiceOrderRow[] }> {
   const env = efaturaEnv();
   const start = invoicingStartDate();
+
+  // Listede görünen durum (Kargoda / Teslim Edildi) veri tabanından gelir; geçmiş aylardaki
+  // açık siparişler önce Ozon'dan tazelenir. Başarısız olursa liste yine açılır.
+  await refreshOpenOrderStatuses(ORDER_STORE_ID).catch((err) =>
+    console.warn('Açık siparişlerin durumu tazelenemedi:', err instanceof Error ? err.message : err)
+  );
 
   const [orders, issuesRaw, gib] = await Promise.all([
     prisma.ozonOrder.findMany({
