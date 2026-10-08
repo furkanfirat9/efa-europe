@@ -82,9 +82,12 @@ export async function buildWarnings(
 ): Promise<string[]> {
   const warnings = [...extra];
   // Bir fatura içindeki ürün adedinden fazla siparişe ait olamaz; yanlış bağlantı işaretidir.
-  const units = productUnits(lines);
-  if (units > 0 && doc.postingNumbers.length > units) {
-    warnings.push(`Faturada ${units} ürün var ama ${doc.postingNumbers.length} siparişe bağlı; siparişleri kontrol edin.`);
+  // Ozon çoklu sipariş / hizmet raporlarında (эквайринг, lojistik vb.) bu kontrol uygulanmaz.
+  if (doc.kind !== 'ozon_report' && doc.kind !== 'ozon_upd') {
+    const units = productUnits(lines);
+    if (units > 0 && doc.postingNumbers.length > units) {
+      warnings.push(`Faturada ${units} ürün var ama ${doc.postingNumbers.length} siparişe bağlı; siparişleri kontrol edin.`);
+    }
   }
   if (!doc.documentDate) warnings.push('Belge tarihi okunamadı.');
   if (!doc.currency) warnings.push('Para birimi okunamadı.');
@@ -183,6 +186,68 @@ export function toDto(doc: DocumentWithLines) {
 export type AccountingDocumentDto = ReturnType<typeof toDto>;
 
 /**
+ * Verilen sipariş veya gönderi numaralarını (örn. "18047692-0554" ya da "18047692-0554-1")
+ * veritabanındaki gerçek Ozon gönderi numaralarıyla (postingNumber) eşleştirip çözümler.
+ * Ozon aracı banka ve gider raporlarında paket eki (-1) bulunmadığından startsWith ile tamamlar.
+ */
+export async function resolvePostingNumbers(rawInputs: string[]): Promise<{
+  resolved: string[];
+  mapping: Map<string, string[]>;
+  unmatched: string[];
+}> {
+  const inputs = Array.from(new Set(rawInputs.map((s) => s.trim()).filter(Boolean)));
+  if (!inputs.length) {
+    return { resolved: [], mapping: new Map(), unmatched: [] };
+  }
+
+  // 1. Doğrudan tam eşleşenler
+  const exactOrders = await prisma.ozonOrder.findMany({
+    where: { postingNumber: { in: inputs } },
+    select: { postingNumber: true },
+  });
+  const exactSet = new Set(exactOrders.map((o) => o.postingNumber));
+
+  const mapping = new Map<string, string[]>();
+  const needPrefix: string[] = [];
+
+  for (const input of inputs) {
+    if (exactSet.has(input)) {
+      mapping.set(input, [input]);
+    } else {
+      needPrefix.push(input);
+    }
+  }
+
+  // 2. Paket eki (-1, -2 vb.) olmayan sipariş numaraları için prefix eşleşmesi
+  if (needPrefix.length > 0) {
+    const prefixConditions = needPrefix.map((p) => ({
+      postingNumber: { startsWith: p.endsWith('-') ? p : `${p}-` },
+    }));
+
+    const prefixOrders = await prisma.ozonOrder.findMany({
+      where: { OR: prefixConditions },
+      select: { postingNumber: true },
+    });
+
+    for (const p of needPrefix) {
+      const prefix = p.endsWith('-') ? p : `${p}-`;
+      const matches = prefixOrders
+        .filter((o) => o.postingNumber.startsWith(prefix))
+        .map((o) => o.postingNumber);
+
+      if (matches.length > 0) {
+        mapping.set(p, matches);
+      }
+    }
+  }
+
+  const resolved = Array.from(new Set([...mapping.values()].flat()));
+  const unmatched = inputs.filter((p) => !mapping.has(p));
+
+  return { resolved, mapping, unmatched };
+}
+
+/**
  * Faturadaki platform sipariş numarasına göre siparişleri bulur (tedarikçi sipariş no alanı).
  * Tek Amazon siparişinde birden fazla Ozon siparişinin ürünü alınmış olabilir; hepsi döner.
  */
@@ -207,6 +272,7 @@ export async function saveExtractedDocument(input: {
   extraWarnings?: string[];
   file: { url: string; name: string; contentType: string; size: number; hash: string; shared?: boolean };
   postingNumber?: string | null;
+  postingNumbers?: string[];
 }): Promise<DocumentWithLines> {
   const { extracted, aiModel, file } = input;
   const documentDate = parseIsoDate(extracted?.documentDate);
@@ -234,8 +300,17 @@ export async function saveExtractedDocument(input: {
   const extraWarnings = [...(input.extraWarnings ?? [])];
   // Siparişten okunan belge o siparişe aittir; faturadaki sipariş no başka siparişleri de getirebilir.
   const found = await findOrdersByOrderNumber(fields.orderNumber);
-  const postingNumbers = [...new Set([...(input.postingNumber ? [input.postingNumber] : []), ...found])];
-  const guessed = postingNumbers.filter((p) => p !== input.postingNumber);
+  const rawPostings = [
+    ...(input.postingNumber ? [input.postingNumber] : []),
+    ...(input.postingNumbers ?? []),
+    ...(extracted?.postingNumbers ?? []),
+  ];
+  // Ozon aracı banka ve gider raporlarındaki -1 eksiz sipariş numaralarını gerçek gönderi no'ya çöz
+  const { resolved: resolvedPostings, unmatched } = await resolvePostingNumbers(rawPostings);
+  const directPostings = [...resolvedPostings, ...unmatched];
+  const postingNumbers = [...new Set([...directPostings, ...found])];
+  const directSet = new Set(directPostings);
+  const guessed = found.filter((p) => !directSet.has(p));
   if (guessed.length) {
     extraWarnings.push(`Sipariş ${guessed.join(', ')} ile eşleştirildi; kontrol edin.`);
   }

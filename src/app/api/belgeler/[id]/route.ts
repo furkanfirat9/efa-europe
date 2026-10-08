@@ -11,6 +11,7 @@ import {
   isCategorised,
   isOwnBuyer,
   parseIsoDate,
+  resolvePostingNumbers,
   toDto,
 } from '@/lib/documents/service';
 
@@ -56,7 +57,8 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<'/api/belgel
       data[field] = parseIsoDate(body[field]);
     }
     if ('currency' in body) {
-      const currency = text(body.currency)?.toUpperCase() ?? null;
+      let currency = text(body.currency)?.toUpperCase() ?? null;
+      if (currency === 'RUR') currency = 'RUB';
       if (currency && !(SUPPORTED_CURRENCIES as readonly string[]).includes(currency)) {
         return fail(400, `Desteklenen para birimleri: ${SUPPORTED_CURRENCIES.join(', ')}.`);
       }
@@ -70,28 +72,37 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<'/api/belgel
     // Belgenin siparişleri; her biri gerçekten var olan bir sipariş olmalı.
     if ('postingNumbers' in body) {
       if (!Array.isArray(body.postingNumbers)) return fail(400, 'Sipariş listesi geçersiz.');
-      const postings = [
+      const rawPostings = [
         ...new Set(body.postingNumbers.map(text).filter((p: string | null): p is string => !!p)),
       ] as string[];
-      const found = await prisma.ozonOrder.findMany({
-        where: { postingNumber: { in: postings } },
-        select: { postingNumber: true },
-      });
-      const known = new Set(found.map((o) => o.postingNumber));
-      const missing = postings.filter((p) => !known.has(p));
+
+      // Ozon aracı banka ve gider raporlarındaki -1 eksiz sipariş numaralarını otomatik çözümler
+      const { resolved: postings, unmatched: missing } = await resolvePostingNumbers(rawPostings);
       if (missing.length) return fail(404, `Sipariş bulunamadı: ${missing.join(', ')}.`);
 
-      // Bir sipariş yalnızca bir alış belgesine bağlanır; yalnızca yeni eklenenlere bakılır.
+      // Çakışma kontrolü: yalnızca mal alımı faturalarında (tedarik.mal) bir sipariş iki ayrı mal faturasına bağlanamaz.
+      // Ozon hizmet ve gider raporları (aracı banka, lojistik, komisyon) mal alımı olmadığı için çakışma kontrolüne girmez.
+      const currentCategory = 'category' in body ? body.category : existing.category;
+      const isGoodsInvoice =
+        (existing.kind === 'invoice' || !existing.kind) &&
+        (currentCategory === 'tedarik.mal' || !currentCategory);
+
       const added = postings.filter((p) => !existing.postingNumbers.includes(p));
-      const taken = added.length
-        ? await prisma.accountingDocument.findFirst({
-            where: { store: CURRENT_STORE, NOT: { id }, postingNumbers: { hasSome: added } },
-            select: { documentNo: true, fileName: true, postingNumbers: true },
-          })
-        : null;
-      if (taken) {
-        const clash = added.filter((p) => taken.postingNumbers.includes(p));
-        return fail(409, `${clash.join(', ')} zaten ${taken.documentNo ?? taken.fileName} belgesine bağlı.`);
+      if (isGoodsInvoice && added.length > 0) {
+        const taken = await prisma.accountingDocument.findFirst({
+          where: {
+            store: CURRENT_STORE,
+            NOT: { id },
+            kind: 'invoice',
+            category: 'tedarik.mal',
+            postingNumbers: { hasSome: added },
+          },
+          select: { documentNo: true, fileName: true, postingNumbers: true },
+        });
+        if (taken) {
+          const clash = added.filter((p) => taken.postingNumbers.includes(p));
+          return fail(409, `${clash.join(', ')} zaten ${taken.documentNo ?? taken.fileName} mal faturasına bağlı.`);
+        }
       }
       data.postingNumbers = postings;
     }

@@ -1,7 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { categoryTotals, type DocumentItem } from '@/app/belgeler/utils';
+import { categoryTotals, signedTry, type DocumentItem } from '@/app/belgeler/utils';
+import type { SalesInvoiceDto } from '@/lib/sales-invoices/service';
+import type { InvoiceOrderRow } from '@/lib/efatura/issue';
 
 export interface MonthOption {
   key: string;        // YYYY-MM
@@ -12,7 +14,6 @@ export interface MonthOption {
   isCurrent: boolean;
   dateFrom: string;   // YYYY-MM-01
   dateTo: string;     // YYYY-MM-DD (ay sonu)
-  invoiceDate: string;// DD.MM.YYYY (ay sonu)
 }
 
 const MONTH_NAMES = [
@@ -47,7 +48,6 @@ function generateMonthOptions(): MonthOption[] {
       isCurrent: i === 0,
       dateFrom: `${y}-${mStr}-01`,
       dateTo: `${y}-${mStr}-${lastDayStr}`,
-      invoiceDate: `${lastDayStr}.${mStr}.${y}`,
     });
   }
 
@@ -55,10 +55,12 @@ function generateMonthOptions(): MonthOption[] {
 }
 
 /**
- * Avrupa mağazasının aylık fatura ve kurumlar vergisi hesabı.
- * Ozon siparişleri (USD), TCMB döviz alış kuru ve Belgeler sayfasındaki onaylı
- * gider belgeleri (mal alımı, Ozon giderleri, üyelikler …) seçilen ay için birlikte
- * çekilir. Gider, siparişlere girilen tahmini alış fiyatlarından değil faturalardan gelir.
+ * Avrupa mağazasının aylık hasılat ve kurumlar vergisi hesabı.
+ *
+ * Hasılat, Belgeler → Satış faturaları'ndaki kesilmiş faturaların TL toplamıdır; her
+ * fatura kendi günündeki kurla kesildiği için tek bir kurla çevrilmez, iade faturaları
+ * düşülür. Gider, Belgeler'deki onaylı alış / gider faturalarından gelir. Faturası henüz
+ * kesilmemiş siparişler (Fatura oluştur) hasılata girmez, ayrıca gösterilir.
  */
 export function useEuropeAccounting() {
   const monthOptions = useMemo(() => generateMonthOptions(), []);
@@ -68,68 +70,67 @@ export function useEuropeAccounting() {
     return monthOptions.find((m) => m.key === selectedMonthKey) || monthOptions[0];
   }, [monthOptions, selectedMonthKey]);
 
-  // Sipariş Verileri (Ozon)
-  const [totalRevenueUsd, setTotalRevenueUsd] = useState<number>(0);
-  const [totalOrdersCount, setTotalOrdersCount] = useState<number>(0);
-  const [ordersLoading, setOrdersLoading] = useState<boolean>(true);
+  // Belgeler → Satış faturaları
+  const [sales, setSales] = useState({ totalTry: 0, totalUsd: 0, count: 0, missingFx: 0 });
+  const [salesLoading, setSalesLoading] = useState<boolean>(true);
 
-  // TCMB Kur Verileri
-  const [tcmbUsdRate, setTcmbUsdRate] = useState<number>(0);
-  const [tcmbDate, setTcmbDate] = useState<string>('');
-  const [rateLoading, setRateLoading] = useState<boolean>(true);
+  // Ay içinde gelip faturası kesilmemiş siparişler
+  const [pending, setPending] = useState({ count: 0, totalUsd: 0 });
+  const [pendingLoading, setPendingLoading] = useState<boolean>(true);
 
   // Belgeler sayfasındaki onaylı gider belgeleri (TL)
   const [expenses, setExpenses] = useState({ total: 0, goods: 0, ozon: 0, documentCount: 0, pendingCount: 0 });
   const [expensesLoading, setExpensesLoading] = useState<boolean>(true);
 
-  // Siparişleri, TCMB kurunu ve Belgeler'deki giderleri çek
+  // Kambiyo zararı: kartla ödenen alışlarda karttan çekilen TL − faturanın TCMB kuruyla TL'si
+  const [fxLoss, setFxLoss] = useState({ total: 0, count: 0 });
+  const [fxLossLoading, setFxLossLoading] = useState<boolean>(true);
+
+  // Satış faturalarını, faturası kesilmemiş siparişleri ve giderleri çek
   const fetchData = useCallback(async () => {
     if (!activeMonth) return;
 
-    setOrdersLoading(true);
-    setRateLoading(true);
+    setSalesLoading(true);
+    setPendingLoading(true);
     setExpensesLoading(true);
 
     try {
-      // 1. Ozon Avrupa Mağazası Siparişleri
-      const ordersRes = await fetch('/api/ozon/analytics', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          store: 'store1',
-          date_from: activeMonth.dateFrom,
-          date_to: activeMonth.dateTo,
-          mode: 'orders',
-        }),
-      });
-
-      if (ordersRes.ok) {
-        const data = await ordersRes.json();
-        setTotalRevenueUsd(Number(data.totalRevenue || 0));
-        setTotalOrdersCount(Number(data.totalOrders || 0));
+      // 1. Ayın satış faturaları
+      const res = await fetch(`/api/belgeler/satis?year=${activeMonth.year}&month=${activeMonth.month}`);
+      if (res.ok) {
+        const invoices: SalesInvoiceDto[] = (await res.json()).invoices ?? [];
+        const sign = (inv: SalesInvoiceDto) => (inv.typeCode === 'IADE' ? -1 : 1);
+        setSales({
+          totalTry: invoices.reduce((acc, inv) => acc + signedTry(inv), 0),
+          totalUsd: invoices
+            .filter((inv) => inv.currency === 'USD')
+            .reduce((acc, inv) => acc + inv.totalAmount * sign(inv), 0),
+          count: invoices.length,
+          missingFx: invoices.filter((inv) => inv.totalTry == null).length,
+        });
       }
     } catch (err) {
-      console.error('Ozon sipariş verileri alınamadı:', err);
+      console.error('Satış faturaları alınamadı:', err);
     } finally {
-      setOrdersLoading(false);
+      setSalesLoading(false);
     }
 
     try {
-      // 2. TCMB USD Alış Kuru
-      const rateUrl = activeMonth.isCurrent
-        ? '/api/exchange-rate'
-        : `/api/exchange-rate?date=${activeMonth.dateTo}`;
-
-      const rateRes = await fetch(rateUrl);
-      if (rateRes.ok) {
-        const rateData = await rateRes.json();
-        setTcmbUsdRate(Number(rateData.usdBuying || 0));
-        setTcmbDate(rateData.effectiveDate || rateData.date || '');
+      // 2. Ay içinde gelip faturası kesilmemiş siparişler (gün Moskova / İstanbul saatiyle)
+      const res = await fetch('/api/fatura');
+      if (res.ok) {
+        const rows: InvoiceOrderRow[] = (await res.json()).pending ?? [];
+        const inMonth = rows.filter((r) => {
+          if (!r.orderDate) return false;
+          const day = new Date(new Date(r.orderDate).getTime() + 3 * 3600_000).toISOString().slice(0, 10);
+          return day >= activeMonth.dateFrom && day <= activeMonth.dateTo;
+        });
+        setPending({ count: inMonth.length, totalUsd: inMonth.reduce((acc, r) => acc + r.amount, 0) });
       }
     } catch (err) {
-      console.error('TCMB kuru alınamadı:', err);
+      console.error('Faturası kesilmemiş siparişler alınamadı:', err);
     } finally {
-      setRateLoading(false);
+      setPendingLoading(false);
     }
 
     try {
@@ -155,17 +156,32 @@ export function useEuropeAccounting() {
     } finally {
       setExpensesLoading(false);
     }
+
+    setFxLossLoading(true);
+    try {
+      // 4. Ayın kambiyo zararı (giderlere eklenir)
+      const res = await fetch(`/api/muhasebe/kambiyo?year=${activeMonth.year}&month=${activeMonth.month}`);
+      const data = await res.json();
+      if (data.success) setFxLoss({ total: data.total, count: data.count });
+    } catch (err) {
+      console.error('Kambiyo zararı alınamadı:', err);
+    } finally {
+      setFxLossLoading(false);
+    }
   }, [activeMonth]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  // Fatura Tutarı / Brüt Hasılat (TL)
-  const invoiceTotalTry = totalRevenueUsd * tcmbUsdRate;
+  // Brüt hasılat (TL): kesilmiş satış faturalarının toplamı
+  const invoiceTotalTry = sales.totalTry;
+
+  // Faturalardaki ağırlıklı ortalama kur (bilgi amaçlı)
+  const averageRate = sales.totalUsd > 0 ? sales.totalTry / sales.totalUsd : 0;
 
   // Dinamik Vergi & Kâr Hesaplaması
-  const totalExpenses = expenses.total;
+  const totalExpenses = expenses.total + fxLoss.total;
 
   // Ticari Kazanç / Kâr (Zarar durumunda 0)
   const commercialProfit = Math.max(0, invoiceTotalTry - totalExpenses);
@@ -188,15 +204,16 @@ export function useEuropeAccounting() {
     setSelectedMonthKey,
     activeMonth,
     fetchData,
-    loading: ordersLoading || rateLoading || expensesLoading,
-    ordersLoading,
-    rateLoading,
-    expensesLoading,
-    totalRevenueUsd,
-    totalOrdersCount,
-    tcmbUsdRate,
-    tcmbDate,
+    loading: salesLoading || expensesLoading || fxLossLoading,
+    salesLoading,
+    pendingLoading,
+    expensesLoading: expensesLoading || fxLossLoading,
+    fxLossLoading,
+    sales,
+    pending,
+    averageRate,
     expenses,
+    fxLoss,
     invoiceTotalTry,
     totalExpenses,
     commercialProfit,

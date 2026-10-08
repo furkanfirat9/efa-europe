@@ -24,19 +24,32 @@ export async function GET(request: NextRequest, ctx: RouteContext<'/api/belgeler
     const { id } = await ctx.params;
     const doc = await prisma.accountingDocument.findFirst({
       where: { id, store: CURRENT_STORE },
-      select: { documentDate: true, createdAt: true, orderNumber: true },
+      select: { documentDate: true, createdAt: true, orderNumber: true, kind: true, category: true },
     });
     if (!doc) return fail(404, 'Belge bulunamadı.');
 
-    const taken = await prisma.accountingDocument.findMany({
-      where: { store: CURRENT_STORE, NOT: [{ id }, { postingNumbers: { isEmpty: true } }] },
-      select: { postingNumbers: true },
-    });
+    const isGoodsInvoice =
+      (doc.kind === 'invoice' || !doc.kind) &&
+      (doc.category === 'tedarik.mal' || !doc.category);
+
+    let excludedPostings: string[] = [];
+    if (isGoodsInvoice) {
+      const taken = await prisma.accountingDocument.findMany({
+        where: {
+          store: CURRENT_STORE,
+          NOT: [{ id }, { postingNumbers: { isEmpty: true } }],
+          kind: 'invoice',
+          category: 'tedarik.mal',
+        },
+        select: { postingNumbers: true },
+      });
+      excludedPostings = taken.flatMap((t) => t.postingNumbers);
+    }
 
     const q = request.nextUrl.searchParams.get('q')?.trim() ?? '';
     const where: Prisma.OzonOrderWhereInput = {
       storeId: ORDER_STORE_ID,
-      postingNumber: { notIn: taken.flatMap((t) => t.postingNumbers) },
+      ...(excludedPostings.length > 0 ? { postingNumber: { notIn: excludedPostings } } : {}),
       NOT: { status: { startsWith: 'cancelled' } },
     };
     if (q) {

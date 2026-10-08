@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/shadcn/skeleton';
 import { formatTL } from '@/lib/format';
 import { useEuropeAccounting } from '@/hooks/useEuropeAccounting';
 
-/** Muhasebe sayfasının dashboard özeti: bu ayın fatura tutarı ve vergi sonrası net kâr. */
+/** Muhasebe sayfasının dashboard özeti: bu ayın satış faturaları toplamı ve vergi sonrası net kâr. */
 export function AccountingSummaryCard() {
   const { activeMonth, invoiceTotalTry, netProfitAfterTax, corporateTaxToPay, loading } = useEuropeAccounting();
 
@@ -22,7 +22,7 @@ export function AccountingSummaryCard() {
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardDescription>Avrupa faturası · {activeMonth.label}</CardDescription>
+        <CardDescription>Satış faturaları · {activeMonth.label}</CardDescription>
         <CardTitle className="text-3xl font-semibold tabular-nums">
           {loading ? <Skeleton className="h-9 w-44" /> : formatTL(invoiceTotalTry, false)}
         </CardTitle>
