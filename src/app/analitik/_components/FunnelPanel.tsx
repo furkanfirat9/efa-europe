@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { ArrowDown } from 'lucide-react';
 import { AnalyticsSummary } from '@/types/analytics';
 import { Panel } from '@/components/ui/Panel';
 import { formatNumber, formatPercent, rate } from '@/lib/format';
@@ -10,10 +11,37 @@ interface FunnelPanelProps {
   loading: boolean;
 }
 
+const SLICE_HEIGHT = 52;
+const SLICE_GAP = 4;
+/** Huninin alt ucu, ağız genişliğine oranla. */
+const FUNNEL_TIP = 0.3;
+/** 1'den büyüdükçe kenarlar içe kavislenir: ağız geniş, gövde dar. */
+const FUNNEL_CURVE = 1.4;
+
 /**
- * Gösterimden siparişe kadar olan dört aşama. Her aşamanın çubuğu ilk
- * aşamaya oranlıdır; sağdaki yüzde ise bir önceki aşamadan devam etme
- * oranını verir — asıl okunması gereken sayı budur.
+ * Huninin y derinliğindeki yarı genişliği, çizim alanının yüzdesi olarak (0–50).
+ * Biçim sabittir, değere oranlı değildir: aşamalar arasında yüzlerce kat fark
+ * var, oranlı çizilse alt dilimler görünmez olurdu. Sayılar dilimin içinde yazar.
+ */
+function halfWidthAt(y: number, height: number) {
+  const t = y / height;
+  return 50 * (FUNNEL_TIP + (1 - FUNNEL_TIP) * (1 - t) ** FUNNEL_CURVE);
+}
+
+/** Bir dilimin yolu. Kenarlar örneklenir; dilimler tek bir kavisli huninin parçaları olur. */
+function slicePath(top: number, bottom: number, height: number) {
+  const samples = 8;
+  const ys = Array.from({ length: samples + 1 }, (_, i) => top + ((bottom - top) * i) / samples);
+  const point = (x: number, y: number) => `${x.toFixed(2)},${y.toFixed(2)}`;
+  const right = ys.map((y) => point(50 + halfWidthAt(y, height), y));
+  const left = [...ys].reverse().map((y) => point(50 - halfWidthAt(y, height), y));
+  return `M${[...right, ...left].join('L')}Z`;
+}
+
+/**
+ * Gösterimden siparişe kadar olan dört aşama, huni biçiminde. Dilimlerin
+ * arasındaki yüzde bir önceki aşamadan devam etme oranını verir — asıl
+ * okunması gereken sayı budur.
  */
 export function FunnelPanel({ summary, loading }: FunnelPanelProps) {
   const views = summary?.hitsViewTotal ?? 0;
@@ -27,7 +55,24 @@ export function FunnelPanel({ summary, loading }: FunnelPanelProps) {
     { label: 'Sipariş', value: summary?.orderedUnits ?? 0 },
   ];
 
-  const top = stages[0].value || 1;
+  const height = stages.length * SLICE_HEIGHT + (stages.length - 1) * SLICE_GAP;
+  const slices = stages.map((stage, index) => {
+    const top = index * (SLICE_HEIGHT + SLICE_GAP);
+    const step = index === 0 ? null : rate(stage.value, stages[index - 1].value);
+    // Geçiş oranı iki dilimin arasındaki boşluğun hizasında durur.
+    const seam = top - SLICE_GAP / 2;
+    return {
+      ...stage,
+      top,
+      step: loading ? null : step,
+      seam,
+      path: slicePath(top, top + SLICE_HEIGHT, height),
+      edge: 50 + halfWidthAt(seam, height),
+      isLast: index === stages.length - 1,
+    };
+  });
+  const lastTop = slices[slices.length - 1].top;
+
   const searchShare = rate(searchViews, views) ?? 0;
   const recommendationShare = 100 - searchShare;
 
@@ -38,52 +83,103 @@ export function FunnelPanel({ summary, loading }: FunnelPanelProps) {
       className="h-full"
     >
       <div className="flex h-full flex-col justify-between gap-6">
-        <ol className="space-y-3.5">
-          {stages.map((stage, index) => {
-            const previous = index === 0 ? null : stages[index - 1].value;
-            const step = index === 0 ? null : rate(stage.value, previous);
-            const width = Math.max(1.5, (stage.value / top) * 100);
-            const isLast = index === stages.length - 1;
+        {/* Sağdaki boşluk geçiş oranlarına ayrılır; geniş ekranda huni yayvanlaşmasın diye sınırlı. */}
+        <div className="relative mx-auto w-full max-w-[26rem] pr-16">
+          <div className="absolute inset-y-0 left-0 right-16" aria-hidden>
+            <svg
+              className="h-full w-full"
+              viewBox={`0 0 100 ${height}`}
+              preserveAspectRatio="none"
+            >
+              <defs>
+                {/* Mavi dilimler aşağı doğru koyulaşır; sipariş dilimi yeşil kalır. */}
+                <linearGradient
+                  id="funnel-fill"
+                  gradientUnits="userSpaceOnUse"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2={lastTop}
+                >
+                  <stop offset="0" style={{ stopColor: 'var(--color-brand)' }} />
+                  <stop
+                    offset="1"
+                    style={{ stopColor: 'var(--color-brand)', stopOpacity: 0.55 }}
+                  />
+                </linearGradient>
+              </defs>
 
-            return (
-              <li key={stage.label}>
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-2xs text-ink-muted">{stage.label}</span>
+              {slices.map((slice) => (
+                <path
+                  key={slice.label}
+                  d={slice.path}
+                  className={loading ? 'fill-white/5' : slice.isLast ? 'fill-gain' : undefined}
+                  fill={loading || slice.isLast ? undefined : 'url(#funnel-fill)'}
+                />
+              ))}
 
-                  {loading ? (
-                    <span className="skeleton h-3.5 w-16" />
-                  ) : (
-                    <span className="flex items-baseline gap-2">
-                      <span
-                        className={`text-[13px] font-semibold tabular-nums ${
-                          isLast ? 'text-gain' : 'text-ink'
-                        }`}
-                      >
-                        {formatNumber(stage.value)}
-                      </span>
-                      {step !== null && (
-                        <span className="w-11 text-right text-2xs tabular-nums text-ink-subtle">
-                          {formatPercent(step)}
-                        </span>
-                      )}
-                    </span>
-                  )}
-                </div>
-
-                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/5">
-                  {!loading && (
-                    <div
-                      className={`h-full rounded-full transition-[width] duration-500 ease-out ${
-                        isLast ? 'bg-gain' : 'bg-brand'
-                      }`}
-                      style={{ width: `${width}%`, opacity: isLast ? 1 : 1 - index * 0.22 }}
+              {slices.map(
+                (slice) =>
+                  slice.step !== null && (
+                    <line
+                      key={slice.label}
+                      x1={slice.edge + 2}
+                      x2={100}
+                      y1={slice.seam}
+                      y2={slice.seam}
+                      className="stroke-hairline-strong"
+                      strokeDasharray="2 3"
+                      vectorEffect="non-scaling-stroke"
                     />
-                  )}
-                </div>
+                  ),
+              )}
+            </svg>
+          </div>
+
+          <ol className="relative flex flex-col" style={{ gap: SLICE_GAP }}>
+            {slices.map((slice) => (
+              <li
+                key={slice.label}
+                className="flex flex-col items-center justify-center"
+                style={{ height: SLICE_HEIGHT }}
+              >
+                <span
+                  className={`text-2xs leading-tight ${
+                    loading
+                      ? 'text-ink-subtle'
+                      : slice.isLast
+                        ? 'text-ink-foreground/70'
+                        : 'text-white/75'
+                  }`}
+                >
+                  {slice.label}
+                </span>
+                {loading ? (
+                  <span className="skeleton mt-1 h-4 w-12" />
+                ) : (
+                  <span
+                    className={`text-[15px] font-semibold leading-snug tabular-nums ${
+                      slice.isLast ? 'text-ink-foreground' : 'text-white'
+                    }`}
+                  >
+                    {formatNumber(slice.value)}
+                  </span>
+                )}
+
+                {slice.step !== null && (
+                  <span
+                    title="Önceki aşamadan geçiş oranı"
+                    className="absolute left-full ml-1.5 inline-flex -translate-y-1/2 items-center gap-0.5 whitespace-nowrap rounded-full border border-hairline-strong bg-panel-sunken px-1.5 py-px text-2xs font-medium tabular-nums text-ink-muted"
+                    style={{ top: slice.seam }}
+                  >
+                    <ArrowDown className="h-2.5 w-2.5 text-ink-subtle" aria-hidden />
+                    {formatPercent(slice.step)}
+                  </span>
+                )}
               </li>
-            );
-          })}
-        </ol>
+            ))}
+          </ol>
+        </div>
 
         <div className="border-t border-hairline pt-4">
           <div className="flex items-baseline justify-between">
