@@ -148,7 +148,7 @@ export function buildOrderColumns({
           label="Ödeme kartı"
           emptyAsNull
           onUpdate={onUpdate}
-          className="w-24"
+          className="w-32"
         />
       ),
     }),
