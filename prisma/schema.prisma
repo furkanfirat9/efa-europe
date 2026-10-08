@@ -453,6 +453,99 @@ model ProductSource {
   @@index([asinStatus])
 }
 
+// Panelden Trendyol E-Faturam ile kesilen e-Arşiv faturaları (/fatura sayfası).
+// Bir siparişe ortam başına tek kayıt: kayıt Trendyol'a gitmeden ÖNCE yazılır ve fatura
+// kimliğini (UUID) biz üretiriz. Aynı UUID ikinci kez gönderilirse Trendyol 409 verir;
+// sonucu belirsiz kalan gönderim (SENDING) bu UUID'nin durumu sorularak tamamlanır.
+model EArchiveIssue {
+  id             String   @id @default(cuid())
+  // staging | production — test ortamında kesilenler canlı listeyi etkilemez
+  env            String
+  postingNumber  String
+  invoiceUuid    String   @unique
+  // SENDING (gönderildi, sonucu belirsiz) | ISSUED (Trendyol kabul etti) | FAILED (kesilemedi, tekrar denenebilir)
+  status         String
+  invoiceNo      String?
+  // Trendyol durumu: 20 işleniyor, 205 tamamlandı, 305 iptal, 29 / 405 hata
+  providerStatus String?
+  // Trendyol'un faturaya yazdığı düzenleme zamanı
+  issuedAt       DateTime?
+  // Güvenlik duvarı engeli yüzünden adlar Latin harfle gönderildi
+  transliterated Boolean  @default(false)
+  error          String?
+  // Canlıda fatura tamamlanınca Belgeler → Satış faturaları kaydı
+  salesInvoiceId String?
+  // Trendyol'a giden son gövde (inceleme için)
+  payload        Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([env, postingNumber])
+}
+
+// Ortak cari hesabı (331 Ortaklara Borçlar): panelde başka kaydı olmayan, elle girilen hareketler.
+// Kartla yapılan sipariş alışları ve Belgeler'deki giderler buraya yazılmaz; bakiye onlardan
+// her istekte hesaplanır (src/lib/accounting/partnerLedger.ts).
+model PartnerLedgerEntry {
+  id          String   @id @default(cuid())
+  store       String   @default("lenora")
+  // transfer: ortak şirkete para gönderdi (+) · expense: ortak, panelde kaydı olmayan bir
+  // şirket giderini kendi cebinden ödedi (+) · repayment: şirket ortağa geri ödedi (−)
+  kind        String
+  date        DateTime @db.Date
+  amountTry   Float
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([store, date])
+}
+
+// Ozon'un satıcıya yaptığı ödemeler (Belgeler → Ozon ödemeleri).
+//
+// Ozon tarafı aylık mutabakat raporundaki "Справка(Селлер) №20260921 от 21.09.2026" satırlarından
+// gelir; Ozon'un defteri rubledir. Para aracı ödeme kuruluşu üzerinden şirketin TL hesabına
+// düşer; TL tutarı yalnızca banka dekontunda vardır ve dekont yüklenince yazılır. Ozon,
+// bakiye 1.000 $'a ulaşmadan ödeme yapmaz; bir ödeme birden fazla dönemi kapsayabilir.
+//
+// Ozon bir ayın raporunu ay kapanmadan vermez; ay içinde gelen paranın dekontu önce yalnızca
+// banka alanlarıyla kaydedilir (Ozon alanları boş), rapor gelince tarihi yakın satırla birleşir.
+model OzonPayout {
+  id                  String    @id @default(cuid())
+  storeId             String    @default("store1")
+  // Ödeme belgesinin numarası, ör. "20260921"
+  ozonDocNo           String?
+  paidAt              DateTime? @db.Date
+  amountRub           Float?
+
+  // Banka dekontu
+  receivedTry         Float?
+  receivedAt          DateTime? @db.Date
+  // Dekont açıklamasındaki dönem referansı, ör. "Rep.20260901"
+  bankReference       String?
+  receiptUrl          String?
+  receiptName         String?
+  receiptContentType  String?
+  receiptSize         Int?
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@unique([storeId, ozonDocNo])
+  @@index([storeId, paidAt])
+}
+
+// Hangi ayın mutabakat raporunun en son ne zaman çekildiği. Biten aylar bir kez,
+// içinde bulunulan ay ve bir önceki ay birkaç saatte bir yeniden çekilir.
+model OzonPayoutSync {
+  id       String   @id @default(cuid())
+  storeId  String
+  month    String   // YYYY-MM
+  syncedAt DateTime
+
+  @@unique([storeId, month])
+}
+
 // Fiyat endeksi geçmişi. Ozon yalnızca anlık endeksi veriyor; renk değişimini ve sebebini
 // (biz mi, rakip mi, Ozon'un yeniden hesabı mı) görmek için durum kaydedilir.
 //

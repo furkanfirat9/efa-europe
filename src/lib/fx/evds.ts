@@ -18,9 +18,10 @@ const SERIES: Record<string, { code: string; source: string }> = {
   EUR: { code: 'TP.DK.EUR.A', source: 'TCMB döviz alış' },
   USD: { code: 'TP.DK.USD.A', source: 'TCMB döviz alış' },
   PLN: { code: 'TP.DK.PLN', source: 'TCMB bilgi amaçlı kur' },
+  RUB: { code: 'TP.DK.RUB.A', source: 'TCMB döviz alış' },
 };
 
-export const SUPPORTED_CURRENCIES = ['EUR', 'USD', 'PLN', 'TRY'] as const;
+export const SUPPORTED_CURRENCIES = ['EUR', 'USD', 'PLN', 'RUB', 'TRY'] as const;
 
 export interface FxResult {
   rate: number;

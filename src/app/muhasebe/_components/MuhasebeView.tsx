@@ -1,16 +1,13 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { DollarSign, FileText, Package, Receipt, RefreshCw, TrendingUp } from 'lucide-react';
+import { FileText, Package, Receipt, RefreshCw, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEuropeAccounting } from '@/hooks/useEuropeAccounting';
 import { formatTL, formatUSD } from '@/lib/format';
 import { Button } from '@/components/shadcn/button';
-import { Badge } from '@/components/shadcn/badge';
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/shadcn/card';
-import { Separator } from '@/components/shadcn/separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shadcn/card';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select';
 import {
@@ -22,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/shadcn/table';
+import { PartnerLedgerCard } from './PartnerLedgerCard';
 
 const compactTL = new Intl.NumberFormat('tr-TR', { notation: 'compact', maximumFractionDigits: 1 });
 
@@ -41,25 +39,12 @@ export function MuhasebeView() {
   ];
 
   const taxRows = [
-    { item: 'Fatura tutarı', note: 'Brüt hasılat', rate: '—', amount: d.invoiceTotalTry },
-    { item: 'Toplam giderler', note: "Belgeler'deki onaylı faturalar", rate: '—', amount: -d.totalExpenses },
+    { item: 'Satış faturaları', note: 'Belgeler → Satış faturaları', rate: '—', amount: d.invoiceTotalTry },
+    { item: 'Toplam giderler', note: "Belgeler'deki onaylı faturalar + kambiyo zararı", rate: '—', amount: -d.totalExpenses },
     { item: 'Net ticari kâr', note: 'Hasılat − giderler', rate: '—', amount: d.commercialProfit },
     { item: 'Kazanç istisnası', note: 'KVK 10/1-i', rate: '%95', amount: -d.exemptAmount95 },
     { item: 'Vergi matrahı', note: 'Vergilendirilen kısım', rate: '%5', amount: d.taxableBase5 },
     { item: 'Kurumlar vergisi', note: 'Matrah üzerinden', rate: '%25', amount: -d.corporateTaxToPay },
-  ];
-
-  const invoiceRows = [
-    { label: 'Fatura türü', value: 'İstisna faturası', badge: 'e-Arşiv' },
-    { label: 'İstisna kodu', value: '351 · Transit ticaret' },
-    { label: 'KDV', value: '₺0,00 (%0)', badge: 'Muaf' },
-    { label: 'Alıcı', value: 'Yurt dışı · Ozon Avrupa' },
-    {
-      label: 'TCMB döviz alış',
-      value: d.rateLoading ? '…' : `${d.tcmbUsdRate.toFixed(4)} ₺`,
-      badge: d.activeMonth.isCurrent ? 'Canlı' : 'Kapanış',
-    },
-    { label: 'Fatura tarihi', value: d.activeMonth.invoiceDate },
   ];
 
   return (
@@ -69,7 +54,7 @@ export function MuhasebeView() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Muhasebe</h1>
           <p className="text-muted-foreground">
-            Avrupa mağazası · {d.activeMonth.label} istisna faturası ve kurumlar vergisi
+            Avrupa mağazası · {d.activeMonth.label} satış faturaları ve kurumlar vergisi
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -105,31 +90,42 @@ export function MuhasebeView() {
 
       {/* Özet kartları */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* Hasılat, kesilmiş satış faturalarından: her fatura kendi günündeki kurla. */}
         <Card className="gap-2">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardDescription className="font-medium text-foreground">Kesilecek fatura</CardDescription>
+            <CardDescription className="font-medium text-foreground">Satış hasılatı</CardDescription>
             <Receipt className="size-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-1">
             <div className="text-2xl font-bold tabular-nums">
-              {d.ordersLoading || d.rateLoading ? <Loading /> : formatTL(d.invoiceTotalTry, true)}
+              {d.salesLoading ? <Loading /> : formatTL(d.invoiceTotalTry, true)}
             </div>
             <p className="text-xs text-muted-foreground tabular-nums">
-              {formatUSD(d.totalRevenueUsd)} × {d.tcmbUsdRate.toFixed(4)} ₺
+              {d.sales.count} fatura · {formatUSD(d.sales.totalUsd)}
             </p>
+            {!d.salesLoading && d.sales.missingFx > 0 && (
+              <Link
+                href={`/belgeler?sekme=satis&year=${d.activeMonth.year}&month=${d.activeMonth.month}`}
+                className="block text-xs font-medium underline-offset-4 hover:underline"
+              >
+                {d.sales.missingFx} faturanın kuru yok, toplama girmedi
+              </Link>
+            )}
           </CardContent>
         </Card>
 
         <Card className="gap-2">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardDescription className="font-medium text-foreground">Döviz hasılatı</CardDescription>
-            <DollarSign className="size-4 text-muted-foreground" />
+            <CardDescription className="font-medium text-foreground">Fatura bekleyen</CardDescription>
+            <FileText className="size-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-1">
             <div className="text-2xl font-bold tabular-nums">
-              {d.ordersLoading ? <Loading /> : formatUSD(d.totalRevenueUsd)}
+              {d.pendingLoading ? <Loading /> : `${d.pending.count} sipariş`}
             </div>
-            <p className="text-xs text-muted-foreground">{d.totalOrdersCount} sipariş · Avrupa teslimatları</p>
+            <p className="text-xs text-muted-foreground tabular-nums">
+              {formatUSD(d.pending.totalUsd)} · hasılata girmedi
+            </p>
           </CardContent>
         </Card>
 
@@ -141,11 +137,11 @@ export function MuhasebeView() {
           </CardHeader>
           <CardContent className="space-y-1">
             <div className="text-2xl font-bold tabular-nums">
-              {d.expensesLoading ? <Loading /> : formatTL(d.expenses.total, true)}
+              {d.expensesLoading ? <Loading /> : formatTL(d.totalExpenses, true)}
             </div>
             <p className="text-xs text-muted-foreground tabular-nums">
               {d.expenses.documentCount} belge · mal alımı {formatTL(d.expenses.goods, true)} · Ozon{' '}
-              {formatTL(d.expenses.ozon, true)}
+              {formatTL(d.expenses.ozon, true)} · kambiyo {formatTL(d.fxLoss.total, true)}
             </p>
             {!d.expensesLoading && d.expenses.pendingCount > 0 && (
               <Link href="/belgeler" className="block text-xs font-medium underline-offset-4 hover:underline">
@@ -214,37 +210,7 @@ export function MuhasebeView() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Fatura bilgileri</CardTitle>
-            <CardDescription>Muhasebeciye iletilecek alanlar</CardDescription>
-            <CardAction>
-              <Badge variant="secondary">Transit ticaret</Badge>
-            </CardAction>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {invoiceRows.map((r, i) => (
-                <React.Fragment key={r.label}>
-                  {i > 0 && <Separator />}
-                  <div className="flex items-center justify-between gap-4 text-sm">
-                    <span className="text-muted-foreground">{r.label}</span>
-                    <span className="flex items-center gap-2 text-right font-medium tabular-nums">
-                      {r.value}
-                      {r.badge && <Badge variant="outline">{r.badge}</Badge>}
-                    </span>
-                  </div>
-                </React.Fragment>
-              ))}
-            </div>
-          </CardContent>
-          <CardFooter className="mt-auto">
-            <div className="flex gap-3 rounded-lg border bg-muted/50 p-3 text-sm text-muted-foreground">
-              <FileText className="mt-0.5 size-4 shrink-0" />
-              Türkiye gümrük bölgesine girmeden alınıp yurt dışına teslim edilen mallar KDV’den istisnadır.
-            </div>
-          </CardFooter>
-        </Card>
+        <PartnerLedgerCard fxLoss={d.fxLoss} fxLossLoading={d.fxLossLoading} monthLabel={d.activeMonth.label} />
       </div>
 
       {/* Vergi tablosu */}

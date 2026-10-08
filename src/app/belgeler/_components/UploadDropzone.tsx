@@ -12,7 +12,7 @@ export function UploadDropzone({
   onFiles,
   onDismiss,
   accept = DOC_ACCEPT,
-  hint = 'PDF veya görsel, dosya başına en fazla 4 MB. Bilgiler otomatik okunur, onayınızdan sonra kaydedilir.',
+  hint = 'PDF, görsel veya Excel (.xlsx), dosya başına en fazla 4 MB. Bilgiler otomatik okunur, onayınızdan sonra kaydedilir.',
 }: {
   uploads: UploadItem[];
   onFiles: (files: File[]) => void;
@@ -51,7 +51,7 @@ export function UploadDropzone({
         )}
       >
         <FileUp className="size-6 text-muted-foreground" />
-        <div className="text-sm font-medium">Faturaları sürükleyip bırakın ya da seçin</div>
+        <div className="text-sm font-medium">Fatura ve Ozon gider belgelerini sürükleyip bırakın ya da seçin</div>
         <p className="text-xs text-muted-foreground">{hint}</p>
         <input
           ref={inputRef}

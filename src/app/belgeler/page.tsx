@@ -14,11 +14,14 @@ import { useSalesInvoices } from './useSalesInvoices';
 import { DocumentKpiCards } from './_components/DocumentKpiCards';
 import { DocumentsTable } from './_components/DocumentsTable';
 import { DocumentSheet } from './_components/DocumentSheet';
+import { OzonPayoutsTab } from './_components/OzonPayoutsTab';
 import { SalesInvoicesTab } from './_components/SalesInvoicesTab';
 import { UploadDropzone } from './_components/UploadDropzone';
 import { formatAmount, formatIsoDate, MONTHS, YEARS } from './utils';
 
-type Tab = 'gider' | 'satis';
+type Tab = 'gider' | 'satis' | 'ozon';
+
+const tabFromParam = (value: string | null): Tab => (value === 'satis' || value === 'ozon' ? value : 'gider');
 
 /** Adresteki ?year=&month= geçerliyse onu, değilse içinde bulunulan ayı verir. */
 function monthFromUrl(params: URLSearchParams) {
@@ -42,13 +45,13 @@ function BelgelerContent() {
   // Açık sekme ve seçili ay adreste tutulur (?sekme=satis&year=2026&month=8); sayfa
   // yenilenince aynı yerde kalınır. İçinde bulunulan ay adrese yazılmaz.
   const searchParams = useSearchParams();
-  const [tab, setTab] = useState<Tab>(searchParams.get('sekme') === 'satis' ? 'satis' : 'gider');
+  const [tab, setTab] = useState<Tab>(tabFromParam(searchParams.get('sekme')));
   const [initialMonth] = useState(() => monthFromUrl(searchParams));
 
   const changeTab = (value: string) => {
-    const next: Tab = value === 'satis' ? 'satis' : 'gider';
+    const next = tabFromParam(value);
     setTab(next);
-    updateUrl((params) => (next === 'satis' ? params.set('sekme', 'satis') : params.delete('sekme')));
+    updateUrl((params) => (next === 'gider' ? params.delete('sekme') : params.set('sekme', next)));
   };
 
   const {
@@ -97,9 +100,10 @@ function BelgelerContent() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Belgeler</h1>
-          <p className="text-muted-foreground">Alış, gider ve satış faturaları; TL karşılıklarıyla.</p>
+          <p className="text-muted-foreground">Alış, gider ve satış faturaları, Ozon ödemeleri; TL karşılıklarıyla.</p>
         </div>
-        <div className="flex items-center gap-2">
+        {/* Ozon ödemeleri aya bağlı değil; ay seçimi o sekmede gizlenir. */}
+        <div className={tab === 'ozon' ? 'hidden' : 'flex items-center gap-2'}>
           <Select value={String(year)} onValueChange={(v) => setYear(Number(v))}>
             <SelectTrigger className="w-24" aria-label="Yıl">
               <SelectValue />
@@ -131,7 +135,12 @@ function BelgelerContent() {
         <TabsList>
           <TabsTrigger value="gider">Alış / Gider</TabsTrigger>
           <TabsTrigger value="satis">Satış faturaları</TabsTrigger>
+          <TabsTrigger value="ozon">Ozon ödemeleri</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="ozon">
+          <OzonPayoutsTab />
+        </TabsContent>
 
         <TabsContent value="satis">
           <SalesInvoicesTab sales={sales} />

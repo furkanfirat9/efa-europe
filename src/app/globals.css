@@ -5,6 +5,36 @@
    sınıfına bağlanır. Uygulamada koyu mod yok; bu sınıf hiçbir yerde kullanılmaz. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Sol menü: geniş ekranda kullanıcı açık bırakmışsa (data-sidebar="expanded")
+   etiketler görünür; kapatılınca ya da dar ekranda yalnız ikonlar kalır. */
+@custom-variant sb-wide {
+  @media (width >= 64rem) {
+    &:where([data-sidebar="expanded"], [data-sidebar="expanded"] *) {
+      @slot;
+    }
+  }
+}
+@custom-variant sb-narrow {
+  @media (width >= 64rem) {
+    &:where([data-sidebar="collapsed"], [data-sidebar="collapsed"] *) {
+      @slot;
+    }
+  }
+}
+
+/* Sol menü ilk yüklenirken kayıtlı açık/kapalı durumu animasyonsuz uygulanır;
+   hareketi azaltmayı seçen kullanıcıda kayma hiç oynatılmaz. */
+[data-sidebar-static],
+[data-sidebar-static] * {
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-sidebar],
+  [data-sidebar] * {
+    transition: none !important;
+  }
+}
+
 /* Sabit değerler: kökte bir kez tanımlanır. */
 @theme {
   --color-canvas: #0a0b0d;

@@ -50,8 +50,9 @@ export function documentCategoryLabel(doc: DocumentItem): string {
   return 'Kategorisiz';
 }
 
-export const DOC_ACCEPT = '.pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp';
-export const CURRENCIES = ['EUR', 'PLN', 'USD', 'TRY'] as const;
+export const DOC_ACCEPT =
+  '.pdf,.png,.jpg,.jpeg,.webp,.xlsx,.xls,application/pdf,image/png,image/jpeg,image/webp,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel';
+export const CURRENCIES = ['EUR', 'PLN', 'USD', 'RUB', 'TRY'] as const;
 
 const amountFormatters = new Map<string, Intl.NumberFormat>();
 

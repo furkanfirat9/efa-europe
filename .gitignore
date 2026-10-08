@@ -38,3 +38,9 @@ scratch_amazon.html
 
 # tedarik taraması çıktıları (scripts/supply_scan.mjs)
 /data/supply-scans/
+
+# Kapak şablonu arama taslağındaki rakip kapakları (yalnız yerel; telif rakiplerin)
+/public/kapak-ornek/
+
+# Ozon görsel çerçeveleme çıktıları (yüzlerce MB jpg)
+/data/ozon-gorseller/

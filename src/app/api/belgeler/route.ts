@@ -27,6 +27,8 @@ const TYPE_BY_EXTENSION: Record<string, string> = {
   jpg: 'image/jpeg',
   jpeg: 'image/jpeg',
   webp: 'image/webp',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  xls: 'application/vnd.ms-excel',
 };
 const ALLOWED_TYPES = new Set(Object.values(TYPE_BY_EXTENSION));
 
@@ -114,7 +116,7 @@ export async function POST(request: NextRequest) {
     if (!(file instanceof File) || file.size === 0) return fail(400, 'Dosya bulunamadı.');
     if (file.size > MAX_BYTES) return fail(413, 'Dosya 4 MB sınırını aşıyor.');
     const contentType = resolveType(file);
-    if (!ALLOWED_TYPES.has(contentType)) return fail(415, 'Yalnızca PDF veya görsel (PNG, JPG, WEBP) yüklenebilir.');
+    if (!ALLOWED_TYPES.has(contentType)) return fail(415, 'Yalnızca PDF, görsel (PNG, JPG, WEBP) veya Excel (.xlsx) yüklenebilir.');
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const fileHash = createHash('sha256').update(buffer).digest('hex');
@@ -132,7 +134,12 @@ export async function POST(request: NextRequest) {
     let aiModel: string | null = null;
     const extraWarnings: string[] = [];
     try {
-      const result = await extractDocument({ base64: buffer.toString('base64'), mimeType: contentType });
+      const result = await extractDocument({
+        buffer,
+        base64: buffer.toString('base64'),
+        mimeType: contentType,
+        fileName: file.name,
+      });
       extracted = result.data;
       aiModel = result.model;
     } catch (err: any) {

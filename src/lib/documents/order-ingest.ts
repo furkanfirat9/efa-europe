@@ -132,7 +132,12 @@ export async function ingestOrderDocument(
   let aiModel: string | null = null;
   const extraWarnings: string[] = [];
   try {
-    const result = await extractDocument({ base64: buffer.toString('base64'), mimeType: contentType });
+    const result = await extractDocument({
+      buffer,
+      base64: buffer.toString('base64'),
+      mimeType: contentType,
+      fileName: order.documentName ?? undefined,
+    });
     extracted = result.data;
     aiModel = result.model;
   } catch (err) {
