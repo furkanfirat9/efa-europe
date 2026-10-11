@@ -4,15 +4,19 @@ import { calculateFulfillmentCosts, calculateShippingCosts } from '@/lib/calcula
  * Otomatik fiyatlandırma kuralları (kullanıcıyla 2026-09-26'da kararlaştırıldı).
  *
  * Satılmamış ürün için ileriye dönük hesap: "bu ürün P $'dan satılırsa ne kalır?"
- *   net kâr = P − P × (komisyon + acquiring) − depoya gelmiş maliyet − Ozon kargosu − depo ücreti
+ *   net kâr = P − P × (komisyon + acquiring + aracılık) − min(P × platform, 200 ₽)
+ *             − depoya gelmiş maliyet (banka kur farkıyla) − Ozon kargosu − depo ücreti
  *   marj    = net kâr ÷ depoya gelmiş maliyet   (satıştan değil, bağlanan sermayeden)
  *
- * Fiyat kararı, en ucuz Ozon rakibine göre:
- *   rakip − 11 ₽ (tam dolara aşağı) asgari kârı sağlıyorsa → o fiyat
- *   sağlamıyorsa                                        → %25 marj fiyatı
- *   rakip yoksa                                           → %35 marj fiyatı
+ * Fiyat kararı, en ucuz Ozon rakibine göre (kullanıcı, 2026-10-11; bütün ürünler):
+ *   rakip − 11 ₽ (tam dolara aşağı) %20 marjı aşıyorsa      → %20 marj fiyatı (rakip çok pahalı diye fiyat şişmez)
+ *   %10 marj ile %20 arasındaysa (en az 5 $ kâr)             → rakip − 11 ₽ (rakibi yeneriz)
+ *   %10'un altında kalıyorsa (rakibi kârla yenemiyoruz)      → %15 marj fiyatı (fiyat yarışına girilmez)
+ *   rakip yoksa                                              → %20 marj fiyatı
  *   rakip Amazon'un KDV hariç fiyatının altındaysa → yok sayılır (kullanıcı: genelde Çinli satıcı, sahte ürün;
  *   orijinali bu fiyatın altına satmak mümkün değil)
+ * Eskiden (2026-09-26 – 10-11): rakibe asgari %8 kâra kadar inilir, inilemezse %25, rakipsiz %35; rakip pahalıysa
+ * sınırsız yaklaşılırdı (MMB6652B: rakip 674 $, %25 fiyatı 377 $).
  */
 export const PRICING = {
   /** 'gross' = Amazon KDV dahil fiyatı; Polonya KDV kaydı bitince 'net' (doğrudan KDV hariç tedarik). */
@@ -22,15 +26,31 @@ export const PRICING = {
   amazonShippingEur: 5.99,
   /** amazon.pl yalnız KDV dahil fiyat gösteriyor (hesap orada Business değil); KDV hariç = fiyat ÷ 1,23 */
   plVatRate: 0.23,
-  /** Amazon ağırlığına kutu/dolgu payı. */
+  /** Kartın TL'den çektiği tutar ECB kurunun bu kadar üstünde (2026-10-10 ölçümü: %2,0 / %4,1 / %4,9; kullanıcı
+   *  ortalamaya yakın %3,5'i seçti). Alışa ve depoya kargoya eklenir; Ozon kargosu ve depo ücreti kartla ödenmiyor. */
+  bankFxPct: 0.035,
+  /** Amazon ağırlığına kutu/dolgu payı. LS'nin ölçtüğü ağırlık ürün ağırlığından çoğunlukla 150–275 g fazla, ürünün
+   *  ağırlığıyla oransal büyümüyor (2026-10-10, 9 gönderi); alt sınır bu yüzden 150 g'dan 250 g'a çıktı. */
   packagingPct: 0.1,
-  packagingMinG: 150,
+  packagingMinG: 250,
+  /** Kutulu ağırlığa (Amazon / Icecat) LS'nin dış paketi: JF4031E0 Icecat kutusu 2 280 g, LS 2 540 g ölçtü. */
+  boxPadG: 250,
+  /** Gerçek kargo ağırlığı tahminin bu katını aşıyorsa ölçüm hatası sayılır
+   *  (HX6064/87: 4 fırça başlığı 1,42 kg ölçüldü, LS'ye soruldu). */
+  realWeightMaxRatio: 3,
   /** Amazon ağırlığı bunun altındaysa anlamsız sayılır ("1 g" gibi). */
   minPlausibleWeightG: 50,
-  targetMargin: 0.25,
-  noRivalMargin: 0.35,
-  /** Asgari net kâr: maliyetin %8'i, en az 5 $. */
-  minProfitPct: 0.08,
+  /** Ozon kartının paketli ağırlığı bunun altındaysa ürün gerçekten hafiftir (başlık, bıçak, ampul): 50 g altı ağırlıklar
+   *  da kabul edilir (2026-10-11, kullanıcı; 18 ürünün kârı hesaplanamıyordu). */
+  smallItemMaxCardG: 250,
+  /** Marj üst sınırı: rakip ne kadar pahalı olursa olsun fiyat bu marjı aşmaz; rakipsiz ürün de bu marjla satılır. */
+  targetMargin: 0.2,
+  noRivalMargin: 0.2,
+  /** Rakibi kârla yenemediğimizde (rakip − 11 ₽ asgari kârın altında) kalınan marj. */
+  noBeatMargin: 0.15,
+  /** Asgari net kâr (rakibi yenerken inilebilecek en alt): maliyetin %10'u, en az 5 $ (30 $'lık üründe %10 kargo ve
+   *  kur oynamasında zarara döner). Eskiden %8. */
+  minProfitPct: 0.1,
   minProfitUsd: 5,
   undercutRub: 11,
   /** Bizim 1 $'ımızın vitrindeki yeşil (Ozon Bank) ruble karşılığı ÷ Ozon'un rakip fiyatını çevirdiği kur.
@@ -45,25 +65,71 @@ export const PRICING = {
    *  endeks iki haneye yuvarlandığı için ölçüm ±0,005 oynuyor). */
   noFactorThreshold: 0.987,
   oldPriceMultiplier: 1.2,
-  /** Fiyat hem Amazon KDV dahil fiyatının 2,5 katını hem %25 marj fiyatının 1,5 katını aşarsa otomatik
-   *  değiştirilmez (ucuz üründe kargo fiyatı doğal olarak Amazon'un birkaç katına çıkarır). */
-  sanityMultiple: 2.5,
-  sanityTargetMultiple: 1.5,
-  /** Ozon acquiring'i vermezse */
-  defaultAcquiringPct: 0.01,
+  /** Acquiring ödeme yöntemine göre değişiyor: Ozon Bank %1,90, banka kartı %1,16, СБП %0,49. Ozon'un ürün başına
+   *  verdiği oran (~%1) bunu yansıtmıyor; 10 siparişin ortalaması %1,54 → kullanıcı %1,5'i seçti (2026-10-10). */
+  acquiringPct: 0.015,
 } as const;
 
-export type WeightSource = 'amazon-package' | 'amazon-item' | 'ozon-card' | 'none';
+/** Ozon'un satış fiyatından kestiği, ürüne göre değişmeyen kalemler (sipariş kârı ve fiyat önerisi ortak kullanır). */
+export const OZON_GLOBAL_FEES = {
+  /** Ozon komisyonu tahakkuk etmeden finansal veride oran yoksa */
+  defaultCommissionPct: 0.05,
+  /** "Электронная услуга подключения к логистической Платформе Ozon" (tahakkuk tipi 123), gönderi başına en fazla 200 ₽ */
+  platformPct: 0.02,
+  platformCapRub: 200,
+  /** "Услуги по заключению договора на организацию международной перевозки" (tahakkuk tipi 122);
+   *  tek tahakkuktan çıkarıldı: 42703766-0246-1'de 21,82 ₽ = 6.613 ₽ × %0,33 */
+  intermediaryPct: 0.0033,
+  /** Ozon satıcının dolar fiyatını CBR USD kurunun bu katıyla rubleye çeviriyor (6.613 ₽ ÷ 76 $ = 87,013; CBR 86,5857) */
+  saleRateFactor: 1.005,
+} as const;
 
-/** Kargo fiziksel ağırlıktan: Amazon kutulu ağırlığı > Amazon ürün ağırlığı + paket payı > Ozon kartı. */
-export function shippingWeight(amzItemG: number | null, amzPackageG: number | null, ozonCardG: number | null) {
+/** Platform hizmetinin 200 ₽ tavanı dolar olarak (Ozon'un satıcı kuru CBR USD × 1,005); kur yoksa null = tavansız */
+export const platformCapUsdFor = (cbrUsd: number | null | undefined) =>
+  cbrUsd ? OZON_GLOBAL_FEES.platformCapRub / (cbrUsd * OZON_GLOBAL_FEES.saleRateFactor) : null;
+
+export type WeightSource ='ozon-real' | 'amazon-package' | 'icecat-package' | 'amazon-item' | 'ozon-card' | 'small-item' | 'none';
+
+export interface WeightInput {
+  amzItemG?: number | null;
+  amzPackageG?: number | null;
+  /** Icecat kutulu ağırlığı (ProductSource.icecatPackageWeightG) */
+  icecatPackageG?: number | null;
+  ozonCardG?: number | null;
+  /** Ozon'un teslim edilmiş siparişte kestiği kargo kademesinden (kademe × 500 g) */
+  realG?: number | null;
+}
+
+/**
+ * Kargo ağırlığı: ürün daha önce gönderildiyse Ozon'un kestiği kargo kademesinden (`realG`), yoksa tahmin.
+ * Tahmin: Amazon kutulu ağırlığı > Icecat kutulu ağırlığı (+ LS dış paketi) > Amazon ürün ağırlığı + paket payı > Ozon kartı.
+ */
+export function shippingWeight({ amzItemG = null, amzPackageG = null, icecatPackageG = null, ozonCardG = null, realG = null }: WeightInput) {
+  const est = estimatedWeight(amzItemG, amzPackageG, icecatPackageG, ozonCardG);
+  if (realG && (!est.grams || realG <= est.grams * PRICING.realWeightMaxRatio)) {
+    return { grams: realG, source: 'ozon-real' as WeightSource, check: false };
+  }
+  return est;
+}
+
+function estimatedWeight(amzItemG: number | null, amzPackageG: number | null, icecatPackageG: number | null, ozonCardG: number | null) {
   const ok = (g: number | null): g is number => g != null && g >= PRICING.minPlausibleWeightG;
-  if (ok(amzPackageG)) return { grams: amzPackageG, source: 'amazon-package' as WeightSource, check: false };
+  if (ok(amzPackageG)) return { grams: amzPackageG + PRICING.boxPadG, source: 'amazon-package' as WeightSource, check: false };
+  // Icecat'te kutunun üründen hafif yazıldığı kayıtlar var (HD2350/80: ürün 2 400 g, kutu 643 g); onlar yok sayılır
+  if (ok(icecatPackageG) && !(ok(amzItemG) && icecatPackageG < amzItemG)) {
+    return { grams: icecatPackageG + PRICING.boxPadG, source: 'icecat-package' as WeightSource, check: false };
+  }
   if (ok(amzItemG)) {
     const pack = Math.max(amzItemG * PRICING.packagingPct, PRICING.packagingMinG);
     return { grams: Math.round(amzItemG + pack), source: 'amazon-item' as WeightSource, check: false };
   }
   if (ok(ozonCardG)) return { grams: ozonCardG, source: 'ozon-card' as WeightSource, check: true };
+  // Çok hafif ürün (7–48 g): kart da küçük diyorsa 50 g altı ağırlık gerçektir. Büyük üründe Amazon'un yanlış "1 g"si
+  // kart ağır olduğu için buraya gelmez, yukarıda kart ağırlığı kullanılır.
+  const small = [amzPackageG, icecatPackageG, amzItemG, ozonCardG].filter((g): g is number => g != null && g > 0);
+  if (small.length && ozonCardG != null && ozonCardG > 0 && ozonCardG < PRICING.smallItemMaxCardG) {
+    return { grams: Math.max(...small) + PRICING.packagingMinG, source: 'small-item' as WeightSource, check: false };
+  }
   return { grams: 0, source: 'none' as WeightSource, check: true };
 }
 
@@ -74,8 +140,12 @@ export interface CostInput {
   shippingEur: number;
   weightG: number;
   eurUsd: number;
-  /** Satıştan kesilen oranlar toplamı (komisyon + acquiring), ör. 0.06 */
+  /** Satıştan tavansız kesilen oranlar toplamı (komisyon + acquiring + aracılık), ör. 0.068 */
   feePct: number;
+  /** Platform hizmeti oranı; gönderi başına platformCapUsd ile sınırlı */
+  platformPct: number;
+  /** Platform hizmetinin tavanı (200 ₽, $); kur bilinmiyorsa null = tavansız */
+  platformCapUsd: number | null;
 }
 
 export interface CostBase {
@@ -85,26 +155,55 @@ export interface CostBase {
   /** Satıştan bağımsız giderler toplamı */
   fixedUsd: number;
   feePct: number;
+  platformPct: number;
+  platformCapUsd: number | null;
 }
 
-export function costBase({ purchaseEur, shippingEur, weightG, eurUsd, feePct }: CostInput): CostBase {
-  const landedUsd = (purchaseEur + shippingEur) * eurUsd;
+export function costBase({ purchaseEur, shippingEur, weightG, eurUsd, feePct, platformPct, platformCapUsd }: CostInput): CostBase {
+  const landedUsd = (purchaseEur + shippingEur) * eurUsd * (1 + PRICING.bankFxPct);
   const ozonShippingUsd = calculateShippingCosts(weightG).totalShipping * eurUsd;
   const depotUsd = calculateFulfillmentCosts(weightG).totalFulfillment * eurUsd;
-  return { landedUsd, ozonShippingUsd, depotUsd, fixedUsd: landedUsd + ozonShippingUsd + depotUsd, feePct };
+  return {
+    landedUsd,
+    ozonShippingUsd,
+    depotUsd,
+    fixedUsd: landedUsd + ozonShippingUsd + depotUsd,
+    feePct,
+    platformPct,
+    platformCapUsd,
+  };
+}
+
+/** Bu fiyattan satışta Ozon'un satış fiyatı üzerinden kestiği toplam */
+function salesFees(price: number, c: CostBase) {
+  const platform = price * c.platformPct;
+  return price * c.feePct + (c.platformCapUsd == null ? platform : Math.min(platform, c.platformCapUsd));
 }
 
 export function profitAt(price: number, c: CostBase) {
-  const profit = price * (1 - c.feePct) - c.fixedUsd;
+  const profit = price - salesFees(price, c) - c.fixedUsd;
   return { profit, margin: c.landedUsd > 0 ? profit / c.landedUsd : 0 };
 }
 
 /** Bu net kârı bırakan en düşük tam dolar fiyat. */
 export function priceForProfit(profitUsd: number, c: CostBase) {
-  return Math.ceil((c.fixedUsd + profitUsd) / (1 - c.feePct));
+  const need = c.fixedUsd + profitUsd;
+  const uncapped = need / (1 - c.feePct - c.platformPct);
+  const capped = c.platformCapUsd != null && uncapped * c.platformPct > c.platformCapUsd;
+  return Math.ceil(capped ? (need + c.platformCapUsd!) / (1 - c.feePct) : uncapped);
 }
 
 export const minProfitUsd = (landedUsd: number) => Math.max(landedUsd * PRICING.minProfitPct, PRICING.minProfitUsd);
+
+/** Asgari kâr (%10, en az 5 $), rakibi yenemeyince %15, üst sınır %20 ve rakipsiz (%20) fiyatlar; hiçbiri tabanın altına inmez. */
+export function marginPrices(c: CostBase) {
+  const floorPrice = priceForProfit(minProfitUsd(c.landedUsd), c);
+  // Ucuz üründe marj kârı "en az 5 $" tabanının altında kalabiliyor (1871016030: 35 $ < 37 $)
+  const targetPrice = Math.max(priceForProfit(c.landedUsd * PRICING.targetMargin, c), floorPrice);
+  const noRivalPrice = Math.max(priceForProfit(c.landedUsd * PRICING.noRivalMargin, c), floorPrice);
+  const noBeatPrice = Math.max(priceForProfit(c.landedUsd * PRICING.noBeatMargin, c), floorPrice);
+  return { floorPrice, targetPrice, noRivalPrice, noBeatPrice };
+}
 
 /**
  * Ozon'un bu ürünün endeksinde kullandığı oran: endeks ÷ (bizim fiyat ÷ rakip $).
@@ -117,7 +216,9 @@ export function storefrontFactorFor(indexValue: number | null | undefined, custo
   return measured >= PRICING.noFactorThreshold ? 1 : PRICING.storefrontRateFactor;
 }
 
-export type PriceRule ='rival' | 'target' | 'no-rival' | 'fake-rival' | 'check';
+/** rival: rakibin 11 ₽ altı · rival-cap: rakip pahalı, %20'de duruldu · no-beat: rakibi kârla yenemiyoruz, %15 ·
+ *  no-rival / fake-rival: %20 · check: eski kural (artık üretilmiyor; kayıtlı eski önerilerde görünebilir) */
+export type PriceRule ='rival' | 'rival-cap' | 'no-beat' | 'no-rival' | 'fake-rival' | 'check';
 
 export interface PriceDecision {
   price: number;
@@ -134,20 +235,16 @@ export interface PriceDecision {
  * @param rivalUsd  en ucuz Ozon rakibi, satıcı para biriminde (USD)
  * @param netPurchaseUsd seçilen kanalın KDV hariç fiyatı; rakip bunun altındaysa sahte sayılır
  * @param rubPerUsd rakibin ruble fiyatı ÷ dolar fiyatı (Ozon'un kendi çevrimi)
- * @param amazonGrossUsd seçilen kanalın KDV dahil fiyatı; rakipsiz fiyatın "abartılı mı" kontrolü için
  * @param storefrontFactor bu ürün için storefrontFactorFor sonucu
  */
 export function decidePrice(
   c: CostBase,
   rivalUsd: number | null,
   rubPerUsd: number | null,
-  amazonGrossUsd: number,
   netPurchaseUsd: number,
   storefrontFactor: number = PRICING.storefrontRateFactor
 ): PriceDecision {
-  const floorPrice = priceForProfit(minProfitUsd(c.landedUsd), c);
-  // Ucuz üründe %25 kâr "en az 5 $" tabanının altında kalabiliyor (1871016030: 35 $ < 37 $); fiyat tabanın altına inmez
-  const targetPrice = Math.max(priceForProfit(c.landedUsd * PRICING.targetMargin, c), floorPrice);
+  const { floorPrice, targetPrice, noRivalPrice: noRival, noBeatPrice } = marginPrices(c);
   const withOld = (price: number, rule: PriceRule, rivalTarget: number | null): PriceDecision => ({
     price,
     oldPrice: Math.round(price * PRICING.oldPriceMultiplier),
@@ -158,20 +255,20 @@ export function decidePrice(
     rivalTarget,
   });
 
-  const noRival = Math.max(priceForProfit(c.landedUsd * PRICING.noRivalMargin, c), floorPrice);
-  const tooHigh = (price: number) => price > Math.max(amazonGrossUsd * PRICING.sanityMultiple, targetPrice * PRICING.sanityTargetMultiple);
-
   const fakeRival = !!rivalUsd && rivalUsd < netPurchaseUsd;
   if (rivalUsd && rivalUsd > 0 && rubPerUsd && rubPerUsd > 0 && !fakeRival) {
     // Müşterinin gördüğü rublede rakibin 11 ₽ altı: rakip ₽ = rivalUsd × rubPerUsd, bizim 1 $ vitrinde
     // rubPerUsd × storefrontFactor ₽. Ozon yalnız tam sayı USD kabul ediyor: aşağı yuvarlanır,
     // fark 11 ₽ ile ~1 $ (≈80 ₽) arasında kalır.
     const rivalTarget = Math.floor((rivalUsd - PRICING.undercutRub / rubPerUsd) / storefrontFactor);
-    if (rivalTarget < floorPrice) return withOld(targetPrice, 'target', rivalTarget);
-    // Ozon'un "en ucuz rakip" verisi bazen saçma (XV1473/00'da 611.074 $): rakibe eşitlemek fiyatı
-    // uçurur. Böyle durumda rakipsiz fiyat önerilir ve elle kontrole düşer.
-    return tooHigh(rivalTarget) ? withOld(noRival, 'check', rivalTarget) : withOld(rivalTarget, 'rival', rivalTarget);
+    // Rakip pahalı: ona yaklaşmak marjı %20'nin üstüne çıkarır → %20'de durulur. Ozon'un saçma rakip verisi de
+    // (XV1473/00'da 611.074 $) böylece fiyatı uçuramaz.
+    if (rivalTarget > targetPrice) return withOld(targetPrice, 'rival-cap', rivalTarget);
+    // Rakibi asgari kârla (%10, en az 5 $) yenebiliyoruz
+    if (rivalTarget >= floorPrice) return withOld(rivalTarget, 'rival', rivalTarget);
+    // Yenemiyoruz: fiyat yarışına girilmez, %15'te kalınır
+    return withOld(noBeatPrice, 'no-beat', rivalTarget);
   }
 
-  return withOld(noRival, tooHigh(noRival) ? 'check' : fakeRival ? 'fake-rival' : 'no-rival', null);
+  return withOld(noRival, fakeRival ? 'fake-rival' : 'no-rival', null);
 }

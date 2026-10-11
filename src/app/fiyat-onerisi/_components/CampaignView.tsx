@@ -21,6 +21,7 @@ import { Skeleton } from '@/components/shadcn/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table';
 import { Tabs, TabsList, TabsTrigger } from '@/components/shadcn/tabs';
 import { cn } from '@/lib/utils';
+import { ManualCheckView } from './ManualCheckView';
 
 const GROUPS: { key: ChangeGroup; label: string; hint: string; preselect: boolean; selectable: boolean }[] = [
   {
@@ -41,7 +42,7 @@ const GROUPS: { key: ChangeGroup; label: string; hint: string; preselect: boolea
   {
     key: 'check',
     label: 'Elle kontrol',
-    hint: 'Öneri abartılı görünüyor ya da Ozon tavanını aşıyor; buradan gönderilmez.',
+    hint: 'Otomatik gönderilmeyen ürünler. Bölümlere ayrıldı; her satırda yapılabilecek işlem var.',
     preselect: false,
     selectable: false,
   },
@@ -127,6 +128,7 @@ export function CampaignView() {
     add: picked.filter((c) => c.current == null).length,
   };
   const groupInfo = GROUPS.find((g) => g.key === group)!;
+  const losing = changes.filter((c) => c.checkKind === 'loss' && !c.keptAt).length;
   const allInGroup = rows.length > 0 && rows.every((c) => selected.has(c.productId));
 
   const toggle = (id: string, on: boolean) =>
@@ -205,6 +207,19 @@ export function CampaignView() {
         </Alert>
       )}
 
+      {losing > 0 && group !== 'check' && (
+        <Alert variant="destructive">
+          <AlertCircle />
+          <AlertTitle>{losing} ürün şu an zararına satıyor</AlertTitle>
+          <AlertDescription>
+            <span>Ozon fiyatı kâr edecek seviyeye çıkarmaya izin vermiyor; bunlar otomatik gönderilmez.</span>
+            <Button variant="outline" size="sm" className="mt-1" onClick={() => setGroup('check')}>
+              Elle kontrol'e git
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Tabs value={group} onValueChange={(v) => setGroup(v as ChangeGroup)}>
           <TabsList className="h-auto flex-wrap">
@@ -221,128 +236,132 @@ export function CampaignView() {
       </div>
       <p className="text-sm text-muted-foreground">{groupInfo.hint}</p>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-10">
-                {groupInfo.selectable && (
-                  <Checkbox
-                    checked={allInGroup}
-                    onCheckedChange={(v) => toggleGroup(v === true)}
-                    aria-label="Bu gruptakilerin hepsini seç"
-                  />
-                )}
-              </TableHead>
-              <TableHead>Ürün</TableHead>
-              <TableHead className="text-right">Kampanyada</TableHead>
-              <TableHead className="text-right">Gönderilecek</TableHead>
-              <TableHead className="text-right">Rakip</TableHead>
-              <TableHead className="text-right">Kâr</TableHead>
-              <TableHead>Neden</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.length === 0 ? (
+      {group === 'check' ? (
+        <ManualCheckView rows={rows} onChanged={load} />
+      ) : (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={7} className="h-20 text-center text-muted-foreground">
-                  Bu grupta ürün yok.
-                </TableCell>
+                <TableHead className="w-10">
+                  {groupInfo.selectable && (
+                    <Checkbox
+                      checked={allInGroup}
+                      onCheckedChange={(v) => toggleGroup(v === true)}
+                      aria-label="Bu gruptakilerin hepsini seç"
+                    />
+                  )}
+                </TableHead>
+                <TableHead>Ürün</TableHead>
+                <TableHead className="text-right">Kampanyada</TableHead>
+                <TableHead className="text-right">Gönderilecek</TableHead>
+                <TableHead className="text-right">Rakip</TableHead>
+                <TableHead className="text-right">Kâr</TableHead>
+                <TableHead>Neden</TableHead>
               </TableRow>
-            ) : (
-              rows.map((c) => {
-                const diff = c.current != null ? c.next - c.current : null;
-                return (
-                  <TableRow key={c.productId}>
-                    <TableCell>
-                      {groupInfo.selectable && (
-                        <Checkbox
-                          checked={selected.has(c.productId)}
-                          onCheckedChange={(v) => toggle(c.productId, v === true)}
-                          aria-label={`${c.offerId} seç`}
-                        />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Thumb src={c.image} alt={c.offerId} />
-                        <div className="min-w-0 max-w-64">
-                          <div className="truncate font-mono text-xs font-medium">{c.offerId}</div>
-                          <div className="truncate text-xs text-muted-foreground" title={c.name ?? ''}>
-                            {c.name}
+            </TableHeader>
+            <TableBody>
+              {rows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-20 text-center text-muted-foreground">
+                    Bu grupta ürün yok.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                rows.map((c) => {
+                  const diff = c.current != null ? c.next - c.current : null;
+                  return (
+                    <TableRow key={c.productId}>
+                      <TableCell>
+                        {groupInfo.selectable && (
+                          <Checkbox
+                            checked={selected.has(c.productId)}
+                            onCheckedChange={(v) => toggle(c.productId, v === true)}
+                            aria-label={`${c.offerId} seç`}
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Thumb src={c.image} alt={c.offerId} />
+                          <div className="min-w-0 max-w-64">
+                            <div className="truncate font-mono text-xs font-medium">{c.offerId}</div>
+                            <div className="truncate text-xs text-muted-foreground" title={c.name ?? ''}>
+                              {c.name}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">{usd(c.current)}</TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {c.group === 'check' ? (
-                        // Gönderilemez: fiyat yalnız bilgi olarak, tavan aşılıyorsa tavanla birlikte
-                        <>
-                          <div className="text-sm text-muted-foreground">gönderilemez</div>
-                          <div className="text-xs text-muted-foreground">öneri {usd(c.proposal)}</div>
-                          {c.maxAction != null && c.next > c.maxAction && (
-                            <div className="text-xs text-destructive">Ozon tavanı {usd(c.maxAction)}</div>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          <div className="font-medium">{usd(c.next)}</div>
-                          {diff != null && diff !== 0 && (
-                            <div className={cn('text-xs', diff < 0 ? 'text-emerald-600' : 'text-amber-600')}>
-                              {diff > 0 ? '+' : ''}
-                              {diff} $ ({((diff / c.current!) * 100).toFixed(1)}%)
-                            </div>
-                          )}
-                          {c.next !== c.proposal && <div className="text-xs text-muted-foreground">öneri {usd(c.proposal)}</div>}
-                        </>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {usd(c.rivalUsd)}
-                      {c.group !== 'check' && <Gap now={c.rivalGapRubNow} next={c.rivalGapRubNext} />}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {usd(c.group === 'check' || c.profitAtNext == null ? null : Math.round(c.profitAtNext * 100) / 100)}
-                      {c.floorPrice != null && <div className="text-xs text-muted-foreground">taban {usd(c.floorPrice)}</div>}
-                    </TableCell>
-                    <TableCell className="max-w-64 text-sm">
-                      {c.tag && (
-                        <Badge
-                          variant="outline"
-                          className={cn('mb-1 gap-1.5', TAGS[c.tag].urgent ? 'text-destructive' : 'text-emerald-600')}
-                        >
-                          <span className={cn('size-1.5 rounded-full', TAGS[c.tag].urgent ? 'bg-destructive' : 'bg-emerald-500')} />
-                          {TAGS[c.tag].label}
-                        </Badge>
-                      )}
-                      <div className="text-xs text-muted-foreground">{c.reason}</div>
-                      {c.atCeiling && (
-                        <Badge
-                          variant="outline"
-                          className="ml-1 text-amber-600"
-                          title="Öneri Ozon'un kampanya tavanını aşıyordu; kâr kaldığı için tavana çekildi"
-                        >
-                          Ozon tavanı
-                        </Badge>
-                      )}
-                      {c.lowBoost && c.group !== 'check' && (
-                        <Badge
-                          variant="outline"
-                          className="ml-1 text-amber-600"
-                          title={`Boost sınırı ${usd(c.maxElastic)}; fiyat üstünde kaldığı için boost %55'ten düşük olur`}
-                        >
-                          düşük boost
-                        </Badge>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">{usd(c.current)}</TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {c.group === 'check' ? (
+                          // Gönderilemez: fiyat yalnız bilgi olarak, tavan aşılıyorsa tavanla birlikte
+                          <>
+                            <div className="text-sm text-muted-foreground">gönderilemez</div>
+                            <div className="text-xs text-muted-foreground">öneri {usd(c.proposal)}</div>
+                            {c.maxAction != null && c.next > c.maxAction && (
+                              <div className="text-xs text-destructive">Ozon tavanı {usd(c.maxAction)}</div>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <div className="font-medium">{usd(c.next)}</div>
+                            {diff != null && diff !== 0 && (
+                              <div className={cn('text-xs', diff < 0 ? 'text-emerald-600' : 'text-amber-600')}>
+                                {diff > 0 ? '+' : ''}
+                                {diff} $ ({((diff / c.current!) * 100).toFixed(1)}%)
+                              </div>
+                            )}
+                            {c.next !== c.proposal && <div className="text-xs text-muted-foreground">öneri {usd(c.proposal)}</div>}
+                          </>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {usd(c.rivalUsd)}
+                        {c.group !== 'check' && <Gap now={c.rivalGapRubNow} next={c.rivalGapRubNext} />}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {usd(c.group === 'check' || c.profitAtNext == null ? null : Math.round(c.profitAtNext * 100) / 100)}
+                        {c.floorPrice != null && <div className="text-xs text-muted-foreground">taban {usd(c.floorPrice)}</div>}
+                      </TableCell>
+                      <TableCell className="max-w-64 text-sm">
+                        {c.tag && (
+                          <Badge
+                            variant="outline"
+                            className={cn('mb-1 gap-1.5', TAGS[c.tag].urgent ? 'text-destructive' : 'text-emerald-600')}
+                          >
+                            <span className={cn('size-1.5 rounded-full', TAGS[c.tag].urgent ? 'bg-destructive' : 'bg-emerald-500')} />
+                            {TAGS[c.tag].label}
+                          </Badge>
+                        )}
+                        <div className="text-xs text-muted-foreground">{c.reason}</div>
+                        {c.atCeiling && (
+                          <Badge
+                            variant="outline"
+                            className="ml-1 text-amber-600"
+                            title="Öneri Ozon'un kampanya tavanını aşıyordu; kâr kaldığı için tavana çekildi"
+                          >
+                            Ozon tavanı
+                          </Badge>
+                        )}
+                        {c.lowBoost && c.group !== 'check' && (
+                          <Badge
+                            variant="outline"
+                            className="ml-1 text-amber-600"
+                            title={`Boost sınırı ${usd(c.maxElastic)}; fiyat üstünde kaldığı için boost %55'ten düşük olur`}
+                          >
+                            düşük boost
+                          </Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       {/* Gönderim çubuğu */}
       <div className="sticky bottom-0 flex flex-wrap items-center justify-between gap-2 rounded-md border bg-background p-3">
