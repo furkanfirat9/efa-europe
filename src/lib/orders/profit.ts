@@ -4,7 +4,7 @@ import { calculateFulfillmentCosts, calculateShippingCosts } from '@/lib/calcula
 import { getCbrRates, type CbrRates } from '@/lib/fx/cbr';
 import { getTryRate } from '@/lib/fx/evds';
 import { getOzonHeaders, ozonFetch } from '@/lib/ozon/gate';
-import { shippingWeight, type WeightSource } from '@/lib/pricing/rules';
+import { OZON_GLOBAL_FEES, PRICING, shippingWeight, type WeightSource } from '@/lib/pricing/rules';
 
 /**
  * Sipariş kârı (Avrupa mağazası, store1).
@@ -19,27 +19,12 @@ import { shippingWeight, type WeightSource } from '@/lib/pricing/rules';
  *    fiyatından, kargo LS Economy PL tarifesinden (10,30 € + 2,50 € × başlanan her 500 g). Tarifeyi LS teyit etti.
  *    Ruble tavanı ve kargo, Ozon'un yaptığı gibi sipariş günündeki CBR kuruyla çevrilir (src/lib/fx/cbr.ts).
  * Aracı banka (acquiring) gönderiye değil sipariş numarasına, sipariş günü kesilir; o günün tahakkuklarından
- * bulunur. Oran ödeme yöntemine göre değiştiği için bulunamazsa %1 varsayılır.
+ * bulunur. Bulunamazsa fiyat önerisindeki oran (PRICING.acquiringPct, %1,5) varsayılır; gerçekte ödeme yöntemine
+ * göre değişiyor: СБП %0,49 (42703766-0246), Ozon Bank %1,90 (18047692-0554), müşterinin ödediği tutardan.
  * LS depo ücreti (kabul + sevk + paket) LS'nin aylık faturasıyla gelir, Ozon'da görünmez; hep tahmindir.
  * TL ↔ $ çevrimi sipariş günündeki TCMB döviz alış kurlarıyla yapılır. Eskiden sabit 48,35 ₺/$
  * ile yalnızca alış ve %5 komisyon düşülüyordu; kargo ve depo atlandığı için kâr olduğundan yüksek çıkıyordu.
  */
-
-export const OZON_GLOBAL_FEES = {
-  /** Ozon komisyonu tahakkuk etmeden finansal veride oran yoksa */
-  defaultCommissionPct: 0.05,
-  /** "Электронная услуга подключения к логистической Платформе Ozon" (tahakkuk tipi 123), gönderi başına en fazla 200 ₽ */
-  platformPct: 0.02,
-  platformCapRub: 200,
-  /** "Услуги по заключению договора на организацию международной перевозки" (tahakkuk tipi 122);
-   *  tek tahakkuktan çıkarıldı: 42703766-0246-1'de 21,82 ₽ = 6.613 ₽ × %0,33 */
-  intermediaryPct: 0.0033,
-  /** Ozon satıcının dolar fiyatını CBR USD kurunun bu katıyla rubleye çeviriyor (6.613 ₽ ÷ 76 $ = 87,013; CBR 86,5857) */
-  saleRateFactor: 1.005,
-  /** Aracı banka tahakkuku bulunamazsa. Gerçekte ödeme yöntemine göre değişiyor:
-   *  СБП %0,49 (42703766-0246), Ozon Bank %1,90 (18047692-0554), müşterinin ödediği tutardan. */
-  defaultAcquiringPct: 0.01,
-} as const;
 
 /** Gönderi tahakkuk tipleri (`/v1/finance/accrual/postings`) */
 const ACCRUAL = { delivery: 67, sale: 69, intermediary: 122, platform: 123 } as const;
@@ -189,7 +174,7 @@ function orderWeight(
   let source: WeightSource | null = null;
   for (const p of products) {
     const s = p.offer_id ? sources.get(p.offer_id) : undefined;
-    const w = shippingWeight(s?.amzItemWeightG ?? null, s?.amzPackageWeightG ?? null, null);
+    const w = shippingWeight({ amzItemG: s?.amzItemWeightG, amzPackageG: s?.amzPackageWeightG, icecatPackageG: s?.icecatPackageWeightG });
     if (!w.grams) {
       total = 0;
       break;
@@ -258,7 +243,7 @@ function computeProfit(
   }
 
   const acquiringUsd =
-    acquiringRub !== null && ozonRubPerUsd ? acquiringRub / ozonRubPerUsd : saleUsd * OZON_GLOBAL_FEES.defaultAcquiringPct;
+    acquiringRub !== null && ozonRubPerUsd ? acquiringRub / ozonRubPerUsd : saleUsd * PRICING.acquiringPct;
 
   const buyUsd = buyTry / rates.usdTry;
   const netProfitUsd =

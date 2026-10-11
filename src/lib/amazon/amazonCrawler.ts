@@ -1,6 +1,6 @@
 import https from 'https';
 import zlib from 'zlib';
-import { AmazonProductItem, AmazonCrawlOptions, AmazonCrawlResponse, OZON_PRICE_MULTIPLIER } from './types';
+import { AmazonProductItem, AmazonCrawlOptions, AmazonCrawlResponse, MAX_OZON_LIST_PRICE_USD, MAX_PURCHASE_EUR, OZON_PRICE_MULTIPLIER } from './types';
 import { checkIsProductInOzon, getUploadedOzonProducts, prepareStoreCodes } from '@/lib/ozon/duplicateDetector';
 import { loadCatalogMemory } from '@/lib/db/catalogMemory';
 import { getStoreOfferIds } from '@/lib/ozon/storeOfferIds';
@@ -352,7 +352,7 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
     category = 'all',
     maxPages = 2,
     maxItems = 5, // Varsayılan 5 ürün canlı test sınırı
-    maxPriceEur = 550,
+    maxPriceEur = MAX_PURCHASE_EUR,
     customUrl,
   } = options;
 
@@ -563,8 +563,8 @@ export async function crawlAmazonProducts(options: AmazonCrawlOptions): Promise<
         pageRawItems.map(async (item) => {
           const status = await verifyImageUrl(item.image);
           if (status === 200) {
-            // Amazon € fiyatı ECB kuruyla dolara çevrilir, çarpanla çarpılır; Ozon tam sayı ister.
-            const ozonPrice = Math.round(item.priceNum * fx.rate * OZON_PRICE_MULTIPLIER);
+            // Amazon € fiyatı ECB kuruyla dolara çevrilir, çarpanla çarpılır; Ozon tam sayı ister. Lojistik tavanını geçemez.
+            const ozonPrice = Math.min(Math.round(item.priceNum * fx.rate * OZON_PRICE_MULTIPLIER), MAX_OZON_LIST_PRICE_USD);
             const ozonOldPrice = Math.round(ozonPrice * 1.2);
             const modelCode = extractModelCode(item.title, brand);
 

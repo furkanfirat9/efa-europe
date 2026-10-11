@@ -23,9 +23,10 @@ import { ScanStatus } from './_components/ScanStatus';
 
 const RULE_LABEL: Record<string, string> = {
   rival: 'Rakibin 11 ₽ altı',
-  target: '%25 marj (rakip çok ucuz)',
-  'no-rival': 'Rakip yok, %35 marj',
-  'fake-rival': 'Rakip alışımızın altında (sahte sayıldı), %35 marj',
+  'rival-cap': 'Rakip pahalı, %20 marjda durdu',
+  'no-beat': 'Rakip çok ucuz, %15 marj',
+  'no-rival': 'Rakip yok, %20 marj',
+  'fake-rival': 'Rakip alışımızın altında (sahte sayıldı), %20 marj',
   check: 'Kontrol et (fiyat olağandışı yüksek)',
 };
 

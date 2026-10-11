@@ -406,6 +406,9 @@ model ProductSource {
   // Amazon "Artikelgewicht" ve (varsa) "Verpackungsabmessungen … ; N Gramm"; kargo fiziksel ağırlıktan hesaplanır
   amzItemWeightG    Int?
   amzPackageWeightG Int?
+  // Icecat "Package weight" (üreticinin kutulu ağırlığı); Amazon kutulu ağırlığı yoksa kargo bundan hesaplanır.
+  // scripts/icecat_paket_agirlik.mjs --write ile doldurulur.
+  icecatPackageWeightG Int?
   // Amazon Business sayfasında görünen "Neu" teklifi; KDV oranı ürünün gönderildiği
   // depoya göre değişebildiği için iki fiyat da sayfadan olduğu gibi alınır.
   priceNetEur     Float?
@@ -621,7 +624,8 @@ model CampaignPriceChange {
   offerId   String
   fromPrice Float?
   toPrice   Float
-  // above-rival | below-floor | profit-up | cheaper (gönderilecek) | small | add
+  // above-rival | below-floor | profit-up | cheaper (gönderilecek) | small | add | manual (Elle kontrol'den elle fiyat)
+  // | removed (Elle kontrol'den kampanyadan çıkarıldı; toPrice 0)
   group     String
   rule      String?
   ok        Boolean
@@ -630,4 +634,21 @@ model CampaignPriceChange {
 
   @@index([storeId, productId, createdAt])
   @@index([createdAt])
+}
+
+// "Fiyat önerisi → Kampanya → Elle kontrol" sekmesinde kullanıcının "olduğu gibi kalsın" kararı. Kampanya fiyatı, alış
+// maliyeti ya da Ozon'un kampanya tavanı değişince karar geçersiz sayılır ve ürün yeniden öne çıkar
+// (src/lib/pricing/campaign.ts, keptAt).
+model CampaignReview {
+  id        String   @id @default(cuid())
+  storeId   String
+  productId String
+  offerId   String
+  // Karar anındaki kampanya fiyatı ($), maliyet (landed, $) ve Ozon tavanı (max_action_price, $)
+  price     Float?
+  landedUsd Float?
+  maxAction Float?
+  createdAt DateTime @default(now())
+
+  @@unique([storeId, productId])
 }

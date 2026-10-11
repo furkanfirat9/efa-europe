@@ -116,11 +116,13 @@ export class OzonRateLimitError extends Error {
 /**
  * Ozon'a giden tek kapı. Kuyruğa girer, 429 / code 8 durumunda üstel geri
  * çekilmeyle yeniden dener ve geri çekilme süresince tüm kuyruğu duraklatır.
+ * Birkaç uç GET'tir (ör. `/v1/actions`); onlar `method: 'GET'` ile çağrılır, gövde gönderilmez.
  */
 export async function ozonFetch<T = any>(
   path: string,
   body: unknown,
-  headers: Record<string, string>
+  headers: Record<string, string>,
+  method: 'POST' | 'GET' = 'POST'
 ): Promise<T> {
   const lane = laneFor(headers['Client-Id'] || 'default');
   const heavy = path.startsWith('/v1/analytics');
@@ -128,9 +130,9 @@ export async function ozonFetch<T = any>(
   for (let attempt = 0; ; attempt++) {
     const res = await schedule(lane, heavy, () =>
       fetch(`${BASE_URL}${path}`, {
-        method: 'POST',
+        method,
         headers,
-        body: JSON.stringify(body),
+        body: method === 'GET' ? undefined : JSON.stringify(body),
         cache: 'no-store',
       })
     );
