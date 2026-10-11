@@ -336,6 +336,9 @@ export async function buildCampaignPlan() {
     else changes.push({ ...base, group: 'small', reason: 'Kur oynaması kadar küçük fark' });
   }
 
+  const exportCapped = new Set(proposals.filter((p) => p.exportCapped).map((p) => p.productId));
+  for (const ch of changes) if (exportCapped.has(ch.productId)) ch.reason += ' · 750 € ihracat sınırına çekildi';
+
   // Acil olanlar (rakipten pahalı, zarar riski) önce, sonra fırsatlar; her birinde büyük fark önce
   const urgent = (c: CampaignChange) => (c.tag === 'above-rival' || c.tag === 'below-floor' ? 0 : 1);
   const order: ChangeGroup[] = ['send', 'add', 'small', 'check'];

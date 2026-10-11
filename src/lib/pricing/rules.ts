@@ -65,6 +65,8 @@ export const PRICING = {
    *  endeks iki haneye yuvarlandığı için ölçüm ±0,005 oynuyor). */
   noFactorThreshold: 0.987,
   oldPriceMultiplier: 1.2,
+  /** AB → Rusya ihracatında satış fiyatı bunu geçemez (AGENTS.md §5); kural fiyatı aşarsa sınırın hemen altına çekilir */
+  exportLimitEur: 750,
   /** Acquiring ödeme yöntemine göre değişiyor: Ozon Bank %1,90, banka kartı %1,16, СБП %0,49. Ozon'un ürün başına
    *  verdiği oran (~%1) bunu yansıtmıyor; 10 siparişin ortalaması %1,54 → kullanıcı %1,5'i seçti (2026-10-10). */
   acquiringPct: 0.015,
