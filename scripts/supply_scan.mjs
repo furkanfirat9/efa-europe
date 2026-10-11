@@ -177,8 +177,10 @@ async function scanCeneo(run, { limit }) {
     { cwd: CENEO_DIR, stdio: 'inherit', timeout: MAX_SCAN_MS }
   );
   if (py.error) throw new Error(`Ceneo taraması başlatılamadı: ${py.error.message}`);
-  if (py.status !== 0) throw new Error(`Ceneo taraması hata verdi (çıkış kodu ${py.status})`);
-  if (!fs.existsSync(file)) throw new Error('Ceneo taraması sonuç üretmedi (proxy ayarı ya da engel)');
+  if (!fs.existsSync(file)) throw new Error(`Ceneo taraması sonuç üretmedi (çıkış kodu ${py.status}; proxy ayarı ya da engel)`);
+  // Yarıda kalan tarama çöpe atılmaz: okunanlar dosyada, kalanlar aşağıdaki ikinci turda taranır
+  // (2026-10-05: dosya kilidi 125. üründe Python'u düşürmüştü, 125 ürünün sonucu hiç içe aktarılmadı)
+  if (py.status !== 0) log(`ceneo: tarama yarıda kaldı (çıkış kodu ${py.status}); okunanlar korunuyor, kalanlar yeniden denenecek`);
 
   // Engellenenler (Cloudflare kontrol sayfası) bir kez daha: aradan zaman geçer, yeni oturumlar = yeni IP'ler.
   // Kontrol sayfası çözülmez; ikinci turda da takılan ürün bir sonraki taramaya kalır.
@@ -186,7 +188,7 @@ async function scanCeneo(run, { limit }) {
   const done = new Set(JSON.parse(fs.readFileSync(file, 'utf8')).map((r) => String(r.id)));
   const missing = tasks.map((x) => String(x.id)).filter((id) => !done.has(id));
   if (missing.length) {
-    log(`ceneo: ${missing.length} ürün engellendi, 2 dakika sonra yeni IP'lerle bir kez daha denenecek`);
+    log(`ceneo: ${missing.length} ürün okunamadı (engel ya da yarıda kalan tarama), 2 dakika sonra yeni IP'lerle bir kez daha denenecek`);
     await sleep(120_000);
     const idsFile = path.join(OUT_DIR, `ceneo-retry_${today()}.json`);
     fs.writeFileSync(idsFile, JSON.stringify(missing));
@@ -198,7 +200,7 @@ async function scanCeneo(run, { limit }) {
   }
   const scanned = JSON.parse(fs.readFileSync(file, 'utf8')).length;
   // Engellenen ürünler dosyaya girmez: eksik kalanlar eski tekliflerinde kalır
-  const blockedStop = scanned < total ? `Ceneo ${total - scanned} ürünü engelledi; onlar eski tekliflerinde kaldı` : null;
+  const blockedStop = scanned < total ? `Ceneo'da ${total - scanned} ürün okunamadı; onlar eski tekliflerinde kaldı` : null;
   log(`ceneo: tarama bitti, ${scanned}/${total} ürün → ${file}`);
   return { file, blockedStop, total };
 }

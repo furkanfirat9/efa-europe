@@ -3,11 +3,13 @@
 // sonuç JSON olarak indirilir. Amazon.pl'de hesap Business değil: fiyat %23 KDV dahil zloti.
 //
 //   node --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/amazon_pl_import.mjs <tarama.json> [--dry-run]
-//   --max-change 0.5   zloti fiyatı bu orandan fazla oynayan ürün yazılmaz, "bekletilen" olarak listelenir (otomatik tarama)
+//   --max-change 0.5   zloti fiyatı bu orandan fazla oynayan ürün yazılmaz, "bekletilen" olarak listelenir (otomatik tarama);
+//                      bir önceki tarama da aynı yeni fiyatı okuduysa yazılır ("iki gün üst üste", lib/oncekiTarama.mjs)
 //   --summary <dosya>  sayıları JSON olarak yazar (scripts/supply_scan.mjs okur)
 
 import fs from 'node:fs';
 import { PrismaClient } from '@prisma/client';
+import { previousScanByAsin, samePrice } from './lib/oncekiTarama.mjs';
 
 const file = process.argv[2];
 const dryRun = process.argv.includes('--dry-run');
@@ -16,6 +18,7 @@ const maxChange = argVal('--max-change') != null ? Number(argVal('--max-change')
 const summaryFile = argVal('--summary');
 if (!file) throw new Error('Tarama dosyası verilmedi');
 const scanByAsin = new Map(JSON.parse(fs.readFileSync(file, 'utf8')).map((s) => [s.asin, s]));
+const prevByAsin = maxChange != null ? previousScanByAsin(file) : new Map();
 
 const prisma = new PrismaClient();
 const rows = await prisma.productSource.findMany({ where: { storeId: 'store1', asin: { not: null } }, orderBy: { offerId: 'asc' } });
@@ -50,15 +53,20 @@ function parsePl(s) {
 }
 
 const eur = (n) => (n == null ? '—' : n.toFixed(2) + ' €');
-const unreadable = [], cheaper = [], onlyPl = [], texts = {}, held = [], priceChanged = [], stockChanged = [];
+const unreadable = [], cheaper = [], onlyPl = [], texts = {}, held = [], confirmed = [], priceChanged = [], stockChanged = [];
 let written = 0, plBuyable = 0, gone = 0;
 for (const r of rows) {
   const s = scanByAsin.get(r.asin);
   if (!s || s.error || (s.blocked && s.status !== 404)) { unreadable.push(`${r.offerId} (${r.asin}): ${s?.error || (s ? 'engellendi' : 'taranmadı')}`); continue; }
   const pl = parsePl(s);
   if (maxChange != null && r.plPricePln && pl.plPricePln && Math.abs(pl.plPricePln / r.plPricePln - 1) > maxChange) {
-    held.push(`${r.offerId} (${r.asin}): ${r.plPricePln} zł → ${pl.plPricePln} zł`);
-    continue;
+    const prev = prevByAsin.get(r.asin);
+    const line = `${r.offerId} (${r.asin}): ${r.plPricePln} zł → ${pl.plPricePln} zł`;
+    if (!(prev && !prev.blocked && samePrice(prev.pricePln, pl.plPricePln))) {
+      held.push(line);
+      continue;
+    }
+    confirmed.push(line);
   }
   if ((r.plPricePln ?? null) !== (pl.plPricePln ?? null)) priceChanged.push({ offer: r.offerId, from: r.plPricePln, to: pl.plPricePln });
   if (r.plCheckedAt && !!r.plInStock !== !!pl.plInStock) stockChanged.push(`${r.offerId}: ${pl.plInStock ? 'stoğa girdi' : 'stoktan çıktı'} (${pl.plAvailability ?? '—'})`);
@@ -87,11 +95,13 @@ if (unreadable.length) { console.log(`\nOkunamayan: ${unreadable.length}`); unre
 console.log(`\nZloti fiyatı değişen: ${priceChanged.length} | stok değişen: ${stockChanged.length}`);
 stockChanged.forEach((x) => console.log('  ' + x));
 if (held.length) { console.log(`\nFiyatı %${Math.round(maxChange * 100)}'den fazla oynadığı için yazılmayan: ${held.length}`); held.forEach((x) => console.log('  ' + x)); }
+if (confirmed.length) { console.log(`\nBüyük oynama ama önceki tarama da aynı fiyatı okudu, yazıldı: ${confirmed.length}`); confirmed.forEach((x) => console.log('  ' + x)); }
 console.log(dryRun ? '\ndry-run: tabloya yazılmadı' : `\ntabloya yazıldı: ${written}`);
 if (summaryFile) {
   fs.writeFileSync(summaryFile, JSON.stringify({
     total: rows.length, scanned: rows.length - unreadable.length, unreadable: unreadable.length, written,
     priceChanged: priceChanged.length, stockChanged: stockChanged.length, held: held.length,
+    confirmed: confirmed.length, confirmedList: confirmed,
     gone, plBuyable, cheaper: cheaper.length, onlyPl: onlyPl.length,
     price: priceChanged.slice(0, 30), stockList: stockChanged, heldList: held, unreadableList: unreadable.slice(0, 30),
   }));
