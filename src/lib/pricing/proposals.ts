@@ -146,6 +146,8 @@ export interface Proposal {
   floorPrice: number | null;
   /** Rakibin 11 ₽ altı (tam dolar); rakip yoksa null */
   rivalTarget: number | null;
+  /** Kural fiyatı 750 € ihracat sınırını aştığı için sınırın hemen altına çekildi */
+  exportCapped: boolean;
   stock: number;
   stockAction: StockAction;
   /** Fiyat değişikliği önerilmiyorsa nedeni */
@@ -327,6 +329,7 @@ export async function buildProposals(
       targetPrice: null,
       floorPrice: null,
       rivalTarget: null,
+      exportCapped: false,
       stock,
       stockAction,
       skipReason: null,
@@ -345,15 +348,35 @@ export async function buildProposals(
       platformCapUsd,
     });
     const current = profitAt(customerPrice, c);
-    const d = decidePrice(c, rival?.price ?? null, rival?.rubPerUsd ?? null, chosen.netEur * ecb.rate, rival?.factor);
-    const next = profitAt(d.price, c);
-    return {
-      ...base,
+    let d = decidePrice(c, rival?.price ?? null, rival?.rubPerUsd ?? null, chosen.netEur * ecb.rate, rival?.factor);
+    const costs = {
       landedUsd: c.landedUsd,
       ozonShippingUsd: c.ozonShippingUsd,
       depotUsd: c.depotUsd,
       currentProfit: current.profit,
       currentMargin: current.margin,
+    };
+    // Satış fiyatı 750 €'yu geçemez (ihracat sınırı): kural fiyatı aşıyorsa sınırın hemen altına çekilir; orada asgari
+    // kâr kalmıyorsa fiyat önerilmez. Kampanya ajanı (scripts/kampanya_yeni_kart.mjs) da aynı sınırı uygular.
+    const exportLimitUsd = Math.floor((PRICING.exportLimitEur - 1) * ecb.rate);
+    const exportCapped = d.price > exportLimitUsd;
+    if (exportCapped) {
+      if (exportLimitUsd < d.floorPrice)
+        // Sınırın altında kâr yok: alınabilse de stok açılmaz (2026-10-12, EP5544/50 ve ADD6921DG/10 kapatıldı)
+        return {
+          ...base,
+          ...costs,
+          floorPrice: d.floorPrice,
+          stockAction: stock > 0 ? 'close' : 'keep',
+          skipReason: `750 € ihracat sınırında kâr yok (asgari ${d.floorPrice} $)`,
+        };
+      d = { ...d, price: exportLimitUsd, oldPrice: Math.round(exportLimitUsd * PRICING.oldPriceMultiplier) };
+    }
+    const next = profitAt(d.price, c);
+    return {
+      ...base,
+      ...costs,
+      exportCapped,
       rule: d.rule,
       newPrice: d.price,
       newOldPrice: d.oldPrice,

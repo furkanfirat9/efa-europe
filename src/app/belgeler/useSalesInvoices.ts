@@ -23,30 +23,32 @@ export function useSalesInvoices(year: number, month: number) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState<string | null>(null);
 
-  // Hızlı ay değişiminde geç gelen eski yanıt yeni ayın verisini ezmesin.
-  const requestRef = useRef<AbortController | null>(null);
+  // Hızlı ay değişiminde geç gelen eski yanıt yeni ayın verisini ezmesin. İstek iptal edilmez, yanıtı yok sayılır:
+  // iptal (AbortController) Next.js geliştirme ekranında "signal is aborted without reason" hatası olarak çıkıyordu.
+  const requestRef = useRef(0);
 
   const load = useCallback(async () => {
-    requestRef.current?.abort();
-    const controller = new AbortController();
-    requestRef.current = controller;
+    const id = ++requestRef.current;
     setLoading(true);
     try {
-      const res = await fetch(`/api/belgeler/satis?year=${year}&month=${month}`, { signal: controller.signal });
+      const res = await fetch(`/api/belgeler/satis?year=${year}&month=${month}`);
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error_message || 'Satış faturaları alınamadı.');
+      if (id !== requestRef.current) return;
       setInvoices(data.invoices);
       setError(null);
     } catch (err: any) {
-      if (err.name !== 'AbortError') setError(err.message);
+      if (id === requestRef.current) setError(err.message);
     } finally {
-      if (requestRef.current === controller) setLoading(false);
+      if (id === requestRef.current) setLoading(false);
     }
   }, [year, month]);
 
   useEffect(() => {
     load();
-    return () => requestRef.current?.abort();
+    return () => {
+      requestRef.current++;
+    };
   }, [load]);
 
   /** Dosyalar sırayla yüklenir; başka aya düşen faturalar bildirimle söylenir. */

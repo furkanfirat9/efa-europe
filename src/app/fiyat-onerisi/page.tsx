@@ -5,7 +5,7 @@ import { AlertCircle, ExternalLink, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/shadcn/alert';
 import { Badge } from '@/components/shadcn/badge';
 import { Button } from '@/components/shadcn/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shadcn/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/shadcn/card';
 import { Input } from '@/components/shadcn/input';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/shadcn/tabs';
@@ -32,35 +32,12 @@ const RULE_LABEL: Record<string, string> = {
 
 const SOURCE_LABEL: Record<string, string> = { 'amazon-de': 'Amazon.de', 'amazon-pl': 'amazon.pl', ceneo: 'Ceneo' };
 
-const FILTERS = [
-  { key: 'all', label: 'Tümü' },
-  { key: 'down', label: 'Fiyat düşüyor' },
-  { key: 'up', label: 'Fiyat artıyor' },
-  { key: 'pl', label: "amazon.pl'den" },
-  { key: 'ceneo', label: "Ceneo'dan" },
-  { key: 'stock', label: 'Stok değişiyor' },
-  { key: 'check', label: 'Kontrol et' },
-  { key: 'skip', label: 'Hesaplanamadı' },
-] as const;
-type Filter = (typeof FILTERS)[number]['key'];
-
 const PAGE_SIZE = 50;
 
 const usd = (n: number | null | undefined, digits = 0) =>
   n == null ? '—' : `${n.toLocaleString('tr-TR', { minimumFractionDigits: digits, maximumFractionDigits: digits })} $`;
 const pct = (n: number | null | undefined) => (n == null ? '—' : `%${Math.round(n * 100)}`);
 const eur = (n: number) => `${n.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
-
-function matches(p: Proposal, f: Filter) {
-  if (f === 'all') return true;
-  if (f === 'pl') return p.buyable && p.source === 'amazon-pl';
-  if (f === 'ceneo') return p.buyable && p.source === 'ceneo';
-  if (f === 'skip') return p.newPrice == null;
-  if (f === 'check') return p.rule === 'check' || p.weightCheck;
-  if (f === 'stock') return p.stockAction !== 'keep';
-  if (p.newPrice == null) return false;
-  return f === 'down' ? p.newPrice < p.customerPrice : p.newPrice > p.customerPrice;
-}
 
 function channelUrl(p: Proposal, source: string) {
   if (source === 'amazon-de' && p.asin) return `https://www.amazon.de/dp/${p.asin}`;
@@ -109,6 +86,7 @@ function ProposalCard({ p }: { p: Proposal }) {
           {p.stockAction === 'close' && <Badge variant="destructive">Stok {p.stock} → 0</Badge>}
           {p.stockAction === 'open' && <Badge>Stok 0 → 1</Badge>}
           {p.weightCheck && <Badge variant="outline">Ağırlığı kontrol et</Badge>}
+          {p.exportCapped && <Badge variant="outline">750 € ihracat sınırına çekildi</Badge>}
         </div>
       </CardHeader>
 
@@ -189,7 +167,6 @@ export default function FiyatOnerisiPage() {
   );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState<Filter>('all');
   const [query, setQuery] = useState('');
   const [shown, setShown] = useState(PAGE_SIZE);
   const [view, setView] = useState<'proposals' | 'campaign'>('proposals');
@@ -213,42 +190,21 @@ export default function FiyatOnerisiPage() {
     load();
   }, [load]);
 
-  // Filtre ya da arama değişince liste baştan gösterilir
-  useEffect(() => setShown(PAGE_SIZE), [filter, query]);
+  // Arama değişince liste baştan gösterilir
+  useEffect(() => setShown(PAGE_SIZE), [query]);
 
   const all = useMemo(() => data?.proposals ?? [], [data]);
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return all
-      .filter((p) => matches(p, filter))
-      .filter(
-        (p) =>
-          !q || p.offerId.toLowerCase().includes(q) || (p.name ?? '').toLowerCase().includes(q) || (p.asin ?? '').toLowerCase().includes(q)
-      );
-  }, [all, filter, query]);
-
-  const priced = all.filter((p) => p.newPrice != null);
-  const kpis = [
-    { label: 'Fiyatı düşecek', value: priced.filter((p) => p.newPrice! < p.customerPrice).length },
-    { label: 'Fiyatı artacak', value: priced.filter((p) => p.newPrice! > p.customerPrice).length },
-    { label: 'Stoğu kapanacak', value: all.filter((p) => p.stockAction === 'close').length },
-    { label: 'Stoğu açılacak', value: all.filter((p) => p.stockAction === 'open').length },
-  ];
+    return all.filter(
+      (p) => !q || p.offerId.toLowerCase().includes(q) || (p.name ?? '').toLowerCase().includes(q) || (p.asin ?? '').toLowerCase().includes(q)
+    );
+  }, [all, query]);
 
   return (
     <div className="flex-1 space-y-4 bg-background p-4 pt-6 text-foreground md:p-8">
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Fiyat önerisi</h1>
-          <p className="text-muted-foreground">En ucuz Ozon rakibine göre önerilen fiyatlar. Öneriler sekmesi hiçbir fiyatı değiştirmez; Kampanyaya gönder sekmesi yalnız senin onayınla Elastik boosting kampanya fiyatını yazar.</p>
-          {data && (
-            <p className="text-xs text-muted-foreground">
-              Kur: 1 € = {data.eurUsd} $ = {data.eurPln} zł (ECB {data.eurUsdDate}) · Alış: Amazon.de, amazon.pl ve Ceneo'daki güvenilir
-              tekliften alınabilen en ucuzu, KDV {data.vatMode === 'net' ? 'hariç' : 'dahil'}; kargo .de 5,99 €, .pl ücretsiz teslimatta 0,
-              Ceneo teklifin kargosu (Allegro 0).
-            </p>
-          )}
-        </div>
+        <h1 className="text-3xl font-bold tracking-tight">Fiyat önerisi</h1>
         <Button variant="outline" size="sm" onClick={load} disabled={loading}>
           <RefreshCw className={loading ? 'animate-spin' : undefined} /> Yeniden hesapla
         </Button>
@@ -258,7 +214,7 @@ export default function FiyatOnerisiPage() {
 
       <Tabs value={view} onValueChange={(v) => setView(v as 'proposals' | 'campaign')}>
         <TabsList>
-          <TabsTrigger value="proposals">Öneriler</TabsTrigger>
+          <TabsTrigger value="proposals">Tedarik</TabsTrigger>
           <TabsTrigger value="campaign">Kampanyaya gönder</TabsTrigger>
         </TabsList>
       </Tabs>
@@ -267,17 +223,6 @@ export default function FiyatOnerisiPage() {
         <CampaignView />
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {kpis.map((k) => (
-              <Card key={k.label} className="gap-1 py-4">
-                <CardHeader className="px-4">
-                  <CardDescription>{k.label}</CardDescription>
-                  <CardTitle className="text-2xl tabular-nums">{data ? k.value : '—'}</CardTitle>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-
           {error && (
             <Alert variant="destructive">
               <AlertCircle />
@@ -286,24 +231,13 @@ export default function FiyatOnerisiPage() {
             </Alert>
           )}
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Tabs value={filter} onValueChange={(v) => setFilter(v as Filter)}>
-              <TabsList className="h-auto flex-wrap">
-                {FILTERS.map((f) => (
-                  <TabsTrigger key={f.key} value={f.key}>
-                    {f.label} ({all.filter((p) => matches(p, f.key)).length})
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Kod, ad ya da ASIN ara"
-              className="h-9 w-56"
-              aria-label="Ürün ara"
-            />
-          </div>
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Kod, ad ya da ASIN ara"
+            className="h-9 w-56"
+            aria-label="Ürün ara"
+          />
 
           {!data && !error && (
             <div className="space-y-4">
@@ -315,7 +249,7 @@ export default function FiyatOnerisiPage() {
 
           {data && visible.length === 0 && (
             <Card className="py-8">
-              <CardContent className="text-center text-muted-foreground">Bu grupta ürün yok.</CardContent>
+              <CardContent className="text-center text-muted-foreground">Ürün bulunamadı.</CardContent>
             </Card>
           )}
 

@@ -53,26 +53,26 @@ export function useDocuments(initial?: { year: number; month: number }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Hızlı ay değişiminde geç gelen eski yanıt yeni ayın verisini ezmesin.
-  const requestRef = useRef<AbortController | null>(null);
+  // Hızlı ay değişiminde geç gelen eski yanıt yeni ayın verisini ezmesin. İstek iptal edilmez, yanıtı yok sayılır:
+  // iptal (AbortController) Next.js geliştirme ekranında "signal is aborted without reason" hatası olarak çıkıyordu.
+  const requestRef = useRef(0);
 
   const load = useCallback(async () => {
-    requestRef.current?.abort();
-    const controller = new AbortController();
-    requestRef.current = controller;
+    const id = ++requestRef.current;
     setLoading(true);
     try {
-      const res = await fetch(`/api/belgeler?year=${year}&month=${month}`, { signal: controller.signal });
+      const res = await fetch(`/api/belgeler?year=${year}&month=${month}`);
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error_message || 'Belgeler alınamadı.');
+      if (id !== requestRef.current) return;
       setDocuments(data.documents);
       setPending(data.pending);
       setOrderDocuments(data.orderDocuments ?? []);
       setError(null);
     } catch (err: any) {
-      if (err.name !== 'AbortError') setError(err.message);
+      if (id === requestRef.current) setError(err.message);
     } finally {
-      if (requestRef.current === controller) setLoading(false);
+      if (id === requestRef.current) setLoading(false);
     }
   }, [year, month]);
 
@@ -93,7 +93,9 @@ export function useDocuments(initial?: { year: number; month: number }) {
 
   useEffect(() => {
     load();
-    return () => requestRef.current?.abort();
+    return () => {
+      requestRef.current++;
+    };
   }, [load]);
 
   /** Dosyalar sırayla okunur; ilk başarılı taslak onay ekranında açılır. */
