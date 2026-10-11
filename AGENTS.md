@@ -67,12 +67,13 @@ Mağazada daha önce yüklenmiş olan ürünleri takip etmek, mükerrer yükleme
 ## 5. Amazon Otonom Keşif ve Fiyatlandırma Kuralları (Amazon Sourcing Engine)
 - **Satıcı Filtresi:** Sadece doğrudan Amazon.de (`p_6:A3JWKAKR8XB7XF`) veya Amazon Business (`p_6:A29D61YZMYPL6V`) ürünleri çekilir; 3. taraf pazar yeri satıcıları elenir.
 - **Anti-Reklam Kalkanı:** Sponsorlu reklamlar (`AdHolder`, `Gesponsert`) ve yabancı marka kartları elenir.
-- **Fiyat Tavan Sınırı:** Amazon alış fiyatı $0 - 550 € arası hedeflenir.
+- **Fiyat Tavan Sınırı:** Amazon alış fiyatı en fazla **500 €** (`MAX_PURCHASE_EUR`, `src/lib/amazon/types.ts`; route bunun üstünü kabul etmez). Sebep: Avrupa'dan Rusya'ya ihracatta **satış fiyatına** 750 € sınırı var; 500 € alış normal marjla ~720 € satışa çıkar. Eskiden 550 €'ydu.
 - **Ozon Tam Sayı Fiyat Kuralı (Integer Price):**
   - Ozon API'si kuruşlu/ondalıklı değer kabul etmediğinden ve Amazon alış fiyatı Euro (€) olup Ozon fiyatı USD ($) olarak yüklendiğinden; Amazon fiyatı günlük ECB EUR/USD referans kuruyla dolara çevrilir, çarpanla çarpılıp tam sayıya yuvarlanır: `Math.round(buyPriceEur * ecbRate * OZON_PRICE_MULTIPLIER)` (`src/lib/fx/ecb.ts`, 3 saat önbellek). Çarpan `src/lib/amazon/types.ts` içindeki `OZON_PRICE_MULTIPLIER`'dır (şu an **4**, 2026-09-23'te 3'ten yükseltildi); ekrandaki "×4" yazıları da buradan gelir. Eskiden kur yerine sabit `1.15` vardı; kur ondan uzaklaştıkça çarpan kayıyordu. ECB'ye ulaşılamazsa `1.15` ile hesaplanır ve tarama sonucu uyarı taşır; kullanılan kur ekranda gösterilir.
   - **Fiyatı okunamayan ürün alınmaz:** Kartta Amazon'un satış fiyatı (`<span class="a-price">`) yoksa ürün Amazon'dan satın alınamıyordur (stokta yok ya da yalnızca başka satıcı / "Seçenekleri gör"). Eskiden 50 € varsayılıyordu ve maliyetin altında satışa yol açtı.
   - **Stok:** "Stokta sadece N adet kaldı" elenir; yanında "(daha fazla ürün gelecektir)" varsa kabul edilir.
   - Üstü çizili eski liste fiyatı: $\text{Satış} \times 1.20$ tam sayıya yuvarlanır.
+  - **Lojistik tavanı 1 160 $:** Kampanyasız fiyat (`price`) 1 160 $'ı geçemez; lojistik firması üstündeki ürüne uyarı verip satışa kapatıyor (`MAX_OZON_LIST_PRICE_USD`, `src/lib/amazon/types.ts`). Çarpanlı fiyat aşarsa 1 160'a çekilir (üstü çizili 1 392, kampanya limiti 1 149). Yeni kart yüklemesi (`data/yeni-kartlar/yukle.mjs`) de aynı tavanı uygular.
 - **Görsel Doğrulaması:** Çekilen Amazon yüksek çözünürlüklü `.jpg` linkleri `HTTP 200 OK` kontrolünden geçirilir; açılmayan linkler elenir.
 
 ## 6. Ozon Analitik ve Huni Takibi Standartları (Ozon Analytics Engine)

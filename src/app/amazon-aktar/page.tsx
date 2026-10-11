@@ -22,7 +22,7 @@ import {
   RefreshCw,
   ShoppingBag,
 } from 'lucide-react';
-import { AmazonProductItem, OZON_PRICE_MULTIPLIER } from '@/lib/amazon/types';
+import { AmazonProductItem, MAX_PURCHASE_EUR, OZON_PRICE_MULTIPLIER } from '@/lib/amazon/types';
 
 const POPULAR_BRANDS = [
   { name: 'Philips', icon: '⚡', category: 'kitchen' },
@@ -49,7 +49,7 @@ export default function AmazonHunterPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [maxPages, setMaxPages] = useState<number>(1);
   const [maxItems, setMaxItems] = useState<number>(5); // Varsayılan 5 ürün canlı test
-  const [maxPriceEur, setMaxPriceEur] = useState<number>(550);
+  const [maxPriceEur, setMaxPriceEur] = useState<number>(MAX_PURCHASE_EUR);
   const [hideExistingOzon, setHideExistingOzon] = useState<boolean>(true); // Mükerrer Ozon koruması
   const [customUrl, setCustomUrl] = useState('');
 
@@ -391,6 +391,7 @@ export default function AmazonHunterPage() {
                 </label>
                 <input
                   type="number"
+                  max={MAX_PURCHASE_EUR}
                   value={maxPriceEur}
                   onChange={(e) => setMaxPriceEur(Number(e.target.value))}
                   className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"

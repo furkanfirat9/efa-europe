@@ -9,12 +9,14 @@
 //
 // --prices-only: haftalık tazeleme. Yalnızca fiyat, stok, satıcı ve ağırlık yazılır; ASIN durumları (kullanıcının
 // /asin-kontrol kararları dahil) ve Ozon karşılaştırması yeniden yapılmaz. Neyin değiştiğini listeler.
-//   --max-change 0.5   fiyatı bu orandan fazla oynayan ürün yazılmaz, "bekletilen" olarak listelenir (otomatik tarama)
+//   --max-change 0.5   fiyatı bu orandan fazla oynayan ürün yazılmaz, "bekletilen" olarak listelenir (otomatik tarama);
+//                      bir önceki tarama da aynı yeni fiyatı okuduysa yazılır ("iki gün üst üste", lib/oncekiTarama.mjs)
 //   --summary <dosya>  sayıları JSON olarak yazar (scripts/supply_scan.mjs okur)
 
 import fs from 'node:fs';
 import sharp from 'sharp';
 import { PrismaClient } from '@prisma/client';
+import { previousScanByAsin, samePrice } from './lib/oncekiTarama.mjs';
 
 const scanFile = process.argv[2];
 const dryRun = process.argv.includes('--dry-run');
@@ -25,6 +27,7 @@ const summaryFile = argVal('--summary');
 if (!scanFile) throw new Error('Tarama dosyası verilmedi');
 const scan = JSON.parse(fs.readFileSync(scanFile, 'utf8'));
 const scanByAsin = new Map((Array.isArray(scan) ? scan : Object.values(scan)).map(s => [s.asin, s]));
+const prevByAsin = maxChange != null ? previousScanByAsin(scanFile) : new Map();
 
 const prisma = new PrismaClient();
 const STORE = 'store1';
@@ -39,16 +42,26 @@ if (pricesOnly) {
 async function refreshPrices() {
   const rows = await prisma.productSource.findMany({ where: { storeId: STORE, asin: { not: null } }, orderBy: { offerId: 'asc' } });
   const eur = n => (n == null ? '—' : n.toFixed(2) + ' €');
-  const price = [], stockIn = [], stockOut = [], seller = [], unreadable = [], held = [];
+  const price = [], stockIn = [], stockOut = [], seller = [], unreadable = [], held = [], confirmed = [];
   let written = 0;
   for (const r of rows) {
     const s = scanByAsin.get(r.asin);
-    if (!s || s.error || s.blocked || !s.title) { unreadable.push(`${r.offerId} (${r.asin}): ${s?.error || (s ? 'engellendi' : 'taranmadı')}`); continue; }
-    const next = parseStock(s);
+    // 404 = ilan Amazon.de'den kaldırılmış (CAF-R901 B0CHB7TNWH, 2026-10-09): okunamadı sayılırsa eski fiyat ve
+    // "stokta" bilgisi kalıyor, maliyet yanlış hesaplanıyordu. amazon_pl_import.mjs ile aynı: sayfa yok = alınamaz
+    const gone = s?.status === 404;
+    if (!gone && (!s || s.error || s.blocked || !s.title)) { unreadable.push(`${r.offerId} (${r.asin}): ${s?.error || (s ? 'engellendi' : 'taranmadı')}`); continue; }
+    const next = gone
+      ? { priceNetEur: null, priceGrossEur: null, listPriceEur: null, availability: 'Amazon.de sayfası yok (404)', inStock: false, soldBy: null, soldByAmazon: null, deliveryText: null, checkedAt: new Date(s.scannedAt ?? Date.now()) }
+      : parseStock(s);
     // Otomatik taramada aşırı fiyat oynaması (yanlış teklif satırı, geçici kampanya, sayfa hatası) yazılmaz
     if (maxChange != null && r.priceGrossEur && next.priceGrossEur && Math.abs(next.priceGrossEur / r.priceGrossEur - 1) > maxChange) {
-      held.push(`${r.offerId} (${r.asin}): ${eur(r.priceGrossEur)} → ${eur(next.priceGrossEur)}`);
-      continue;
+      const prev = prevByAsin.get(r.asin);
+      const line = `${r.offerId} (${r.asin}): ${eur(r.priceGrossEur)} → ${eur(next.priceGrossEur)}`;
+      if (!(prev && !prev.blocked && samePrice(prev.grossEur, next.priceGrossEur))) {
+        held.push(line);
+        continue;
+      }
+      confirmed.push(line);
     }
     if ((r.priceGrossEur ?? null) !== (next.priceGrossEur ?? null) && Math.abs((r.priceGrossEur ?? 0) - (next.priceGrossEur ?? 0)) >= 0.01)
       price.push({ offer: r.offerId, from: r.priceGrossEur, to: next.priceGrossEur });
@@ -57,7 +70,8 @@ async function refreshPrices() {
     if (dryRun) continue;
     await prisma.productSource.update({
       where: { id: r.id },
-      data: { ...next, ...('itemWeightG' in s ? { amzItemWeightG: s.itemWeightG ?? null, amzPackageWeightG: s.packageWeightG ?? null } : {}) },
+      // Sayfası olmayan üründe ağırlık okunmadı; eski ağırlık kargo hesabı için kalır
+      data: { ...next, ...(!gone && 'itemWeightG' in s ? { amzItemWeightG: s.itemWeightG ?? null, amzPackageWeightG: s.packageWeightG ?? null } : {}) },
     });
     written++;
   }
@@ -70,11 +84,13 @@ async function refreshPrices() {
   console.log(`\nSatıcısı değişen: ${seller.length}`); seller.forEach(x => console.log('  ' + x));
   if (unreadable.length) { console.log(`\nOkunamayan (eski değerler korunur): ${unreadable.length}`); unreadable.forEach(x => console.log('  ' + x)); }
   if (held.length) { console.log(`\nFiyatı %${Math.round(maxChange * 100)}'den fazla oynadığı için yazılmayan: ${held.length}`); held.forEach(x => console.log('  ' + x)); }
+  if (confirmed.length) { console.log(`\nBüyük oynama ama önceki tarama da aynı fiyatı okudu, yazıldı: ${confirmed.length}`); confirmed.forEach(x => console.log('  ' + x)); }
   console.log(dryRun ? '\ndry-run: tabloya yazılmadı' : `\ntabloya yazıldı: ${written}`);
   if (summaryFile) {
     fs.writeFileSync(summaryFile, JSON.stringify({
       total: rows.length, scanned: rows.length - unreadable.length, unreadable: unreadable.length, written,
       priceChanged: price.length, stockChanged: stockIn.length + stockOut.length, held: held.length,
+      confirmed: confirmed.length, confirmedList: confirmed,
       price: price.slice(0, 30), stockIn, stockOut, seller, heldList: held, unreadableList: unreadable.slice(0, 30),
     }));
   }

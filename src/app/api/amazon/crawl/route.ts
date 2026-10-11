@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { crawlAmazonProducts } from '@/lib/amazon/amazonCrawler';
-import { AmazonCrawlOptions } from '@/lib/amazon/types';
+import { AmazonCrawlOptions, MAX_PURCHASE_EUR } from '@/lib/amazon/types';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       category: body.category || 'all',
       maxPages: Number(body.maxPages) || 1,
       maxItems: body.maxItems !== undefined ? Number(body.maxItems) : 5,
-      maxPriceEur: Number(body.maxPriceEur) || 550,
+      maxPriceEur: Math.min(Number(body.maxPriceEur) || MAX_PURCHASE_EUR, MAX_PURCHASE_EUR),
       hideExistingOzon: body.hideExistingOzon !== undefined ? Boolean(body.hideExistingOzon) : false,
       customUrl: body.customUrl,
     });
