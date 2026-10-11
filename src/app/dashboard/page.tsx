@@ -1,6 +1,7 @@
 import React from 'react';
 import { MonthlyRevenueCard } from './_components/MonthlyRevenueCard';
 import { AccountingSummaryCard } from './_components/AccountingSummaryCard';
+import { OrderProfitCard } from './_components/OrderProfitCard';
 
 export const metadata = {
   title: 'Dashboard | EFA Europe',
@@ -18,9 +19,13 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">Mağazaların, siparişlerin ve muhasebenin özeti.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <MonthlyRevenueCard />
-        <AccountingSummaryCard />
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <div className="grid grid-cols-1 content-start gap-4 md:grid-cols-2 xl:col-span-2">
+          <MonthlyRevenueCard />
+          <AccountingSummaryCard />
+        </div>
+        {/* Sağ sütun: dikey kâr kartı */}
+        <OrderProfitCard />
       </div>
     </div>
   );
