@@ -1,3 +1,13 @@
+/** Tedarik sitesinde ödenebilen para birimleri (Alış €/zł sütunu). */
+export const SOURCE_CURRENCIES = [
+  { value: 'EUR', symbol: '€' },
+  { value: 'PLN', symbol: 'zł' },
+] as const;
+
+export function sourceCurrencySymbol(currency?: string | null): string {
+  return SOURCE_CURRENCIES.find((c) => c.value === currency)?.symbol ?? currency ?? '';
+}
+
 /**
  * Verilen metnin bir web URL'si olup olmadığını tespit eder.
  */

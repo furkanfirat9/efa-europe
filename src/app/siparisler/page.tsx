@@ -46,6 +46,8 @@ function SiparislerContent() {
     setDetailModalOpen,
     detailNotes,
     setDetailNotes,
+    detailSource,
+    setDetailSource,
     savingDetail,
     searchTerm,
     setSearchTerm,
@@ -157,6 +159,8 @@ function SiparislerContent() {
         open={detailModalOpen}
         notes={detailNotes}
         onNotesChange={setDetailNotes}
+        source={detailSource}
+        onSourceChange={setDetailSource}
         saving={savingDetail}
         onSave={handleSaveDetailNotes}
         onClose={() => setDetailModalOpen(false)}
