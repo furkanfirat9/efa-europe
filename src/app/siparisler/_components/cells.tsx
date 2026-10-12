@@ -5,6 +5,7 @@ import { ExternalLink, FileCheck, Link2, Loader2, Package, Upload } from 'lucide
 import { Badge } from '@/components/shadcn/badge';
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip';
 import { cn } from '@/lib/utils';
 import { formatTrNumber, parseTrNumber } from '@/lib/format';
@@ -15,6 +16,8 @@ import {
   getOzonPostingUrl,
   getShipmentCountdown,
   isUrlString,
+  SOURCE_CURRENCIES,
+  sourceCurrencySymbol,
 } from '../utils';
 import { useOrderDocument, type OnDocumentChange } from '../useOrderDocument';
 
@@ -154,6 +157,85 @@ export function BuyPriceCell({ order, onUpdate }: { order: OrderItem; onUpdate: 
       onKeyDown={blurOnEnter}
       className={cn(inlineInput, 'w-22 font-medium tabular-nums')}
     />
+  );
+}
+
+// ─── Alış €/zł (sitedeki orijinal tutar) ─────────────────────────────────────
+
+/**
+ * Para birimi ilk girişte seçilir; tutar kaydedildikten sonra seçici gizlenir
+ * ve simge tutarın yanında yazılır (232,00 zł). Para birimi yan panelden düzeltilir.
+ */
+export function SourcePriceCell({ order, onUpdate }: { order: OrderItem; onUpdate: UpdateOrder }) {
+  const hasPrice = order.sourcePrice !== null && order.sourcePrice !== undefined;
+  const savedCurrency = hasPrice ? order.sourceCurrency || 'EUR' : null;
+  const formatted = hasPrice ? formatTrNumber(order.sourcePrice) : '';
+  const display = savedCurrency ? `${formatted} ${sourceCurrencySymbol(savedCurrency)}` : '';
+  const { value, setValue, setFocused } = useInlineValue(display);
+  const [currency, setCurrency] = useState<string>(SOURCE_CURRENCIES[0].value);
+
+  const commit = () => {
+    setFocused(false);
+    const trimmed = value.trim();
+    if (trimmed === '') {
+      setValue('');
+      if (hasPrice) onUpdate(order.postingNumber, { sourcePrice: null, sourceCurrency: null });
+      return;
+    }
+
+    const parsed = parseTrNumber(trimmed);
+    if (parsed === null || parsed <= 0) {
+      setValue(display);
+      return;
+    }
+
+    const nextCurrency = savedCurrency ?? currency;
+    if (parsed !== order.sourcePrice || nextCurrency !== order.sourceCurrency) {
+      onUpdate(order.postingNumber, { sourcePrice: parsed, sourceCurrency: nextCurrency });
+    }
+  };
+
+  const input = (
+    <Input
+      type="text"
+      inputMode="decimal"
+      placeholder="0,00"
+      aria-label="Sitedeki alış tutarı"
+      value={value}
+      spellCheck={false}
+      autoComplete="off"
+      onChange={(e) => setValue(e.target.value.replace(/[^0-9.,]/g, ''))}
+      onFocus={(e) => {
+        // Düzenlerken yalnızca rakam kalır; simge kayıttan sonra geri gelir.
+        const el = e.currentTarget;
+        setFocused(true);
+        setValue(formatted);
+        requestAnimationFrame(() => el.select());
+      }}
+      onBlur={commit}
+      onKeyDown={blurOnEnter}
+      className={cn(inlineInput, savedCurrency ? 'w-24' : 'mx-0 w-20', 'font-medium tabular-nums')}
+    />
+  );
+
+  if (savedCurrency) return input;
+
+  return (
+    <div className="flex items-center justify-center gap-1">
+      <Select value={currency} onValueChange={setCurrency}>
+        <SelectTrigger size="sm" aria-label="Para birimi" className="w-14 px-2 text-xs">
+          <SelectValue>{sourceCurrencySymbol(currency)}</SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {SOURCE_CURRENCIES.map((c) => (
+            <SelectItem key={c.value} value={c.value}>
+              {c.symbol} {c.value}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {input}
+    </div>
   );
 }
 

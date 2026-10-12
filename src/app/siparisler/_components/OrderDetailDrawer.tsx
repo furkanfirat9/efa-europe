@@ -15,7 +15,9 @@ import {
 } from '@/components/shadcn/alert-dialog';
 import { Badge } from '@/components/shadcn/badge';
 import { Button } from '@/components/shadcn/button';
+import { Input } from '@/components/shadcn/input';
 import { Label } from '@/components/shadcn/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select';
 import { Separator } from '@/components/shadcn/separator';
 import {
   Sheet,
@@ -36,8 +38,10 @@ import {
   getOzonPostingUrl,
   getShipmentCountdown,
   isUrlString,
+  SOURCE_CURRENCIES,
 } from '../utils';
 import { useOrderDocument, type OnDocumentChange } from '../useOrderDocument';
+import type { SourceDraft } from '../useOrders';
 import { DOC_ACCEPT, isDocumentExpected } from './cells';
 import { OrderStatusBadge } from './OrderStatusBadge';
 
@@ -46,6 +50,8 @@ interface OrderDetailDrawerProps {
   open: boolean;
   notes: string;
   onNotesChange: (notes: string) => void;
+  source: SourceDraft;
+  onSourceChange: (source: SourceDraft) => void;
   saving: boolean;
   onSave: () => Promise<void>;
   onClose: () => void;
@@ -85,6 +91,8 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
   open,
   notes,
   onNotesChange,
+  source,
+  onSourceChange,
   saving,
   onSave,
   onClose,
@@ -287,6 +295,38 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
 
               <Section title="Tedarik ve takip">
                 <dl className="space-y-2">
+                  <div className="flex items-center justify-between gap-4 text-sm">
+                    <Label htmlFor="order-source-price" className="font-normal text-muted-foreground">
+                      Alış €/zł
+                    </Label>
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={source.currency}
+                        onValueChange={(currency) => onSourceChange({ ...source, currency })}
+                      >
+                        <SelectTrigger size="sm" aria-label="Para birimi" className="w-24">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SOURCE_CURRENCIES.map((c) => (
+                            <SelectItem key={c.value} value={c.value}>
+                              {c.symbol} {c.value}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Input
+                        id="order-source-price"
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="0,00"
+                        autoComplete="off"
+                        value={source.price}
+                        onChange={(e) => onSourceChange({ ...source, price: e.target.value.replace(/[^0-9.,]/g, '') })}
+                        className="h-8 w-28 text-right tabular-nums"
+                      />
+                    </div>
+                  </div>
                   <Row label="Tedarikçi">{order.supplier || '—'}</Row>
                   <Row label="Sipariş / takip no">
                     {isUrlString(order.supplierOrderId) ? (

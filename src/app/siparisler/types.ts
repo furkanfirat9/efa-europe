@@ -22,6 +22,9 @@ export interface OrderItem {
   buyPrice?: number | null;
   buyCurrency?: string | null;
   buyPriceTry?: number | null;
+  /** Tedarik sitesindeki orijinal tutar; para birimi sourceCurrency (EUR | PLN) */
+  sourcePrice?: number | null;
+  sourceCurrency?: string | null;
   paymentCard?: string | null;
   supplier?: string | null;
   supplierOrderId?: string | null;

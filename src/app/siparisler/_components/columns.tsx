@@ -21,6 +21,7 @@ import {
   InlineTextCell,
   PostingNumberCell,
   ProductImageCell,
+  SourcePriceCell,
   SupplierOrderIdCell,
   type UpdateOrder,
 } from './cells';
@@ -122,6 +123,11 @@ export function buildOrderColumns({
           </div>
         </div>
       ),
+    }),
+    helper.display({
+      id: 'sourcePrice',
+      header: 'Alış €/zł',
+      cell: ({ row }) => <SourcePriceCell order={row.original} onUpdate={onUpdate} />,
     }),
     helper.display({
       id: 'buyPrice',

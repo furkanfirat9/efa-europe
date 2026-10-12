@@ -256,6 +256,8 @@ export async function PATCH(request: NextRequest) {
       postingNumber,
       buyPrice,
       buyCurrency,
+      sourcePrice,
+      sourceCurrency,
       paymentCard,
       supplier,
       supplierOrderId,
@@ -291,6 +293,17 @@ export async function PATCH(request: NextRequest) {
       buyPrice !== undefined && buyPrice !== null && buyPrice !== '' ? parseTrNumber(buyPrice) : null;
     const numBuyPrice = parsedBuyPrice !== null && !isNaN(parsedBuyPrice) ? parsedBuyPrice : null;
 
+    // Sitedeki orijinal tutar (€ / zł). Yalnızca bilgi amaçlıdır; kâr hesabı TL alışla yapılır.
+    const parsedSourcePrice =
+      sourcePrice !== undefined && sourcePrice !== null && sourcePrice !== '' ? parseTrNumber(sourcePrice) : null;
+    const numSourcePrice = parsedSourcePrice !== null && parsedSourcePrice > 0 ? parsedSourcePrice : null;
+    if (numSourcePrice !== null && !['EUR', 'PLN'].includes(sourceCurrency)) {
+      return NextResponse.json(
+        { success: false, error_message: 'Para birimi EUR ya da PLN olmalıdır.' },
+        { status: 400 }
+      );
+    }
+
     // Satın alma / Karttan çekim tarihi (purchaseDate) belirleme
     let resolvedPurchaseDate: Date | null | undefined = undefined;
     if (purchaseDate !== undefined) {
@@ -320,6 +333,9 @@ export async function PATCH(request: NextRequest) {
             }
         : {}),
       ...(resolvedPurchaseDate !== undefined ? { purchaseDate: resolvedPurchaseDate } : {}),
+      ...(sourcePrice !== undefined
+        ? { sourcePrice: numSourcePrice, sourceCurrency: numSourcePrice !== null ? sourceCurrency : null }
+        : {}),
       buyCurrency: 'TRY',
       ...(paymentCard !== undefined ? { paymentCard: paymentCard || null } : {}),
       ...(supplier !== undefined ? { supplier: supplier || null } : {}),

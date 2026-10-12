@@ -81,6 +81,9 @@ model OzonOrder {
   buyPrice            Float?
   buyCurrency         String?   @default("EUR")
   buyPriceTry         Float?
+  // Tedarik sitesinde ödenen orijinal tutar, sitenin para biriminde (EUR | PLN)
+  sourcePrice         Float?
+  sourceCurrency      String?
   purchaseDate        DateTime?
   paymentCard         String?
   supplier            String?

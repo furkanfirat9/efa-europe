@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
+import { formatTrNumber, parseTrNumber } from '@/lib/format';
 import { OrderItem, OrderStats, MONTHS, type OrderDocumentFields } from './types';
+
+/** Yan paneldeki "Alış €/zł" alanının kaydedilmemiş hâli. */
+export interface SourceDraft {
+  price: string;
+  currency: string;
+}
 
 export type SortField = 'date' | 'salePrice' | 'buyPrice';
 export type SortDirection = 'asc' | 'desc';
@@ -419,6 +426,7 @@ export function useOrders() {
   const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [detailNotes, setDetailNotes] = useState('');
+  const [detailSource, setDetailSource] = useState<SourceDraft>({ price: '', currency: 'EUR' });
   const [savingDetail, setSavingDetail] = useState(false);
 
   // Başarı bildirimi (sonner; kök layout'taki Toaster gösterir)
@@ -572,15 +580,30 @@ export function useOrders() {
   const handleOpenDetail = useCallback((order: OrderItem) => {
     setSelectedOrder(order);
     setDetailNotes(order.notes || '');
+    setDetailSource({
+      price: order.sourcePrice != null ? formatTrNumber(order.sourcePrice) : '',
+      currency: order.sourceCurrency || 'EUR',
+    });
     setDetailModalOpen(true);
   }, []);
 
-  // Detay Notlarını Kaydet
+  // Detay Notlarını ve sitedeki alış tutarını kaydet
   const handleSaveDetailNotes = async () => {
     if (!selectedOrder) return;
+    const priceText = detailSource.price.trim();
+    const sourcePrice = priceText ? parseTrNumber(priceText) : null;
+    if (priceText && (sourcePrice === null || sourcePrice <= 0)) {
+      toast.error('Alış €/zł tutarı okunamadı.');
+      return;
+    }
+
     setSavingDetail(true);
     try {
-      await handleInlineUpdate(selectedOrder.postingNumber, { notes: detailNotes.trim() });
+      await handleInlineUpdate(selectedOrder.postingNumber, {
+        notes: detailNotes.trim(),
+        sourcePrice,
+        sourceCurrency: sourcePrice !== null ? detailSource.currency : null,
+      });
       setDetailModalOpen(false);
       showToast('Sipariş detayları kaydedildi.');
     } finally {
@@ -625,6 +648,8 @@ export function useOrders() {
     setDetailModalOpen,
     detailNotes,
     setDetailNotes,
+    detailSource,
+    setDetailSource,
     savingDetail,
     handleInlineUpdate,
     handleOpenDetail,
