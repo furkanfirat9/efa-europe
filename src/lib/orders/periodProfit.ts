@@ -9,7 +9,7 @@ import { OZON_GLOBAL_FEES, PRICING, costBase, platformCapUsdFor, profitAt, shipp
 /**
  * Dashboard kâr kartı: bugün, bu hafta (pazartesiden) ve bu ay, Moskova/Türkiye saatiyle (UTC+3), sipariş tarihine göre.
  *
- *   kesin    alışı girilmiş sipariş: Siparişler sayfasının kârı (src/lib/orders/profit.ts; Ozon tahakkuku gelmediyse
+ *   kesin    alışı (€/zł ya da ₺) girilmiş sipariş: Siparişler sayfasının kârı (src/lib/orders/profit.ts; Ozon tahakkuku gelmediyse
  *            kesintiler tarifeden tahmin, alış kartın gerçek TL'si)
  *   tahmini  alışı henüz girilmemiş sipariş: fiyat önerisinin maliyetiyle (en ucuz tedarik kanalı, kur farkı,
  *            kutulu ağırlık; komisyon Ozon'un oranı bilinmediği için %5)

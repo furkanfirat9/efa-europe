@@ -9,8 +9,13 @@ import { OZON_GLOBAL_FEES, PRICING, shippingWeight, type WeightSource } from '@/
 /**
  * Sipariş kârı (Avrupa mağazası, store1).
  *
- *   net kâr $ = satış $ − Ozon kesintileri $ − LS depo ücreti $ − alış ₺ ÷ (USD/TRY)
+ *   net kâr $ = satış $ − Ozon kesintileri $ − LS depo ücreti $ − alış $
  *   net kâr ₺ = net kâr $ × (USD/TRY)
+ *
+ * Alış $: sitede ödenen döviz tutarı girildiyse (Alış €/zł, `sourcePrice`) o tutar sipariş günündeki TCMB
+ * kurlarıyla dolara çevrilir ve kâr hesaplama / fiyat önerisindeki gibi banka kur farkı (PRICING.bankFxPct)
+ * eklenir. Döviz tutarı yoksa karttan çekilen ₺ (`buyPrice`) USD/TRY ile çevrilir. Muhasebe alışı ₺ olarak
+ * `buyPriceTry`'dan okur; o alan yalnız ₺ alıştan yazılır.
  *
  * Ozon kesintileri:
  *  - Tahakkuk ettiyse (teslimattan sonra, `/v1/finance/accrual/postings`) Ozon'un gerçek tutarları.
@@ -49,8 +54,11 @@ export interface OrderProfitBreakdown {
   /** Ozon'un kestiği aracı banka tutarı (₽); bulunamadıysa null ve acquiringUsd tahmindir */
   acquiringRub: number | null;
   depotUsd: number;
+  /** Alışın ₺ karşılığı: ₺ girildiyse kendisi, döviz girildiyse buyUsd × USD/TRY */
   buyTry: number;
   buyUsd: number;
+  /** Alış dövizden hesaplandıysa sitede ödenen tutar; ₺'den hesaplandıysa null */
+  buyOriginal?: { amount: number; currency: 'EUR' | 'PLN'; fxPct: number } | null;
   netProfitUsd: number;
   netProfitTry: number;
   /** Kargo ve depo ücretinin dayandığı paketli ağırlık; bilinmiyorsa ikisi de 0 */
@@ -142,6 +150,8 @@ interface OrderRates {
   usdTry: number;
   /** TCMB çapraz kuru; CBR alınamazsa kargo bununla çevrilir */
   eurUsd: number;
+  /** TCMB zł ÷ USD; zł kuru alınamazsa null (yalnız zł alışında gerekir) */
+  plnUsd: number | null;
   rateDate: string;
   /** Sipariş günündeki CBR kurları (₽); alınamazsa null */
   cbr: CbrRates | null;
@@ -153,12 +163,21 @@ async function ratesFor(date: Date, memo: Map<string, Promise<OrderRates>>) {
   if (!memo.has(key)) {
     memo.set(
       key,
-      Promise.all([getTryRate('USD', date), getTryRate('EUR', date), getCbrRates(date).catch(() => null)]).then(
-        ([usd, eur, cbr]) => {
-          if (!usd || !eur) throw new Error(`${key} için TCMB kuru bulunamadı.`);
-          return { usdTry: usd.rate, eurUsd: eur.rate / usd.rate, rateDate: usd.rateDate.toISOString().slice(0, 10), cbr };
-        }
-      )
+      Promise.all([
+        getTryRate('USD', date),
+        getTryRate('EUR', date),
+        getTryRate('PLN', date).catch(() => null),
+        getCbrRates(date).catch(() => null),
+      ]).then(([usd, eur, pln, cbr]) => {
+        if (!usd || !eur) throw new Error(`${key} için TCMB kuru bulunamadı.`);
+        return {
+          usdTry: usd.rate,
+          eurUsd: eur.rate / usd.rate,
+          plnUsd: pln ? pln.rate / usd.rate : null,
+          rateDate: usd.rateDate.toISOString().slice(0, 10),
+          cbr,
+        };
+      })
     );
   }
   return memo.get(key)!;
@@ -187,6 +206,20 @@ function orderWeight(
   return null;
 }
 
+/** Alış maliyeti: döviz tutarı girildiyse ondan (kur farkıyla), yoksa karttan çekilen ₺'den. */
+function purchaseCost(order: OzonOrder, rates: OrderRates) {
+  const amount = Number(order.sourcePrice) || 0;
+  const currency = order.sourceCurrency === 'PLN' ? 'PLN' : order.sourceCurrency === 'EUR' ? 'EUR' : null;
+  if (amount > 0 && currency) {
+    const toUsd = currency === 'EUR' ? rates.eurUsd : rates.plnUsd;
+    if (!toUsd) throw new Error(`${rates.rateDate} için zł kuru bulunamadı.`);
+    const usd = amount * toUsd * (1 + PRICING.bankFxPct);
+    return { usd, try: usd * rates.usdTry, original: { amount, currency, fxPct: PRICING.bankFxPct } as const };
+  }
+  const buyTry = Number(order.buyPrice) || 0;
+  return { usd: buyTry / rates.usdTry, try: buyTry, original: null };
+}
+
 function computeProfit(
   order: OzonOrder,
   accruals: Accrual[] | undefined,
@@ -195,7 +228,7 @@ function computeProfit(
   acquiringRub: number | null
 ): { breakdown: OrderProfitBreakdown; source: ProfitSource } {
   const saleUsd = Number(order.totalPrice) || 0;
-  const buyTry = Number(order.buyPrice) || 0;
+  const buy = purchaseCost(order, rates);
   const weightG = weight?.grams ?? null;
   const depotUsd = weightG ? calculateFulfillmentCosts(weightG).totalFulfillment * rates.eurUsd : 0;
 
@@ -245,9 +278,8 @@ function computeProfit(
   const acquiringUsd =
     acquiringRub !== null && ozonRubPerUsd ? acquiringRub / ozonRubPerUsd : saleUsd * PRICING.acquiringPct;
 
-  const buyUsd = buyTry / rates.usdTry;
   const netProfitUsd =
-    saleUsd - commissionUsd - ozonServicesUsd - shippingUsd - otherOzonUsd - acquiringUsd - depotUsd - buyUsd;
+    saleUsd - commissionUsd - ozonServicesUsd - shippingUsd - otherOzonUsd - acquiringUsd - depotUsd - buy.usd;
 
   return {
     source,
@@ -260,8 +292,9 @@ function computeProfit(
       acquiringUsd: round2(acquiringUsd),
       acquiringRub: acquiringRub !== null && ozonRubPerUsd ? round2(acquiringRub) : null,
       depotUsd: round2(depotUsd),
-      buyTry: round2(buyTry),
-      buyUsd: round2(buyUsd),
+      buyTry: round2(buy.try),
+      buyUsd: round2(buy.usd),
+      buyOriginal: buy.original,
       netProfitUsd: round2(netProfitUsd),
       netProfitTry: round2(netProfitUsd * rates.usdTry),
       weightG,
@@ -281,7 +314,9 @@ function computeProfit(
  * Dönen sayı güncellenen sipariş adedidir.
  */
 export async function recalcOrderProfits(orders: OzonOrder[], { checkOzon }: { checkOzon: boolean }): Promise<number> {
-  const targets = orders.filter((o) => Number(o.buyPrice) > 0 && Number(o.totalPrice) > 0 && o.currency === 'USD');
+  const targets = orders.filter(
+    (o) => (Number(o.buyPrice) > 0 || Number(o.sourcePrice) > 0) && Number(o.totalPrice) > 0 && o.currency === 'USD'
+  );
   if (targets.length === 0) return 0;
 
   const toCheck = checkOzon ? targets.filter((o) => o.status !== 'cancelled').map((o) => o.postingNumber) : [];
@@ -352,7 +387,8 @@ export async function recalcOrderProfits(orders: OzonOrder[], { checkOzon }: { c
       await prisma.ozonOrder.update({
         where: { postingNumber: order.postingNumber },
         data: {
-          buyPriceTry: breakdown.buyTry,
+          // Muhasebe ₺ alışı buradan okur: yalnız karttan çekilen ₺ yazılır, dövizden çevrilen tutar değil
+          buyPriceTry: Number(order.buyPrice) > 0 ? Number(order.buyPrice) : null,
           netProfit: breakdown.netProfitUsd,
           netProfitTry: breakdown.netProfitTry,
           profitSource: source,
@@ -369,7 +405,7 @@ export async function recalcOrderProfits(orders: OzonOrder[], { checkOzon }: { c
 }
 
 /**
- * Dönemdeki kesinleşmemiş kârları tazeler: alış fiyatı girilmiş, iptal olmayan ve Ozon'a son
+ * Dönemdeki kesinleşmemiş kârları tazeler: alışı (₺ ya da €/zł) girilmiş, iptal olmayan ve Ozon'a son
  * 6 saatte sorulmamış siparişler. Geçmiş aylar Ozon'dan bir kez indirildiği için sipariş durumu
  * orada eski kalabilir; tahakkuk durumdan bağımsız sorulur.
  */
@@ -378,9 +414,9 @@ export async function refreshPeriodProfits(storeId: string, start: Date, end: Da
   const orders = await prisma.ozonOrder.findMany({
     where: {
       storeId,
-      buyPrice: { gt: 0 },
       status: { not: 'cancelled' },
       AND: [
+        { OR: [{ buyPrice: { gt: 0 } }, { sourcePrice: { gt: 0 } }] },
         { OR: [{ inProcessAt: { gte: start, lt: end } }, { inProcessAt: null, createdAt: { gte: start, lt: end } }] },
         { OR: [{ profitSource: null }, { profitSource: 'estimate' }] },
         { OR: [{ profitCheckedAt: null }, { profitCheckedAt: { lt: cutoff } }] },

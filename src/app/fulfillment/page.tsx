@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertCircle,
   Barcode,
   Check,
+  ChevronLeft,
+  ChevronRight,
   Copy,
   Edit3,
   ExternalLink,
@@ -12,6 +14,7 @@ import {
   FileText,
   Loader2,
   Package,
+  PackageSearch,
   Plus,
   RefreshCw,
   Search,
@@ -28,11 +31,16 @@ import {
   WarehouseReportRecord,
   LSStockItem,
 } from '@/lib/fulfillment/types';
+import { Button } from '@/components/shadcn/button';
+import { OrderPickerDialog, type OrderCandidate } from './_components/OrderPickerDialog';
 import { formatClock, formatDateTime, formatNumber } from '@/lib/format';
 import { ShipmentStatus, isCancelled, isShipped } from './_components/ShipmentStatus';
 import styles from './fulfillment.module.css';
 
 type TabKey = 'orders' | 'reports' | 'stocks';
+
+/** Kayıtlı görevler tablosunda bir sayfadaki görev sayısı. */
+const ORDERS_PAGE_SIZE = 10;
 
 const TABS: { value: TabKey; label: string; countKey: 'orders' | 'reports' | 'stocks' }[] = [
   { value: 'orders', label: 'Sevkiyat görevleri', countKey: 'orders' },
@@ -172,6 +180,18 @@ export default function FulfillmentPage() {
 
   // Search Filter
   const [searchTerm, setSearchTerm] = useState('');
+  const [orderPage, setOrderPage] = useState(1);
+
+  // Sipariş seçici: forma sipariş no, beyan değeri, etiket ve koli ölçülerini getirir (LS'ye giden form aynı kalır)
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [prefill, setPrefill] = useState<{
+    postingNumber: string;
+    loading: boolean;
+    labelLoaded?: boolean;
+    parcelSource?: string;
+    notes: string[];
+  } | null>(null);
+  const latestPick = useRef<string | null>(null);
 
   // Initial Fetch
   const fetchData = async () => {
@@ -255,6 +275,15 @@ export default function FulfillmentPage() {
   };
 
   // Handle PDF File Upload (Order Label)
+  /** Formdaki (henüz kaydedilmemiş) etiket PDF'ini yeni sekmede açar. */
+  const openLabelInNewTab = (base64: string) => {
+    const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+    window.open(url, '_blank', 'noopener');
+    // Sekme PDF'i yükledikten sonra adres serbest bırakılır
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -290,6 +319,50 @@ export default function FulfillmentPage() {
   };
 
   // Start Edit Mode
+  const handlePickOrder = async (item: OrderCandidate) => {
+    const postingNumber = item.postingNumber;
+    latestPick.current = postingNumber;
+    setPickerOpen(false);
+    setForm((f) => ({ ...f, ozonOrderId: postingNumber, declaredValueEuro: item.priceEur ?? f.declaredValueEuro }));
+    setPrefill({ postingNumber, loading: true, notes: [] });
+
+    try {
+      const res = await fetch(`/api/fulfillment/order-prefill?postingNumber=${encodeURIComponent(postingNumber)}`);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error_message || 'Sipariş bilgileri alınamadı.');
+      // Bu sırada başka sipariş seçildiyse eski yanıt formu ezmesin
+      if (latestPick.current !== postingNumber) return;
+
+      setForm((f) =>
+        f.ozonOrderId !== postingNumber
+          ? f
+          : {
+              ...f,
+              declaredValueEuro: data.declaredValueEur ?? f.declaredValueEuro,
+              ...(data.parcel
+                ? {
+                    lengthMm: data.parcel.lengthMm,
+                    widthMm: data.parcel.widthMm,
+                    heightMm: data.parcel.heightMm,
+                    weightGr: data.parcel.weightGr,
+                  }
+                : {}),
+            }
+      );
+      if (data.label) setLabelFile(data.label);
+      setPrefill({
+        postingNumber,
+        loading: false,
+        labelLoaded: !!data.label,
+        parcelSource: data.parcel?.source,
+        notes: data.notes ?? [],
+      });
+    } catch (err: any) {
+      if (latestPick.current !== postingNumber) return;
+      setPrefill({ postingNumber, loading: false, notes: [err.message || 'Sipariş bilgileri alınamadı.'] });
+    }
+  };
+
   const handleStartEdit = (order: ArbitrageOrderRecord) => {
     setIsEditing(true);
     setEditingOrderId(order.ozonOrderId);
@@ -495,6 +568,14 @@ export default function FulfillmentPage() {
     );
   }, [orders, searchTerm]);
 
+  // Görev silinip sayfa sayısı azalırsa son sayfada kalınır.
+  const orderPageCount = Math.max(1, Math.ceil(filteredOrders.length / ORDERS_PAGE_SIZE));
+  const currentOrderPage = Math.min(orderPage, orderPageCount);
+  const pagedOrders = filteredOrders.slice(
+    (currentOrderPage - 1) * ORDERS_PAGE_SIZE,
+    currentOrderPage * ORDERS_PAGE_SIZE
+  );
+
   const filteredReports = useMemo(
     () =>
       reports.filter((r) => reportFilterType === 'all' || r.type === reportFilterType),
@@ -608,6 +689,8 @@ export default function FulfillmentPage() {
       </header>
 
       {/* ANA İÇERİK ALANI — 1200px maksimum genişlik, 24px dikey ritim */}
+      {/* @container: sayfa geçişi sağdaki boşluğu ekrana göre değil bu alana göre ölçer (sol menü açık/kapalı fark etmez). */}
+      <div className="@container">
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
         {/* Hata Bildirimi */}
         {(error || actionError) && (
@@ -793,6 +876,46 @@ export default function FulfillmentPage() {
                   )}
 
                   <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
+                    {/* Sipariş seçici: yalnızca formu doldurur, hiçbir şeyi göndermez */}
+                    {!isEditing && (
+                      <div className="space-y-2">
+                        <Button type="button" variant="outline" className="w-full" onClick={() => setPickerOpen(true)}>
+                          <PackageSearch />
+                          Siparişlerden seç
+                        </Button>
+                        {prefill && prefill.postingNumber === form.ozonOrderId && (
+                          <div className="space-y-1 text-xs text-muted-foreground">
+                            {prefill.loading ? (
+                              <p className="flex items-center gap-1.5">
+                                <Loader2 className="size-3 animate-spin" />
+                                Etiket ve koli ölçüleri getiriliyor…
+                              </p>
+                            ) : (
+                              <>
+                                {(prefill.labelLoaded || prefill.parcelSource) && (
+                                  <p className="flex items-center gap-1.5">
+                                    <Check className="size-3" />
+                                    {[
+                                      prefill.labelLoaded && "Etiket Ozon'dan alındı",
+                                      prefill.parcelSource && `Ölçüler: ${prefill.parcelSource}`,
+                                    ]
+                                      .filter(Boolean)
+                                      .join(' · ')}
+                                  </p>
+                                )}
+                                {prefill.notes.map((note) => (
+                                  <p key={note} className="flex items-center gap-1.5">
+                                    <AlertCircle className="size-3" />
+                                    {note}
+                                  </p>
+                                ))}
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* Ozon Sipariş No */}
                     <div>
                       <label
@@ -914,10 +1037,15 @@ export default function FulfillmentPage() {
                       >
                         {labelFile ? (
                           <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2 truncate text-xs">
+                            <button
+                              type="button"
+                              onClick={() => openLabelInNewTab(labelFile.base64)}
+                              className="flex min-w-0 items-center gap-2 truncate rounded-sm text-xs outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                              title="Etiketi yeni sekmede aç"
+                            >
                               <FileText className="h-4 w-4 shrink-0" strokeWidth={1.5} />
                               <span className="truncate font-mono">{labelFile.name}</span>
-                            </div>
+                            </button>
                             <button
                               type="button"
                               onClick={() => setLabelFile(null)}
@@ -1032,7 +1160,7 @@ export default function FulfillmentPage() {
             </div>
 
             {/* SAĞ KOLON: KAYITLI GÖREVLER TABLOSU (XL: 8, LG: 7 SÜTUN) */}
-            <div className="min-w-0 xl:col-span-8 lg:col-span-7">
+            <div className="relative min-w-0 xl:col-span-8 lg:col-span-7">
               <div className={`${styles.card} min-w-0 overflow-hidden`}>
                 <div
                   className="flex flex-col gap-3 border-b px-5 py-3 sm:flex-row sm:items-center sm:justify-between"
@@ -1062,7 +1190,10 @@ export default function FulfillmentPage() {
                     <input
                       type="text"
                       value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setOrderPage(1);
+                      }}
                       placeholder="Sipariş no veya barkod…"
                       className={styles.input}
                       style={{ width: 190, paddingLeft: 28 }}
@@ -1110,7 +1241,7 @@ export default function FulfillmentPage() {
                           </td>
                         </tr>
                       ) : (
-                        filteredOrders.map((order) => (
+                        pagedOrders.map((order) => (
                           <tr key={order.id || order.ozonOrderId}>
                             {/* Sipariş ve Ürün */}
                             <td className="min-w-0">
@@ -1271,6 +1402,39 @@ export default function FulfillmentPage() {
                   </table>
                 </div>
               </div>
+
+              {/* Sayfa geçişi: geniş alanda tablonun sağındaki boşluğun ortasında, üçüncü satır
+                  hizasında (sayfayla birlikte kayar); dar alanda tablonun altında sağda. Boşluk genişliği:
+                  içerik alanının max-w-7xl dışında kalan yarısı + sayfanın sağ iç boşluğu (2rem). */}
+              {!loading && orderPageCount > 1 && (
+                <div className="mt-3 flex justify-end @min-[1460px]:absolute @min-[1460px]:inset-y-0 @min-[1460px]:left-full @min-[1460px]:mt-0 @min-[1460px]:w-[calc((100cqw-80rem)/2+2rem)] @min-[1460px]:justify-center @min-[1460px]:pt-80">
+                  <div className="flex h-fit flex-col items-center gap-1.5">
+                    <span className="text-xs text-muted-foreground tabular-nums">
+                      Sayfa <span className="font-medium text-foreground">{currentOrderPage}</span> / {orderPageCount}
+                    </span>
+                    <div className="flex gap-1.5">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        aria-label="Önceki sayfa"
+                        disabled={currentOrderPage <= 1}
+                        onClick={() => setOrderPage(currentOrderPage - 1)}
+                      >
+                        <ChevronLeft />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        aria-label="Sonraki sayfa"
+                        disabled={currentOrderPage >= orderPageCount}
+                        onClick={() => setOrderPage(currentOrderPage + 1)}
+                      >
+                        <ChevronRight />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -1577,6 +1741,9 @@ export default function FulfillmentPage() {
           </div>
         )}
       </main>
+      </div>
+
+      <OrderPickerDialog open={pickerOpen} onOpenChange={setPickerOpen} onSelect={handlePickOrder} />
 
       {/* YENİ BİLDİRİM MODALI — Yönerge Madde 6: 16px yarıçap, shadow-3, blur yok */}
       {showReportModal && (

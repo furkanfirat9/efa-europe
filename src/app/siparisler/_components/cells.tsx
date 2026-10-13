@@ -13,11 +13,13 @@ import { OrderItem } from '../types';
 import {
   formatOrderUrlLabel,
   getCountdownUrgencyStyle,
+  getOrderSiteLogo,
   getOzonPostingUrl,
   getShipmentCountdown,
   isUrlString,
   SOURCE_CURRENCIES,
   sourceCurrencySymbol,
+  toOrderHref,
 } from '../utils';
 import { useOrderDocument, type OnDocumentChange } from '../useOrderDocument';
 
@@ -285,6 +287,38 @@ export function InlineTextCell({
   );
 }
 
+// ─── Tedarikçi sipariş bağlantısı (tablo + yan panel) ────────────────────────
+
+/** Bilinen sitelerde logolu rozet (Amazon, Prime Business, Allegro Business), diğerlerinde site adı. */
+export function SupplierOrderLink({ value, title }: { value: string; title?: string }) {
+  const href = toOrderHref(value);
+  const logo = getOrderSiteLogo(value);
+
+  if (logo) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        title={title ?? value}
+        className="inline-flex h-6 shrink-0 items-center rounded-md border bg-background px-1.5 transition-opacity outline-none hover:opacity-80 focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      >
+        <img src={logo.src} alt={logo.alt} className={cn('w-auto', logo.tall ? 'h-[18px]' : 'h-3.5')} />
+      </a>
+    );
+  }
+
+  return (
+    <Badge asChild variant="secondary" className="max-w-36 gap-1">
+      <a href={href} target="_blank" rel="noreferrer" title={title ?? value}>
+        <Link2 />
+        <span className="truncate">{formatOrderUrlLabel(value)}</span>
+        <ExternalLink />
+      </a>
+    </Badge>
+  );
+}
+
 // ─── Tedarikçi sipariş no (bağlantıysa tıklanabilir, çift tıkla düzenlenir) ──
 
 export function SupplierOrderIdCell({ order, onUpdate }: { order: OrderItem; onUpdate: UpdateOrder }) {
@@ -298,7 +332,6 @@ export function SupplierOrderIdCell({ order, onUpdate }: { order: OrderItem; onU
   }, [current, focused]);
 
   const isUrl = isUrlString(value);
-  const href = isUrl ? (/^https?:\/\//i.test(value.trim()) ? value.trim() : `https://${value.trim()}`) : '';
 
   const commit = () => {
     setFocused(false);
@@ -321,13 +354,7 @@ export function SupplierOrderIdCell({ order, onUpdate }: { order: OrderItem; onU
   if (isUrl && !editing) {
     return (
       <div onDoubleClick={startEditing} className="flex justify-center">
-        <Badge asChild variant="secondary" className="max-w-36 gap-1">
-          <a href={href} target="_blank" rel="noreferrer" title={`${value} (düzenlemek için çift tıklayın)`}>
-            <Link2 />
-            <span className="truncate">{formatOrderUrlLabel(value)}</span>
-            <ExternalLink />
-          </a>
-        </Badge>
+        <SupplierOrderLink value={value} title={`${value} (düzenlemek için çift tıklayın)`} />
       </div>
     );
   }

@@ -33,16 +33,16 @@ import { formatNumber, formatTL, formatTrNumber, formatUSD } from '@/lib/format'
 import { OrderItem } from '../types';
 import {
   formatDate,
-  formatOrderUrlLabel,
   getCountdownUrgencyStyle,
   getOzonPostingUrl,
   getShipmentCountdown,
   isUrlString,
   SOURCE_CURRENCIES,
+  sourceCurrencySymbol,
 } from '../utils';
 import { useOrderDocument, type OnDocumentChange } from '../useOrderDocument';
 import type { SourceDraft } from '../useOrders';
-import { DOC_ACCEPT, isDocumentExpected } from './cells';
+import { DOC_ACCEPT, isDocumentExpected, SupplierOrderLink } from './cells';
 import { OrderStatusBadge } from './OrderStatusBadge';
 
 interface OrderDetailDrawerProps {
@@ -99,7 +99,8 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
   onDocumentChange,
 }) => {
   const { docFile, busy, upload, remove, view } = useOrderDocument(order, onDocumentChange);
-  const profit = order?.buyPrice ? order.profitJson : null;
+  const hasCost = !!(order?.buyPrice || order?.sourcePrice);
+  const profit = hasCost ? order?.profitJson ?? null : null;
 
   const countdown = React.useMemo(
     () => (order ? getShipmentCountdown(order.shipmentDate, order.status) : null),
@@ -111,12 +112,6 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
     if (file) upload(file);
     e.target.value = '';
   };
-
-  const supplierOrderHref = order?.supplierOrderId?.trim()
-    ? /^https?:\/\//i.test(order.supplierOrderId.trim())
-      ? order.supplierOrderId.trim()
-      : `https://${order.supplierOrderId.trim()}`
-    : '';
 
   return (
     <Sheet open={open && !!order} onOpenChange={(next) => !next && onClose()}>
@@ -248,7 +243,11 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                       </Row>
                       <Row label="Tedarik alış maliyeti">
                         <span className="tabular-nums">− {usd2(profit.buyUsd)}</span>
-                        <Hint>{formatTL(profit.buyTry)}</Hint>
+                        <Hint>
+                          {profit.buyOriginal
+                            ? `${formatTrNumber(profit.buyOriginal.amount)} ${sourceCurrencySymbol(profit.buyOriginal.currency)}, %${formatTrNumber(profit.buyOriginal.fxPct * 100)} kur farkıyla`
+                            : formatTL(profit.buyTry)}
+                        </Hint>
                       </Row>
                     </dl>
                     <div className="flex items-center justify-between rounded-md bg-muted px-4 py-3">
@@ -280,12 +279,16 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                       </Row>
                       <Row label="Tedarik alış maliyeti">
                         <span className="tabular-nums">
-                          {order.buyPrice !== null && order.buyPrice !== undefined ? formatTL(order.buyPrice) : 'Henüz girilmedi'}
+                          {order.sourcePrice
+                            ? `${formatTrNumber(order.sourcePrice)} ${sourceCurrencySymbol(order.sourceCurrency)}`
+                            : order.buyPrice
+                              ? formatTL(order.buyPrice)
+                              : 'Henüz girilmedi'}
                         </span>
                       </Row>
                     </dl>
                     <p className="text-xs text-muted-foreground">
-                      {order.buyPrice ? 'Kâr henüz hesaplanmadı.' : 'Alış fiyatı girilince kâr hesaplanır.'}
+                      {hasCost ? 'Kâr henüz hesaplanmadı.' : 'Alış (€/zł ya da ₺) girilince kâr hesaplanır.'}
                     </p>
                   </>
                 )}
@@ -329,13 +332,8 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                   </div>
                   <Row label="Tedarikçi">{order.supplier || '—'}</Row>
                   <Row label="Sipariş / takip no">
-                    {isUrlString(order.supplierOrderId) ? (
-                      <Badge asChild variant="secondary" className="gap-1">
-                        <a href={supplierOrderHref} target="_blank" rel="noreferrer" title={order.supplierOrderId || undefined}>
-                          {formatOrderUrlLabel(order.supplierOrderId || '')}
-                          <ExternalLink />
-                        </a>
-                      </Badge>
+                    {order.supplierOrderId && isUrlString(order.supplierOrderId) ? (
+                      <SupplierOrderLink value={order.supplierOrderId} />
                     ) : (
                       order.supplierOrderId || '—'
                     )}
