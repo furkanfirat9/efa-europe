@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { parseTrNumber } from '@/lib/format';
 import { recalcOrderProfits } from '@/lib/orders/profit';
+import { extractProductMeta } from '@/lib/orders/productMeta';
 import { monthRangeMsk } from '@/lib/ozon/postings';
 
 export const dynamic = 'force-dynamic';
@@ -13,28 +14,6 @@ function parsePriceFromRaw(p: any): number {
     return p.products.reduce((acc: number, item: any) => acc + Number(item.price || 0), 0);
   }
   return Number(p.totalPrice || 0);
-}
-
-function extractProductMeta(p: any) {
-  let offerId = p.productOfferId || '';
-  let title = p.productTitle || '';
-  let image = p.productImage || '';
-  let sku = '';
-
-  if (p.productsJson && Array.isArray(p.productsJson) && p.productsJson.length > 0) {
-    const first = p.productsJson[0];
-    if (!offerId && first.offer_id) offerId = first.offer_id;
-    if (!title && first.name) title = first.name;
-    if (first.sku) sku = String(first.sku);
-  }
-
-  // Raw veriden görsel kontrolü
-  if (!image && p.rawDataJson?.products?.[0]?.sku) {
-    const rawProd = p.rawDataJson.products[0];
-    if (rawProd.image_url) image = rawProd.image_url;
-  }
-
-  return { offerId, title, image, sku };
 }
 
 async function computeStoreStats(storeId = 'store1', startDate?: Date, endDate?: Date) {
@@ -319,19 +298,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const updateData: any = {
-      ...(buyPrice !== undefined
-        ? numBuyPrice !== null
-          ? { buyPrice: numBuyPrice, buyPriceTry: numBuyPrice }
-          : {
-              buyPrice: null,
-              buyPriceTry: null,
-              netProfit: null,
-              netProfitTry: null,
-              profitSource: null,
-              profitJson: Prisma.DbNull,
-              profitCheckedAt: null,
-            }
-        : {}),
+      ...(buyPrice !== undefined ? { buyPrice: numBuyPrice, buyPriceTry: numBuyPrice } : {}),
       ...(resolvedPurchaseDate !== undefined ? { purchaseDate: resolvedPurchaseDate } : {}),
       ...(sourcePrice !== undefined
         ? { sourcePrice: numSourcePrice, sourceCurrency: numSourcePrice !== null ? sourceCurrency : null }
@@ -362,10 +329,28 @@ export async function PATCH(request: NextRequest) {
     const where = { postingNumber: String(postingNumber).trim() };
     let updated = await prisma.ozonOrder.update({ where, data: updateData });
 
-    if (numBuyPrice !== null) {
-      // Ozon kesintisi tahakkuk ettiyse gerçek tutarlar, etmediyse tarife tahmini yazılır.
-      await recalcOrderProfits([updated], { checkOzon: true });
-      updated = await prisma.ozonOrder.findUniqueOrThrow({ where });
+    // Alış (₺ ya da €/zł) değiştiyse kâr yeniden hesaplanır; ikisi de boşaldıysa kâr silinir.
+    const costChanged =
+      (buyPrice !== undefined && numBuyPrice !== existing.buyPrice) ||
+      (sourcePrice !== undefined &&
+        (updated.sourcePrice !== existing.sourcePrice || updated.sourceCurrency !== existing.sourceCurrency));
+    if (costChanged) {
+      if (Number(updated.buyPrice) > 0 || Number(updated.sourcePrice) > 0) {
+        // Ozon kesintisi tahakkuk ettiyse gerçek tutarlar, etmediyse tarife tahmini yazılır.
+        await recalcOrderProfits([updated], { checkOzon: true });
+        updated = await prisma.ozonOrder.findUniqueOrThrow({ where });
+      } else {
+        updated = await prisma.ozonOrder.update({
+          where,
+          data: {
+            netProfit: null,
+            netProfitTry: null,
+            profitSource: null,
+            profitJson: Prisma.DbNull,
+            profitCheckedAt: null,
+          },
+        });
+      }
     }
 
     const stats = await computeStoreStats('store1', patchStartDate, patchEndDate);

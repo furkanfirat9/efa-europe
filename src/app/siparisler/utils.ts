@@ -22,6 +22,37 @@ export function isUrlString(val?: string | null): boolean {
   return false;
 }
 
+/** Şemasız yazılmış bağlantıyı (amazon.de/...) açılabilir adrese çevirir. */
+export function toOrderHref(urlStr: string): string {
+  const raw = urlStr.trim();
+  return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+}
+
+export interface OrderSiteLogo {
+  src: string;
+  alt: string;
+  /** Yazının altında ok olduğu için yazı küçük kalıyor; logo daha yüksek çizilir. */
+  tall?: boolean;
+}
+
+/**
+ * Sık kullanılan tedarik sitelerinin logosu. Amazon.de alımları Prime Business
+ * hesabıyla, Allegro alımları Allegro Business ile yapılır. Diğer siteler null
+ * döner ve site adıyla gösterilir.
+ */
+export function getOrderSiteLogo(urlStr?: string | null): OrderSiteLogo | null {
+  if (!urlStr) return null;
+  try {
+    const host = new URL(toOrderHref(urlStr)).hostname.toLowerCase();
+    if (host.includes('allegro')) return { src: '/logos/allegro-business.svg', alt: 'Allegro Business' };
+    if (/(^|\.)amazon\.de$/.test(host)) return { src: '/logos/prime-business.svg', alt: 'Amazon.de Prime Business', tall: true };
+    if (host.includes('amazon')) return { src: '/logos/amazon.svg', alt: 'Amazon' };
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * URL'nin ait olduğu siteyi etiket olarak çıkarır (örn: 'Allegro', 'Amazon', vb.)
  */

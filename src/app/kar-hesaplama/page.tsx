@@ -19,25 +19,36 @@ import { Table, TableBody, TableCell, TableFooter, TableRow } from '@/components
  * Tek ürün için kâr hesabı. Fiyat önerisiyle aynı kurallar (src/lib/pricing/rules.ts): alış € ECB kuruyla
  * dolara (+ banka kur farkı), satış $, Ozon kesintileri, LS kargo ve depo ücreti ağırlıktan.
  * Eskiden alış ve satış aynı para biriminde sayılıyordu; dolar seçilince LS'nin € tarifeleri dolar gibi toplanıyordu.
+ * Alış zł de girilebilir (amazon.pl): önce ECB EUR/PLN kuruyla €'ya çevrilir, hesabın geri kalanı aynıdır.
  */
 
 interface Rates {
   eurUsd: number;
   eurUsdDate: string;
+  eurPln: number;
   eurTry: number;
   usdTry: number;
+  plnTry: number;
   tryDate: string;
   platformCapUsd: number | null;
 }
 
-type Form = { buy: string; inbound: string; sell: string; itemG: string; boxG: string; commission: string };
+type BuyCurrency = 'EUR' | 'PLN';
+type Form = { currency: BuyCurrency; buy: string; inbound: string; sell: string; itemG: string; boxG: string; commission: string };
 
-const EMPTY: Form = { buy: '', inbound: '0', sell: '', itemG: '', boxG: '', commission: '5' };
-const START: Form = { buy: '50', inbound: '0', sell: '120', itemG: '1000', boxG: '', commission: '5' };
+const EMPTY: Form = { currency: 'EUR', buy: '', inbound: '0', sell: '', itemG: '', boxG: '', commission: '5' };
+const START: Form = { currency: 'EUR', buy: '50', inbound: '0', sell: '120', itemG: '1000', boxG: '', commission: '5' };
+
+/** Alışın girildiği para birimi: Amazon.de / Ceneo €, amazon.pl zł */
+const BUY_CURRENCIES: { value: BuyCurrency; symbol: string; label: string; buyHint: string; inboundHint: string }[] = [
+  { value: 'EUR', symbol: '€', label: '€ Euro', buyHint: 'Amazon.de / Ceneo, KDV dahil', inboundHint: 'Amazon.de 5,99 €; ücretsizse 0' },
+  { value: 'PLN', symbol: 'zł', label: 'zł Zloti', buyHint: 'amazon.pl, KDV dahil', inboundHint: 'amazon.pl kargosu; ücretsizse 0' },
+];
 
 const decimal2 = new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const decimal4 = new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 const usd = (n: number) => `${n < 0 ? '−' : ''}$${decimal2.format(Math.abs(n))}`;
+const zloty = (n: number) => `${decimal2.format(n)} zł`;
 const grams = (n: number) => `${new Intl.NumberFormat('tr-TR').format(n)} g`;
 const pct = (p: number) => formatPercent(p * 100, p * 100 < 1 ? 2 : 1);
 /** 0.25 → "%25" (0.07 × 100 gibi kayan nokta artıklarını atar) */
@@ -143,8 +154,11 @@ export default function KarHesaplamaPage() {
 
   const calc = useMemo(() => {
     if (!rates) return null;
-    const buy = num(form.buy);
-    const inbound = num(form.inbound);
+    // zł girildiyse € karşılığı (ECB); hesabın geri kalanı € üzerinden
+    const toEur = form.currency === 'PLN' ? 1 / rates.eurPln : 1;
+    const buy = num(form.buy) * toEur;
+    const inbound = num(form.inbound) * toEur;
+    const buyLocal = num(form.buy) + num(form.inbound);
     const sell = num(form.sell);
     const commissionPct = num(form.commission) / 100;
     const w = shippingWeight({ amzItemG: num(form.itemG) || null, amzPackageG: num(form.boxG) || null });
@@ -180,10 +194,14 @@ export default function KarHesaplamaPage() {
       margin,
       prices: marginPrices(c),
       payoutUsd: sell - ozonFees - c.ozonShippingUsd,
-      cardTry: (buy + inbound) * rates.eurTry * (1 + PRICING.bankFxPct),
+      cardTry: buyLocal * (form.currency === 'PLN' ? rates.plnTry : rates.eurTry) * (1 + PRICING.bankFxPct),
       buyEur: buy + inbound,
+      buyLocal,
     };
   }, [rates, form]);
+
+  const cur = BUY_CURRENCIES.find((c) => c.value === form.currency)!;
+  const isPln = form.currency === 'PLN';
 
   const weightNote = calc
     ? calc.w.source === 'amazon-package'
@@ -197,7 +215,7 @@ export default function KarHesaplamaPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Kâr Hesaplama</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Fiyat önerisiyle aynı hesap: alış €, Ozon satışı $, kargo ve depo ücreti ağırlıktan.
+            Fiyat önerisiyle aynı hesap: alış € ya da zł, Ozon satışı $, kargo ve depo ücreti ağırlıktan.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -207,6 +225,14 @@ export default function KarHesaplamaPage() {
                 1 € = <span className="font-semibold tabular-nums text-foreground">{decimal4.format(rates.eurUsd)} $</span> · ECB{' '}
                 {day(rates.eurUsdDate)}
               </span>
+              {isPln && (
+                <>
+                  <span className="text-border">|</span>
+                  <span>
+                    1 € = <span className="font-semibold tabular-nums text-foreground">{decimal4.format(rates.eurPln)} zł</span> · ECB
+                  </span>
+                </>
+              )}
               <span className="text-border">|</span>
               <span>
                 1 € = <span className="font-semibold tabular-nums text-foreground">{decimal2.format(rates.eurTry)} ₺</span>, 1 $ ={' '}
@@ -236,20 +262,41 @@ export default function KarHesaplamaPage() {
             <CardTitle>Ürün</CardTitle>
             <CardDescription>Alış, satış ve ağırlık</CardDescription>
             <CardAction className="flex gap-1.5">
-              <Button variant="ghost" size="sm" onClick={() => setForm(EMPTY)} className="h-8 gap-1.5 text-xs">
+              <Button variant="ghost" size="sm" onClick={() => setForm((f) => ({ ...EMPTY, currency: f.currency }))} className="h-8 gap-1.5 text-xs">
                 <RotateCcw className="h-3.5 w-3.5" />
                 Sıfırla
               </Button>
             </CardAction>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <Label id="buy-currency" className="text-xs">
+                Alış para birimi
+              </Label>
+              <div role="radiogroup" aria-labelledby="buy-currency" className="inline-flex gap-0.5 rounded-md border p-0.5">
+                {BUY_CURRENCIES.map((c) => (
+                  <Button
+                    key={c.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={form.currency === c.value}
+                    variant={form.currency === c.value ? 'secondary' : 'ghost'}
+                    size="sm"
+                    className="h-7 px-2.5 text-xs"
+                    onClick={() => setForm((f) => ({ ...f, currency: c.value }))}
+                  >
+                    {c.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Field id="buy" label="Alış fiyatı" hint="Amazon / Ceneo, KDV dahil" unit="€" value={form.buy} onChange={set('buy')} />
+              <Field id="buy" label="Alış fiyatı" hint={cur.buyHint} unit={cur.symbol} value={form.buy} onChange={set('buy')} />
               <Field
                 id="inbound"
                 label="Depoya kargo"
-                hint="Amazon.de 5,99 €; ücretsizse 0"
-                unit="€"
+                hint={cur.inboundHint}
+                unit={cur.symbol}
                 value={form.inbound}
                 onChange={set('inbound')}
               />
@@ -319,7 +366,7 @@ export default function KarHesaplamaPage() {
                         <Line label="Ozon satış fiyatı" value={usd(calc.sell)} strong />
                         <Line
                           label="Alış + depoya kargo"
-                          note={`${formatEuro(calc.buyEur)} × ${decimal4.format(rates!.eurUsd)}, ${pct(PRICING.bankFxPct)} kur farkıyla`}
+                          note={`${isPln ? `${zloty(calc.buyLocal)} ÷ ${decimal4.format(rates!.eurPln)} = ` : ''}${formatEuro(calc.buyEur)} × ${decimal4.format(rates!.eurUsd)}, ${pct(PRICING.bankFxPct)} kur farkıyla`}
                           value={usd(-calc.c.landedUsd)}
                         />
                         <Line
@@ -382,7 +429,10 @@ export default function KarHesaplamaPage() {
                       </div>
                       <div className="mt-1 text-xl font-semibold tabular-nums">{formatTL(calc.cardTry)}</div>
                       <p className="text-xs text-muted-foreground">
-                        {formatEuro(calc.buyEur)} × {decimal2.format(rates!.eurTry)} ₺, {pct(PRICING.bankFxPct)} kur farkıyla
+                        {isPln
+                          ? `${zloty(calc.buyLocal)} × ${decimal4.format(rates!.plnTry)} ₺`
+                          : `${formatEuro(calc.buyEur)} × ${decimal2.format(rates!.eurTry)} ₺`}
+                        , {pct(PRICING.bankFxPct)} kur farkıyla
                       </p>
                     </div>
                   </div>
