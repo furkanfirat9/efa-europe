@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { after, NextRequest, NextResponse } from 'next/server';
 import { del, get, put } from '@vercel/blob';
 import { prisma } from '@/lib/db/prisma';
+import { DOCUMENT_AI_ENABLED } from '@/lib/documents/extract';
 import { checkSharedInvoice, IngestError, ingestOrderDocument, READABLE_TYPES } from '@/lib/documents/order-ingest';
 import { CURRENT_STORE } from '@/lib/documents/service';
 
@@ -147,8 +148,9 @@ export async function POST(request: NextRequest) {
     await deleteBlobQuietly(order.documentUrl);
 
     // Belgeler'e işleme yanıtı bekletmez. Siparişin zaten bir belgesi varsa ya da
-    // dosya okunamayan bir türse (Word, Excel) atlanır.
-    if (READABLE_TYPES.has(contentType)) {
+    // dosya okunamayan bir türse (Word, Excel) atlanır. Panelde okuma kapalıysa (2026-10-13'ten beri,
+    // DOCUMENT_AI) belgeyi muhasebe ajanı okur; Belgeler'de "Siparişlere yüklenmiş faturalar"da bekler.
+    if (DOCUMENT_AI_ENABLED && READABLE_TYPES.has(contentType)) {
       after(async () => {
         try {
           const { document, merged } = await ingestOrderDocument(postingNumber);

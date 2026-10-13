@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { prisma } from '@/lib/db/prisma';
-import { extractDocument, type ExtractedDocument } from '@/lib/documents/extract';
+import { DOCUMENT_AI_ENABLED, extractDocument, type ExtractedDocument } from '@/lib/documents/extract';
 import { CURRENT_STORE, isOtherStoreBuyer, saveExtractedDocument, toDto } from '@/lib/documents/service';
 
 /**
@@ -129,22 +129,27 @@ export async function POST(request: NextRequest) {
       return fail(409, 'Bu dosya daha önce yüklenmiş.', { existingId: sameFile.id, existingStatus: sameFile.status });
     }
 
-    // Okuma başarısız olsa da belge taslak olarak kaydedilir; bilgiler elle doldurulur.
+    // Okuma başarısız olsa da belge taslak olarak kaydedilir; bilgiler elle doldurulur. Panelde okuma
+    // kapalıysa (DOCUMENT_AI) taslağı muhasebe ajanı okuyup doldurur.
     let extracted: ExtractedDocument | null = null;
     let aiModel: string | null = null;
     const extraWarnings: string[] = [];
-    try {
-      const result = await extractDocument({
-        buffer,
-        base64: buffer.toString('base64'),
-        mimeType: contentType,
-        fileName: file.name,
-      });
-      extracted = result.data;
-      aiModel = result.model;
-    } catch (err: any) {
-      console.error('Belge okunamadı:', err);
-      extraWarnings.push('Belge otomatik okunamadı; bilgileri elle doldurun.');
+    if (!DOCUMENT_AI_ENABLED) {
+      extraWarnings.push('Belgeyi muhasebe ajanı okuyacak.');
+    } else {
+      try {
+        const result = await extractDocument({
+          buffer,
+          base64: buffer.toString('base64'),
+          mimeType: contentType,
+          fileName: file.name,
+        });
+        extracted = result.data;
+        aiModel = result.model;
+      } catch (err: any) {
+        console.error('Belge okunamadı:', err);
+        extraWarnings.push('Belge otomatik okunamadı; bilgileri elle doldurun.');
+      }
     }
 
     if (extracted?.documentKind === 'income_report') {

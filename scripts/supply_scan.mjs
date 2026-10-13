@@ -102,7 +102,8 @@ const CHANNELS = {
     // amazon.pl'de hesap Business değil; oturum "Cześć <ad>" ile, teslimat aynı posta koduyla (69108) görünür
     check(s) {
       if (!s.account || /zaloguj/i.test(s.account)) return `amazon.pl oturumu kapalı ("${s.account}") — --login ile yeniden giriş gerekli`;
-      if (!/69108/.test(s.deliver)) return `amazon.pl teslimat adresi 69108 değil ("${s.deliver}")`;
+      // Posta kodu bazen "69108", bazen "69-108 Cybinka" diye yazılıyor (2026-10-13)
+      if (!/69-?108/.test(s.deliver)) return `amazon.pl teslimat adresi 69108 değil ("${s.deliver}")`;
       return null;
     },
   },

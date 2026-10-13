@@ -5,8 +5,9 @@ import { toDto } from '@/lib/documents/service';
 /**
  * POST { postingNumber } → siparişe yüklenmiş alış faturasını okuyup Belgeler'e işler.
  *
- * Siparişler sayfasında yüklenen belge zaten arka planda okunur; bu uç, o okuma
- * başarısız olduğunda ya da eski yüklemeler için elle çalıştırılır. Uyarısız okunan
+ * Siparişler sayfasında yüklenen belge arka planda okunur; bu uç, o okuma başarısız olduğunda
+ * ya da eski yüklemeler için elle çalıştırılır. Panelde okuma kapalıysa (DOCUMENT_AI, 2026-10-13'ten
+ * beri) 409 döner: belgeyi muhasebe ajanı okur. Uyarısız okunan
  * belge doğrudan onaylanır. Aynı dosya listede zaten varsa sipariş o belgeye
  * eklenir ve yanıtta `merged: true` döner.
  */

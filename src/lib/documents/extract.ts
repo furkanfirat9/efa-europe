@@ -12,6 +12,13 @@ import {
  * Sonuç her zaman kullanıcının onayına sunulur; burada hiçbir şey kaydedilmez.
  */
 
+/**
+ * 2026-10-13'ten beri belgeleri muhasebe ajanı okuyor (kullanıcı: Gemini kullanılmasın; ajan
+ * scripts/muhasebe_belge.mjs ile `src/lib/documents/agent-ingest.ts` üzerinden yazar). Gemini'yle okuma
+ * yalnız `DOCUMENT_AI=gemini` ortam değişkeniyle açılır.
+ */
+export const DOCUMENT_AI_ENABLED = process.env.DOCUMENT_AI === 'gemini';
+
 export type DocumentKind = 'invoice' | 'credit_note' | 'ozon_upd' | 'ozon_report' | 'income_report' | 'not_invoice';
 
 export interface ExtractedLine {
@@ -202,6 +209,7 @@ export async function extractDocument(file: {
   mimeType: string;
   fileName?: string;
 }): Promise<{ data: ExtractedDocument; model: string }> {
+  if (!DOCUMENT_AI_ENABLED) throw new Error('Panelde belge okuma kapalı; belgeleri muhasebe ajanı okuyor.');
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new Error('GEMINI_API_KEY tanımlı değil.');
   const model = process.env.DEFAULT_AI_MODEL || 'gemini-3.8-flash';

@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { get } from '@vercel/blob';
 import { prisma } from '@/lib/db/prisma';
-import { extractDocument, type ExtractedDocument } from './extract';
+import { DOCUMENT_AI_ENABLED, extractDocument, type ExtractedDocument } from './extract';
 import {
   CURRENT_STORE,
   isCategorised,
@@ -14,8 +14,9 @@ import {
 /**
  * Siparişe yüklenmiş alış faturasını Belgeler'e işler.
  *
- * Siparişler sayfasında belge yüklenince arka planda, Belgeler'deki "Oku"
- * düğmesiyle de elle çalışır. Dosya kopyalanmaz: siparişin blob adresi paylaşılır
+ * 2026-10-13'ten beri belgeyi muhasebe ajanı okur ve okuduğunu `provided` ile verir
+ * (scripts/muhasebe_belge.mjs). Gemini'yle okuma yalnız DOCUMENT_AI=gemini iken (Siparişler'de
+ * yükleme sonrası arka planda ve Belgeler'deki "Oku" düğmesiyle) çalışır. Dosya kopyalanmaz: siparişin blob adresi paylaşılır
  * (fileShared). Aynı dosya başka bir siparişte zaten okunmuşsa yeniden okunmaz,
  * sipariş o belgeye eklenir ve belge kontrol için onay bekleyenlere döner. Okuma
  * sorunsuzsa (hiç uyarı yoksa) belge doğrudan onaylanır; aksi hâlde onay bekleyenlere düşer.
@@ -60,7 +61,7 @@ export async function checkSharedInvoice(fileHash: string, postingNumber: string
 }
 
 /** Uyarısız ve eksiksiz okunan belgeyi onaylar; onaylayamazsa belgeyi olduğu gibi döner. */
-async function autoConfirmIfClean(doc: DocumentWithLines): Promise<DocumentWithLines> {
+export async function autoConfirmIfClean(doc: DocumentWithLines): Promise<DocumentWithLines> {
   const warnings = Array.isArray(doc.warnings) ? doc.warnings : [];
   const complete =
     !!doc.documentDate &&
@@ -78,7 +79,10 @@ async function autoConfirmIfClean(doc: DocumentWithLines): Promise<DocumentWithL
 
 export async function ingestOrderDocument(
   postingNumber: string,
-  { autoConfirm = true }: { autoConfirm?: boolean } = {}
+  {
+    autoConfirm = true,
+    provided,
+  }: { autoConfirm?: boolean; provided?: { extracted: ExtractedDocument; aiModel: string } } = {}
 ): Promise<{ document: DocumentWithLines; merged: boolean }> {
   const order = await prisma.ozonOrder.findUnique({
     where: { postingNumber },
@@ -128,21 +132,27 @@ export async function ingestOrderDocument(
     return { document: merged, merged: true };
   }
 
-  let extracted: ExtractedDocument | null = null;
-  let aiModel: string | null = null;
+  if (!provided && !DOCUMENT_AI_ENABLED) {
+    throw new IngestError(409, 'Panelden okuma kapalı; bu belgeyi muhasebe ajanı okuyacak.');
+  }
+
+  let extracted: ExtractedDocument | null = provided?.extracted ?? null;
+  let aiModel: string | null = provided?.aiModel ?? null;
   const extraWarnings: string[] = [];
-  try {
-    const result = await extractDocument({
-      buffer,
-      base64: buffer.toString('base64'),
-      mimeType: contentType,
-      fileName: order.documentName ?? undefined,
-    });
-    extracted = result.data;
-    aiModel = result.model;
-  } catch (err) {
-    console.error('Sipariş belgesi okunamadı:', postingNumber, err);
-    extraWarnings.push('Belge otomatik okunamadı; bilgileri elle doldurun.');
+  if (!provided) {
+    try {
+      const result = await extractDocument({
+        buffer,
+        base64: buffer.toString('base64'),
+        mimeType: contentType,
+        fileName: order.documentName ?? undefined,
+      });
+      extracted = result.data;
+      aiModel = result.model;
+    } catch (err) {
+      console.error('Sipariş belgesi okunamadı:', postingNumber, err);
+      extraWarnings.push('Belge otomatik okunamadı; bilgileri elle doldurun.');
+    }
   }
 
   if (extracted?.documentKind === 'income_report') {
