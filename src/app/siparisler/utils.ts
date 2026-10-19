@@ -31,7 +31,7 @@ export function toOrderHref(urlStr: string): string {
 export interface OrderSiteLogo {
   src: string;
   alt: string;
-  /** Yazının altında ok olduğu için yazı küçük kalıyor; logo daha yüksek çizilir. */
+  /** Yazının altında ok var ya da logo iki satır; yazı küçük kaldığı için logo daha yüksek çizilir. */
   tall?: boolean;
 }
 
@@ -47,6 +47,7 @@ export function getOrderSiteLogo(urlStr?: string | null): OrderSiteLogo | null {
     if (host.includes('allegro')) return { src: '/logos/allegro-business.svg', alt: 'Allegro Business' };
     if (/(^|\.)amazon\.de$/.test(host)) return { src: '/logos/prime-business.svg', alt: 'Amazon.de Prime Business', tall: true };
     if (host.includes('amazon')) return { src: '/logos/amazon.svg', alt: 'Amazon' };
+    if (host.includes('oleole')) return { src: '/logos/oleole.svg', alt: 'OleOle', tall: true };
     return null;
   } catch {
     return null;
