@@ -289,7 +289,7 @@ export function InlineTextCell({
 
 // ─── Tedarikçi sipariş bağlantısı (tablo + yan panel) ────────────────────────
 
-/** Bilinen sitelerde logolu rozet (Amazon, Prime Business, Allegro Business), diğerlerinde site adı. */
+/** Bilinen sitelerde logolu rozet (Amazon, Prime Business, Allegro Business, OleOle), diğerlerinde site adı. */
 export function SupplierOrderLink({ value, title }: { value: string; title?: string }) {
   const href = toOrderHref(value);
   const logo = getOrderSiteLogo(value);
