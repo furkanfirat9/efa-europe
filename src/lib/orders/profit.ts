@@ -79,6 +79,8 @@ interface OrderProduct {
   offer_id?: string;
   price?: string | number;
   quantity?: number;
+  /** Ozon kartının paketli ağırlığı (kg), v4 gönderi listesinden */
+  weight?: number | string;
 }
 
 interface FinancialProduct {
@@ -183,27 +185,34 @@ async function ratesFor(date: Date, memo: Map<string, Promise<OrderRates>>) {
   return memo.get(key)!;
 }
 
-/** Paketli ağırlık: ürünlerin tedarik kaydındaki ağırlığı (paket payıyla), yoksa LS'ye bildirilen ağırlık. */
+/**
+ * Paketli ağırlık: ürünlerin tedarik kaydındaki ağırlığı (paket payıyla), yoksa LS'ye bildirilen ağırlık, o da yoksa
+ * siparişteki Ozon kartı ağırlığı. Ağırlık bulunamazsa kargo ve depo 0 sayılır ve kâr şişer (QT2028, 2026-10-19).
+ */
 function orderWeight(
   products: OrderProduct[],
   sources: Map<string, ProductSource>,
   lsOrder: ArbitrageOrder | undefined
 ): { grams: number; source: OrderProfitBreakdown['weightSource'] } | null {
-  let total = 0;
-  let source: WeightSource | null = null;
-  for (const p of products) {
-    const s = p.offer_id ? sources.get(p.offer_id) : undefined;
-    const w = shippingWeight({ amzItemG: s?.amzItemWeightG, amzPackageG: s?.amzPackageWeightG, icecatPackageG: s?.icecatPackageWeightG });
-    if (!w.grams) {
-      total = 0;
-      break;
+  const sum = (withCard: boolean) => {
+    let total = 0;
+    let source: WeightSource | null = null;
+    for (const p of products) {
+      const s = p.offer_id ? sources.get(p.offer_id) : undefined;
+      const cardKg = Number(p.weight);
+      const w = shippingWeight({
+        amzItemG: s?.amzItemWeightG,
+        amzPackageG: s?.amzPackageWeightG,
+        icecatPackageG: s?.icecatPackageWeightG,
+        ozonCardG: withCard && cardKg > 0 ? Math.round(cardKg * 1000) : null,
+      });
+      if (!w.grams) return null;
+      total += w.grams * (p.quantity || 1);
+      source = w.source;
     }
-    total += w.grams * (p.quantity || 1);
-    source = w.source;
-  }
-  if (total > 0) return { grams: total, source };
-  if (lsOrder?.weightGr) return { grams: lsOrder.weightGr, source: 'ls-order' };
-  return null;
+    return total > 0 ? { grams: total, source } : null;
+  };
+  return sum(false) ?? (lsOrder?.weightGr ? { grams: lsOrder.weightGr, source: 'ls-order' } : null) ?? sum(true);
 }
 
 /** Alış maliyeti: döviz tutarı girildiyse ondan (kur farkıyla), yoksa karttan çekilen ₺'den. */
