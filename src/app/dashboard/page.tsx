@@ -1,32 +1,22 @@
 import React from 'react';
-import { MonthlyRevenueCard } from './_components/MonthlyRevenueCard';
-import { AccountingSummaryCard } from './_components/AccountingSummaryCard';
-import { OrderProfitCard } from './_components/OrderProfitCard';
+import { DashboardView } from './_components/DashboardView';
 
 export const metadata = {
   title: 'Dashboard | EFA Europe',
 };
 
 /**
- * Uygulamanın özet sayfası. Her alan tek bir kartla temsil edilir
- * (ana rakam + detay sayfasına bağlantı); ayrıntı kendi sayfasında durur.
+ * Uygulamanın özet sayfası, Amazon satıcı paneli düzeninde (src/app/dashboard/_components/DashboardView.tsx).
+ * Ana rakamlar ve bağlantılar burada; ayrıntı kendi sayfasında durur.
  */
 export default function DashboardPage() {
   return (
-    <div className="flex-1 space-y-4 bg-background p-4 pt-6 text-foreground md:p-8">
+    <div className="flex-1 space-y-6 bg-background p-4 pt-6 text-foreground md:p-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Genel bakış</h1>
         <p className="text-muted-foreground">Mağazaların, siparişlerin ve muhasebenin özeti.</p>
       </div>
-
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        <div className="grid grid-cols-1 content-start gap-4 md:grid-cols-2 xl:col-span-2">
-          <MonthlyRevenueCard />
-          <AccountingSummaryCard />
-        </div>
-        {/* Sağ sütun: dikey kâr kartı */}
-        <OrderProfitCard />
-      </div>
+      <DashboardView />
     </div>
   );
 }

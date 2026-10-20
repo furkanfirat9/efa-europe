@@ -70,6 +70,7 @@ export function ProductImageCell({ order }: { order: OrderItem }) {
     () => getShipmentCountdown(order.shipmentDate, order.status),
     [order.shipmentDate, order.status]
   );
+  const quantity = order.quantity ?? 1;
 
   return (
     <div className="relative inline-flex">
@@ -85,13 +86,25 @@ export function ProductImageCell({ order }: { order: OrderItem }) {
         )}
       </div>
 
-      {/* Ozon'un 6 günlük ek süresine göre kalan gün */}
+      {/* Birden fazla adet: sağ üstte adet. Tutar (Satış) bütün adetlerin toplamıdır. */}
+      {quantity > 1 && (
+        <span
+          className="absolute -top-2 -right-2 z-20 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground ring-1 ring-background select-none"
+          title={`${quantity} adet`}
+          aria-label={`${quantity} adet`}
+        >
+          {quantity}
+        </span>
+      )}
+
+      {/* Ozon'un 6 günlük ek süresine göre kalan gün. Sağ üstte adet varsa alta iner, üst üste binmesin. */}
       {countdown && (
         <Tooltip>
           <TooltipTrigger asChild>
             <span
               className={cn(
-                'absolute -top-2 left-7 z-10 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-bold leading-none whitespace-nowrap ring-1 ring-background select-none',
+                quantity > 1 ? 'absolute -bottom-2 left-7' : 'absolute -top-2 left-7',
+                'z-10 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-bold leading-none whitespace-nowrap ring-1 ring-background select-none',
                 getCountdownUrgencyStyle(countdown.daysLeft, countdown.isExpired)
               )}
             >

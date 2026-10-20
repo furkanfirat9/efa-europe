@@ -59,6 +59,8 @@ function filterAndSortOrdersLocally(
       res = res.filter((o) => o.status === 'delivered');
     } else if (status === 'cancelled') {
       res = res.filter((o) => o.status === 'cancelled');
+    } else if (status === 'unfulfilled') {
+      res = res.filter((o) => o.missingFulfillment);
     } else {
       res = res.filter((o) => o.status === status);
     }

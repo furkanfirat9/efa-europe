@@ -363,6 +363,28 @@ export default function FulfillmentPage() {
     }
   };
 
+  // Siparişler sayfasındaki "Fulfillment'a ekle" bağlantısı (?siparis=<gönderi no>): form o
+  // siparişle, seçiciden seçilmiş gibi doldurulur. Adres temizlenir ki yenileme formu tekrar doldurmasın.
+  useEffect(() => {
+    const postingNumber = new URLSearchParams(window.location.search).get('siparis')?.trim();
+    if (!postingNumber) return;
+    window.history.replaceState(null, '', window.location.pathname);
+
+    (async () => {
+      try {
+        const res = await fetch('/api/fulfillment/order-candidates', { cache: 'no-store' });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error_message || 'Sipariş bilgileri alınamadı.');
+        const item = (data.items as OrderCandidate[]).find((i) => i.postingNumber === postingNumber);
+        if (item) handlePickOrder(item);
+        else setSubmitError(`${postingNumber}: sipariş açık değil ya da sevkiyat görevi zaten açılmış.`);
+      } catch (err: any) {
+        setSubmitError(err.message || 'Sipariş bilgileri alınamadı.');
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleStartEdit = (order: ArbitrageOrderRecord) => {
     setIsEditing(true);
     setEditingOrderId(order.ozonOrderId);

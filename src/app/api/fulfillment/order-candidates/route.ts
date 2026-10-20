@@ -2,11 +2,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { getEcbEurUsd } from '@/lib/fx/ecb';
 import { extractProductMeta } from '@/lib/orders/productMeta';
+import { ordersWithoutTaskWhere } from '@/lib/fulfillment/missing';
 
 export const dynamic = 'force-dynamic';
-
-/** Depoya henüz gönderilmemiş, kargolanmayı bekleyen siparişler. İptal ve teslim edilenler listelenmez. */
-const OPEN_STATUSES = ['awaiting_registration', 'awaiting_packaging', 'awaiting_deliver'];
 
 /**
  * GET /api/fulfillment/order-candidates
@@ -17,18 +15,12 @@ const OPEN_STATUSES = ['awaiting_registration', 'awaiting_packaging', 'awaiting_
  */
 export async function GET() {
   try {
-    const [records, ecb] = await Promise.all([
-      prisma.arbitrageOrder.findMany({ select: { ozonOrderId: true } }),
-      getEcbEurUsd().catch(() => null),
-    ]);
+    const [where, ecb] = await Promise.all([ordersWithoutTaskWhere(), getEcbEurUsd().catch(() => null)]);
 
     const orders = await prisma.ozonOrder.findMany({
-      where: {
-        storeId: 'store1',
-        status: { in: OPEN_STATUSES },
-        postingNumber: { notIn: records.map((r) => r.ozonOrderId) },
-      },
-      orderBy: { inProcessAt: 'desc' },
+      where,
+      // Eskiden yeniye: en uzun süredir bekleyen sipariş en üstte.
+      orderBy: { inProcessAt: 'asc' },
     });
 
     const items = orders.map((o) => {

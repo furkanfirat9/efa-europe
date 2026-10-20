@@ -26,6 +26,26 @@ export function currentMonthMsk(): { year: number; month: number } {
 }
 
 /**
+ * Gönderinin satış tutarı. Ozon ürün satırında `price` birim fiyattır; aynı üründen 2 adet
+ * alınan siparişte tutar 2 × fiyattır. Eskiden adet hesaba katılmıyordu ve 2 adetli
+ * siparişler tek adet tutarıyla görünüyordu (04722444-0706-1, 2026-10-20).
+ */
+export function postingTotalPrice(p: any): number {
+  const lines = Array.isArray(p?.financial_data?.products)
+    ? p.financial_data.products
+    : Array.isArray(p?.products)
+      ? p.products
+      : [];
+  return lines.reduce((sum: number, prod: any) => sum + Number(prod.price || 0) * (Number(prod.quantity) || 1), 0);
+}
+
+/** Gönderideki toplam ürün adedi. */
+export function postingQuantity(products: unknown): number {
+  if (!Array.isArray(products)) return 1;
+  return products.reduce((sum: number, prod: any) => sum + (Number(prod?.quantity) || 1), 0) || 1;
+}
+
+/**
  * v4 gönderisini v3 biçimine çevirir; veri tabanına yazılan ve ekranların okuduğu
  * alanlar (fiyat, para birimi, komisyon) eskisiyle aynı kalır, eski kayıtlarla
  * yenileri arasında fark oluşmaz. v4'ün eklediği alanlar olduğu gibi durur.

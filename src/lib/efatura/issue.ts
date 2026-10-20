@@ -433,6 +433,32 @@ export interface InvoiceOrderRow {
   gibInvoice: { id: string; invoiceNo: string; hasPdf: boolean } | null;
 }
 
+/**
+ * Faturası kesilmemiş sipariş sayısı (dashboard). listInvoiceOrders'ın "pending" ölçütüyle aynı:
+ * başlangıç gününden sonraki, iptal edilmemiş, panelde kesilmiş (ISSUED) ya da GİB faturası
+ * bağlanmış olmayan siparişler. Trendyol'a durum sormaz, Ozon'dan durum tazelemez.
+ */
+export async function countPendingInvoices(): Promise<number> {
+  const env = efaturaEnv();
+  const [orders, issued, gib] = await Promise.all([
+    prisma.ozonOrder.findMany({
+      where: { storeId: ORDER_STORE_ID, status: { not: 'cancelled' }, inProcessAt: { gte: invoicingStartDate() } },
+      select: { postingNumber: true },
+    }),
+    prisma.eArchiveIssue.findMany({ where: { env, status: 'ISSUED' }, select: { postingNumber: true, salesInvoiceId: true } }),
+    prisma.salesInvoice.findMany({
+      where: { store: CURRENT_STORE, postingNumber: { not: null } },
+      select: { id: true, postingNumber: true },
+    }),
+  ]);
+  const own = new Set(issued.map((i) => i.salesInvoiceId).filter(Boolean));
+  const invoiced = new Set([
+    ...issued.map((i) => i.postingNumber),
+    ...gib.filter((g) => !own.has(g.id)).map((g) => g.postingNumber!),
+  ]);
+  return orders.filter((o) => !invoiced.has(o.postingNumber)).length;
+}
+
 /** Yenilemede en fazla bu kadar fatura için Trendyol'a durum sorulur. */
 const REFRESH_LIMIT = 10;
 
