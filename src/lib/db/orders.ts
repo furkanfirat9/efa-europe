@@ -1,4 +1,5 @@
 import { prisma } from './prisma';
+import { postingTotalPrice } from '@/lib/ozon/postings';
 
 function getOrderStatusName(status: string): string {
   switch (status) {
@@ -39,13 +40,7 @@ export async function syncOzonOrdersToDb(postings: any[], storeId: string = 'sto
       const inProcessAt = p.in_process_at ? new Date(p.in_process_at) : p.shipment_date ? new Date(p.shipment_date) : null;
       const shipmentDate = p.shipment_date ? new Date(p.shipment_date) : null;
 
-      // Fiyat hesabı
-      let totalPrice = 0;
-      if (p.financial_data?.products && Array.isArray(p.financial_data.products)) {
-        totalPrice = p.financial_data.products.reduce((acc: number, prod: any) => acc + Number(prod.price || 0), 0);
-      } else if (p.products && Array.isArray(p.products)) {
-        totalPrice = p.products.reduce((acc: number, prod: any) => acc + Number(prod.price || 0), 0);
-      }
+      const totalPrice = postingTotalPrice(p);
 
       const currency = p.products?.[0]?.currency_code || 'RUB';
 

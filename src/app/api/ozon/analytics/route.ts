@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { syncOzonOrdersToDb } from '@/lib/db/orders';
 import { getOzonHeaders, ozonFetch, OzonRateLimitError } from '@/lib/ozon/gate';
-import { fetchPostingsForRange } from '@/lib/ozon/postings';
+import { fetchPostingsForRange, postingTotalPrice } from '@/lib/ozon/postings';
 
 function getOrderStatusName(status: string): string {
   switch (status) {
@@ -244,13 +244,7 @@ async function fetchRealOrders(dateFrom: string, dateTo: string, headers: Record
       // Yalnızca seçili tarih aralığına (yerel gün bazında) uyan siparişleri dahil et
       if (dayKey < dateFrom || dayKey > dateTo) return;
 
-      // Fiyat hesabı
-      let orderPrice = 0;
-      if (p.financial_data?.products) {
-        orderPrice = p.financial_data.products.reduce((acc: number, prod: any) => acc + Number(prod.price || 0), 0);
-      } else if (p.products) {
-        orderPrice = p.products.reduce((acc: number, prod: any) => acc + Number(prod.price || 0), 0);
-      }
+      const orderPrice = postingTotalPrice(p);
 
       totalOrders += 1;
       totalRevenue += orderPrice;

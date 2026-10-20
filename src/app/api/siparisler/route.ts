@@ -4,15 +4,23 @@ import { prisma } from '@/lib/db/prisma';
 import { parseTrNumber } from '@/lib/format';
 import { recalcOrderProfits } from '@/lib/orders/profit';
 import { extractProductMeta } from '@/lib/orders/productMeta';
-import { monthRangeMsk } from '@/lib/ozon/postings';
+import { monthRangeMsk, postingQuantity, postingTotalPrice } from '@/lib/ozon/postings';
+import { ordersWithoutTaskWhere } from '@/lib/fulfillment/missing';
 
 export const dynamic = 'force-dynamic';
 
+/** Sevkiyat görevi açılmamış açık siparişlerin gönderi numaraları ("Fulfillment'a eklenmeyenler" filtresi). */
+async function findOrdersWithoutTask(): Promise<Set<string>> {
+  const orders = await prisma.ozonOrder.findMany({
+    where: await ordersWithoutTaskWhere(),
+    select: { postingNumber: true },
+  });
+  return new Set(orders.map((o) => o.postingNumber));
+}
+
 function parsePriceFromRaw(p: any): number {
   if (!p) return 0;
-  if (p.products && Array.isArray(p.products)) {
-    return p.products.reduce((acc: number, item: any) => acc + Number(item.price || 0), 0);
-  }
+  if (p.products && Array.isArray(p.products)) return postingTotalPrice(p);
   return Number(p.totalPrice || 0);
 }
 
@@ -164,13 +172,14 @@ export async function GET(request: NextRequest) {
       where.AND = andConditions;
     }
 
-    const [orders, stats] = await Promise.all([
+    const [orders, stats, withoutTask] = await Promise.all([
       prisma.ozonOrder.findMany({
         where,
         orderBy: { inProcessAt: 'asc' },
         take: limit,
       }),
       computeStoreStats('store1', startDate, endDate),
+      findOrdersWithoutTask(),
     ]);
 
     // Tüm siparişler arasında varsa mevcut ürün görsellerini offerId ile eşle
@@ -206,6 +215,8 @@ export async function GET(request: NextRequest) {
         productOfferId: offerId,
         productTitle: title,
         productImage: image,
+        quantity: postingQuantity(o.productsJson),
+        missingFulfillment: withoutTask.has(o.postingNumber),
       };
     });
 

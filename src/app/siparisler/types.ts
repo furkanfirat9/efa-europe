@@ -19,6 +19,8 @@ export interface OrderItem {
   productOfferId?: string;
   productTitle?: string;
   productImage?: string;
+  /** Gönderideki toplam ürün adedi; salePrice bütün adetlerin toplamıdır. */
+  quantity?: number;
   buyPrice?: number | null;
   buyCurrency?: string | null;
   buyPriceTry?: number | null;
@@ -41,6 +43,8 @@ export interface OrderItem {
   documentContentType?: string | null;
   documentSize?: number | null;
   documentUploadedAt?: string | null;
+  /** Açık sipariş ama Fulfillment'ta sevkiyat görevi açılmamış. */
+  missingFulfillment?: boolean;
 }
 
 export type OrderDocumentFields = Pick<
@@ -123,4 +127,5 @@ export const STATUS_FILTER_OPTIONS: StatusFilterOption[] = [
   { key: 'delivered', label: 'Teslim Edilenler', fullLabel: 'Teslim Edilenler', dotColor: 'bg-emerald-500' },
   { key: 'cancelled', label: 'İptaller', fullLabel: 'İptal Edilenler', dotColor: 'bg-rose-500' },
   { key: 'uncalculated', label: 'Hesaplanmayanlar', fullLabel: 'Hesaplanmayanlar', dotColor: 'bg-purple-500' },
+  { key: 'unfulfilled', label: 'Fulfillment yok', fullLabel: "Fulfillment'a eklenmeyenler", dotColor: 'bg-orange-500' },
 ];

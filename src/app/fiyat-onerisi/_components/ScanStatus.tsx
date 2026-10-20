@@ -6,7 +6,7 @@ import type { ScanStatus as Status } from '@/lib/sourcing/scanStatus';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import { cn } from '@/lib/utils';
 
-const when = (iso: string | null) => {
+export const when = (iso: string | null) => {
   if (!iso) return '—';
   const d = new Date(iso);
   const days = Math.floor((new Date().setHours(0, 0, 0, 0) - new Date(d).setHours(0, 0, 0, 0)) / 86400_000);
@@ -16,7 +16,7 @@ const when = (iso: string | null) => {
   return d.toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 };
 
-const LOOK: Record<string, { icon: typeof CheckCircle2; text: string; tone: string }> = {
+export const LOOK: Record<string, { icon: typeof CheckCircle2; text: string; tone: string }> = {
   ok: { icon: CheckCircle2, text: 'Tamam', tone: 'text-emerald-600' },
   partial: { icon: AlertTriangle, text: 'Kısmi', tone: 'text-amber-600' },
   error: { icon: XCircle, text: 'Hata', tone: 'text-destructive' },

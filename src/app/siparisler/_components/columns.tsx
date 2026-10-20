@@ -8,7 +8,8 @@ import {
   rowPaginationFeature,
   tableFeatures,
 } from '@tanstack/react-table';
-import { ArrowDown, ArrowUp, ArrowUpDown, PanelRightOpen } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowDown, ArrowUp, ArrowUpDown, PackagePlus, PanelRightOpen } from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
 import { formatNumber, formatUSD } from '@/lib/format';
 import { OrderItem } from '../types';
@@ -188,15 +189,34 @@ export function buildOrderColumns({
       header: () => <span className="sr-only">İşlemler</span>,
       enableHiding: false,
       cell: ({ row }) => (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-8"
-          onClick={() => onOpenDetail(row.original)}
-          aria-label="Sipariş detayını aç"
-        >
-          <PanelRightOpen />
-        </Button>
+        <div className="flex items-center justify-end gap-1">
+          {/* Turuncu: Durum menüsündeki "Fulfillment'a eklenmeyenler" filtresinin rengi */}
+          {row.original.missingFulfillment && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
+              asChild
+            >
+              <Link
+                href={`/fulfillment?siparis=${encodeURIComponent(row.original.postingNumber)}`}
+                aria-label="Fulfillment'a ekle"
+                title="Fulfillment'a ekle"
+              >
+                <PackagePlus />
+              </Link>
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-8"
+            onClick={() => onOpenDetail(row.original)}
+            aria-label="Sipariş detayını aç"
+          >
+            <PanelRightOpen />
+          </Button>
+        </div>
       ),
     }),
   ]);
