@@ -61,6 +61,9 @@ function filterAndSortOrdersLocally(
       res = res.filter((o) => o.status === 'cancelled');
     } else if (status === 'unfulfilled') {
       res = res.filter((o) => o.missingFulfillment);
+    } else if (status === 'nodoc') {
+      // Alış belgesi (Belge sütunu) yüklenmemiş, iptal edilmemiş siparişler
+      res = res.filter((o) => o.status !== 'cancelled' && !o.documentName);
     } else {
       res = res.filter((o) => o.status === status);
     }

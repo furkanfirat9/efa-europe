@@ -128,4 +128,5 @@ export const STATUS_FILTER_OPTIONS: StatusFilterOption[] = [
   { key: 'cancelled', label: 'İptaller', fullLabel: 'İptal Edilenler', dotColor: 'bg-rose-500' },
   { key: 'uncalculated', label: 'Hesaplanmayanlar', fullLabel: 'Hesaplanmayanlar', dotColor: 'bg-purple-500' },
   { key: 'unfulfilled', label: 'Fulfillment yok', fullLabel: "Fulfillment'a eklenmeyenler", dotColor: 'bg-orange-500' },
+  { key: 'nodoc', label: 'Belgesiz', fullLabel: 'Belgesiz (alış belgesi yüklenmemiş)', dotColor: 'bg-sky-500' },
 ];
