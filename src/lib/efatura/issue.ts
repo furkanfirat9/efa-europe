@@ -1,11 +1,11 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { put } from '@vercel/blob';
+import { del, put } from '@vercel/blob';
 import type { EArchiveIssue, OzonOrder, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { getTryRate } from '@/lib/fx/evds';
 import { refreshOpenOrderStatuses } from '@/lib/orders/openStatus';
 import { parseUblInvoice, type ParsedInvoice } from '@/lib/sales-invoices/ubl';
-import { CURRENT_STORE, OWN_TAX_ID, ORDER_STORE_ID, saveParsedInvoice } from '@/lib/sales-invoices/service';
+import { CURRENT_STORE, OWN_TAX_ID, ORDER_STORE_ID, replaceParsedInvoice, saveParsedInvoice } from '@/lib/sales-invoices/service';
 import {
   createEArchive,
   downloadEArchive,
@@ -296,6 +296,12 @@ export async function refreshIssue(issue: EArchiveIssue): Promise<EArchiveIssue>
 /** Belgeler kaydı için XML'in beklendiği süre */
 const XML_WAIT_MS = 15 * 60_000;
 
+/**
+ * XML beklenen sürede gelmediği için yalnız PDF ile kaydedilmiş faturanın asıl dosya türü.
+ * Muhasebeci resmî XML'i istiyor; bu kayıtların XML'i sonradan eklenir (attachMissingXml).
+ */
+const PDF_ONLY = 'application/pdf';
+
 async function saveToSalesInvoices(issue: EArchiveIssue): Promise<EArchiveIssue> {
   const existing = await prisma.salesInvoice.findUnique({
     where: { store_uuid: { store: CURRENT_STORE, uuid: issue.invoiceUuid } },
@@ -319,7 +325,7 @@ async function saveToSalesInvoices(issue: EArchiveIssue): Promise<EArchiveIssue>
     original = { bytes: xml, name: `${parsed.invoiceNo}.xml`, contentType: 'application/xml' };
   } else if (pdf && issue.payload && issue.invoiceNo && !waitForXml) {
     parsed = parsedFromPayload(issue);
-    original = { bytes: pdf, name: `${parsed.invoiceNo}.pdf`, contentType: 'application/pdf' };
+    original = { bytes: pdf, name: `${parsed.invoiceNo}.pdf`, contentType: PDF_ONLY };
   } else {
     return issue; // dosyalar henüz hazır değil; sonraki yenilemede
   }
@@ -352,6 +358,64 @@ async function saveToSalesInvoices(issue: EArchiveIssue): Promise<EArchiveIssue>
   }
 
   return prisma.eArchiveIssue.update({ where: { id: issue.id }, data: { salesInvoiceId: saved.id } });
+}
+
+/**
+ * Yalnız PDF ile kaydedilmiş faturanın XML'i Trendyol'da çıktıysa Belgeler kaydını tamamlar:
+ * XML asıl dosya olur, alanlar ve satırlar XML'den yazılır, PDF eklenmiş PDF olarak kalır.
+ * Yeni kayıt açılmaz. XML başka bir faturaya aitse (no, ETTN, satıcı, gönderi no) eklenmez.
+ */
+export async function attachMissingXml(issue: EArchiveIssue): Promise<EArchiveIssue> {
+  if (!issue.salesInvoiceId) return issue;
+  const invoice = await prisma.salesInvoice.findUnique({
+    where: { id: issue.salesInvoiceId },
+    select: { id: true, invoiceNo: true, uuid: true, fileUrl: true, fileName: true, fileSize: true, fileContentType: true, pdfUrl: true },
+  });
+  if (invoice?.fileContentType !== PDF_ONLY) return issue;
+
+  const xml = await downloadEArchive(issue.invoiceUuid, 'xml');
+  if (!xml) return issue; // hâlâ yok; sonraki yenilemede
+
+  const parsed = parseUblInvoice(new TextDecoder('utf-8').decode(xml));
+  const mismatch = [
+    parsed.sellerTaxId !== OWN_TAX_ID && `satıcı ${parsed.sellerTaxId}`,
+    parsed.invoiceNo !== invoice.invoiceNo && `no ${parsed.invoiceNo}`,
+    parsed.uuid !== invoice.uuid.toLowerCase() && `ETTN ${parsed.uuid}`,
+    parsed.postingNumber !== issue.postingNumber && `gönderi no ${parsed.postingNumber ?? 'yok'}`,
+  ].filter(Boolean);
+  if (mismatch.length) throw new Error(`${invoice.invoiceNo} için gelen XML bu faturanın değil (${mismatch.join(', ')}).`);
+
+  const token = process.env.BLOB_READ_WRITE_TOKEN || undefined;
+  const name = `${parsed.invoiceNo}.xml`;
+  const blob = await put(`sales-invoices/${CURRENT_STORE}/${Date.now()}-${name}`, xml, {
+    access: 'private',
+    contentType: 'application/xml',
+    token,
+  });
+  const file = {
+    url: blob.url,
+    name,
+    contentType: 'application/xml',
+    size: xml.length,
+    hash: createHash('sha256').update(xml).digest('hex'),
+  };
+  const updated = await replaceParsedInvoice(invoice.id, parsed, file, PDF_ONLY);
+  if (!updated) {
+    // Aynı anda başka bir yenileme tamamladı.
+    await del(blob.url, { token }).catch(() => {});
+    return issue;
+  }
+
+  // Asıl dosya olarak saklanan PDF, eklenmiş PDF'in kopyası. Eklenmiş PDF yoksa o olur.
+  if (invoice.pdfUrl) {
+    await del(invoice.fileUrl, { token }).catch((err) => console.error('Eski PDF silinemedi:', invoice.fileUrl, err));
+  } else {
+    await prisma.salesInvoice.update({
+      where: { id: invoice.id },
+      data: { pdfUrl: invoice.fileUrl, pdfName: invoice.fileName, pdfSize: invoice.fileSize },
+    });
+  }
+  return issue;
 }
 
 interface SentPayload {
@@ -459,8 +523,48 @@ export async function countPendingInvoices(): Promise<number> {
   return orders.filter((o) => !invoiced.has(o.postingNumber)).length;
 }
 
-/** Yenilemede en fazla bu kadar fatura için Trendyol'a durum sorulur. */
+/** Yenilemede en fazla bu kadar fatura için Trendyol'a gidilir. */
 const REFRESH_LIMIT = 10;
+
+/**
+ * Bitmemiş faturaları ilerletir: Trendyol durumu, Belgeler kaydı ve sonradan gelen XML.
+ * En fazla REFRESH_LIMIT fatura için Trendyol'a gidilir; kalanlar sonraki turda.
+ * XML'i saatlerce çıkmayan fatura olabiliyor (DAP2026000000023); yeni faturalar onları
+ * beklemesin diye önce durum ve Belgeler kaydı, kalan hakla XML denenir.
+ * `pdfOnly`: asıl dosyası PDF olan (XML'i eksik) Belgeler kayıtlarının kimlikleri.
+ */
+async function refreshIssues(env: EfaturaEnv, issuesRaw: EArchiveIssue[], pdfOnly: Set<string>) {
+  const needsXml = (i: EArchiveIssue) => env === 'production' && !!i.salesInvoiceId && pdfOnly.has(i.salesInvoiceId);
+  const needsRefresh = (i: EArchiveIssue) =>
+    i.status === 'ISSUED' && (!isFinalStatus(i.providerStatus) || (env === 'production' && i.providerStatus === FINAL_OK && !i.salesInvoiceId));
+
+  const toRefresh = issuesRaw.filter(needsRefresh);
+  const toAttach = issuesRaw.filter((i) => needsXml(i) && !needsRefresh(i));
+  const queue = [...toRefresh, ...toAttach].slice(0, REFRESH_LIMIT);
+  const done = new Map<string, EArchiveIssue>();
+  for (const issue of queue) {
+    done.set(issue.id, await (needsRefresh(issue) ? refreshIssue(issue) : attachMissingXml(issue)).catch((err) => {
+      console.error('e-Arşiv durumu güncellenemedi:', issue.postingNumber, err);
+      return issue;
+    }));
+  }
+  return { issues: issuesRaw.map((i) => done.get(i.id) ?? i), refreshed: queue.length };
+}
+
+/**
+ * Vercel Cron: Fatura oluştur sayfası açılmasa da kesilen faturalar Belgeler'e yazılır ve
+ * yalnız PDF ile kaydedilenlerin XML'i eklenir.
+ */
+export async function refreshPendingIssues() {
+  const env = efaturaEnv();
+  const [issuesRaw, pdfOnly] = await Promise.all([
+    prisma.eArchiveIssue.findMany({ where: { env, status: 'ISSUED' } }),
+    prisma.salesInvoice.findMany({ where: { store: CURRENT_STORE, fileContentType: PDF_ONLY }, select: { id: true } }),
+  ]);
+  const { refreshed } = await refreshIssues(env, issuesRaw, new Set(pdfOnly.map((s) => s.id)));
+  const xmlMissing = await prisma.salesInvoice.count({ where: { store: CURRENT_STORE, fileContentType: PDF_ONLY } });
+  return { env, refreshed, xmlMissing };
+}
 
 export async function listInvoiceOrders(): Promise<{ env: EfaturaEnv; startDate: string; pending: InvoiceOrderRow[]; invoiced: InvoiceOrderRow[] }> {
   const env = efaturaEnv();
@@ -480,25 +584,13 @@ export async function listInvoiceOrders(): Promise<{ env: EfaturaEnv; startDate:
     prisma.eArchiveIssue.findMany({ where: { env } }),
     prisma.salesInvoice.findMany({
       where: { store: CURRENT_STORE, postingNumber: { not: null } },
-      select: { id: true, postingNumber: true, invoiceNo: true, pdfUrl: true },
+      select: { id: true, postingNumber: true, invoiceNo: true, pdfUrl: true, fileContentType: true },
     }),
   ]);
 
-  // İşlenmekte olan faturaların durumu sayfa açılınca güncellenir.
-  let refreshed = 0;
-  const issues: EArchiveIssue[] = [];
-  for (const issue of issuesRaw) {
-    const needs = issue.status === 'ISSUED' && (!isFinalStatus(issue.providerStatus) || (env === 'production' && issue.providerStatus === FINAL_OK && !issue.salesInvoiceId));
-    if (needs && refreshed < REFRESH_LIMIT) {
-      refreshed++;
-      issues.push(await refreshIssue(issue).catch((err) => {
-        console.error('e-Arşiv durumu güncellenemedi:', issue.postingNumber, err);
-        return issue;
-      }));
-    } else {
-      issues.push(issue);
-    }
-  }
+  // İşlenmekte olan faturaların durumu ve eksik XML'i sayfa açılınca güncellenir.
+  const pdfOnly = new Set(gib.filter((g) => g.fileContentType === PDF_ONLY).map((g) => g.id));
+  const { issues } = await refreshIssues(env, issuesRaw, pdfOnly);
 
   const issueByPosting = new Map(issues.map((i) => [i.postingNumber, i]));
   // Belgeler'de satış faturası bağlanmış siparişler GİB portalında faturalandı: kesilmez,
