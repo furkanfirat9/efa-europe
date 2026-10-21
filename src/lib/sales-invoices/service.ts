@@ -21,14 +21,13 @@ export const NEGATIVE_TYPES = new Set(['IADE']);
 const isoDate = (d: Date | null) => (d ? d.toISOString().slice(0, 10) : null);
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
+type InvoiceFile = { url: string; name: string; contentType: string; size: number; hash: string };
+
 /**
- * Okunan faturayı kaydeder. Kur faturanın üzerindekidir; faturada yoksa
- * (dövizli faturada olmamalı) TCMB kuruna düşülür ve kaynağı yazılır.
+ * Okunan faturanın kayıt alanları (dosya ve satırlar hariç). Kur faturanın üzerindekidir;
+ * faturada yoksa (dövizli faturada olmamalı) TCMB kuruna düşülür ve kaynağı yazılır.
  */
-export async function saveParsedInvoice(
-  parsed: ParsedInvoice,
-  file: { url: string; name: string; contentType: string; size: number; hash: string }
-) {
+async function invoiceFields(parsed: ParsedInvoice) {
   let fxRate = parsed.fxRate;
   let fxSource: string | null = fxRate == null ? null : parsed.currency === 'TRY' ? 'TL' : 'Fatura';
   if (fxRate == null) {
@@ -42,41 +41,73 @@ export async function saveParsedInvoice(
     }
   }
 
+  return {
+    invoiceNo: parsed.invoiceNo,
+    uuid: parsed.uuid,
+    profile: parsed.profile,
+    typeCode: parsed.typeCode,
+    issueDate: new Date(`${parsed.issueDate}T00:00:00Z`),
+    issueTime: parsed.issueTime,
+    customerName: parsed.customerName,
+    customerCountry: parsed.customerCountry,
+    customerCity: parsed.customerCity,
+    currency: parsed.currency,
+    totalAmount: parsed.totalAmount,
+    taxExclusive: parsed.taxExclusive,
+    taxAmount: parsed.taxAmount,
+    allowanceTotal: parsed.allowanceTotal,
+    exemptionCode: parsed.exemptionCode,
+    exemptionReason: parsed.exemptionReason,
+    fxRate,
+    fxSource,
+    totalTry: fxRate == null ? null : round2(parsed.totalAmount * fxRate),
+    postingNumber: parsed.postingNumber,
+    notes: parsed.notes,
+    data: parsed.data as Prisma.InputJsonValue,
+  };
+}
+
+const fileFields = (file: InvoiceFile) => ({
+  fileUrl: file.url,
+  fileName: file.name,
+  fileContentType: file.contentType,
+  fileSize: file.size,
+  fileHash: file.hash,
+});
+
+/** Okunan faturayı kaydeder. */
+export async function saveParsedInvoice(parsed: ParsedInvoice, file: InvoiceFile) {
   return prisma.salesInvoice.create({
     data: {
       store: CURRENT_STORE,
-      invoiceNo: parsed.invoiceNo,
-      uuid: parsed.uuid,
-      profile: parsed.profile,
-      typeCode: parsed.typeCode,
-      issueDate: new Date(`${parsed.issueDate}T00:00:00Z`),
-      issueTime: parsed.issueTime,
-      customerName: parsed.customerName,
-      customerCountry: parsed.customerCountry,
-      customerCity: parsed.customerCity,
-      currency: parsed.currency,
-      totalAmount: parsed.totalAmount,
-      taxExclusive: parsed.taxExclusive,
-      taxAmount: parsed.taxAmount,
-      allowanceTotal: parsed.allowanceTotal,
-      exemptionCode: parsed.exemptionCode,
-      exemptionReason: parsed.exemptionReason,
-      fxRate,
-      fxSource,
-      totalTry: fxRate == null ? null : round2(parsed.totalAmount * fxRate),
-      postingNumber: parsed.postingNumber,
-      notes: parsed.notes,
-      data: parsed.data as Prisma.InputJsonValue,
-      fileUrl: file.url,
-      fileName: file.name,
-      fileContentType: file.contentType,
-      fileSize: file.size,
-      fileHash: file.hash,
+      ...(await invoiceFields(parsed)),
+      ...fileFields(file),
       lines: {
         create: parsed.lines.map((line, position) => ({ position, ...line })),
       },
     },
     include: { lines: true },
+  });
+}
+
+/**
+ * Kayıtlı faturayı okunan faturayla günceller: alanlar, satırlar ve asıl dosya değişir,
+ * eklenmiş PDF kalır. Yalnız asıl dosyası hâlâ `fromContentType` türündeki kayıt
+ * güncellenir; aynı anda başka bir istek güncellediyse null döner (satırlar iki kez yazılmasın).
+ */
+export async function replaceParsedInvoice(id: string, parsed: ParsedInvoice, file: InvoiceFile, fromContentType: string) {
+  const fields = await invoiceFields(parsed);
+  return prisma.$transaction(async (tx) => {
+    const { count } = await tx.salesInvoice.updateMany({
+      where: { id, fileContentType: fromContentType },
+      data: { ...fields, ...fileFields(file) },
+    });
+    if (!count) return null;
+    await tx.salesInvoiceLine.deleteMany({ where: { invoiceId: id } });
+    await tx.salesInvoiceLine.createMany({
+      data: parsed.lines.map((line, position) => ({ invoiceId: id, position, ...line })),
+    });
+    return tx.salesInvoice.findUniqueOrThrow({ where: { id }, include: { lines: true } });
   });
 }
 
