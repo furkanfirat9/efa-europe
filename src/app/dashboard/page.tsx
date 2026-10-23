@@ -12,10 +12,7 @@ export const metadata = {
 export default function DashboardPage() {
   return (
     <div className="flex-1 space-y-6 bg-background p-4 pt-6 text-foreground md:p-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Genel bakış</h1>
-        <p className="text-muted-foreground">Mağazaların, siparişlerin ve muhasebenin özeti.</p>
-      </div>
+      <h1 className="sr-only">Genel bakış</h1>
       <DashboardView />
     </div>
   );
