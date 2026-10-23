@@ -3,7 +3,6 @@
 import React from 'react';
 import { formatClock } from '@/lib/format';
 import { ActionsList } from './ActionsList';
-import { MarketStrip } from './MarketStrip';
 import { SalesChart } from './SalesChart';
 import { Snapshot } from './Snapshot';
 import { TopSellersTable } from './TopSellersTable';
@@ -17,9 +16,10 @@ import { useProfitData } from './useProfitData';
  *   Genel durum        altı ana rakam tek şeritte; tıklanan rakamın ayrıntısı altında açılır
  *   Yapılacaklar       solda düz liste
  *   Satışlar           sağda tek grafik (Sipariş / Ciro / Kâr, 7 / 30 gün) + en çok satanlar tablosu
- *   Pazar ve tedarik   huninin geçiş oranları ve tarama durumu tek şeritte
  *
  * Şerit ve grafik aynı okumaları paylaşır; her uç bir kez çağrılır.
+ * "Pazar ve tedarik" şeridi 2026-10-23'te kaldırıldı: satış hunisi Avrupa'nın günlük 50 isteklik
+ * Ozon analitik kotasını bitiriyordu (huni /analitik'te), tarama durumu Fiyat önerisi sayfasında.
  */
 export function DashboardView() {
   const pulse = useDashboardData<PulseData>('/api/dashboard/siparisler');
@@ -45,8 +45,6 @@ export function DashboardView() {
           <TopSellersTable />
         </div>
       </div>
-
-      <MarketStrip market={market} />
     </div>
   );
 }
