@@ -48,6 +48,7 @@ export function getOrderSiteLogo(urlStr?: string | null): OrderSiteLogo | null {
     if (/(^|\.)amazon\.de$/.test(host)) return { src: '/logos/prime-business.svg', alt: 'Amazon.de Prime Business', tall: true };
     if (host.includes('amazon')) return { src: '/logos/amazon.svg', alt: 'Amazon' };
     if (host.includes('oleole')) return { src: '/logos/oleole.svg', alt: 'OleOle', tall: true };
+    if (host.includes('mediaexpert')) return { src: '/logos/mediaexpert.svg', alt: 'Media Expert' };
     return null;
   } catch {
     return null;
@@ -75,6 +76,7 @@ export function formatOrderUrlLabel(urlStr: string): string {
     if (host.includes('trendyol')) return 'Trendyol';
     if (host.includes('n11')) return 'N11';
     if (host.includes('morele')) return 'Morele';
+    if (host.includes('mediaexpert')) return 'Media Expert';
     if (host.includes('ceneo')) return 'Ceneo';
     if (host.includes('rtveuroagd') || host.includes('euro.com.pl')) return 'RTV Euro AGD';
     if (host.includes('x-kom') || host.includes('xkom')) return 'x-kom';

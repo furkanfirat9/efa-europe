@@ -25,9 +25,13 @@ import { useOrderDocument, type OnDocumentChange } from '../useOrderDocument';
 
 export type UpdateOrder = (postingNumber: string, payload: Record<string, any>) => Promise<void>;
 
-/** Tablo içi düzenleme kutusu: kenarlığı yalnızca üzerine gelince veya odakta görünür. */
+/**
+ * Tablo içi düzenleme kutusu: kenarlığı yalnızca üzerine gelince veya odakta görünür.
+ * Yazı ortalı olduğu için yan boşluk dar (px-1); Input'un px-3'ü dar kutularda
+ * 18.806,25 ya da 1.399,00 zł gibi değerleri kesiyordu.
+ */
 const inlineInput =
-  'mx-auto h-8 border-transparent bg-transparent text-center text-xs shadow-none hover:border-input focus-visible:bg-background';
+  'mx-auto h-8 border-transparent bg-transparent px-1 text-center text-xs shadow-none hover:border-input focus-visible:bg-background';
 
 const blurOnEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (e.key === 'Enter') e.currentTarget.blur();
@@ -170,7 +174,7 @@ export function BuyPriceCell({ order, onUpdate }: { order: OrderItem; onUpdate: 
       }}
       onBlur={commit}
       onKeyDown={blurOnEnter}
-      className={cn(inlineInput, 'w-22 font-medium tabular-nums')}
+      className={cn(inlineInput, 'w-24 font-medium tabular-nums')}
     />
   );
 }
@@ -229,7 +233,7 @@ export function SourcePriceCell({ order, onUpdate }: { order: OrderItem; onUpdat
       }}
       onBlur={commit}
       onKeyDown={blurOnEnter}
-      className={cn(inlineInput, savedCurrency ? 'w-24' : 'mx-0 w-20', 'font-medium tabular-nums')}
+      className={cn(inlineInput, savedCurrency ? 'w-26' : 'mx-0 w-20', 'font-medium tabular-nums')}
     />
   );
 
@@ -291,6 +295,7 @@ export function InlineTextCell({
       value={value}
       spellCheck={false}
       autoComplete="off"
+      title={value || undefined}
       onChange={(e) => setValue(e.target.value)}
       onFocus={() => setFocused(true)}
       onBlur={commit}

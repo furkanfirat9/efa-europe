@@ -165,7 +165,7 @@ export function buildOrderColumns({
       id: 'supplier',
       header: 'Tedarik',
       cell: ({ row }) => (
-        <InlineTextCell order={row.original} field="supplier" label="Tedarikçi" onUpdate={onUpdate} className="w-24" />
+        <InlineTextCell order={row.original} field="supplier" label="Tedarikçi" onUpdate={onUpdate} className="w-28" />
       ),
     }),
     helper.display({
