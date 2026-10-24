@@ -15,6 +15,7 @@ import {
   profitAt,
   shippingWeight,
   storefrontFactorFor,
+  type CostBase,
   type PriceRule,
   type WeightSource,
 } from './rules';
@@ -117,6 +118,8 @@ export interface Proposal {
   weightG: number;
   weightSource: WeightSource;
   weightCheck: boolean;
+  /** Kart ağırlığına güvenlik payı eklendi (PRICING.cardWeightSafePct): rakiple fark yetince %10 yerine %30 kutu payı */
+  weightPadded?: boolean;
   landedUsd: number | null;
   ozonShippingUsd: number | null;
   depotUsd: number | null;
@@ -338,17 +341,23 @@ export async function buildProposals(
     if (!chosen || purchaseEur == null) return { ...base, skipReason: src?.asin ? 'Amazon.de / .pl / Ceneo fiyatı yok' : 'ASIN yok' };
     if (!w.grams) return { ...base, skipReason: 'Ağırlık bilinmiyor' };
 
-    const c = costBase({
-      purchaseEur,
-      shippingEur: chosen.shippingEur,
-      weightG: w.grams,
-      eurUsd: ecb.rate,
-      feePct,
-      platformPct,
-      platformCapUsd,
-    });
+    const costFor = (weightG: number) =>
+      costBase({ purchaseEur, shippingEur: chosen.shippingEur, weightG, eurUsd: ecb.rate, feePct, platformPct, platformCapUsd });
+    const decide = (cost: CostBase) => decidePrice(cost, rival?.price ?? null, rival?.rubPerUsd ?? null, chosen.netEur * ecb.rate, rival?.factor);
+    let c = costFor(w.grams);
+    let d = decide(c);
+    // Kaynaksız kart ağırlığı: kutu payı %30 sayılınca fiyat hâlâ rakibi yeniyorsa (rakibin altında) o maliyet kullanılır
+    if (w.source === 'ozon-card' && rival) {
+      const paddedG = Math.round((w.grams / (1 + PRICING.cardWeightPct)) * (1 + PRICING.cardWeightSafePct));
+      const cp = costFor(paddedG);
+      const dp = decide(cp);
+      if ((dp.rule === 'rival' || dp.rule === 'rival-cap') && dp.rivalTarget != null && dp.price <= dp.rivalTarget) {
+        [c, d] = [cp, dp];
+        base.weightG = paddedG;
+        base.weightPadded = true;
+      }
+    }
     const current = profitAt(customerPrice, c);
-    let d = decidePrice(c, rival?.price ?? null, rival?.rubPerUsd ?? null, chosen.netEur * ecb.rate, rival?.factor);
     const costs = {
       landedUsd: c.landedUsd,
       ozonShippingUsd: c.ozonShippingUsd,
