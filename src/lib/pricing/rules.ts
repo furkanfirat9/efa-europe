@@ -94,11 +94,13 @@ export const OZON_GLOBAL_FEES = {
 export const platformCapUsdFor = (cbrUsd: number | null | undefined) =>
   cbrUsd ? OZON_GLOBAL_FEES.platformCapRub / (cbrUsd * OZON_GLOBAL_FEES.saleRateFactor) : null;
 
-export type WeightSource ='ozon-real' | 'amazon-package' | 'icecat-package' | 'amazon-item' | 'ozon-card' | 'small-item' | 'none';
+export type WeightSource ='ozon-real' | 'researched' | 'amazon-package' | 'icecat-package' | 'amazon-item' | 'ozon-card' | 'small-item' | 'none';
 
 export interface WeightInput {
   amzItemG?: number | null;
   amzPackageG?: number | null;
+  /** Araştırılmış kutulu ağırlık (ProductSource.researchedPackageWeightG) */
+  researchedPackageG?: number | null;
   /** Icecat kutulu ağırlığı (ProductSource.icecatPackageWeightG) */
   icecatPackageG?: number | null;
   ozonCardG?: number | null;
@@ -108,18 +110,27 @@ export interface WeightInput {
 
 /**
  * Kargo ağırlığı: ürün daha önce gönderildiyse Ozon'un kestiği kargo kademesinden (`realG`), yoksa tahmin.
- * Tahmin: Amazon kutulu ağırlığı > Icecat kutulu ağırlığı (+ LS dış paketi) > Amazon ürün ağırlığı + paket payı > Ozon kartı.
+ * Tahmin: araştırılmış kutulu ağırlık > Amazon kutulu ağırlığı > Icecat kutulu ağırlığı (+ LS dış paketi) > Amazon ürün
+ * ağırlığı + paket payı > Ozon kartı.
  */
-export function shippingWeight({ amzItemG = null, amzPackageG = null, icecatPackageG = null, ozonCardG = null, realG = null }: WeightInput) {
-  const est = estimatedWeight(amzItemG, amzPackageG, icecatPackageG, ozonCardG);
+export function shippingWeight({ amzItemG = null, amzPackageG = null, researchedPackageG = null, icecatPackageG = null, ozonCardG = null, realG = null }: WeightInput) {
+  const est = estimatedWeight(amzItemG, amzPackageG, researchedPackageG, icecatPackageG, ozonCardG);
   if (realG && (!est.grams || realG <= est.grams * PRICING.realWeightMaxRatio)) {
     return { grams: realG, source: 'ozon-real' as WeightSource, check: false };
   }
   return est;
 }
 
-function estimatedWeight(amzItemG: number | null, amzPackageG: number | null, icecatPackageG: number | null, ozonCardG: number | null) {
+function estimatedWeight(
+  amzItemG: number | null,
+  amzPackageG: number | null,
+  researchedPackageG: number | null,
+  icecatPackageG: number | null,
+  ozonCardG: number | null
+) {
   const ok = (g: number | null): g is number => g != null && g >= PRICING.minPlausibleWeightG;
+  // Kaynağıyla tek tek kontrol edildi; Amazon'un "ürün ağırlığı" bazen kutudan bile ağır yazılı (BHD341/10: fön 600 g, Amazon 1 090 g)
+  if (ok(researchedPackageG)) return { grams: researchedPackageG + PRICING.boxPadG, source: 'researched' as WeightSource, check: false };
   if (ok(amzPackageG)) return { grams: amzPackageG + PRICING.boxPadG, source: 'amazon-package' as WeightSource, check: false };
   // Icecat'te kutunun üründen hafif yazıldığı kayıtlar var (HD2350/80: ürün 2 400 g, kutu 643 g); onlar yok sayılır
   if (ok(icecatPackageG) && !(ok(amzItemG) && icecatPackageG < amzItemG)) {

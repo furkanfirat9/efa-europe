@@ -287,6 +287,7 @@ export async function buildProposals(
     const w = shippingWeight({
       amzItemG: src?.amzItemWeightG,
       amzPackageG: src?.amzPackageWeightG,
+      researchedPackageG: src?.researchedPackageWeightG,
       icecatPackageG: src?.icecatPackageWeightG,
       ozonCardG: cardWeights.get(String(item.product_id)),
       realG: realWeights.get(item.offer_id),

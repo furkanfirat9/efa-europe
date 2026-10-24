@@ -412,6 +412,9 @@ model ProductSource {
   // Icecat "Package weight" (üreticinin kutulu ağırlığı); Amazon kutulu ağırlığı yoksa kargo bundan hesaplanır.
   // scripts/icecat_paket_agirlik.mjs --write ile doldurulur.
   icecatPackageWeightG Int?
+  // Araştırılmış kutulu ağırlık (data/agirlik: üretici föyü, büyük mağaza, Google özeti + kaynak; güveni yüksek/orta olan
+  // ve kullanıcının onayladığı). Fiyat hesabında Amazon ve Icecat'in önüne geçer; yalnız Ozon'un kestiği gerçek kargo önde.
+  researchedPackageWeightG Int?
   // Amazon Business sayfasında görünen "Neu" teklifi; KDV oranı ürünün gönderildiği
   // depoya göre değişebildiği için iki fiyat da sayfadan olduğu gibi alınır.
   priceNetEur     Float?
