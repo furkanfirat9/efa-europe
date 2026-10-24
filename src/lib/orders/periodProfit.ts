@@ -102,7 +102,12 @@ function estimateProfit(order: OzonOrder, sources: Map<string, ProductSource>, r
     const qty = p.quantity || 1;
     const src = p.offer_id ? sources.get(p.offer_id) : undefined;
     const { chosen, purchaseEur: unitEur } = pickSupply(src, rates.eurPln);
-    const w = shippingWeight({ amzItemG: src?.amzItemWeightG, amzPackageG: src?.amzPackageWeightG, icecatPackageG: src?.icecatPackageWeightG });
+    const w = shippingWeight({
+      amzItemG: src?.amzItemWeightG,
+      amzPackageG: src?.amzPackageWeightG,
+      researchedPackageG: src?.researchedPackageWeightG,
+      icecatPackageG: src?.icecatPackageWeightG,
+    });
     if (!chosen || unitEur == null || !w.grams) return null;
     purchaseEur += unitEur * qty;
     inboundEur += chosen.shippingEur * qty;

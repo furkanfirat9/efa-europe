@@ -203,6 +203,7 @@ function orderWeight(
       const w = shippingWeight({
         amzItemG: s?.amzItemWeightG,
         amzPackageG: s?.amzPackageWeightG,
+        researchedPackageG: s?.researchedPackageWeightG,
         icecatPackageG: s?.icecatPackageWeightG,
         ozonCardG: withCard && cardKg > 0 ? Math.round(cardKg * 1000) : null,
       });
