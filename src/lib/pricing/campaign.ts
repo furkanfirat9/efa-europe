@@ -19,6 +19,8 @@ import { profitAt as costProfitAt } from './rules';
  *          kullanıcıyla 2026-10-10): loss (şu anki fiyatta zarar), thin (Ozon tavanı kâr sınırımızın altında),
  *          opportunity (en ucuz rakip bizden çok pahalı; hazır fiyat seçenekleri), blocked (kampanyada değil, giremiyor).
  *          "Olduğu gibi kalsın" kararı CampaignReview'da; fiyat, maliyet ya da tavan değişince düşer.
+ *   other  kampanyada değil ama Ozon'un başka bir kampanyasında (ör. Max boosting 11.11) → gönderilemez; o kampanya
+ *          bitince "add"e düşer (kullanıcı 2026-10-25: toplu gönderimde yanlışlıkla Elastik'e eklenmişlerdi)
  */
 
 const STORE = 'store1';
@@ -30,7 +32,7 @@ const MEANINGFUL_USD = 2;
  *  ve rakipten gereksiz uzaklaştırır (PSG8200/80: öneri 759 $, sınır 644 $) — o zaman öneri kalır, boost düşer. */
 const MAX_BOOST_CUT_PCT = 0.03;
 
-export type ChangeGroup = 'send' | 'small' | 'add' | 'check';
+export type ChangeGroup = 'send' | 'small' | 'add' | 'check' | 'other';
 export type ChangeTag = 'above-rival' | 'below-floor' | 'profit-up' | 'cheaper';
 export type CheckKind = 'loss' | 'thin' | 'opportunity' | 'blocked';
 
@@ -106,14 +108,14 @@ interface ActionRow {
 
 const amount = (m?: { amount: string }) => (m && Number(m.amount) > 0 ? Number(m.amount) : null);
 
-async function loadAction(path: '/v2/actions/products' | '/v2/actions/candidates') {
+async function loadAction(path: '/v2/actions/products' | '/v2/actions/candidates', actionId = ELASTIC_ACTION_ID) {
   const headers = getOzonHeaders(STORE);
   const rows = new Map<string, ActionRow>();
   let last_id = '';
   for (;;) {
     const res = await ozonFetch<{ products: ActionRow[]; last_id: string }>(
       path,
-      { action_id: ELASTIC_ACTION_ID, limit: 100, last_id },
+      { action_id: actionId, limit: 100, last_id },
       headers
     );
     for (const p of res.products ?? []) rows.set(String(p.id), p);
@@ -121,6 +123,23 @@ async function loadAction(path: '/v2/actions/products' | '/v2/actions/candidates
     last_id = res.last_id;
   }
   return rows;
+}
+
+/** Elastik dışında ürünümüzün katıldığı kampanyalar: product_id → kampanya adı, fiyatı, bitişi */
+async function loadOtherActions() {
+  const headers = getOzonHeaders(STORE);
+  const res = await ozonFetch<{ result: { id: number; title: string; date_end: string; participating_products_count: number }[] }>(
+    '/v1/actions',
+    undefined,
+    headers,
+    'GET'
+  );
+  const out = new Map<string, { title: string; price: number | null; dateEnd: string }>();
+  for (const a of (res.result ?? []).filter((a) => a.id !== ELASTIC_ACTION_ID && a.participating_products_count > 0)) {
+    const rows = await loadAction('/v2/actions/products', a.id);
+    for (const [id, row] of rows) if (!out.has(id)) out.set(id, { title: a.title, price: amount(row.action_price), dateEnd: a.date_end });
+  }
+  return out;
 }
 
 /** Bu dolar fiyatının vitrinde rakipten kaç ruble farklı olduğu (eksi = altında) */
@@ -233,10 +252,11 @@ function optionsFor(p: Proposal, current: number | null, maxAction: number | nul
 const KIND_ORDER: CheckKind[] = ['loss', 'thin', 'opportunity', 'blocked'];
 
 export async function buildCampaignPlan() {
-  const [{ proposals, eurUsd }, inAction, candidates, sales, reviews] = await Promise.all([
+  const [{ proposals, eurUsd }, inAction, candidates, otherActions, sales, reviews] = await Promise.all([
     buildProposals(),
     loadAction('/v2/actions/products'),
     loadAction('/v2/actions/candidates'),
+    loadOtherActions(),
     loadSales(),
     prisma.campaignReview.findMany({ where: { storeId: STORE } }),
   ]);
@@ -280,6 +300,16 @@ export async function buildCampaignPlan() {
       keptAt: null as string | null,
     };
 
+    const other = current == null ? otherActions.get(p.productId) : undefined;
+    if (other) {
+      const end = new Date(other.dateEnd).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
+      changes.push({
+        ...base,
+        group: 'other',
+        reason: `Başka kampanyada: ${other.title}${other.price != null ? ` · ${other.price} $` : ''} · bitiş ${end}. O bitince eklenir.`,
+      });
+      continue;
+    }
     if (p.rule === 'check' || overCeiling) {
       const options = optionsFor(p, current, maxAction, maxElastic);
       const checkKind = checkKindOf(p, current, maxAction, base.profitNow, overCeiling, options.length > 0);
@@ -341,7 +371,7 @@ export async function buildCampaignPlan() {
 
   // Acil olanlar (rakipten pahalı, zarar riski) önce, sonra fırsatlar; her birinde büyük fark önce
   const urgent = (c: CampaignChange) => (c.tag === 'above-rival' || c.tag === 'below-floor' ? 0 : 1);
-  const order: ChangeGroup[] = ['send', 'add', 'small', 'check'];
+  const order: ChangeGroup[] = ['send', 'add', 'small', 'check', 'other'];
   // Elle kontrol: bölüm sırası, karar verilmişler bölümün sonunda, en kötü kâr (fırsatta en büyük rakip farkı) önce
   const checkRank = (c: CampaignChange) =>
     c.checkKind === 'opportunity' ? -((c.rivalUsd ?? 0) / (c.current ?? c.proposal)) : (c.profitNow ?? 0);
@@ -389,7 +419,7 @@ export async function applyCampaignPrices(productIds: string[]): Promise<ApplyRe
         verified: null,
         error: 'Değişiklik yok ya da öneri hesaplanamadı',
       });
-    else if (c.group === 'check')
+    else if (c.group === 'check' || c.group === 'other')
       results.push({ productId: id, offerId: c.offerId, from: c.current, to: c.next, ok: false, verified: null, error: c.reason });
     else toSend.push(c);
   }

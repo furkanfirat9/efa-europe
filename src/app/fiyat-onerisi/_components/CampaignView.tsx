@@ -46,6 +46,13 @@ const GROUPS: { key: ChangeGroup; label: string; hint: string; preselect: boolea
     preselect: false,
     selectable: false,
   },
+  {
+    key: 'other',
+    label: 'Başka kampanyada',
+    hint: "Ozon'un başka bir kampanyasında (ör. Max boosting); o bitene kadar Elastik'e eklenmez, gönderilemez.",
+    preselect: false,
+    selectable: false,
+  },
 ];
 
 /** "Gönderilecek" satırlarının nedeni: kırmızı acil, yeşil fırsat */
@@ -294,7 +301,7 @@ export function CampaignView() {
                       </TableCell>
                       <TableCell className="text-right tabular-nums">{usd(c.current)}</TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {c.group === 'check' ? (
+                        {c.group === 'check' || c.group === 'other' ? (
                           // Gönderilemez: fiyat yalnız bilgi olarak, tavan aşılıyorsa tavanla birlikte
                           <>
                             <div className="text-sm text-muted-foreground">gönderilemez</div>
@@ -318,10 +325,10 @@ export function CampaignView() {
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
                         {usd(c.rivalUsd)}
-                        {c.group !== 'check' && <Gap now={c.rivalGapRubNow} next={c.rivalGapRubNext} />}
+                        {c.group !== 'check' && c.group !== 'other' && <Gap now={c.rivalGapRubNow} next={c.rivalGapRubNext} />}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {usd(c.group === 'check' || c.profitAtNext == null ? null : Math.round(c.profitAtNext * 100) / 100)}
+                        {usd(c.group === 'check' || c.group === 'other' || c.profitAtNext == null ? null : Math.round(c.profitAtNext * 100) / 100)}
                         {c.floorPrice != null && <div className="text-xs text-muted-foreground">taban {usd(c.floorPrice)}</div>}
                       </TableCell>
                       <TableCell className="max-w-64 text-sm">
