@@ -126,6 +126,11 @@ function ProposalCard({ p }: { p: Proposal }) {
               />
               <Stat label="Rakip" value={usd(p.rivalUsd, 2)} />
               <Stat label="Kâr" value={usd(p.newProfit, 2)} sub={`marj ${pct(p.newMargin)}`} />
+              <Stat
+                label="Kargo ağırlığı"
+                value={p.weightG ? kg(p.weightG) : '—'}
+                sub={`${WEIGHT_LABEL[p.weightSource] ?? p.weightSource}${p.weightPadded ? ' · %15 kutu payıyla' : ''}`}
+              />
             </div>
           </div>
         </div>
@@ -163,16 +168,6 @@ function ProposalCard({ p }: { p: Proposal }) {
           ) : (
             <p className="rounded-md border px-3 py-2 text-muted-foreground">Hiçbir kanalda fiyat yok</p>
           )}
-          <div className="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
-            <div className="min-w-0">
-              <span className="font-medium">Kargo ağırlığı</span>
-              <p className="text-xs text-muted-foreground">
-                {WEIGHT_LABEL[p.weightSource] ?? p.weightSource}
-                {p.weightPadded && ' · %15 kutu payıyla'}
-              </p>
-            </div>
-            <p className="shrink-0 tabular-nums font-semibold">{p.weightG ? kg(p.weightG) : '—'}</p>
-          </div>
           {p.landedUsd != null && (
             <p className="text-xs text-muted-foreground">
               Depoya gelmiş {usd(p.landedUsd)} + Ozon kargo/depo {usd((p.ozonShippingUsd ?? 0) + (p.depotUsd ?? 0))}
