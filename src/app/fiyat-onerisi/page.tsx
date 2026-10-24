@@ -32,6 +32,20 @@ const RULE_LABEL: Record<string, string> = {
 
 const SOURCE_LABEL: Record<string, string> = { 'amazon-de': 'Amazon.de', 'amazon-pl': 'amazon.pl', ceneo: 'Ceneo' };
 
+// Fiyat hesabındaki kargo ağırlığının kaynağı (src/lib/pricing/rules.ts shippingWeight, öncelik sırasıyla)
+const WEIGHT_LABEL: Record<string, string> = {
+  'ozon-real': "Ozon'un kestiği kargodan",
+  researched: 'Araştırılmış kutu ağırlığı',
+  'amazon-package': 'Amazon kutulu ağırlığı',
+  'icecat-package': 'Icecat kutulu ağırlığı',
+  'amazon-item': 'Amazon ürün ağırlığı + paket payı',
+  'ozon-card': 'Ozon kartı',
+  'small-item': 'Küçük ürün + paket payı',
+  none: 'Bilinmiyor',
+};
+
+const kg = (g: number) => `${(g / 1000).toLocaleString('tr-TR', { maximumFractionDigits: 2 })} kg`;
+
 const PAGE_SIZE = 50;
 
 const usd = (n: number | null | undefined, digits = 0) =>
@@ -149,10 +163,19 @@ function ProposalCard({ p }: { p: Proposal }) {
           ) : (
             <p className="rounded-md border px-3 py-2 text-muted-foreground">Hiçbir kanalda fiyat yok</p>
           )}
+          <div className="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
+            <div className="min-w-0">
+              <span className="font-medium">Kargo ağırlığı</span>
+              <p className="text-xs text-muted-foreground">
+                {WEIGHT_LABEL[p.weightSource] ?? p.weightSource}
+                {p.weightPadded && ' · %15 kutu payıyla'}
+              </p>
+            </div>
+            <p className="shrink-0 tabular-nums font-semibold">{p.weightG ? kg(p.weightG) : '—'}</p>
+          </div>
           {p.landedUsd != null && (
             <p className="text-xs text-muted-foreground">
-              Depoya gelmiş {usd(p.landedUsd)} + Ozon kargo/depo {usd((p.ozonShippingUsd ?? 0) + (p.depotUsd ?? 0))} ·{' '}
-              {(p.weightG / 1000).toLocaleString('tr-TR', { maximumFractionDigits: 1 })} kg
+              Depoya gelmiş {usd(p.landedUsd)} + Ozon kargo/depo {usd((p.ozonShippingUsd ?? 0) + (p.depotUsd ?? 0))}
             </p>
           )}
         </div>
