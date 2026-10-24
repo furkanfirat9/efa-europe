@@ -36,9 +36,10 @@ export const PRICING = {
   /** Kutulu ağırlığa (Amazon / Icecat) LS'nin dış paketi: JF4031E0 Icecat kutusu 2 280 g, LS 2 540 g ölçtü. */
   boxPadG: 250,
   /** Ozon kartındaki ağırlık kaynaksız tahmindir (yüklemede çoğunlukla ürün + %10). Rakiple aramızda yeterli fark varsa
-   *  kutu payı %10 yerine %30 sayılır: maliyet yükselir ama fiyat yine rakibin altında kalır (kullanıcı, 2026-10-24). */
+   *  kutu payı %10 yerine %15 sayılır: maliyet yükselir ama fiyat yine rakibin altında kalır (kullanıcı: 2026-10-24 %30,
+   *  2026-10-25 %15 — araştırılmış ağırlık gelince kural yalnız birkaç kaynaksız üründe kaldı). */
   cardWeightPct: 0.1,
-  cardWeightSafePct: 0.3,
+  cardWeightSafePct: 0.15,
   /** Gerçek kargo ağırlığı tahminin bu katını aşıyorsa ölçüm hatası sayılır
    *  (HX6064/87: 4 fırça başlığı 1,42 kg ölçüldü, LS'ye soruldu). */
   realWeightMaxRatio: 3,

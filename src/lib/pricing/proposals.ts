@@ -118,7 +118,7 @@ export interface Proposal {
   weightG: number;
   weightSource: WeightSource;
   weightCheck: boolean;
-  /** Kart ağırlığına güvenlik payı eklendi (PRICING.cardWeightSafePct): rakiple fark yetince %10 yerine %30 kutu payı */
+  /** Kart ağırlığına güvenlik payı eklendi (PRICING.cardWeightSafePct): rakiple fark yetince %10 yerine %15 kutu payı */
   weightPadded?: boolean;
   landedUsd: number | null;
   ozonShippingUsd: number | null;
@@ -347,7 +347,7 @@ export async function buildProposals(
     const decide = (cost: CostBase) => decidePrice(cost, rival?.price ?? null, rival?.rubPerUsd ?? null, chosen.netEur * ecb.rate, rival?.factor);
     let c = costFor(w.grams);
     let d = decide(c);
-    // Kaynaksız kart ağırlığı: kutu payı %30 sayılınca fiyat hâlâ rakibi yeniyorsa (rakibin altında) o maliyet kullanılır
+    // Kaynaksız kart ağırlığı: kutu payı %15 sayılınca fiyat hâlâ rakibi yeniyorsa (rakibin altında) o maliyet kullanılır
     if (w.source === 'ozon-card' && rival) {
       const paddedG = Math.round((w.grams / (1 + PRICING.cardWeightPct)) * (1 + PRICING.cardWeightSafePct));
       const cp = costFor(paddedG);
