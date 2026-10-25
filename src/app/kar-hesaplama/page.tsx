@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AlertCircle, Box, RefreshCw, RotateCcw, Scale, Truck, Wallet } from 'lucide-react';
 import { calculateShippingCosts } from '@/lib/calculator/profitCalculator';
 import { formatEuro, formatPercent, formatTL } from '@/lib/format';
-import { OZON_GLOBAL_FEES, PRICING, costBase, marginPrices, profitAt, shippingWeight } from '@/lib/pricing/rules';
+import { OZON_GLOBAL_FEES, PRICING, costBase, marginPrices, profitAt } from '@/lib/pricing/rules';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@/components/shadcn/alert';
 import { Button } from '@/components/shadcn/button';
@@ -20,6 +20,9 @@ import { Table, TableBody, TableCell, TableFooter, TableRow } from '@/components
  * dolara (+ banka kur farkı), satış $, Ozon kesintileri, LS kargo ve depo ücreti ağırlıktan.
  * Eskiden alış ve satış aynı para biriminde sayılıyordu; dolar seçilince LS'nin € tarifeleri dolar gibi toplanıyordu.
  * Alış zł de girilebilir (amazon.pl): önce ECB EUR/PLN kuruyla €'ya çevrilir, hesabın geri kalanı aynıdır.
+ * Ağırlık tek alandır ve olduğu gibi kullanılır: fiyat önerisinde görünen kargo ağırlığı (LS paketi dahil) girilir.
+ * Eskiden ürün/kutulu ağırlık girilip LS paketi burada ekleniyordu; fiyat önerisindeki paketli değer girilince
+ * paket iki kez sayılıyordu (E3040644: 2 290 g → 2 540 g, bir kargo kademesi fazla, kâr 8,61 $ yerine 5,81 $).
  */
 
 interface Rates {
@@ -34,10 +37,10 @@ interface Rates {
 }
 
 type BuyCurrency = 'EUR' | 'PLN';
-type Form = { currency: BuyCurrency; buy: string; inbound: string; sell: string; itemG: string; boxG: string; commission: string };
+type Form = { currency: BuyCurrency; buy: string; inbound: string; sell: string; weightG: string; commission: string };
 
-const EMPTY: Form = { currency: 'EUR', buy: '', inbound: '0', sell: '', itemG: '', boxG: '', commission: '5' };
-const START: Form = { currency: 'EUR', buy: '50', inbound: '0', sell: '120', itemG: '1000', boxG: '', commission: '5' };
+const EMPTY: Form = { currency: 'EUR', buy: '', inbound: '0', sell: '', weightG: '', commission: '5' };
+const START: Form = { currency: 'EUR', buy: '50', inbound: '0', sell: '120', weightG: '1250', commission: '5' };
 
 /** Alışın girildiği para birimi: Amazon.de / Ceneo €, amazon.pl zł */
 const BUY_CURRENCIES: { value: BuyCurrency; symbol: string; label: string; buyHint: string; inboundHint: string }[] = [
@@ -161,7 +164,7 @@ export default function KarHesaplamaPage() {
     const buyLocal = num(form.buy) + num(form.inbound);
     const sell = num(form.sell);
     const commissionPct = num(form.commission) / 100;
-    const w = shippingWeight({ amzItemG: num(form.itemG) || null, amzPackageG: num(form.boxG) || null });
+    const w = { grams: Math.round(num(form.weightG)) };
     if (!buy || !w.grams) return null;
 
     const c = costBase({
@@ -203,11 +206,7 @@ export default function KarHesaplamaPage() {
   const cur = BUY_CURRENCIES.find((c) => c.value === form.currency)!;
   const isPln = form.currency === 'PLN';
 
-  const weightNote = calc
-    ? calc.w.source === 'amazon-package'
-      ? `kutulu ağırlık + ${PRICING.boxPadG} g LS paketi`
-      : `ürün ağırlığı + ${whole(PRICING.packagingPct)} paket payı, en az ${PRICING.packagingMinG} g`
-    : '';
+  const weightNote = 'girildiği gibi, LS paketi dahil';
 
   return (
     <div className="flex-1 space-y-6 bg-background p-4 pt-6 text-foreground md:p-8">
@@ -303,17 +302,14 @@ export default function KarHesaplamaPage() {
             </div>
             <Field id="sell" label="Ozon satış fiyatı" hint="Müşterinin gördüğü fiyat" unit="$" value={form.sell} onChange={set('sell')} />
             <Separator />
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Field id="item-g" label="Ürün ağırlığı" hint="Amazon'daki ürün ağırlığı" unit="g" value={form.itemG} onChange={set('itemG')} />
-              <Field
-                id="box-g"
-                label="Kutulu ağırlık"
-                hint="Varsa (Icecat / Amazon); bu kullanılır"
-                unit="g"
-                value={form.boxG}
-                onChange={set('boxG')}
-              />
-            </div>
+            <Field
+              id="weight-g"
+              label="Kargo ağırlığı"
+              hint={`Fiyat önerisindeki kargo ağırlığı; LS paketi (${PRICING.boxPadG} g) dahil, olduğu gibi kullanılır`}
+              unit="g"
+              value={form.weightG}
+              onChange={set('weightG')}
+            />
             <Field id="commission" label="Ozon komisyonu" hint="Kategoriye göre, çoğunlukla %5" unit="%" value={form.commission} onChange={set('commission')} />
           </CardContent>
         </Card>
