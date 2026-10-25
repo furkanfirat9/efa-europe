@@ -1,12 +1,14 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertCircle, RefreshCw, RotateCcw } from 'lucide-react';
+import { AlertCircle, RefreshCw, RotateCcw, Search, X } from 'lucide-react';
 import { formatPercent, formatTL } from '@/lib/format';
+import type { Proposal } from '@/lib/pricing/proposals';
 import { OZON_GLOBAL_FEES, PRICING, costBase, marginPrices, profitAt } from '@/lib/pricing/rules';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@/components/shadcn/alert';
 import { Button } from '@/components/shadcn/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/shadcn/dialog';
 import { Input } from '@/components/shadcn/input';
 import { Label } from '@/components/shadcn/label';
 import { Skeleton } from '@/components/shadcn/skeleton';
@@ -19,6 +21,8 @@ import { Skeleton } from '@/components/shadcn/skeleton';
  * (eskiden LS paketi burada bir kez daha ekleniyordu). Alış fiyatı depoya gelmiş tutardır; ayrı "depoya kargo" yok.
  * Görünüm (kullanıcı 2026-10-25): açıklama metni yok, yalnız değerin ne olduğunu söyleyen başlıklar. Sağda tek panel:
  * üstte net kâr ve oranlar, altta gider dökümü (satışın yüzdesiyle).
+ * Mağazadan ürün seçilebilir (fiyat önerisi verisi, /api/fiyat-onerisi): alış = seçilen kanalın alışı + depoya kargosu
+ * (€), satış = müşteri fiyatı, ağırlık = hesaptaki kargo ağırlığı, komisyon = Ozon'un o ürün için kestiği oran.
  */
 
 interface Rates {
@@ -50,6 +54,21 @@ const pct = (p: number) => formatPercent(p * 100, 1);
 /** 0.25 → "%25" (0.07 × 100 gibi kayan nokta artıklarını atar) */
 const whole = (p: number) => `%${Math.round(p * 100)}`;
 const day = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+/** Fiyat önerisindeki üründen hesap girdileri */
+function formFromProposal(p: Proposal): Form {
+  const channel = p.channels.find((c) => c.source === p.source);
+  const commission = p.feePct - PRICING.acquiringPct - OZON_GLOBAL_FEES.intermediaryPct;
+  return {
+    currency: 'EUR',
+    buy: p.purchaseEur != null ? String(round2(p.purchaseEur + (channel?.shippingEur ?? 0))) : '',
+    sell: p.customerPrice ? String(p.customerPrice) : '',
+    weightG: p.weightG ? String(p.weightG) : '',
+    commission: String(round2(commission * 100)),
+  };
+}
 
 /** Boş ya da geçersiz giriş 0 sayılır */
 function num(value: string) {
@@ -128,6 +147,42 @@ export default function KarHesaplamaPage() {
   const [loading, setLoading] = useState(false);
 
   const set = (key: keyof Form) => (value: string) => setForm((f) => ({ ...f, [key]: value }));
+
+  // Mağazadan ürün seçme
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [products, setProducts] = useState<Proposal[] | null>(null);
+  const [productsError, setProductsError] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [selected, setSelected] = useState<Proposal | null>(null);
+
+  const openPicker = async () => {
+    setPickerOpen(true);
+    setQuery('');
+    if (products) return;
+    setProductsError(null);
+    try {
+      const res = await fetch('/api/fiyat-onerisi');
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error_message || 'Ürünler alınamadı.');
+      setProducts(data.proposals);
+    } catch (err) {
+      setProductsError(err instanceof Error ? err.message : 'Ürünler alınamadı.');
+    }
+  };
+
+  const pick = (p: Proposal) => {
+    setSelected(p);
+    setForm(formFromProposal(p));
+    setPickerOpen(false);
+  };
+
+  const found = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const list = (products ?? []).filter(
+      (p) => !q || p.offerId.toLowerCase().includes(q) || (p.name ?? '').toLowerCase().includes(q) || (p.asin ?? '').toLowerCase().includes(q)
+    );
+    return { total: list.length, shown: list.slice(0, 100) };
+  }, [products, query]);
 
   const loadRates = useCallback(async () => {
     setLoading(true);
@@ -243,7 +298,7 @@ export default function KarHesaplamaPage() {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
         {/* Girdiler */}
         <section className="rounded-xl border bg-card p-5 shadow-xs">
           <div className="mb-5 flex items-center justify-between">
@@ -252,13 +307,43 @@ export default function KarHesaplamaPage() {
               variant="ghost"
               size="sm"
               className="h-8 text-muted-foreground"
-              onClick={() => setForm((f) => ({ ...EMPTY, currency: f.currency }))}
+              onClick={() => {
+                setSelected(null);
+                setForm((f) => ({ ...EMPTY, currency: f.currency }));
+              }}
             >
               <RotateCcw />
               Sıfırla
             </Button>
           </div>
           <div className="space-y-4">
+            {selected ? (
+              <div className="flex items-center gap-3 rounded-lg border p-2.5">
+                {selected.image ? (
+                  <img src={selected.image} alt="" className="size-12 shrink-0 rounded-md border bg-white object-contain p-0.5" />
+                ) : (
+                  <div className="size-12 shrink-0 rounded-md border bg-muted" />
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="truncate font-mono text-sm font-semibold">{selected.offerId}</div>
+                  <div className="truncate text-xs text-muted-foreground" title={selected.name ?? ''}>
+                    {selected.name}
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" onClick={openPicker}>
+                  Değiştir
+                </Button>
+                <Button variant="ghost" size="icon" className="size-8" aria-label="Ürün seçimini kaldır" onClick={() => setSelected(null)}>
+                  <X />
+                </Button>
+              </div>
+            ) : (
+              <Button variant="outline" className="h-11 w-full justify-start text-muted-foreground" onClick={openPicker}>
+                <Search />
+                Mağazadan ürün seç
+              </Button>
+            )}
+
             <div className="space-y-1.5">
               <div className="text-xs font-medium text-muted-foreground">Alış para birimi</div>
               <div role="radiogroup" aria-label="Alış para birimi" className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
@@ -279,12 +364,74 @@ export default function KarHesaplamaPage() {
                 ))}
               </div>
             </div>
-            <Field id="buy" label="Alış fiyatı" unit={cur.symbol} value={form.buy} onChange={set('buy')} />
-            <Field id="sell" label="Ozon satış fiyatı" unit="$" value={form.sell} onChange={set('sell')} />
-            <Field id="weight-g" label="Kargo ağırlığı" unit="g" value={form.weightG} onChange={set('weightG')} />
-            <Field id="commission" label="Komisyon" unit="%" value={form.commission} onChange={set('commission')} />
+            <div className="grid grid-cols-2 gap-3">
+              <Field id="buy" label="Alış fiyatı" unit={cur.symbol} value={form.buy} onChange={set('buy')} />
+              <Field id="sell" label="Ozon satış fiyatı" unit="$" value={form.sell} onChange={set('sell')} />
+              <Field id="weight-g" label="Kargo ağırlığı" unit="g" value={form.weightG} onChange={set('weightG')} />
+              <Field id="commission" label="Komisyon" unit="%" value={form.commission} onChange={set('commission')} />
+            </div>
           </div>
         </section>
+
+        <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+          <DialogContent className="gap-3 sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Ürün seç</DialogTitle>
+            </DialogHeader>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                autoFocus
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Kod, ad ya da ASIN"
+                aria-label="Ürün ara"
+                className="h-10 pl-9"
+              />
+            </div>
+            <div className="-mx-1 max-h-[60vh] overflow-y-auto px-1">
+              {productsError ? (
+                <p className="py-8 text-center text-sm text-destructive">{productsError}</p>
+              ) : !products ? (
+                <div className="space-y-2">
+                  {Array.from({ length: 6 }, (_, i) => (
+                    <Skeleton key={i} className="h-14" />
+                  ))}
+                </div>
+              ) : found.total === 0 ? (
+                <p className="py-8 text-center text-sm text-muted-foreground">Ürün bulunamadı</p>
+              ) : (
+                <ul className="divide-y">
+                  {found.shown.map((p) => (
+                    <li key={p.productId}>
+                      <button
+                        type="button"
+                        onClick={() => pick(p)}
+                        className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-left hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
+                      >
+                        {p.image ? (
+                          <img src={p.image} alt="" loading="lazy" className="size-10 shrink-0 rounded border bg-white object-contain p-0.5" />
+                        ) : (
+                          <div className="size-10 shrink-0 rounded border bg-muted" />
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate font-mono text-sm font-medium">{p.offerId}</div>
+                          <div className="truncate text-xs text-muted-foreground">{p.name}</div>
+                        </div>
+                        <div className="shrink-0 text-right text-sm font-semibold tabular-nums">{usd(p.customerPrice)}</div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            {products && found.total > found.shown.length && (
+              <p className="text-xs text-muted-foreground">
+                {found.shown.length} / {found.total}
+              </p>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Sonuç */}
         {!rates && !rateError ? (
