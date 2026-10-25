@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertCircle, Box, RefreshCw, RotateCcw, Scale, Truck, Wallet } from 'lucide-react';
+import { AlertCircle, RefreshCw, RotateCcw } from 'lucide-react';
 import { calculateShippingCosts } from '@/lib/calculator/profitCalculator';
 import { formatEuro, formatPercent, formatTL } from '@/lib/format';
 import { OZON_GLOBAL_FEES, PRICING, costBase, marginPrices, profitAt } from '@/lib/pricing/rules';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@/components/shadcn/alert';
+import { Badge } from '@/components/shadcn/badge';
 import { Button } from '@/components/shadcn/button';
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shadcn/card';
 import { Input } from '@/components/shadcn/input';
@@ -14,6 +15,7 @@ import { Label } from '@/components/shadcn/label';
 import { Separator } from '@/components/shadcn/separator';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import { Table, TableBody, TableCell, TableFooter, TableRow } from '@/components/shadcn/table';
+import { Tabs, TabsList, TabsTrigger } from '@/components/shadcn/tabs';
 
 /**
  * Tek ürün için kâr hesabı. Fiyat önerisiyle aynı kurallar (src/lib/pricing/rules.ts): alış € ECB kuruyla
@@ -23,6 +25,7 @@ import { Table, TableBody, TableCell, TableFooter, TableRow } from '@/components
  * Ağırlık tek alandır ve olduğu gibi kullanılır: fiyat önerisinde görünen kargo ağırlığı (LS paketi dahil) girilir.
  * Eskiden ürün/kutulu ağırlık girilip LS paketi burada ekleniyordu; fiyat önerisindeki paketli değer girilince
  * paket iki kez sayılıyordu (E3040644: 2 290 g → 2 540 g, bir kargo kademesi fazla, kâr 8,61 $ yerine 5,81 $).
+ * "Depoya kargo" alanı kaldırıldı (kullanıcı 2026-10-25): alış fiyatı depoya gelmiş tutar olarak girilir.
  */
 
 interface Rates {
@@ -37,15 +40,15 @@ interface Rates {
 }
 
 type BuyCurrency = 'EUR' | 'PLN';
-type Form = { currency: BuyCurrency; buy: string; inbound: string; sell: string; weightG: string; commission: string };
+type Form = { currency: BuyCurrency; buy: string; sell: string; weightG: string; commission: string };
 
-const EMPTY: Form = { currency: 'EUR', buy: '', inbound: '0', sell: '', weightG: '', commission: '5' };
-const START: Form = { currency: 'EUR', buy: '50', inbound: '0', sell: '120', weightG: '1250', commission: '5' };
+const EMPTY: Form = { currency: 'EUR', buy: '', sell: '', weightG: '', commission: '5' };
+const START: Form = { currency: 'EUR', buy: '50', sell: '120', weightG: '1250', commission: '5' };
 
 /** Alışın girildiği para birimi: Amazon.de / Ceneo €, amazon.pl zł */
-const BUY_CURRENCIES: { value: BuyCurrency; symbol: string; label: string; buyHint: string; inboundHint: string }[] = [
-  { value: 'EUR', symbol: '€', label: '€ Euro', buyHint: 'Amazon.de / Ceneo, KDV dahil', inboundHint: 'Amazon.de 5,99 €; ücretsizse 0' },
-  { value: 'PLN', symbol: 'zł', label: 'zł Zloti', buyHint: 'amazon.pl, KDV dahil', inboundHint: 'amazon.pl kargosu; ücretsizse 0' },
+const BUY_CURRENCIES: { value: BuyCurrency; symbol: string; label: string; buyHint: string }[] = [
+  { value: 'EUR', symbol: '€', label: '€ Euro', buyHint: 'Amazon.de / Ceneo, KDV dahil; kargo ücretliyse ekleyin' },
+  { value: 'PLN', symbol: 'zł', label: 'zł Zloti', buyHint: 'amazon.pl, KDV dahil; kargo ücretliyse ekleyin' },
 ];
 
 const decimal2 = new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -81,9 +84,7 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={id} className="text-xs">
-        {label}
-      </Label>
+      <Label htmlFor={id}>{label}</Label>
       <div className="relative">
         <Input
           id={id}
@@ -93,11 +94,11 @@ function Field({
           min="0"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="pr-12 font-semibold tabular-nums"
+          className="h-10 pr-12 text-base font-semibold tabular-nums"
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">{unit}</span>
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">{unit}</span>
       </div>
-      {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
+      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
 }
@@ -105,26 +106,23 @@ function Field({
 function Line({ label, note, value, strong }: { label: React.ReactNode; note?: string; value: string; strong?: boolean }) {
   return (
     <TableRow>
-      <TableCell className="py-2.5 text-xs">
-        <div className={cn(strong && 'font-semibold')}>{label}</div>
-        {note && <div className="text-[11px] text-muted-foreground">{note}</div>}
+      <TableCell className="py-2.5">
+        <div className={cn('text-sm', strong && 'font-semibold')}>{label}</div>
+        {note && <div className="text-xs text-muted-foreground">{note}</div>}
       </TableCell>
-      <TableCell className={cn('py-2.5 text-right text-xs tabular-nums', strong ? 'font-semibold' : 'font-medium')}>{value}</TableCell>
+      <TableCell className={cn('py-2.5 text-right text-sm tabular-nums', strong ? 'font-semibold' : 'font-medium')}>{value}</TableCell>
     </TableRow>
   );
 }
 
-function Kpi({ title, value, note, tone }: { title: string; value: string; note?: string; tone?: 'bad' }) {
+/** Hedef fiyat kutusu: asgari kâr, rakibi yenemeyince ve üst sınır fiyatları */
+function PriceTarget({ title, value, note, active }: { title: string; value: string; note: string; active?: boolean }) {
   return (
-    <Card className="gap-1 py-4">
-      <CardHeader className="px-4">
-        <CardDescription className="text-xs">{title}</CardDescription>
-      </CardHeader>
-      <CardContent className="px-4">
-        <div className={cn('text-2xl font-bold tracking-tight tabular-nums', tone === 'bad' && 'text-destructive')}>{value}</div>
-        {note && <p className="mt-0.5 text-xs text-muted-foreground">{note}</p>}
-      </CardContent>
-    </Card>
+    <div className={cn('rounded-lg border p-3', active && 'border-primary')}>
+      <p className="text-xs text-muted-foreground">{title}</p>
+      <p className="mt-1 text-lg font-semibold tabular-nums">{value}</p>
+      <p className="text-xs text-muted-foreground">{note}</p>
+    </div>
   );
 }
 
@@ -158,19 +156,17 @@ export default function KarHesaplamaPage() {
   const calc = useMemo(() => {
     if (!rates) return null;
     // zł girildiyse € karşılığı (ECB); hesabın geri kalanı € üzerinden
-    const toEur = form.currency === 'PLN' ? 1 / rates.eurPln : 1;
-    const buy = num(form.buy) * toEur;
-    const inbound = num(form.inbound) * toEur;
-    const buyLocal = num(form.buy) + num(form.inbound);
+    const buyLocal = num(form.buy);
+    const buy = form.currency === 'PLN' ? buyLocal / rates.eurPln : buyLocal;
     const sell = num(form.sell);
     const commissionPct = num(form.commission) / 100;
-    const w = { grams: Math.round(num(form.weightG)) };
-    if (!buy || !w.grams) return null;
+    const weightG = Math.round(num(form.weightG));
+    if (!buy || !weightG) return null;
 
     const c = costBase({
       purchaseEur: buy,
-      shippingEur: inbound,
-      weightG: w.grams,
+      shippingEur: 0,
+      weightG,
       eurUsd: rates.eurUsd,
       feePct: commissionPct + PRICING.acquiringPct + OZON_GLOBAL_FEES.intermediaryPct,
       platformPct: OZON_GLOBAL_FEES.platformPct,
@@ -188,60 +184,66 @@ export default function KarHesaplamaPage() {
     return {
       sell,
       commissionPct,
-      w,
+      weightG,
       c,
       fees,
+      ozonFees,
       platformCapped: rates.platformCapUsd != null && platformRaw > rates.platformCapUsd,
-      tiers: calculateShippingCosts(w.grams).weightUnits,
+      tiers: calculateShippingCosts(weightG).weightUnits,
       profit,
       margin,
       prices: marginPrices(c),
       payoutUsd: sell - ozonFees - c.ozonShippingUsd,
       cardTry: buyLocal * (form.currency === 'PLN' ? rates.plnTry : rates.eurTry) * (1 + PRICING.bankFxPct),
-      buyEur: buy + inbound,
+      buyEur: buy,
       buyLocal,
     };
   }, [rates, form]);
 
   const cur = BUY_CURRENCIES.find((c) => c.value === form.currency)!;
   const isPln = form.currency === 'PLN';
+  const loss = !!calc && calc.sell > 0 && calc.profit < 0;
 
-  const weightNote = 'girildiği gibi, LS paketi dahil';
+  // Satış fiyatının nereye gittiği: zararda maliyetin toplamına göre
+  const parts = calc
+    ? [
+        { key: 'buy', label: 'Alış', value: calc.c.landedUsd, color: 'bg-chart-1' },
+        { key: 'ship', label: 'Ozon kargosu', value: calc.c.ozonShippingUsd, color: 'bg-chart-2' },
+        { key: 'depot', label: 'LS depo', value: calc.c.depotUsd, color: 'bg-chart-3' },
+        { key: 'fees', label: 'Ozon kesintileri', value: calc.ozonFees, color: 'bg-chart-4' },
+        { key: 'profit', label: 'Net kâr', value: Math.max(calc.profit, 0), color: 'bg-chart-5' },
+      ]
+    : [];
+  const partsTotal = parts.reduce((s, p) => s + p.value, 0);
 
   return (
     <div className="flex-1 space-y-6 bg-background p-4 pt-6 text-foreground md:p-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Kâr Hesaplama</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Fiyat önerisiyle aynı hesap: alış € ya da zł, Ozon satışı $, kargo ve depo ücreti ağırlıktan.
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">Fiyat önerisiyle aynı hesap: alış € ya da zł, Ozon satışı $, kargo ve depo ücreti ağırlıktan.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {rates && (
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-lg border bg-card px-3 py-1.5 text-xs text-muted-foreground shadow-xs">
-              <span>
-                1 € = <span className="font-semibold tabular-nums text-foreground">{decimal4.format(rates.eurUsd)} $</span> · ECB{' '}
-                {day(rates.eurUsdDate)}
-              </span>
+            <>
+              <Badge variant="outline" className="gap-1 font-normal text-muted-foreground">
+                1 € = <span className="font-semibold tabular-nums text-foreground">{decimal4.format(rates.eurUsd)} $</span>
+                <span>· ECB {day(rates.eurUsdDate)}</span>
+              </Badge>
               {isPln && (
-                <>
-                  <span className="text-border">|</span>
-                  <span>
-                    1 € = <span className="font-semibold tabular-nums text-foreground">{decimal4.format(rates.eurPln)} zł</span> · ECB
-                  </span>
-                </>
+                <Badge variant="outline" className="gap-1 font-normal text-muted-foreground">
+                  1 € = <span className="font-semibold tabular-nums text-foreground">{decimal4.format(rates.eurPln)} zł</span>
+                </Badge>
               )}
-              <span className="text-border">|</span>
-              <span>
+              <Badge variant="outline" className="gap-1 font-normal text-muted-foreground">
                 1 € = <span className="font-semibold tabular-nums text-foreground">{decimal2.format(rates.eurTry)} ₺</span>, 1 $ ={' '}
-                <span className="font-semibold tabular-nums text-foreground">{decimal2.format(rates.usdTry)} ₺</span> · TCMB{' '}
-                {day(rates.tryDate)}
-              </span>
-            </div>
+                <span className="font-semibold tabular-nums text-foreground">{decimal2.format(rates.usdTry)} ₺</span>
+                <span>· TCMB {day(rates.tryDate)}</span>
+              </Badge>
+            </>
           )}
-          <Button variant="outline" size="sm" onClick={loadRates} disabled={loading} className="gap-1.5">
-            <RefreshCw className={cn('h-3.5 w-3.5', loading && 'animate-spin')} />
+          <Button variant="outline" size="sm" onClick={loadRates} disabled={loading}>
+            <RefreshCw className={cn(loading && 'animate-spin')} />
             Kurları yenile
           </Button>
         </div>
@@ -255,51 +257,32 @@ export default function KarHesaplamaPage() {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
-        <Card className="xl:col-span-5">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
+        <Card>
           <CardHeader>
             <CardTitle>Ürün</CardTitle>
-            <CardDescription>Alış, satış ve ağırlık</CardDescription>
-            <CardAction className="flex gap-1.5">
-              <Button variant="ghost" size="sm" onClick={() => setForm((f) => ({ ...EMPTY, currency: f.currency }))} className="h-8 gap-1.5 text-xs">
-                <RotateCcw className="h-3.5 w-3.5" />
+            <CardDescription>Alış, satış ve kargo ağırlığı</CardDescription>
+            <CardAction>
+              <Button variant="ghost" size="sm" onClick={() => setForm((f) => ({ ...EMPTY, currency: f.currency }))}>
+                <RotateCcw />
                 Sıfırla
               </Button>
             </CardAction>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between gap-3">
-              <Label id="buy-currency" className="text-xs">
-                Alış para birimi
-              </Label>
-              <div role="radiogroup" aria-labelledby="buy-currency" className="inline-flex gap-0.5 rounded-md border p-0.5">
-                {BUY_CURRENCIES.map((c) => (
-                  <Button
-                    key={c.value}
-                    type="button"
-                    role="radio"
-                    aria-checked={form.currency === c.value}
-                    variant={form.currency === c.value ? 'secondary' : 'ghost'}
-                    size="sm"
-                    className="h-7 px-2.5 text-xs"
-                    onClick={() => setForm((f) => ({ ...f, currency: c.value }))}
-                  >
-                    {c.label}
-                  </Button>
-                ))}
-              </div>
+          <CardContent className="space-y-5">
+            <div className="space-y-1.5">
+              <Label>Alış para birimi</Label>
+              <Tabs value={form.currency} onValueChange={(v) => setForm((f) => ({ ...f, currency: v as BuyCurrency }))}>
+                <TabsList className="w-full">
+                  {BUY_CURRENCIES.map((c) => (
+                    <TabsTrigger key={c.value} value={c.value}>
+                      {c.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Field id="buy" label="Alış fiyatı" hint={cur.buyHint} unit={cur.symbol} value={form.buy} onChange={set('buy')} />
-              <Field
-                id="inbound"
-                label="Depoya kargo"
-                hint={cur.inboundHint}
-                unit={cur.symbol}
-                value={form.inbound}
-                onChange={set('inbound')}
-              />
-            </div>
+            <Field id="buy" label="Alış fiyatı" hint={cur.buyHint} unit={cur.symbol} value={form.buy} onChange={set('buy')} />
             <Field id="sell" label="Ozon satış fiyatı" hint="Müşterinin gördüğü fiyat" unit="$" value={form.sell} onChange={set('sell')} />
             <Separator />
             <Field
@@ -314,77 +297,107 @@ export default function KarHesaplamaPage() {
           </CardContent>
         </Card>
 
-        <div className="space-y-6 xl:col-span-7">
+        <div className="space-y-6">
           {!rates && !rateError ? (
-            <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
-              {Array.from({ length: 4 }, (_, i) => (
-                <Skeleton key={i} className="h-24" />
-              ))}
+            <div className="space-y-4">
+              <Skeleton className="h-44" />
+              <Skeleton className="h-72" />
             </div>
           ) : !calc ? (
             <Card>
-              <CardContent className="py-8 text-center text-sm text-muted-foreground">Alış fiyatı ve ağırlık girin.</CardContent>
+              <CardContent className="py-12 text-center text-sm text-muted-foreground">Alış fiyatı ve kargo ağırlığı girin.</CardContent>
             </Card>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
-                <Kpi
-                  title="Net kâr"
-                  value={calc.sell ? usd(calc.profit) : '—'}
-                  note={calc.sell && rates ? formatTL(calc.profit * rates.usdTry) : 'Satış fiyatı girin'}
-                  tone={calc.sell && calc.profit < 0 ? 'bad' : undefined}
-                />
-                <Kpi
-                  title="Marj"
-                  value={calc.sell ? pct(calc.margin) : '—'}
-                  note={calc.sell ? `maliyete göre · satışa göre ${pct(calc.profit / calc.sell)}` : 'maliyete göre'}
-                  tone={calc.sell && calc.profit < 0 ? 'bad' : undefined}
-                />
-                <Kpi title="Asgari kâr fiyatı" value={usd(calc.prices.floorPrice)} note={`maliyetin ${whole(PRICING.minProfitPct)}'i, en az ${PRICING.minProfitUsd} $`} />
-                <Kpi
-                  title={`${whole(PRICING.targetMargin)} marj fiyatı`}
-                  value={usd(calc.prices.targetPrice)}
-                  note={`rakipsiz (${whole(PRICING.noRivalMargin)}): ${usd(calc.prices.noRivalPrice)}`}
-                />
-              </div>
-
               <Card>
-                <CardHeader>
-                  <CardTitle>Döküm</CardTitle>
-                  <CardDescription>
-                    Kargo ağırlığı {grams(calc.w.grams)} ({weightNote}) · {calc.tiers} kademe
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="rounded-lg border">
+                <CardContent className="space-y-5">
+                  <div className="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Net kâr</p>
+                      <p className={cn('text-4xl font-bold tracking-tight tabular-nums', loss && 'text-destructive')}>
+                        {calc.sell ? usd(calc.profit) : '—'}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {calc.sell && rates ? formatTL(calc.profit * rates.usdTry) : 'Satış fiyatı girin'}
+                      </p>
+                    </div>
+                    {calc.sell > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant={loss ? 'destructive' : 'secondary'} className="text-sm">
+                          Marj {pct(calc.margin)}
+                        </Badge>
+                        <Badge variant="outline" className="text-sm font-normal">
+                          satışa göre {pct(calc.profit / calc.sell)}
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+
+                  {calc.sell > 0 && partsTotal > 0 && (
+                    <div className="space-y-2">
+                      <div
+                        className="flex h-3 w-full overflow-hidden rounded-full bg-muted"
+                        role="img"
+                        aria-label={`Satış fiyatının dağılımı: ${parts.map((p) => `${p.label} ${usd(p.value)}`).join(', ')}`}
+                      >
+                        {parts.map((p) =>
+                          p.value > 0 ? (
+                            <div key={p.key} className={p.color} style={{ width: `${(p.value / partsTotal) * 100}%` }} title={`${p.label}: ${usd(p.value)}`} />
+                          ) : null
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                        {parts.map((p) => (
+                          <span key={p.key} className="inline-flex items-center gap-1.5">
+                            <span className={cn('size-2 rounded-full', p.color)} />
+                            {p.label} <span className="tabular-nums text-foreground">{usd(p.value)}</span>
+                          </span>
+                        ))}
+                        {loss && <span className="text-destructive">zarar {usd(-calc.profit)}</span>}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <PriceTarget
+                      title="Asgari kâr fiyatı"
+                      value={usd(calc.prices.floorPrice)}
+                      note={`maliyetin ${whole(PRICING.minProfitPct)}'i, en az ${PRICING.minProfitUsd} $`}
+                      active={calc.sell > 0 && calc.sell < calc.prices.floorPrice}
+                    />
+                    <PriceTarget
+                      title="Rakip yenilemezse"
+                      value={usd(calc.prices.noBeatPrice)}
+                      note={`${whole(PRICING.noBeatMargin)} marj`}
+                    />
+                    <PriceTarget
+                      title="Üst sınır / rakipsiz"
+                      value={usd(calc.prices.targetPrice)}
+                      note={`${whole(PRICING.targetMargin)} marj`}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,280px)]">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Döküm</CardTitle>
+                    <CardDescription>
+                      Kargo ağırlığı {grams(calc.weightG)} (LS paketi dahil) · {calc.tiers} kademe
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
                     <Table>
                       <TableBody>
                         <Line label="Ozon satış fiyatı" value={usd(calc.sell)} strong />
                         <Line
-                          label="Alış + depoya kargo"
+                          label="Alış"
                           note={`${isPln ? `${zloty(calc.buyLocal)} ÷ ${decimal4.format(rates!.eurPln)} = ` : ''}${formatEuro(calc.buyEur)} × ${decimal4.format(rates!.eurUsd)}, ${pct(PRICING.bankFxPct)} kur farkıyla`}
                           value={usd(-calc.c.landedUsd)}
                         />
-                        <Line
-                          label={
-                            <span className="flex items-center gap-1.5">
-                              <Truck className="h-3 w-3 text-muted-foreground" />
-                              Ozon kargosu
-                            </span>
-                          }
-                          note={`10,30 € + ${calc.tiers} × 2,50 €`}
-                          value={usd(-calc.c.ozonShippingUsd)}
-                        />
-                        <Line
-                          label={
-                            <span className="flex items-center gap-1.5">
-                              <Box className="h-3 w-3 text-muted-foreground" />
-                              Depo ücreti (LS)
-                            </span>
-                          }
-                          note="kabul + sevk + paket"
-                          value={usd(-calc.c.depotUsd)}
-                        />
+                        <Line label="Ozon kargosu" note={`10,30 € + ${calc.tiers} × 2,50 €`} value={usd(-calc.c.ozonShippingUsd)} />
+                        <Line label="Depo ücreti (LS)" note="kabul + sevk + paket" value={usd(-calc.c.depotUsd)} />
                         <Line label={`Komisyon (${pct(calc.commissionPct)})`} value={usd(-calc.fees.commission)} />
                         <Line label={`Acquiring (${pct(PRICING.acquiringPct)})`} value={usd(-calc.fees.acquiring)} />
                         <Line label={`Aracılık (${pct(OZON_GLOBAL_FEES.intermediaryPct)})`} value={usd(-calc.fees.intermediary)} />
@@ -396,44 +409,40 @@ export default function KarHesaplamaPage() {
                       </TableBody>
                       <TableFooter>
                         <TableRow>
-                          <TableCell className="py-3 text-xs font-semibold">Net kâr</TableCell>
-                          <TableCell
-                            className={cn('py-3 text-right text-xs font-bold tabular-nums', calc.profit < 0 && 'text-destructive')}
-                          >
+                          <TableCell className="py-3 text-sm font-semibold">Net kâr</TableCell>
+                          <TableCell className={cn('py-3 text-right text-sm font-bold tabular-nums', calc.profit < 0 && 'text-destructive')}>
                             {usd(calc.profit)}
                           </TableCell>
                         </TableRow>
                       </TableFooter>
                     </Table>
-                  </div>
+                  </CardContent>
+                </Card>
 
-                  <div className="space-y-3">
-                    <div className="rounded-lg border p-4">
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Wallet className="h-3.5 w-3.5" />
-                        Ozon hakedişi
-                      </div>
-                      <div className="mt-1 text-xl font-semibold tabular-nums">{usd(calc.payoutUsd)}</div>
-                      <p className="text-xs text-muted-foreground">
-                        {formatTL(calc.payoutUsd * rates!.usdTry)} · satış − Ozon kesintileri − kargo
-                      </p>
-                    </div>
-                    <div className="rounded-lg border p-4">
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Scale className="h-3.5 w-3.5" />
-                        Kartından çekilecek (tahmini)
-                      </div>
-                      <div className="mt-1 text-xl font-semibold tabular-nums">{formatTL(calc.cardTry)}</div>
-                      <p className="text-xs text-muted-foreground">
-                        {isPln
-                          ? `${zloty(calc.buyLocal)} × ${decimal4.format(rates!.plnTry)} ₺`
-                          : `${formatEuro(calc.buyEur)} × ${decimal2.format(rates!.eurTry)} ₺`}
-                        , {pct(PRICING.bankFxPct)} kur farkıyla
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                <div className="space-y-6">
+                  <Card className="gap-2">
+                    <CardHeader>
+                      <CardDescription>Ozon hakedişi</CardDescription>
+                      <CardTitle className="text-2xl tabular-nums">{usd(calc.payoutUsd)}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-xs text-muted-foreground">
+                      {formatTL(calc.payoutUsd * rates!.usdTry)} · satış − Ozon kesintileri − kargo
+                    </CardContent>
+                  </Card>
+                  <Card className="gap-2">
+                    <CardHeader>
+                      <CardDescription>Kartından çekilecek (tahmini)</CardDescription>
+                      <CardTitle className="text-2xl tabular-nums">{formatTL(calc.cardTry)}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-xs text-muted-foreground">
+                      {isPln
+                        ? `${zloty(calc.buyLocal)} × ${decimal4.format(rates!.plnTry)} ₺`
+                        : `${formatEuro(calc.buyEur)} × ${decimal2.format(rates!.eurTry)} ₺`}
+                      , {pct(PRICING.bankFxPct)} kur farkıyla
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
             </>
           )}
         </div>
