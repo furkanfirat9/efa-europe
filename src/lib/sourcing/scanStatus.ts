@@ -17,6 +17,15 @@ export const SCAN_CHANNELS: { channel: ScanChannel; label: string; /** Beklenen 
 /** Bu süreden uzun "running" kalan çalışma yarıda kesilmiş sayılır (bilgisayar kapandı, süreç öldü). */
 const STALLED_MS = 2 * 3600_000;
 
+/** Taramada ani fiyat değişimi; Amazon.de KDV dahil €, amazon.pl ve Ceneo (en iyi teklif) zł */
+export interface PriceJump {
+  offer: string;
+  from: number;
+  to: number;
+  unit: string;
+  pct: number;
+}
+
 export interface ScanStatus {
   channel: ScanChannel;
   label: string;
@@ -28,7 +37,8 @@ export interface ScanStatus {
   scanned: number;
   priceChanged: number;
   stockChanged: number;
-  held: number;
+  /** Fiyatı %20 ya da daha fazla oynayan ürünler (scripts/lib/aniDegisim.mjs), en çok artan başta */
+  jumps: PriceJump[];
   error: string | null;
   /** Son başarılı/kısmi taramanın üstünden beklenen süre geçti */
   stale: boolean;
@@ -64,7 +74,7 @@ export async function loadScanStatus(storeId = 'store1'): Promise<ScanStatus[]> 
       scanned: last?.scanned ?? 0,
       priceChanged: last?.priceChanged ?? 0,
       stockChanged: last?.stockChanged ?? 0,
-      held: last?.held ?? 0,
+      jumps: ((last?.summary as { jumps?: PriceJump[] } | null)?.jumps ?? []),
       error: last?.error ?? null,
       stale: !goodAt || Date.now() - goodAt.getTime() > maxAgeH * 3600_000,
       lastDataAt: lastData[channel]?.toISOString() ?? null,
