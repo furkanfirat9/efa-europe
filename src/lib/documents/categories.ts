@@ -10,6 +10,9 @@ export interface DocumentCategory {
 
 export const DOCUMENT_CATEGORIES: DocumentCategory[] = [
   { key: 'tedarik.mal', group: 'Tedarik', label: 'Mal alımı' },
+  // Satılamadan kaybolan mal (yanlış müşteriye giden adet vb.); fatura siparişe bağlanmaz.
+  // Anahtar 'tedarik' ile başlamaz: tedarik.* yalnız siparişin maliyeti sayılır, bu ise ayrıca gider yazılır.
+  { key: 'kayip.stok', group: 'Tedarik', label: 'Stok kaybı' },
 
   { key: 'uyelik.amazon_prime', group: 'Üyelikler', label: 'Amazon Prime' },
   { key: 'uyelik.allegro_smart', group: 'Üyelikler', label: 'Allegro Business Smart' },
