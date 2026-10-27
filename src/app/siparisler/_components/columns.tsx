@@ -9,8 +9,9 @@ import {
   tableFeatures,
 } from '@tanstack/react-table';
 import Link from 'next/link';
-import { ArrowDown, ArrowUp, ArrowUpDown, PackagePlus, PanelRightOpen } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, ArrowUpRight, PackagePlus, PanelRightOpen } from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip';
 import { formatNumber, formatUSD } from '@/lib/format';
 import { OrderItem } from '../types';
 import { formatDate } from '../utils';
@@ -78,6 +79,27 @@ function SortableHeader({ field, label, sort }: { field: SortField; label: strin
   );
 }
 
+/** Ürünün tedarik kartını yeni sekmede açar: /fiyat-onerisi Tedarik sekmesi, arama kutusu bu kodla dolu. */
+function SupplyLink({ offerId }: { offerId: string }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="ghost" size="icon" className="-ml-2 size-6 shrink-0 text-muted-foreground" asChild>
+          <Link
+            href={`/fiyat-onerisi?sekme=tedarik&q=${encodeURIComponent(offerId)}`}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`${offerId} tedarik bilgisini yeni sekmede aç`}
+          >
+            <ArrowUpRight />
+          </Link>
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Tedarikte aç — yeni sekmede</TooltipContent>
+    </Tooltip>
+  );
+}
+
 export function buildOrderColumns({
   onUpdate,
   onOpenDetail,
@@ -111,10 +133,10 @@ export function buildOrderColumns({
       header: 'Ürün',
       // Görsel ve ad sabit genişlikte bir kutuda; kutu ortalanır ama içerik sola
       // hizalı kalır, böylece görseller ve adlar satırlar arasında aynı hizada durur.
-      // Kutu, tipik model kodu (~14 karakter) kadar dar tutulur; geniş kutuda kısa kodların
-      // sağında boşluk kalıyor ve sütun sola yatık görünüyordu. Uzun kodlar kısalır, başlıkta tamamı.
+      // Kutu, tipik model kodu (~14 karakter) ve yanındaki tedarik oku kadar dar tutulur; geniş kutuda
+      // kısa kodların sağında boşluk kalıyor ve sütun sola yatık görünüyordu. Uzun kodlar kısalır, başlıkta tamamı.
       cell: ({ row }) => (
-        <div className="mx-auto flex w-36 items-center gap-3 text-left">
+        <div className="mx-auto flex w-44 items-center gap-3 text-left">
           <ProductImageCell order={row.original} />
           <div
             className="min-w-0 flex-1 truncate text-xs font-medium"
@@ -122,6 +144,7 @@ export function buildOrderColumns({
           >
             {row.original.productOfferId || row.original.productTitle || '—'}
           </div>
+          {row.original.productOfferId && <SupplyLink offerId={row.original.productOfferId} />}
         </div>
       ),
     }),

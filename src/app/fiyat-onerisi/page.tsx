@@ -208,6 +208,18 @@ export default function FiyatOnerisiPage() {
     load();
   }, [load]);
 
+  // Siparişler sayfasındaki ürün okundan gelinir (?sekme=tedarik&q=<offer_id>): sekme açılır, arama
+  // kutusu o kodla dolar. Adres temizlenir ki arama değiştikten sonra yenileme eski kodu geri getirmesin.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sekme = params.get('sekme');
+    const q = params.get('q')?.trim();
+    if (!sekme && !q) return;
+    if (sekme) setView(sekme === 'kampanya' ? 'campaign' : 'proposals');
+    if (q) setQuery(q);
+    window.history.replaceState(null, '', window.location.pathname);
+  }, []);
+
   // Arama değişince liste baştan gösterilir
   useEffect(() => setShown(PAGE_SIZE), [query]);
 
