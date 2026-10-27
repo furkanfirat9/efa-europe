@@ -42,7 +42,7 @@ export const OrderKpiCards: React.FC<OrderKpiCardsProps> = React.memo(function O
     { label: 'Toplam ciro', value: formatUSD(stats?.totalRevenueUsd) },
     { label: 'Sevk bekleyen', value: formatNumber(stats?.awaitingOrders || 0), dot: 'bg-amber-500', filter: 'awaiting', hint: 'Sevk bekleyenleri filtrele' },
     { label: 'İptaller', value: formatNumber(stats?.cancelledOrders || 0), dot: 'bg-rose-500', filter: 'cancelled', hint: 'İptalleri filtrele' },
-    { label: 'Hesaplanmayan', value: formatNumber(uncalculatedCount), dot: 'bg-purple-500', filter: 'uncalculated', hint: 'Alış fiyatı girilmemişleri filtrele' },
+    { label: 'Hesaplanmayan', value: formatNumber(uncalculatedCount), dot: 'bg-purple-500', filter: 'uncalculated', hint: 'Alışı (₺ ya da €/zł) girilmemişleri filtrele' },
   ];
 
   return (

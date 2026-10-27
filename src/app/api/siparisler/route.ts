@@ -47,6 +47,7 @@ async function computeStoreStats(storeId = 'store1', startDate?: Date, endDate?:
       buyPrice: true,
       buyCurrency: true,
       buyPriceTry: true,
+      sourcePrice: true,
       netProfitTry: true,
     },
   });
@@ -84,10 +85,9 @@ async function computeStoreStats(storeId = 'store1', startDate?: Date, endDate?:
     }
   }
 
+  // Alış ₺ ya da döviz (€/zł) olarak girildiyse kâr hesaplanır
   const uncalculatedOrders = allOrders.filter(
-    (o) =>
-      o.status !== 'cancelled' &&
-      (o.buyPrice === null || o.buyPrice === undefined || Number(o.buyPrice) <= 0)
+    (o) => o.status !== 'cancelled' && !(Number(o.buyPrice) > 0) && !(Number(o.sourcePrice) > 0)
   ).length;
 
   return {
@@ -148,7 +148,10 @@ export async function GET(request: NextRequest) {
       } else if (status === 'uncalculated') {
         andConditions.push({
           status: { not: 'cancelled' },
-          OR: [{ buyPrice: null }, { buyPrice: 0 }],
+          AND: [
+            { OR: [{ buyPrice: null }, { buyPrice: { lte: 0 } }] },
+            { OR: [{ sourcePrice: null }, { sourcePrice: { lte: 0 } }] },
+          ],
         });
       } else {
         andConditions.push({ status });
