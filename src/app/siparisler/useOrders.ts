@@ -49,9 +49,7 @@ function filterAndSortOrdersLocally(
       );
     } else if (status === 'uncalculated') {
       res = res.filter(
-        (o) =>
-          o.status !== 'cancelled' &&
-          (o.buyPrice === null || o.buyPrice === undefined || Number(o.buyPrice) <= 0)
+        (o) => o.status !== 'cancelled' && !(Number(o.buyPrice) > 0) && !(Number(o.sourcePrice) > 0)
       );
     } else if (status === 'delivering') {
       res = res.filter((o) => ['delivering', 'driver_pickup'].includes(o.status));
