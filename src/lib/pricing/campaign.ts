@@ -498,13 +498,18 @@ const recordChanges = (rows: { c: CampaignChange; from: number | null; to: numbe
 
 /**
  * "Zararına satıyor" / "Ozon izin vermiyor" ürünlerini Elastik boosting'den çıkarır, sonra kampanyayı yeniden okuyup
- * doğrular. Ozon 13 Ekim 2026'dan sonra /v2/actions/products/deactivate'i yalnız "Promo Codes" için bırakıyor; elastik
- * kampanyadan çıkarma /v1/actions/products/update'e taşınıyor. Doğrulama çıkmayan ürünü hata olarak gösterir.
+ * doğrular. Doğrulama çıkmayan ürünü hata olarak gösterir.
+ *
+ * /v2/actions/products/deactivate artık yalnız "Promo Codes" içindir; elastikte "unified price logic" hatası veriyor
+ * (2026-10-29). Çıkarma /v1/actions/products/update ile yapılır: kampanya tavanının üstünde bir fiyat ürünü çıkarır,
+ * ama gönderilen fiyat kartın limit fiyatı (min_price) da olur. Bu yüzden kartın kendi min_price'ı gönderilir;
+ * tavanın altındaysa tavanın 1 $ üstü (limit fiyatı yükselir, ürün zararına bir kampanyaya yeniden girmez).
  */
 export async function removeFromCampaign(productIds: string[]): Promise<ApplyResult[]> {
   const rows = await checkRows([...new Set(productIds)]);
   const results: ApplyResult[] = [];
-  const ok = rows.filter((r) => r.c && r.c.current != null && r.c.checkKind !== 'opportunity');
+  // Tavan bilinmeden çıkarma fiyatı seçilemez: tavanın altındaki fiyat ürünü çıkarmaz, o fiyattan kampanyaya sokar
+  const ok = rows.filter((r) => r.c && r.c.current != null && r.c.checkKind !== 'opportunity' && r.c.maxAction != null);
   for (const r of rows)
     if (!ok.includes(r))
       results.push({
@@ -514,19 +519,34 @@ export async function removeFromCampaign(productIds: string[]): Promise<ApplyRes
         to: 0,
         ok: false,
         verified: null,
-        error: 'Elle kontrolde kampanyadaki zararlı/az kârlı ürün değil',
+        error: r.c && r.c.maxAction == null ? 'Ozon kampanya tavanı okunamadı' : 'Elle kontrolde kampanyadaki zararlı/az kârlı ürün değil',
       });
   if (!ok.length) return results;
 
-  await ozonFetch(
-    '/v2/actions/products/deactivate',
-    { action_id: ELASTIC_ACTION_ID, product_ids: ok.map((r) => Number(r.id)) },
-    getOzonHeaders(STORE)
+  const headers = getOzonHeaders(STORE);
+  const prices = await ozonFetch<{ items: { product_id: number; price: { min_price: number } }[] }>(
+    '/v5/product/info/prices',
+    { filter: { product_id: ok.map((r) => r.id), visibility: 'ALL' }, limit: 1000 },
+    headers
   );
+  const minPrice = new Map(prices.items.map((i) => [String(i.product_id), Number(i.price.min_price) || 0]));
+  const res = await ozonFetch<{ rejected?: { product_id: number; reason: string }[] }>(
+    '/v1/actions/products/update',
+    {
+      action_id: ELASTIC_ACTION_ID,
+      products: ok.map((r) => ({
+        product_id: Number(r.id),
+        action_price: { amount: String(Math.max(minPrice.get(r.id) ?? 0, Math.floor(r.c!.maxAction ?? 0) + 1)), currency: 'USD' },
+      })),
+    },
+    headers
+  );
+  const rejected = new Map((res.rejected ?? []).map((r) => [String(r.product_id), r.reason]));
   const after = await loadAction('/v2/actions/products');
   const done = ok.map((r) => {
     const still = after.has(r.id);
-    return { c: r.c!, from: r.c!.current, to: 0, group: 'removed', ok: !still, error: still ? 'Ozon ürünü kampanyada tutuyor' : null };
+    const error = still ? (rejected.get(r.id) ? `Ozon reddetti: ${rejected.get(r.id)}` : 'Ozon ürünü kampanyada tutuyor') : null;
+    return { c: r.c!, from: r.c!.current, to: 0, group: 'removed', ok: !still, error };
   });
   await recordChanges(done);
   for (const d of done)
