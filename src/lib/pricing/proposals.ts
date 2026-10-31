@@ -9,6 +9,7 @@ import { pickBestOffer, type CeneoOffer } from '@/lib/sourcing/ceneoRules';
 import {
   OZON_GLOBAL_FEES,
   PRICING,
+  REAL_WEIGHT_MIN_G,
   costBase,
   decidePrice,
   platformCapUsdFor,
@@ -222,7 +223,7 @@ async function loadCardWeights() {
  * kargo bedelinden (sipariş kârındaki tahakkuk) kademe sayısı bulunur, ağırlık = kademe × 500 g. Ozon LS'nin
  * ölçtüğü ağırlığı API'de vermiyor; kargo bedeli de yalnız teslimattan sonra tahakkuk ediyor.
  * Yalnız tek ürünlü siparişler. Ürün birden çok kez gittiyse en yüksek kademe: LS'nin paketi değişiyor
- * (Devil 27 bir gönderide 1 420 g, ötekinde 1 960 g ölçüldü).
+ * (Devil 27 bir gönderide 1 420 g, ötekinde 1 960 g ölçüldü). REAL_WEIGHT_MIN_G'nin altındaki ağırlık yok sayılır.
  */
 async function loadRealShippingWeights() {
   const orders = await prisma.ozonOrder.findMany({
@@ -242,6 +243,7 @@ async function loadRealShippingWeights() {
       const diff = (k: number) => Math.abs(calculateShippingCosts(k * 500).totalShipping - shippingEur);
       if (diff(n) < diff(tiers)) tiers = n;
     }
+    if (tiers * 500 <= (REAL_WEIGHT_MIN_G[offerId] ?? 0)) continue;
     weights.set(offerId, Math.max(weights.get(offerId) ?? 0, tiers * 500));
   }
   return weights;
