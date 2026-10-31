@@ -77,6 +77,10 @@ export const PRICING = {
   acquiringPct: 0.015,
 } as const;
 
+/** Ozon'un kestiği kargodan çıkan ağırlık bu sınırı aşmıyorsa depo yanlış tartmış sayılır, kendi ağırlığımız kullanılır
+ *  (NA555/00: LS 1,12 kg girdi, kutulu ~10 kg; 2026-10-31, kullanıcı). */
+export const REAL_WEIGHT_MIN_G: Record<string, number> = { 'NA555/00': 7500 };
+
 /** Ozon'un satış fiyatından kestiği, ürüne göre değişmeyen kalemler (sipariş kârı ve fiyat önerisi ortak kullanır). */
 export const OZON_GLOBAL_FEES = {
   /** Ozon komisyonu tahakkuk etmeden finansal veride oran yoksa */
