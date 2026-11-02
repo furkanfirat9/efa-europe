@@ -216,6 +216,7 @@ export default function KarHesaplamaPage() {
     const c = costBase({
       purchaseEur: buy,
       shippingEur: 0,
+      fxPct: PRICING.bankFxPct[form.currency],
       weightG,
       eurUsd: rates.eurUsd,
       feePct: commissionPct + PRICING.acquiringPct + OZON_GLOBAL_FEES.intermediaryPct,
@@ -241,7 +242,7 @@ export default function KarHesaplamaPage() {
       margin,
       prices: marginPrices(c),
       payoutUsd: sell - ozonFees - c.ozonShippingUsd,
-      cardTry: buyLocal * (form.currency === 'PLN' ? rates.plnTry : rates.eurTry) * (1 + PRICING.bankFxPct),
+      cardTry: buyLocal * (form.currency === 'PLN' ? rates.plnTry : rates.eurTry) * (1 + PRICING.bankFxPct[form.currency]),
     };
   }, [rates, form]);
 

@@ -97,6 +97,7 @@ function estimateProfit(order: OzonOrder, sources: Map<string, ProductSource>, r
   if (!products.length) return null;
   let purchaseEur = 0;
   let inboundEur = 0;
+  let fxEur = 0;
   let grams = 0;
   for (const p of products) {
     const qty = p.quantity || 1;
@@ -111,11 +112,14 @@ function estimateProfit(order: OzonOrder, sources: Map<string, ProductSource>, r
     if (!chosen || unitEur == null || !w.grams) return null;
     purchaseEur += unitEur * qty;
     inboundEur += chosen.shippingEur * qty;
+    fxEur += (unitEur + chosen.shippingEur) * qty * chosen.fxPct;
     grams += w.grams * qty;
   }
   const c = costBase({
     purchaseEur,
     shippingEur: inboundEur,
+    // Siparişteki ürünler farklı kanallardan gelebilir: tutarlara göre ağırlıklı kur farkı
+    fxPct: fxEur / (purchaseEur + inboundEur),
     weightG: grams,
     eurUsd: rates.eurUsd,
     feePct: OZON_GLOBAL_FEES.defaultCommissionPct + PRICING.acquiringPct + OZON_GLOBAL_FEES.intermediaryPct,
