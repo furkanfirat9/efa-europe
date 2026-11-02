@@ -2,12 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { getEcbEurUsd } from '@/lib/fx/ecb';
 import { extractProductMeta } from '@/lib/orders/productMeta';
-import { getOzonHeaders, ozonFetch, ozonFetchBuffer } from '@/lib/ozon/gate';
+import { getOzonHeaders, ozonFetch, ozonFetchBuffer, OzonRateLimitError } from '@/lib/ozon/gate';
 
 export const dynamic = 'force-dynamic';
 
 /** LS formunun boş bırakılınca gönderdiği varsayılan koli; bu ölçülerle açılmış kayıt örnek alınmaz. */
 const DEFAULT_PARCEL = { lengthMm: 300, widthMm: 200, heightMm: 150, weightGr: 1200 };
+
+/** Sınırda etiket için en çok ~4 sn beklenir (5 denemede ~40 sn dönüyordu). */
+const LABEL_MAX_RETRIES = 2;
 
 interface Parcel {
   lengthMm: number;
@@ -71,6 +74,18 @@ async function parcelFromOzonCard(offerId: string): Promise<Parcel | null> {
   return { lengthMm: mm(card.depth), widthMm: mm(card.width), heightMm: mm(card.height), weightGr: grams, source: 'Ozon kartından' };
 }
 
+/** Ozon kargo etiketi. Form beklediği için kısa denenir; sınır sürerse kullanıcı PDF'i elle seçer. */
+async function fetchLabel(postingNumber: string, status: string | null): Promise<{ name: string; base64: string } | null> {
+  if (status !== 'awaiting_deliver') return null;
+  const pdf = await ozonFetchBuffer(
+    '/v2/posting/fbs/package-label',
+    { posting_number: [postingNumber] },
+    getOzonHeaders('store1'),
+    LABEL_MAX_RETRIES
+  );
+  return { name: `posting-label-${postingNumber}.pdf`, base64: pdf.toString('base64') };
+}
+
 /**
  * GET /api/fulfillment/order-prefill?postingNumber=…
  *
@@ -103,32 +118,33 @@ export async function GET(request: NextRequest) {
       notes.push('ECB kuru alınamadı; beyan değerini elle girin.');
     }
 
+    // Etiket ve koli ölçüleri birbirini beklemez: etiket ucu sınıra takılınca koli de gecikiyordu.
+    const [labelResult, parcelResult] = await Promise.allSettled([
+      fetchLabel(postingNumber, order.status),
+      offerId ? parcelFromPreviousTask(offerId, postingNumber).then((p) => p ?? parcelFromOzonCard(offerId)) : null,
+    ]);
+
     // Ozon kargo etiketi: yalnız gönderime hazır siparişte basılabilir
     let label: { name: string; base64: string } | null = null;
-    if (order.status === 'awaiting_deliver') {
-      try {
-        const pdf = await ozonFetchBuffer(
-          '/v2/posting/fbs/package-label',
-          { posting_number: [postingNumber] },
-          getOzonHeaders('store1')
-        );
-        label = { name: `posting-label-${postingNumber}.pdf`, base64: pdf.toString('base64') };
-      } catch (err) {
-        console.warn('[Fulfillment] Etiket alınamadı:', err instanceof Error ? err.message : err);
-        notes.push("Ozon etiketi alınamadı; PDF'i elle seçin.");
-      }
-    } else {
+    if (order.status !== 'awaiting_deliver') {
       notes.push('Sipariş Ozon\'da henüz paketlenmedi; etiket "gönderime hazır" olunca alınabilir.');
+    } else if (labelResult.status === 'fulfilled') {
+      label = labelResult.value;
+    } else {
+      console.warn('[Fulfillment] Etiket alınamadı:', labelResult.reason instanceof Error ? labelResult.reason.message : labelResult.reason);
+      notes.push(
+        labelResult.reason instanceof OzonRateLimitError
+          ? "Ozon etiket servisi şu an yanıt vermiyor; PDF'i elle seçin ya da birazdan siparişi yeniden seçin."
+          : "Ozon etiketi alınamadı; PDF'i elle seçin."
+      );
     }
 
     // Koli ölçüleri ve ağırlık
     let parcel: Parcel | null = null;
-    if (offerId) {
-      try {
-        parcel = (await parcelFromPreviousTask(offerId, postingNumber)) ?? (await parcelFromOzonCard(offerId));
-      } catch (err) {
-        console.warn('[Fulfillment] Koli ölçüleri alınamadı:', err instanceof Error ? err.message : err);
-      }
+    if (parcelResult.status === 'fulfilled') {
+      parcel = parcelResult.value;
+    } else {
+      console.warn('[Fulfillment] Koli ölçüleri alınamadı:', parcelResult.reason instanceof Error ? parcelResult.reason.message : parcelResult.reason);
     }
     if (!parcel) notes.push('Koli ölçüleri bulunamadı; elle girin.');
 
