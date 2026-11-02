@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
+import { ceneoPickInput } from '@/lib/pricing/proposals';
+import type { RejectedOffer } from '@/lib/sourcing/ceneoRules';
 
 /**
  * Ceneo onay ekranındaki kararı yazar. Kararlar sonraki taramalarda korunur:
@@ -10,6 +12,9 @@ import { prisma } from '@/lib/db/prisma';
  *   PATCH { action: 'set-id', ceneoId }     → doğru Ceneo ürünü bu (numara ya da ceneo.pl linki)
  *   PATCH { action: 'reject', ceneoId }     → bu aday yanlış; aday kalmazsa ürün yeniden aranır
  *   PATCH { action: 'not-in-poland' }       → ürün Ceneo'da yok; kaynak Amazon.de / amazon.pl
+ *   PATCH { action: 'reject-offer', offerId }  → bu teklif yanlış; seçime girmez, tarama geri getirmez
+ *   PATCH { action: 'restore-offer', offerId } → eleme geri alınır
+ *   PATCH { action: 'offers-ok' }           → teklif kontrolü bitti; ürün bekleyen listesinden düşer
  */
 
 const fail = (status: number, message: string) =>
@@ -25,6 +30,8 @@ const CLEARED_OFFERS = {
   ceneoMatchedCode: null,
   ceneoWeightG: null,
   ceneoOffers: Prisma.DbNull,
+  ceneoRejectedOffers: Prisma.DbNull,
+  ceneoOfferReview: null,
 };
 
 /** "192123361" ya da "https://www.ceneo.pl/192123361#tab=…" → "192123361" */
@@ -62,6 +69,22 @@ export async function PATCH(request: NextRequest, ctx: RouteContext<'/api/ceneo-
       };
     } else if (body.action === 'not-in-poland') {
       data = { ...CLEARED_OFFERS, ceneoStatus: 'NOT_IN_POLAND', ceneoProductId: null, ceneoName: null, ceneoCandidates: Prisma.DbNull };
+    } else if (body.action === 'reject-offer') {
+      const { offers, rejected } = ceneoPickInput(row);
+      const offer = offers.find((o) => o.offerId && o.offerId === body.offerId);
+      if (!offer) return fail(400, 'Bu teklif ürünün listesinde yok.');
+      const next: RejectedOffer[] = [
+        ...rejected.filter((r) => r.offerId !== offer.offerId),
+        { offerId: offer.offerId!, shop: offer.shop, title: offer.title, pricePln: offer.pricePln, at: new Date().toISOString() },
+      ];
+      data = { ceneoRejectedOffers: next as unknown as Prisma.InputJsonValue };
+    } else if (body.action === 'restore-offer') {
+      const { rejected } = ceneoPickInput(row);
+      const rest = rejected.filter((r) => r.offerId !== body.offerId);
+      if (rest.length === rejected.length) return fail(400, 'Bu teklif elenmemiş.');
+      data = { ceneoRejectedOffers: rest.length ? (rest as unknown as Prisma.InputJsonValue) : Prisma.DbNull };
+    } else if (body.action === 'offers-ok') {
+      data = { ceneoOfferReview: null };
     } else {
       return fail(400, 'Geçersiz işlem.');
     }

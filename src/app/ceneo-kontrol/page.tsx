@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { AlertCircle, Check, ExternalLink, Loader2, MapPinOff, RefreshCw, Search, X } from 'lucide-react';
+import { AlertCircle, Check, Loader2, MapPinOff, RefreshCw, Search, X } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/shadcn/alert';
 import { Badge } from '@/components/shadcn/badge';
 import { Button } from '@/components/shadcn/button';
@@ -10,11 +10,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/shadcn/input';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/shadcn/tabs';
+import { OfferReview } from './_components/OfferReview';
+import { ExtLink, ProductImage } from './_components/parts';
 
 /**
  * Ceneo onay ekranı: otomatik eşleşmenin "kesin" diyemediği Ozon ürünlerine son kararı kullanıcı verir.
  * Solda Ozon kartı (ve Amazon kaynağının kodu), sağda Ceneo adayları; karar ProductSource tablosuna yazılır.
- * Görünüm /asin-kontrol ile aynıdır.
+ * Görünüm /asin-kontrol ile aynıdır. "Teklif kontrolü" sekmesi eşleşmesi kesin ürünlerin şüpheli tekliflerini ele alır.
  */
 
 interface Candidate {
@@ -76,19 +78,6 @@ function searchUrl(row: Row) {
   const brand = (row.ozonBrand || row.amzBrand || '').split(/\s+/)[0];
   const code = row.amzModel || row.ozonPartNumber || row.offerId;
   return `https://www.ceneo.pl/;szukaj-${encodeURIComponent(`${brand} ${code}`.trim())}`;
-}
-
-function ProductImage({ src, alt }: { src: string | null; alt: string }) {
-  if (!src) return <div className="flex size-28 shrink-0 items-center justify-center rounded-md border bg-muted text-xs text-muted-foreground">Görsel yok</div>;
-  return <img src={src} alt={alt} loading="lazy" referrerPolicy="no-referrer" className="size-28 shrink-0 rounded-md border bg-white object-contain p-1" />;
-}
-
-function ExtLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a href={href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs underline-offset-4 hover:underline">
-      {children} <ExternalLink className="size-3" />
-    </a>
-  );
 }
 
 function ReviewCard({ row, onDone }: { row: Row; onDone: (id: string) => void }) {
@@ -230,6 +219,8 @@ export default function CeneoKontrolPage() {
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>('ALL');
+  const [view, setView] = useState<'match' | 'offers'>('match');
+  const [offerReview, setOfferReview] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     setError(null);
@@ -239,6 +230,7 @@ export default function CeneoKontrolPage() {
       if (!json.success) throw new Error(json.error_message);
       setRows(json.rows);
       setCounts(json.counts);
+      setOfferReview(json.offerReview);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Liste alınamadı');
     }
@@ -274,6 +266,17 @@ export default function CeneoKontrolPage() {
         </Button>
       </div>
 
+      <Tabs value={view} onValueChange={(v) => setView(v as 'match' | 'offers')}>
+        <TabsList>
+          <TabsTrigger value="match">Eşleşme</TabsTrigger>
+          <TabsTrigger value="offers">Teklif kontrolü ({offerReview ?? '—'})</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      {view === 'offers' ? (
+        <OfferReview onChanged={load} />
+      ) : (
+        <>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {[
           { label: 'Kesin (otomatik)', value: counts.EXACT ?? 0 },
@@ -327,6 +330,8 @@ export default function CeneoKontrolPage() {
           <ReviewCard key={row.id} row={row} onDone={done} />
         ))}
       </div>
+        </>
+      )}
     </div>
   );
 }

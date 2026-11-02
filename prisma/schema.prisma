@@ -443,6 +443,11 @@ model ProductSource {
   // VARIANT / NOT_FOUND kararı için aramada çıkan adaylar
   ceneoCandidates Json?
   ceneoCheckedAt  DateTime?
+  // /ceneo-kontrol → Teklif kontrolü'nde elenen teklifler: [{ offerId, shop, title, pricePln, at }]. Tarama ceneoOffers'ı
+  // her seferinde yeniden yazar, bu alana dokunmaz; seçim elenen teklifi saymaz (pickBestOffer).
+  ceneoRejectedOffers Json?
+  // Seçilen teklifin neden kontrol istediği; doluysa ürün "Teklif kontrolü" listesinde bekler, karar verilince boşalır
+  ceneoOfferReview String?
   // Amazon.pl (3. tedarik kanalı): aynı ASIN'in Polonya sayfası, tarayıcıda okunur (skill amazon-scan, __runScanPl).
   // Hesap orada Business değil: fiyat yalnız %23 KDV dahil zloti.
   plTitle         String?
