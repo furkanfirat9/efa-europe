@@ -35,9 +35,11 @@ export const PRICING = {
    *  (çarşamba → pazartesi); 6 tolerans, sınırda her gün gidip gelmesin. O gün 896 teklif 1-4 gün, 52 teklif 7 gün ve üstü
    *  (X9000/10: 14 gün), arası boştu. */
   maxDeliveryDays: 6,
-  /** Kartın TL'den çektiği tutar ECB kurunun bu kadar üstünde (2026-10-10 ölçümü: %2,0 / %4,1 / %4,9; kullanıcı
-   *  ortalamaya yakın %3,5'i seçti). Alışa ve depoya kargoya eklenir; Ozon kargosu ve depo ücreti kartla ödenmiyor. */
-  bankFxPct: 0.035,
+  /** Kartın TL'den çektiği tutar ECB kurunun bu kadar üstünde; alışın ödendiği para birimine göre ayrı. 2026-11-02 ölçümü,
+   *  son 10 gün, aynı günün ECB kuruyla: euro %4,73 (4 sipariş, iki kart da aynı), zloti %3,44 (21 sipariş). Bütün 51
+   *  siparişte euro %4,85, zloti %4,37; zlotideki düşüşün nedeni bilinmiyor. Kullanıcı 2026-11-03'te euro %4,75'i onayladı,
+   *  zloti 2026-10-10'dan beri %3,5. Alışa ve depoya kargoya eklenir; Ozon kargosu ve depo ücreti kartla ödenmiyor. */
+  bankFxPct: { EUR: 0.0475, PLN: 0.035 },
   /** Amazon ağırlığına kutu/dolgu payı. LS'nin ölçtüğü ağırlık ürün ağırlığından çoğunlukla 150–275 g fazla, ürünün
    *  ağırlığıyla oransal büyümüyor (2026-10-10, 9 gönderi); alt sınır bu yüzden 150 g'dan 250 g'a çıktı. */
   packagingPct: 0.1,
@@ -169,6 +171,8 @@ export interface CostInput {
   purchaseEur: number;
   /** O kanaldan depoya kargo (€) */
   shippingEur: number;
+  /** Bu alışın banka kur farkı (PRICING.bankFxPct, ödendiği para birimine göre) */
+  fxPct: number;
   weightG: number;
   eurUsd: number;
   /** Satıştan tavansız kesilen oranlar toplamı (komisyon + acquiring + aracılık), ör. 0.068 */
@@ -190,8 +194,9 @@ export interface CostBase {
   platformCapUsd: number | null;
 }
 
-export function costBase({ purchaseEur, shippingEur, weightG, eurUsd, feePct, platformPct, platformCapUsd }: CostInput): CostBase {
-  const landedUsd = (purchaseEur + shippingEur) * eurUsd * (1 + PRICING.bankFxPct);
+// Tip denetiminden geçmeyen yerel script'ler fxPct vermez: maliyet NaN çıkmasın diye yüksek oran varsayılır
+export function costBase({ purchaseEur, shippingEur, fxPct = PRICING.bankFxPct.EUR, weightG, eurUsd, feePct, platformPct, platformCapUsd }: CostInput): CostBase {
+  const landedUsd = (purchaseEur + shippingEur) * eurUsd * (1 + fxPct);
   const ozonShippingUsd = calculateShippingCosts(weightG).totalShipping * eurUsd;
   const depotUsd = calculateFulfillmentCosts(weightG).totalFulfillment * eurUsd;
   return {

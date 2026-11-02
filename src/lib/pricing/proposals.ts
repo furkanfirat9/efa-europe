@@ -45,6 +45,8 @@ interface SupplyOffer {
   grossEur: number;
   netEur: number;
   shippingEur: number;
+  /** Banka kur farkı: Amazon.de euro ile, amazon.pl ve Ceneo zloti ile ödeniyor */
+  fxPct: number;
   buyable: boolean;
   /** Ceneo'da teklifi veren mağaza (allegro.pl, mediaexpert.pl …) */
   shop?: string | null;
@@ -67,6 +69,7 @@ function supplyOffers(src: ProductSource | undefined, eurPln: number): SupplyOff
       grossEur: netEur * (1 + PRICING.plVatRate),
       netEur,
       shippingEur: PRICING.amazonShippingEur,
+      fxPct: PRICING.bankFxPct.EUR,
       buyable: !!(src.inStock && src.soldByAmazon) && !deliversLate(src.deliveryText, src.checkedAt),
     });
   }
@@ -82,6 +85,7 @@ function supplyOffers(src: ProductSource | undefined, eurPln: number): SupplyOff
       grossEur,
       netEur: grossEur / (1 + PRICING.plVatRate),
       shippingEur: freeShipping ? 0 : PRICING.amazonShippingEur,
+      fxPct: PRICING.bankFxPct.PLN,
       buyable: (!!(src.plInStock && src.plSoldByAmazon) && !deliversLate(src.plDeliveryText, src.plCheckedAt)) || cartHidden,
     });
   }
@@ -96,6 +100,7 @@ function supplyOffers(src: ProductSource | undefined, eurPln: number): SupplyOff
       grossEur,
       netEur: grossEur / (1 + PRICING.plVatRate),
       shippingEur: (ceneo.best.totalPln - ceneo.best.pricePln) / eurPln,
+      fxPct: PRICING.bankFxPct.PLN,
       buyable: true,
       shop: ceneo.best.shop,
     });
@@ -103,11 +108,11 @@ function supplyOffers(src: ProductSource | undefined, eurPln: number): SupplyOff
   return out;
 }
 
-/** Depoya en ucuz gelen alınabilir kanal; hiçbiri alınamıyorsa fiyatı olan ilk kanal (buyable false). */
+/** Depoya en ucuz gelen alınabilir kanal (banka kur farkı dahil); hiçbiri alınamıyorsa fiyatı olan ilk kanal (buyable false). */
 export function pickSupply(src: ProductSource | undefined, eurPln: number, vatMode: 'gross' | 'net' = PRICING.vatMode) {
   const priceOf = (o: SupplyOffer) => (vatMode === 'net' ? o.netEur : o.grossEur);
   const offers = supplyOffers(src, eurPln);
-  const landed = (o: SupplyOffer) => priceOf(o) + o.shippingEur;
+  const landed = (o: SupplyOffer) => (priceOf(o) + o.shippingEur) * (1 + o.fxPct);
   const chosen = offers.filter((o) => o.buyable).sort((a, b) => landed(a) - landed(b))[0] ?? offers[0] ?? null;
   return { offers, chosen, priceOf, purchaseEur: chosen ? priceOf(chosen) : null };
 }
@@ -359,7 +364,7 @@ export async function buildProposals(
     if (!w.grams) return { ...base, skipReason: 'Ağırlık bilinmiyor' };
 
     const costFor = (weightG: number) =>
-      costBase({ purchaseEur, shippingEur: chosen.shippingEur, weightG, eurUsd: ecb.rate, feePct, platformPct, platformCapUsd });
+      costBase({ purchaseEur, shippingEur: chosen.shippingEur, fxPct: chosen.fxPct, weightG, eurUsd: ecb.rate, feePct, platformPct, platformCapUsd });
     const decide = (cost: CostBase) => decidePrice(cost, rival?.price ?? null, rival?.rubPerUsd ?? null, chosen.netEur * ecb.rate, rival?.factor);
     let c = costFor(w.grams);
     let d = decide(c);

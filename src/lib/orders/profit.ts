@@ -223,8 +223,9 @@ function purchaseCost(order: OzonOrder, rates: OrderRates) {
   if (amount > 0 && currency) {
     const toUsd = currency === 'EUR' ? rates.eurUsd : rates.plnUsd;
     if (!toUsd) throw new Error(`${rates.rateDate} için zł kuru bulunamadı.`);
-    const usd = amount * toUsd * (1 + PRICING.bankFxPct);
-    return { usd, try: usd * rates.usdTry, original: { amount, currency, fxPct: PRICING.bankFxPct } as const };
+    const fxPct = PRICING.bankFxPct[currency];
+    const usd = amount * toUsd * (1 + fxPct);
+    return { usd, try: usd * rates.usdTry, original: { amount, currency, fxPct } as const };
   }
   const buyTry = Number(order.buyPrice) || 0;
   return { usd: buyTry / rates.usdTry, try: buyTry, original: null };

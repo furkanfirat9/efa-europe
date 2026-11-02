@@ -80,6 +80,7 @@ Mağazada daha önce yüklenmiş olan ürünleri takip etmek, mükerrer yükleme
   - **Geç teslimat alınamaz sayılır:** En erken teslim taramadan `PRICING.maxDeliveryDays` günden uzaksa (Amazon.de ve amazon.pl) kanal alınamaz. Ozon'un son gönderimi siparişten 3-4 gün sonradır (`src/lib/sourcing/deliveryDate.ts`).
   - **amazon.pl gizli sepet:** Aynı üründen birkaç adet alınca tarama 7-12 gün sepet görmüyor (fiyat var, satıcı Amazon, stok ve teslimat yazısı boş). Bu hâl stoksuzluk sayılmaz, kanal maliyette kalır.
   - **Ceneo'da başka model:** Başlıkta ürünün ailesinden başka bir kod varsa (FY2420 ↔ FY2430) teklif seçime girmez (`isOtherModelTitle`, `src/lib/sourcing/ceneoRules.ts`). Kodsuz başlık elenmez; marka ya da kod şartı gerçek teklifleri de düşürüyordu.
+  - **Banka kur farkı para birimine göre ayrıdır (`PRICING.bankFxPct`):** euro %4,75 (Amazon.de), zloti %3,5 (amazon.pl, Ceneo). Kanal seçimi de bu farkla karşılaştırır; alışı girilmiş siparişte siparişin para birimi kullanılır. Zaten kesinleşmiş sipariş kârları yeniden hesaplanmaz.
 - **Kampanyadan Çıkış Fiyatı (`removeFromCampaign`):** Gönderilen fiyat kartın fiyatı olur ve kart ondan satar; bu yüzden `min_price`, tavanın 1 $ üstü ve asgari kâr fiyatının en büyüğü gönderilir.
 
 ## 6. Ozon Analitik ve Huni Takibi Standartları (Ozon Analytics Engine)
