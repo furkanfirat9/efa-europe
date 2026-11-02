@@ -131,16 +131,18 @@ export async function ozonFetch<T = any>(
 export async function ozonFetchBuffer(
   path: string,
   body: unknown,
-  headers: Record<string, string>
+  headers: Record<string, string>,
+  maxRetries: number = MAX_RATE_LIMIT_RETRIES
 ): Promise<Buffer> {
-  return Buffer.from(await (await ozonRequest(path, body, headers, 'POST')).arrayBuffer());
+  return Buffer.from(await (await ozonRequest(path, body, headers, 'POST', maxRetries)).arrayBuffer());
 }
 
 async function ozonRequest(
   path: string,
   body: unknown,
   headers: Record<string, string>,
-  method: 'POST' | 'GET'
+  method: 'POST' | 'GET',
+  maxRetries: number = MAX_RATE_LIMIT_RETRIES
 ): Promise<Response> {
   const lane = laneFor(headers['Client-Id'] || 'default');
   const heavy = path.startsWith('/v1/analytics');
@@ -161,12 +163,12 @@ async function ozonRequest(
     const rateLimited =
       res.status === 429 || errText.includes('rate limit exceeded') || errText.includes('"code":8');
 
-    if (rateLimited && attempt < MAX_RATE_LIMIT_RETRIES) {
+    if (rateLimited && attempt < maxRetries) {
       // Jitter, aynı anda sıraya girmiş çağrıların yeniden denemede tekrar
       // çakışmasını engeller.
       const backoff = Math.round(1200 * 2 ** attempt + Math.random() * 500);
       lane.pausedUntil = Date.now() + backoff;
-      console.warn(`[Ozon] ${path} sınıra takıldı, ${backoff}ms sonra tekrar denenecek (deneme ${attempt + 1}/${MAX_RATE_LIMIT_RETRIES}).`);
+      console.warn(`[Ozon] ${path} sınıra takıldı, ${backoff}ms sonra tekrar denenecek (deneme ${attempt + 1}/${maxRetries}).`);
       continue;
     }
 
