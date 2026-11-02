@@ -5,7 +5,7 @@ import { getCbrRates } from '@/lib/fx/cbr';
 import { getEcbEurPln, getEcbEurUsd } from '@/lib/fx/ecb';
 import { getOzonHeaders, ozonFetch } from '@/lib/ozon/gate';
 import type { OrderProfitBreakdown } from '@/lib/orders/profit';
-import { pickBestOffer, type CeneoOffer } from '@/lib/sourcing/ceneoRules';
+import { pickBestOffer, type CeneoOffer, type RejectedOffer } from '@/lib/sourcing/ceneoRules';
 import { deliveryDays } from '@/lib/sourcing/deliveryDate';
 import {
   OZON_GLOBAL_FEES,
@@ -56,6 +56,14 @@ interface SupplyOffer {
 const deliversLate = (text: string | null, scannedAt: Date | null) =>
   (deliveryDays(text, scannedAt) ?? 0) > PRICING.maxDeliveryDays;
 
+/** Ürünün Ceneo seçimine girdileri; maliyet hesabı ve /ceneo-kontrol aynısını kullanır */
+export const ceneoPickInput = (src: ProductSource) => ({
+  offers: (Array.isArray(src.ceneoOffers) ? src.ceneoOffers : []) as unknown as CeneoOffer[],
+  brand: src.ozonBrand,
+  codes: [src.offerId, src.ceneoMatchedCode, src.ozonPartNumber],
+  rejected: (Array.isArray(src.ceneoRejectedOffers) ? src.ceneoRejectedOffers : []) as unknown as RejectedOffer[],
+});
+
 /** Ürünün Amazon.de ve amazon.pl teklifleri (fiyatı olanlar) */
 function supplyOffers(src: ProductSource | undefined, eurPln: number): SupplyOffer[] {
   if (!src) return [];
@@ -90,8 +98,9 @@ function supplyOffers(src: ProductSource | undefined, eurPln: number): SupplyOff
     });
   }
   // Ceneo: yalnız eşleşmesi kesin ya da onaylı ürün; teklifler Polonya'daki depoya kargo dahil (Allegro 0, Smart)
-  const ceneo = (src.ceneoStatus === 'EXACT' || src.ceneoStatus === 'MANUAL') && Array.isArray(src.ceneoOffers)
-    ? pickBestOffer(src.ceneoOffers as unknown as CeneoOffer[], src.ozonBrand, [src.offerId, src.ceneoMatchedCode, src.ozonPartNumber])
+  const pickInput = ceneoPickInput(src);
+  const ceneo = src.ceneoStatus === 'EXACT' || src.ceneoStatus === 'MANUAL'
+    ? pickBestOffer(pickInput.offers, pickInput.brand, pickInput.codes, pickInput.rejected)
     : null;
   if (ceneo) {
     const grossEur = ceneo.best.pricePln / eurPln;

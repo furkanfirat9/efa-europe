@@ -7,7 +7,8 @@ import { prisma } from '@/lib/db/prisma';
  *   GET → { counts: { durum: adet }, rows: karar bekleyen ürünler }
  *
  * Tablo `scripts/ceneo_import.mjs` ile dolar (Ceneo taraması tarayıcıda yapılır, skill ceneo-scan).
- * Kesin (EXACT) ve elle karar verilmiş (MANUAL, NOT_IN_POLAND) ürünler listeye girmez.
+ * Kesin (EXACT) ve elle karar verilmiş (MANUAL, NOT_IN_POLAND) ürünler listeye girmez; onların teklifleri
+ * ./teklifler listesindedir, `offerReview` orada bekleyen ürün sayısıdır.
  * Hiç eşleşmemiş ürünün durumu boştur; sayımda NONE olarak döner.
  */
 
@@ -16,8 +17,9 @@ const STORE = 'store1';
 export async function GET() {
   try {
     const where = { storeId: STORE, asinStatus: { not: 'ARCHIVED' } };
-    const [groups, rows] = await Promise.all([
+    const [groups, offerReview, rows] = await Promise.all([
       prisma.productSource.groupBy({ by: ['ceneoStatus'], where, _count: true }),
+      prisma.productSource.count({ where: { ...where, ceneoStatus: { in: ['EXACT', 'MANUAL'] }, ceneoOfferReview: { not: null } } }),
       prisma.productSource.findMany({
         where: { ...where, OR: [{ ceneoStatus: null }, { ceneoStatus: { in: ['VARIANT', 'NOT_FOUND', 'ERROR'] } }] },
         orderBy: [{ ceneoStatus: 'asc' }, { offerId: 'asc' }],
@@ -38,7 +40,7 @@ export async function GET() {
       }),
     ]);
     const counts = Object.fromEntries(groups.map((g) => [g.ceneoStatus ?? 'NONE', g._count]));
-    return NextResponse.json({ success: true, counts, rows });
+    return NextResponse.json({ success: true, counts, offerReview, rows });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Ceneo listesi alınamadı.';
     return NextResponse.json({ success: false, error_message: message }, { status: 500 });

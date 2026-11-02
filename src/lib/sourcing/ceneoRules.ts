@@ -88,10 +88,9 @@ const modelCodes = (s: string) =>
   });
 
 /**
- * İlan başka bir model mi: başlıkta ürünün ailesinden farklı bir kod var (FY2420 ↔ FY2430). Ceneo'nun sayfası yakın
- * modelleri de listeliyor (GV9550'de GV9225, PSG7030/20'de PSG7200/20) ve muadil satıcıları kodu sıralıyor ("Filtr FY2420
- * Hepa i FY2430 węglowy", 107 zł; orijinali 219 zł). Ürünün kodu da yazıyorsa ve başlık markayla başlıyorsa dokunulmaz:
- * orijinal parça uyumlu cihazları sıralar ("Philips Filtr … FC8009 … FC6721").
+ * İlan başka bir model mi: başlıkta ürünün ailesinden farklı bir kod var (FY2420 ↔ FY2430). Muadil satıcıları kodu sıralıyor
+ * ("Filtr FY2420 Hepa i FY2430 węglowy", 107 zł; orijinali 219 zł). Ürünün kodu da yazıyorsa ve başlık markayla başlıyorsa
+ * dokunulmaz: orijinal parça uyumlu cihazları sıralar ("Philips Filtr … FC8009 … FC6721").
  * Kodsuz başlığa bakılmaz; marka ya da kod aramak gerçek teklifleri de eliyor ("Toster DesigLine Czerwony").
  */
 export function isOtherModelTitle(title: string | null, codes: (string | null)[], brand?: string | null) {
@@ -103,11 +102,37 @@ export function isOtherModelTitle(title: string | null, codes: (string | null)[]
   return !inTitle.some(isOwn) || !b || !letters(title ?? '').startsWith(b);
 }
 
-/** @param codes ürünün kendi model kodları (offer_id, Ceneo'da eşleşen, Ozon parça no.); boşsa kod kontrolü yapılmaz */
-export function pickBestOffer(offers: CeneoOffer[], brand?: string | null, codes: (string | null)[] = []): CeneoPick | null {
-  const trusted = rateOffers(offers, brand).filter(
-    (o) => o.kind !== 'untrusted' && !SOURCING.compatibleTitle.test(o.title ?? '') && !isOtherModelTitle(o.title, codes, brand)
-  );
+/** /ceneo-kontrol'de elenen teklif. Numara taramalar arasında sabit kalıyor (2026-11-03: 690 teklifin yeni olmayan hepsi). */
+export interface RejectedOffer {
+  offerId: string;
+  shop: string | null;
+  title: string | null;
+  pricePln: number;
+  at: string;
+}
+
+export type OfferSkip = 'rejected' | 'untrusted' | 'compatible' | 'other-model';
+
+/** Teklif seçime neden girmiyor; null = giriyor */
+export function offerSkip(o: RatedOffer, brand?: string | null, codes: (string | null)[] = [], rejected: RejectedOffer[] = []): OfferSkip | null {
+  if (rejected.some((r) => r.offerId === o.offerId)) return 'rejected';
+  if (o.kind === 'untrusted') return 'untrusted';
+  if (SOURCING.compatibleTitle.test(o.title ?? '')) return 'compatible';
+  if (isOtherModelTitle(o.title, codes, brand)) return 'other-model';
+  return null;
+}
+
+/**
+ * @param codes ürünün kendi model kodları (offer_id, Ceneo'da eşleşen, Ozon parça no.); boşsa kod kontrolü yapılmaz
+ * @param rejected kullanıcının elediği teklifler
+ */
+export function pickBestOffer(
+  offers: CeneoOffer[],
+  brand?: string | null,
+  codes: (string | null)[] = [],
+  rejected: RejectedOffer[] = []
+): CeneoPick | null {
+  const trusted = rateOffers(offers, brand).filter((o) => !offerSkip(o, brand, codes, rejected));
   if (!trusted.length) return null;
   const cheapest = trusted[0];
   const big = trusted.find((o) => o.kind === 'big' || o.kind === 'official');
