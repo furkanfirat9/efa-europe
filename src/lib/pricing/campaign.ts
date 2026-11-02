@@ -502,9 +502,9 @@ const recordChanges = (rows: { c: CampaignChange; from: number | null; to: numbe
  *
  * /v2/actions/products/deactivate artık yalnız "Promo Codes" içindir; elastikte "unified price logic" hatası veriyor
  * (2026-10-29). Çıkarma /v1/actions/products/update ile yapılır: kampanya tavanının üstünde bir fiyat ürünü çıkarır,
- * ama gönderilen fiyat kartın limit fiyatı (min_price) da olur ve kart bundan sonra bu fiyattan satar. Bu yüzden üçünün en
- * büyüğü gönderilir: kartın min_price'ı, tavanın 1 $ üstü, asgari kâr fiyatı. Eskiden asgari kâr yoktu; min_price düşükse
- * ürün kampanyadan çıkıp yine zararına satıyordu (FN101EUGY: 185 $ = −16 $).
+ * ama gönderilen fiyat kartın fiyatı olur ve kart bundan sonra ondan satar (min_price her zaman güncellenmiyor: GC271810
+ * 148 $ satıyor, min_price 122 $ kaldı). Bu yüzden üçünün en büyüğü gönderilir: kartın min_price'ı, tavanın 1 $ üstü, asgari
+ * kâr fiyatı. Eskiden asgari kâr yoktu; min_price düşükse ürün kampanyadan çıkıp yine zararına satıyordu (FN101EUGY: 185 $ = −16 $).
  */
 export async function removeFromCampaign(productIds: string[]): Promise<ApplyResult[]> {
   const rows = await checkRows([...new Set(productIds)]);
