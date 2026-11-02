@@ -75,6 +75,12 @@ Mağazada daha önce yüklenmiş olan ürünleri takip etmek, mükerrer yükleme
   - Üstü çizili eski liste fiyatı: $\text{Satış} \times 1.20$ tam sayıya yuvarlanır.
   - **Lojistik tavanı 1 160 $:** Kampanyasız fiyat (`price`) 1 160 $'ı geçemez; lojistik firması üstündeki ürüne uyarı verip satışa kapatıyor (`MAX_OZON_LIST_PRICE_USD`, `src/lib/amazon/types.ts`). Çarpanlı fiyat aşarsa 1 160'a çekilir (üstü çizili 1 392, kampanya limiti 1 149). Yeni kart yüklemesi (`data/yeni-kartlar/yukle.mjs`) de aynı tavanı uygular.
 - **Görsel Doğrulaması:** Çekilen Amazon yüksek çözünürlüklü `.jpg` linkleri `HTTP 200 OK` kontrolünden geçirilir; açılmayan linkler elenir.
+- **Tedarik Maliyeti (`supplyOffers`, `src/lib/pricing/proposals.ts`):** Kurallar taramada değil okurken uygulanır; tarama yazısı olduğu gibi saklanır, kural değişince yeniden tarama gerekmez.
+  - **Amazon.de KDV'si:** Polonya'daki depoya fatura %23 KDV'li gelir: maliyet = KDV hariç fiyat × 1,23 + kargo. Sayfadaki KDV dahil fiyat çoğu üründe %19'lu, bir kısmında zaten %23'lüdür; doğrudan kullanmak maliyeti %3,36 düşük gösteriyordu.
+  - **Geç teslimat alınamaz sayılır:** En erken teslim taramadan `PRICING.maxDeliveryDays` günden uzaksa (Amazon.de ve amazon.pl) kanal alınamaz. Ozon'un son gönderimi siparişten 3-4 gün sonradır (`src/lib/sourcing/deliveryDate.ts`).
+  - **amazon.pl gizli sepet:** Aynı üründen birkaç adet alınca tarama 7-12 gün sepet görmüyor (fiyat var, satıcı Amazon, stok ve teslimat yazısı boş). Bu hâl stoksuzluk sayılmaz, kanal maliyette kalır.
+  - **Ceneo'da başka model:** Başlıkta ürünün ailesinden başka bir kod varsa (FY2420 ↔ FY2430) teklif seçime girmez (`isOtherModelTitle`, `src/lib/sourcing/ceneoRules.ts`). Kodsuz başlık elenmez; marka ya da kod şartı gerçek teklifleri de düşürüyordu.
+- **Kampanyadan Çıkış Fiyatı (`removeFromCampaign`):** Gönderilen fiyat `min_price` olur ve kart ondan satar; bu yüzden `min_price`, tavanın 1 $ üstü ve asgari kâr fiyatının en büyüğü gönderilir.
 
 ## 6. Ozon Analitik ve Huni Takibi Standartları (Ozon Analytics Engine)
 - **API Endpoint:** `POST https://api-seller.ozon.ru/v1/analytics/data`

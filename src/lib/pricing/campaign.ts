@@ -502,8 +502,9 @@ const recordChanges = (rows: { c: CampaignChange; from: number | null; to: numbe
  *
  * /v2/actions/products/deactivate artık yalnız "Promo Codes" içindir; elastikte "unified price logic" hatası veriyor
  * (2026-10-29). Çıkarma /v1/actions/products/update ile yapılır: kampanya tavanının üstünde bir fiyat ürünü çıkarır,
- * ama gönderilen fiyat kartın limit fiyatı (min_price) da olur. Bu yüzden kartın kendi min_price'ı gönderilir;
- * tavanın altındaysa tavanın 1 $ üstü (limit fiyatı yükselir, ürün zararına bir kampanyaya yeniden girmez).
+ * ama gönderilen fiyat kartın limit fiyatı (min_price) da olur ve kart bundan sonra bu fiyattan satar. Bu yüzden üçünün en
+ * büyüğü gönderilir: kartın min_price'ı, tavanın 1 $ üstü, asgari kâr fiyatı. Eskiden asgari kâr yoktu; min_price düşükse
+ * ürün kampanyadan çıkıp yine zararına satıyordu (FN101EUGY: 185 $ = −16 $).
  */
 export async function removeFromCampaign(productIds: string[]): Promise<ApplyResult[]> {
   const rows = await checkRows([...new Set(productIds)]);
@@ -536,7 +537,10 @@ export async function removeFromCampaign(productIds: string[]): Promise<ApplyRes
       action_id: ELASTIC_ACTION_ID,
       products: ok.map((r) => ({
         product_id: Number(r.id),
-        action_price: { amount: String(Math.max(minPrice.get(r.id) ?? 0, Math.floor(r.c!.maxAction ?? 0) + 1)), currency: 'USD' },
+        action_price: {
+          amount: String(Math.max(minPrice.get(r.id) ?? 0, Math.floor(r.c!.maxAction ?? 0) + 1, r.c!.floorPrice ?? 0)),
+          currency: 'USD',
+        },
       })),
     },
     headers

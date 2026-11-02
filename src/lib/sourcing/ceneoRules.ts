@@ -79,8 +79,35 @@ export interface CeneoPick {
   trustedCount: number;
 }
 
-export function pickBestOffer(offers: CeneoOffer[], brand?: string | null): CeneoPick | null {
-  const trusted = rateOffers(offers, brand).filter((o) => o.kind !== 'untrusted' && !SOURCING.compatibleTitle.test(o.title ?? ''));
+/** Model kodu: en az iki harf + en az üç rakam (FY2420, hx6064, PSG 7200). Aile = harfler + rakam sayısı. */
+const MODEL_CODE = /(?<![\p{L}\d])(\p{L}{2,})[-\s]?(\d{3,})/gu;
+const modelCodes = (s: string) =>
+  [...s.matchAll(MODEL_CODE)].map((m) => {
+    const prefix = m[1].toLowerCase();
+    return { family: prefix + m[2].length, code: prefix + m[2] };
+  });
+
+/**
+ * İlan başka bir model mi: başlıkta ürünün ailesinden farklı bir kod var (FY2420 ↔ FY2430). Ceneo'nun sayfası yakın
+ * modelleri de listeliyor (GV9550'de GV9225, PSG7030/20'de PSG7200/20) ve muadil satıcıları kodu sıralıyor ("Filtr FY2420
+ * Hepa i FY2430 węglowy", 107 zł; orijinali 219 zł). Ürünün kodu da yazıyorsa ve başlık markayla başlıyorsa dokunulmaz:
+ * orijinal parça uyumlu cihazları sıralar ("Philips Filtr … FC8009 … FC6721").
+ * Kodsuz başlığa bakılmaz; marka ya da kod aramak gerçek teklifleri de eliyor ("Toster DesigLine Czerwony").
+ */
+export function isOtherModelTitle(title: string | null, codes: (string | null)[], brand?: string | null) {
+  const own = codes.flatMap((c) => (c ? modelCodes(c) : []));
+  const inTitle = modelCodes(title ?? '');
+  const isOwn = (c: { code: string }) => own.some((o) => o.code === c.code);
+  if (!inTitle.some((c) => own.some((o) => o.family === c.family) && !isOwn(c))) return false;
+  const b = brand ? letters(brand.split(/\s+/)[0]) : '';
+  return !inTitle.some(isOwn) || !b || !letters(title ?? '').startsWith(b);
+}
+
+/** @param codes ürünün kendi model kodları (offer_id, Ceneo'da eşleşen, Ozon parça no.); boşsa kod kontrolü yapılmaz */
+export function pickBestOffer(offers: CeneoOffer[], brand?: string | null, codes: (string | null)[] = []): CeneoPick | null {
+  const trusted = rateOffers(offers, brand).filter(
+    (o) => o.kind !== 'untrusted' && !SOURCING.compatibleTitle.test(o.title ?? '') && !isOtherModelTitle(o.title, codes, brand)
+  );
   if (!trusted.length) return null;
   const cheapest = trusted[0];
   const big = trusted.find((o) => o.kind === 'big' || o.kind === 'official');
