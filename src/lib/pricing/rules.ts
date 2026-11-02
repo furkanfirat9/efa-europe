@@ -26,6 +26,15 @@ export const PRICING = {
   amazonShippingEur: 5.99,
   /** amazon.pl yalnız KDV dahil fiyat gösteriyor (hesap orada Business değil); KDV hariç = fiyat ÷ 1,23 */
   plVatRate: 0.23,
+  /** Amazon.de'de KDV hariç fiyat okunamazsa sayfadaki KDV dahil fiyatın içindeki oran varsayılır */
+  deVatRate: 0.19,
+  /** amazon.pl'de ücretsiz kargo sınırı ("powyżej 65zł"); sepeti gizli üründe teslimat yazısı olmadığı için buna bakılır */
+  plFreeShippingPln: 65,
+  /** Amazon'un en erken teslimi taramadan bu kadar günden uzaksa kanal alınamaz sayılır. Ozon'un son gönderimi siparişten
+   *  3-4 gün sonra (2026-11-02, 86 siparişin 79'u; en çok 5). Amazon normalde 3 gün yazıyor, hafta sonu girince 5
+   *  (çarşamba → pazartesi); 6 tolerans, sınırda her gün gidip gelmesin. O gün 896 teklif 1-4 gün, 52 teklif 7 gün ve üstü
+   *  (X9000/10: 14 gün), arası boştu. */
+  maxDeliveryDays: 6,
   /** Kartın TL'den çektiği tutar ECB kurunun bu kadar üstünde (2026-10-10 ölçümü: %2,0 / %4,1 / %4,9; kullanıcı
    *  ortalamaya yakın %3,5'i seçti). Alışa ve depoya kargoya eklenir; Ozon kargosu ve depo ücreti kartla ödenmiyor. */
   bankFxPct: 0.035,

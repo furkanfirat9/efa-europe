@@ -6,6 +6,7 @@ import { getEcbEurPln, getEcbEurUsd } from '@/lib/fx/ecb';
 import { getOzonHeaders, ozonFetch } from '@/lib/ozon/gate';
 import type { OrderProfitBreakdown } from '@/lib/orders/profit';
 import { pickBestOffer, type CeneoOffer } from '@/lib/sourcing/ceneoRules';
+import { deliveryDays } from '@/lib/sourcing/deliveryDate';
 import {
   OZON_GLOBAL_FEES,
   PRICING,
@@ -30,7 +31,8 @@ import {
  * siparişlerin kargo tahakkukları (gerçek kargo ağırlığı).
  *
  * Tedarik kanalı: o an alınabilen kanallardan depoya en ucuz geleni — Amazon.de, amazon.pl (stokta, satıcı
- * Amazon, fiyat var) ve Ceneo'daki en uygun güvenilir teklif (src/lib/sourcing/ceneoRules.ts).
+ * Amazon, fiyat var, teslimi Ozon'un gönderim süresini kaçırmıyor) ve Ceneo'daki en uygun güvenilir teklif
+ * (src/lib/sourcing/ceneoRules.ts).
  */
 
 const STORE = 'store1';
@@ -48,32 +50,44 @@ interface SupplyOffer {
   shop?: string | null;
 }
 
+/** En erken teslim Ozon'un gönderim süresini kaçırıyor: stokta görünse de sipariş zamanında çıkamaz (X9000/10: 16-30 Kasım) */
+const deliversLate = (text: string | null, scannedAt: Date | null) =>
+  (deliveryDays(text, scannedAt) ?? 0) > PRICING.maxDeliveryDays;
+
 /** Ürünün Amazon.de ve amazon.pl teklifleri (fiyatı olanlar) */
 function supplyOffers(src: ProductSource | undefined, eurPln: number): SupplyOffer[] {
   if (!src) return [];
   const out: SupplyOffer[] = [];
   if (src.asin && src.priceGrossEur) {
+    // Polonya'daki depoya kesilen fatura %23 KDV'li (6/6 fatura: KDV hariç × 1,23 + kargo). Sayfadaki KDV dahil fiyat
+    // çoğu üründe %19'lu, bir kısmında zaten %23'lü (2026-11-02: 441 / 142 ürün); bu yüzden hesap KDV hariç fiyattan.
+    const netEur = src.priceNetEur ?? src.priceGrossEur / (1 + PRICING.deVatRate);
     out.push({
       source: 'amazon-de',
-      grossEur: src.priceGrossEur,
-      netEur: src.priceNetEur ?? src.priceGrossEur,
+      grossEur: netEur * (1 + PRICING.plVatRate),
+      netEur,
       shippingEur: PRICING.amazonShippingEur,
-      buyable: !!(src.inStock && src.soldByAmazon),
+      buyable: !!(src.inStock && src.soldByAmazon) && !deliversLate(src.deliveryText, src.checkedAt),
     });
   }
   if (src.asin && src.plPricePln) {
     const grossEur = src.plPricePln / eurPln;
+    // Aynı üründen birkaç adet alınca tarama 7-12 gün sepet görmüyor: fiyat ve satıcı Amazon duruyor, stok ve teslimat
+    // yazısı boş; sonra kendiliğinden dönüyor (2026-10: 929001215261, CA6903/22, QP1924/30; QP o günlerde iki kez alındı).
+    // Gerçek stoksuzlukta "Obecnie niedostępny" yazar, fiyat da olmaz.
+    const cartHidden = !src.plInStock && !!src.plSoldByAmazon && !src.plAvailability;
+    const freeShipping = /darmowa/i.test(src.plDeliveryText ?? '') || (cartHidden && src.plPricePln >= PRICING.plFreeShippingPln);
     out.push({
       source: 'amazon-pl',
       grossEur,
       netEur: grossEur / (1 + PRICING.plVatRate),
-      shippingEur: /darmowa/i.test(src.plDeliveryText ?? '') ? 0 : PRICING.amazonShippingEur,
-      buyable: !!(src.plInStock && src.plSoldByAmazon),
+      shippingEur: freeShipping ? 0 : PRICING.amazonShippingEur,
+      buyable: (!!(src.plInStock && src.plSoldByAmazon) && !deliversLate(src.plDeliveryText, src.plCheckedAt)) || cartHidden,
     });
   }
   // Ceneo: yalnız eşleşmesi kesin ya da onaylı ürün; teklifler Polonya'daki depoya kargo dahil (Allegro 0, Smart)
   const ceneo = (src.ceneoStatus === 'EXACT' || src.ceneoStatus === 'MANUAL') && Array.isArray(src.ceneoOffers)
-    ? pickBestOffer(src.ceneoOffers as unknown as CeneoOffer[], src.ozonBrand)
+    ? pickBestOffer(src.ceneoOffers as unknown as CeneoOffer[], src.ozonBrand, [src.offerId, src.ceneoMatchedCode, src.ozonPartNumber])
     : null;
   if (ceneo) {
     const grossEur = ceneo.best.pricePln / eurPln;
@@ -108,7 +122,7 @@ export interface Proposal {
   asin: string | null;
   ceneoId: string | null;
   asinStatus: string;
-  /** Herhangi bir kanaldan şu an alınabilir mi (stokta, satıcı Amazon, fiyat var) */
+  /** Herhangi bir kanaldan şu an alınabilir mi (stokta, satıcı Amazon, fiyat var, teslimi geç değil) */
   buyable: boolean;
   /** Maliyetin dayandığı kanal: alınabilenlerden en ucuzu; hiçbiri alınamıyorsa fiyatı olan ilk kanal */
   source: SupplySource | null;
