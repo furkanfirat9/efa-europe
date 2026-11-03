@@ -34,6 +34,7 @@ interface Channel {
   shippingEur: number;
   buyable: boolean;
   shop: string | null;
+  outlier: boolean;
 }
 
 interface Row {
@@ -73,7 +74,7 @@ function Costs({ row }: { row: Row }) {
       {row.channels.map((c) => (
         <li key={c.source} className={c.source === row.source ? 'font-medium text-foreground' : undefined}>
           {SOURCE_LABEL[c.source] ?? c.source}
-          {c.shop ? ` · ${c.shop}` : ''}: {(c.eur + c.shippingEur).toFixed(1)} €{c.buyable ? '' : ' (alınamaz)'}
+          {c.shop ? ` · ${c.shop}` : ''}: {(c.eur + c.shippingEur).toFixed(1)} €{c.outlier ? ' (piyasanın çok üstünde, maliyete alınmadı)' : c.buyable ? '' : ' (alınamaz)'}
           {c.source === row.source ? ' · maliyet bu' : ''}
         </li>
       ))}

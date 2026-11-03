@@ -19,6 +19,11 @@ export const SOURCING = {
   minRating: 4.7,
   minReviews: 100,
   bigShopPreferPct: 0.03,
+  /** Seçilen teklif Amazon'un kendi sattığı fiyatın bu katından pahalıysa maliyete girmez (proposals.ts). Tek bir yanlış okuma
+   *  bütün hesabı bozuyordu: RK102811 2026-11-02'de eukasa 1 399 zł (ertesi gün 229 zł, Amazon.de 58 €) → −278 $ "zarar",
+   *  gerçek rakip "sahte", çıkış fiyatı 475 $. Son 31 günün 7 441 Ceneo maliyetinde 2 kat yalnız bunu değiştiriyor; 2'nin
+   *  altı gerçek fiyatları da yakalıyor (BGS7MS64 1,89, ECAM292.81.SB 1,88). */
+  outlierRatio: 2,
   /** Başlığında muadil / uyumlu parça yazan ilanlar seçime girmez (kullanıcı, 2026-10-01): satıcılar, özellikle
    *  Allegro'da, orijinalin sayfasına "Zamiennik" ürün listeliyor (CA6903/22, FY3446/30). Bedeli: asıl ürünü
    *  "Samsung TV ile uyumlu" diye anlatan ilan da düşer (SRP4010/10 kumandası). */

@@ -5,7 +5,7 @@ import { getCbrRates } from '@/lib/fx/cbr';
 import { getEcbEurPln, getEcbEurUsd } from '@/lib/fx/ecb';
 import { getOzonHeaders, ozonFetch } from '@/lib/ozon/gate';
 import type { OrderProfitBreakdown } from '@/lib/orders/profit';
-import { pickBestOffer, type CeneoOffer, type RejectedOffer } from '@/lib/sourcing/ceneoRules';
+import { pickBestOffer, SOURCING, type CeneoOffer, type RejectedOffer } from '@/lib/sourcing/ceneoRules';
 import { deliveryDays } from '@/lib/sourcing/deliveryDate';
 import {
   OZON_GLOBAL_FEES,
@@ -50,6 +50,8 @@ interface SupplyOffer {
   buyable: boolean;
   /** Ceneo'da teklifi veren mağaza (allegro.pl, mediaexpert.pl …) */
   shop?: string | null;
+  /** Ceneo teklifi piyasanın çok üstünde (SOURCING.outlierRatio): yanlış okuma sayılır, maliyete girmez */
+  outlier?: boolean;
 }
 
 /** En erken teslim Ozon'un gönderim süresini kaçırıyor: stokta görünse de sipariş zamanında çıkamaz (X9000/10: 16-30 Kasım) */
@@ -104,14 +106,21 @@ function supplyOffers(src: ProductSource | undefined, eurPln: number): SupplyOff
     : null;
   if (ceneo) {
     const grossEur = ceneo.best.pricePln / eurPln;
+    const shippingEur = (ceneo.best.totalPln - ceneo.best.pricePln) / eurPln;
+    // Tarama okuduğunu yazar (kullanıcı kararı, 2026-10-26), sağlama burada. Kıyas Amazon'un kendi sattığı fiyat: geç teslim
+    // yüzünden alınamasa da piyasayı gösterir, iade ve üçüncü taraf fiyatı göstermez (KI150D10: iade 20 €, yeni 47 €)
+    // Amazon'un sattığı fiyat yoksa kıyas yok: sayfadaki öteki teklifler güvenilir kıyas değil (IT3480E1: 1,5 yıldızlı başka ilan)
+    const amazon = out.filter((o) => (o.source === 'amazon-de' ? src.soldByAmazon : src.plSoldByAmazon)).map((o) => o.grossEur + o.shippingEur);
+    const outlier = grossEur + shippingEur > Math.min(...amazon) * SOURCING.outlierRatio;
     out.push({
       source: 'ceneo',
       grossEur,
       netEur: grossEur / (1 + PRICING.plVatRate),
-      shippingEur: (ceneo.best.totalPln - ceneo.best.pricePln) / eurPln,
+      shippingEur,
       fxPct: PRICING.bankFxPct.PLN,
-      buyable: true,
+      buyable: !outlier,
       shop: ceneo.best.shop,
+      outlier,
     });
   }
   return out;
@@ -143,7 +152,7 @@ export interface Proposal {
   /** Seçilen kanaldaki alış fiyatı (vatMode'a göre KDV dahil/hariç, €) */
   purchaseEur: number | null;
   /** Karşılaştırma için kanalların fiyatı (vatMode'a göre, €); alınamıyorsa buyable false */
-  channels: { source: SupplySource; eur: number; shippingEur: number; buyable: boolean; shop?: string | null }[];
+  channels: { source: SupplySource; eur: number; shippingEur: number; buyable: boolean; shop?: string | null; outlier?: boolean }[];
   weightG: number;
   weightSource: WeightSource;
   weightCheck: boolean;
@@ -312,8 +321,11 @@ export async function buildProposals(
 
     const { offers, chosen, priceOf, purchaseEur } = pickSupply(src, pln.rate, vatMode);
     const buyable = !!chosen?.buyable;
+    // Ceneo fiyatı piyasa dışı ve başka alınabilir kanal yok: gerçek maliyet bilinmiyor. Fiyat ve stok önerilmez, kart olduğu
+    // gibi kalır; sonraki taramada kendiliğinden düzelir
+    const outlierOnly = !buyable && offers.some((o) => o.outlier);
     const stock = stocks.get(String(item.product_id)) ?? 0;
-    const stockAction: StockAction = !buyable && stock > 0 ? 'close' : buyable && stock === 0 ? 'open' : 'keep';
+    const stockAction: StockAction = outlierOnly ? 'keep' : !buyable && stock > 0 ? 'close' : buyable && stock === 0 ? 'open' : 'keep';
     const w = shippingWeight({
       amzItemG: src?.amzItemWeightG,
       amzPackageG: src?.amzPackageWeightG,
@@ -336,7 +348,7 @@ export async function buildProposals(
       buyable,
       source: chosen?.source ?? null,
       purchaseEur,
-      channels: offers.map((o) => ({ source: o.source, eur: priceOf(o), shippingEur: o.shippingEur, buyable: o.buyable, shop: o.shop ?? null })),
+      channels: offers.map((o) => ({ source: o.source, eur: priceOf(o), shippingEur: o.shippingEur, buyable: o.buyable, shop: o.shop ?? null, outlier: !!o.outlier })),
       weightG: w.grams,
       weightSource: w.source,
       weightCheck: w.check,
@@ -369,6 +381,7 @@ export async function buildProposals(
       skipReason: null,
     };
 
+    if (outlierOnly) return { ...base, skipReason: 'Ceneo fiyatı piyasa dışı, kontrol et' };
     if (!chosen || purchaseEur == null) return { ...base, skipReason: src?.asin ? 'Amazon.de / .pl / Ceneo fiyatı yok' : 'ASIN yok' };
     if (!w.grams) return { ...base, skipReason: 'Ağırlık bilinmiyor' };
 
