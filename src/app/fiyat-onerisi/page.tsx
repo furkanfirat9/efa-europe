@@ -153,7 +153,7 @@ function ProposalCard({ p }: { p: Proposal }) {
                       {chosen && <Badge>{p.buyable ? 'Seçildi' : 'Alınamıyor'}</Badge>}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {ch.buyable ? 'Alınabilir' : 'Şu an alınamıyor'} · kargo {ch.shippingEur ? eur(ch.shippingEur) : 'ücretsiz'}
+                      {ch.outlier ? 'Fiyat piyasanın çok üstünde, maliyete alınmadı' : ch.buyable ? 'Alınabilir' : 'Şu an alınamıyor'} · kargo {ch.shippingEur ? eur(ch.shippingEur) : 'ücretsiz'}
                     </p>
                   </div>
                   <div className="shrink-0 text-right">

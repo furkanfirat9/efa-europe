@@ -60,7 +60,7 @@ export async function GET() {
           })),
           rejectedGone: rejected.filter((x) => !offers.some((o) => o.offerId === x.offerId)),
           source: chosen?.source ?? null,
-          channels: channels.map((c) => ({ source: c.source, eur: priceOf(c), shippingEur: c.shippingEur, buyable: c.buyable, shop: c.shop ?? null })),
+          channels: channels.map((c) => ({ source: c.source, eur: priceOf(c), shippingEur: c.shippingEur, buyable: c.buyable, shop: c.shop ?? null, outlier: !!c.outlier })),
         };
       }),
     });
