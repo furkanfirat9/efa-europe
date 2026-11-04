@@ -59,6 +59,7 @@ type Action = 'reject-offer' | 'restore-offer' | 'offers-ok' | 'not-in-poland';
 
 const SKIP_LABEL: Record<OfferSkip, string> = {
   rejected: 'Elendi',
+  'direct-amazon-pl': 'amazon.pl doğrudan taranıyor',
   untrusted: 'Güvenilmeyen mağaza',
   compatible: 'Muadil yazıyor',
   'other-model': 'Başka model kodu',

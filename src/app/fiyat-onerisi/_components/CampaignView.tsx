@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertCircle, CheckCircle2, ImageOff, RefreshCw, Send, XCircle } from 'lucide-react';
 import type { ApplyResult, CampaignChange, ChangeGroup, ChangeTag } from '@/lib/pricing/campaign';
 import { Alert, AlertDescription, AlertTitle } from '@/components/shadcn/alert';
@@ -21,7 +21,7 @@ import { Skeleton } from '@/components/shadcn/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table';
 import { Tabs, TabsList, TabsTrigger } from '@/components/shadcn/tabs';
 import { cn } from '@/lib/utils';
-import { ManualCheckView } from './ManualCheckView';
+import { ManualCheckView, SOURCE } from './ManualCheckView';
 
 const GROUPS: { key: ChangeGroup; label: string; hint: string; preselect: boolean; selectable: boolean }[] = [
   {
@@ -35,7 +35,7 @@ const GROUPS: { key: ChangeGroup; label: string; hint: string; preselect: boolea
   {
     key: 'small',
     label: 'Küçük fark',
-    hint: 'Kur oynaması kadar küçük fark; göndermek fiyatı boşuna gidip getirir. İstersen tek tek seçebilirsin.',
+    hint: 'Kur oynaması kadar küçük fark; göndermek fiyatı boşuna gidip getirir. Alınabilir kaynağı olmayan kartın fiyat indirimi de burada; başlık kutusu bunları seçmez. İstersen tek tek seçebilirsin.',
     preselect: false,
     selectable: true,
   },
@@ -65,6 +65,12 @@ const TAGS: Record<ChangeTag, { label: string; urgent: boolean }> = {
 
 const usd = (n: number | null) => (n == null ? '—' : `${n.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} $`);
 
+/** Alınamaz kartın fiyat indirimi: maliyet yalnız tahmin, başlık kutusu seçmez; satırından tek tek seçilir */
+const isEstimateCut = (c: CampaignChange) => !c.buyable && c.current != null && c.next < c.current;
+
+/** Seçim korunurken işaret yalnız aynı satırda kalır. Grubu, fiyatı ya da alınabilirliği değişen satırın işareti düşer: send() seçili her "alınamaz" indirimi görüldü sayar (estimateCuts), eski işaret isUnseenEstimateCut korumasını delmesin */
+const sameRow = (a: CampaignChange, b: CampaignChange) => a.group === b.group && a.next === b.next && a.buyable === b.buyable;
+
 function Thumb({ src, alt }: { src: string | null; alt: string }) {
   return (
     <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border bg-white">
@@ -93,7 +99,7 @@ function Gap({ now, next }: { now: number | null; next: number | null }) {
 }
 
 /** Elastik boosting kampanyasına fiyat gönderimi. Gruplar ve kurallar: src/lib/pricing/campaign.ts */
-export function CampaignView() {
+export function CampaignView({ onWrote }: { onWrote: () => void }) {
   const [plan, setPlan] = useState<{ changes: CampaignChange[]; inCampaign: number } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -102,17 +108,28 @@ export function CampaignView() {
   const [confirm, setConfirm] = useState(false);
   const [sending, setSending] = useState(false);
   const [results, setResults] = useState<ApplyResult[] | null>(null);
+  const lastChanges = useRef<CampaignChange[]>([]);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async ({ keepSelection = false }: { keepSelection?: boolean } = {}) => {
     setLoading(true);
     setError(null);
     try {
       const j = await (await fetch('/api/kampanya-fiyat')).json();
       if (!j.success) throw new Error(j.error_message);
+      const next: CampaignChange[] = j.changes;
+      const before = new Map(lastChanges.current.map((c) => [c.productId, c]));
+      lastChanges.current = next;
       setPlan(j);
-      setSelected(
+      // İlk açılış ve "Yeniden hesapla" seçimi sıfırlar; işlem sonrası yenileme kullanıcının seçimine dokunmaz (kaldırdığı satır geri işaretlenmesin, seçtiği düşmesin). Yeni gelen satır seçili gelmez
+      setSelected((prev) =>
         new Set(
-          j.changes.filter((c: CampaignChange) => GROUPS.find((g) => g.key === c.group)?.preselect).map((c: CampaignChange) => c.productId)
+          next
+            .filter((c) => {
+              if (!keepSelection) return GROUPS.find((g) => g.key === c.group)?.preselect;
+              const old = before.get(c.productId);
+              return prev.has(c.productId) && old != null && sameRow(old, c);
+            })
+            .map((c) => c.productId)
         )
       );
     } catch (e) {
@@ -128,6 +145,7 @@ export function CampaignView() {
 
   const changes = useMemo(() => plan?.changes ?? [], [plan]);
   const rows = changes.filter((c) => c.group === group);
+  const bulkRows = rows.filter((c) => !isEstimateCut(c));
   const picked = changes.filter((c) => selected.has(c.productId));
   const summary = {
     down: picked.filter((c) => c.current != null && c.next < c.current).length,
@@ -135,8 +153,11 @@ export function CampaignView() {
     add: picked.filter((c) => c.current == null).length,
   };
   const groupInfo = GROUPS.find((g) => g.key === group)!;
-  const losing = changes.filter((c) => c.checkKind === 'loss' && !c.keptAt).length;
-  const allInGroup = rows.length > 0 && rows.every((c) => selected.has(c.productId));
+  // Hangi grupta olursa olsun: kampanyada, stok açık, şu anki fiyatta zarar, geçerli "olduğu gibi kalsın" kararı yok
+  const losing = changes.filter((c) => c.current != null && c.stock > 0 && c.profitNow != null && c.profitNow < 0 && !c.keptAt);
+  // Öteki gruplardakiler için düğme; açık sekmedekiler zaten ekranda
+  const losingElsewhere = GROUPS.filter((g) => g.key !== group && losing.some((c) => c.group === g.key));
+  const allInGroup = bulkRows.length > 0 && bulkRows.every((c) => selected.has(c.productId));
 
   const toggle = (id: string, on: boolean) =>
     setSelected((prev) => {
@@ -148,7 +169,8 @@ export function CampaignView() {
   const toggleGroup = (on: boolean) =>
     setSelected((prev) => {
       const next = new Set(prev);
-      for (const c of rows)
+      // Başlık kutusu alınamaz indirimleri seçmez; kaldırırken sekmenin hepsi temizlenir, görünmeden seçili satır kalmasın
+      for (const c of on ? bulkRows : rows)
         if (on) next.add(c.productId);
         else next.delete(c.productId);
       return next;
@@ -157,17 +179,23 @@ export function CampaignView() {
   const send = async () => {
     setSending(true);
     setError(null);
+    // Yanıt gelmese de (60 sn kesintisi) Ozon'a yazılmış olabilir
+    onWrote();
     try {
       const j = await (
         await fetch('/api/kampanya-fiyat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ productIds: [...selected] }),
+          body: JSON.stringify({
+            productIds: [...selected],
+            // Alınamaz hâliyle ekranda görülen indirimler; bunlar yalnız kendi satırından seçilebilir. Sayfa açıkken alınamaz olan kartın indirimi sunucuda reddedilir (isUnseenEstimateCut)
+            estimateCuts: Object.fromEntries(picked.filter(isEstimateCut).map((c) => [c.productId, c.next])),
+          }),
         })
       ).json();
       if (!j.success) throw new Error(j.error_message);
       setResults(j.results);
-      await load();
+      await load({ keepSelection: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Gönderilemedi');
     } finally {
@@ -214,15 +242,21 @@ export function CampaignView() {
         </Alert>
       )}
 
-      {losing > 0 && group !== 'check' && (
+      {losing.length > 0 && (
         <Alert variant="destructive">
           <AlertCircle />
-          <AlertTitle>{losing} ürün şu an zararına satıyor</AlertTitle>
+          <AlertTitle>{losing.length} ürün şu an zararına satıyor</AlertTitle>
           <AlertDescription>
-            <span>Ozon fiyatı kâr edecek seviyeye çıkarmaya izin vermiyor; bunlar otomatik gönderilmez.</span>
-            <Button variant="outline" size="sm" className="mt-1" onClick={() => setGroup('check')}>
-              Elle kontrol'e git
-            </Button>
+            <span>Stoğu açık, kampanya fiyatı maliyetin altında.{losingElsewhere.length > 0 ? ' Bulundukları gruba git:' : ' Hepsi bu sekmede.'}</span>
+            {losingElsewhere.length > 0 && (
+              <div className="mt-1 flex flex-wrap gap-2">
+                {losingElsewhere.map((g) => (
+                  <Button key={g.key} variant="outline" size="sm" onClick={() => setGroup(g.key)}>
+                    {g.label} ({losing.filter((c) => c.group === g.key).length})
+                  </Button>
+                ))}
+              </div>
+            )}
           </AlertDescription>
         </Alert>
       )}
@@ -237,14 +271,14 @@ export function CampaignView() {
             ))}
           </TabsList>
         </Tabs>
-        <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+        <Button variant="outline" size="sm" onClick={() => load()} disabled={loading}>
           <RefreshCw className={loading ? 'animate-spin' : undefined} /> Yeniden hesapla
         </Button>
       </div>
       <p className="text-sm text-muted-foreground">{groupInfo.hint}</p>
 
       {group === 'check' ? (
-        <ManualCheckView rows={rows} onChanged={load} />
+        <ManualCheckView rows={rows} onChanged={() => load({ keepSelection: true })} onWrote={onWrote} />
       ) : (
         <div className="rounded-md border">
           <Table>
@@ -307,7 +341,7 @@ export function CampaignView() {
                             <div className="text-sm text-muted-foreground">gönderilemez</div>
                             <div className="text-xs text-muted-foreground">öneri {usd(c.proposal)}</div>
                             {c.maxAction != null && c.next > c.maxAction && (
-                              <div className="text-xs text-destructive">Ozon tavanı {usd(c.maxAction)}</div>
+                              <div className="text-xs text-destructive">Ozon tavanı {usd(Math.floor(c.maxAction))}</div>
                             )}
                           </>
                         ) : (
@@ -331,7 +365,13 @@ export function CampaignView() {
                         {usd(c.group === 'check' || c.group === 'other' || c.profitAtNext == null ? null : Math.round(c.profitAtNext * 100) / 100)}
                         {c.floorPrice != null && <div className="text-xs text-muted-foreground">taban {usd(c.floorPrice)}</div>}
                       </TableCell>
-                      <TableCell className="max-w-64 text-sm">
+                      <TableCell className="max-w-64 whitespace-normal text-sm">
+                        {c.current != null && c.profitNow != null && c.profitNow < 0 && (
+                          <Badge variant="destructive" className="mb-1 mr-1" title="Şu anki kampanya fiyatında kalan kâr">
+                            Zararda {usd(Math.round(c.profitNow * 100) / 100)}
+                            {c.stock === 0 && ' · stok 0'}
+                          </Badge>
+                        )}
                         {c.tag && (
                           <Badge
                             variant="outline"
@@ -342,6 +382,11 @@ export function CampaignView() {
                           </Badge>
                         )}
                         <div className="text-xs text-muted-foreground">{c.reason}</div>
+                        {!c.buyable && c.source && (
+                          <Badge variant="outline" className="ml-1 text-destructive" title="Hiçbir kanaldan şu an alınamıyor; maliyet yalnız tahmin">
+                            {SOURCE[c.source]} · alınamaz
+                          </Badge>
+                        )}
                         {c.atCeiling && (
                           <Badge
                             variant="outline"
@@ -390,8 +435,8 @@ export function CampaignView() {
             <AlertDialogTitle>{selected.size} ürünün kampanya fiyatı Ozon'a gönderilsin mi?</AlertDialogTitle>
             <AlertDialogDescription>
               {summary.down} ürün düşüyor, {summary.up} ürün artıyor, {summary.add} ürün kampanyaya ekleniyor. Fiyatlar gönderim anında
-              yeniden hesaplanır; Ozon'un kabul ettiği fiyat ürün ürün doğrulanır. Ana fiyat değişmez, yalnız Elastik boosting kampanya
-              fiyatı.
+              yeniden hesaplanır; Ozon'un kabul ettiği fiyat ürün ürün doğrulanır. Yalnız Elastik boosting kampanya fiyatı yazılır; kart
+              kampanyadayken ana fiyatı da bu fiyat olur.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

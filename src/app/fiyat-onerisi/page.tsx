@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertCircle, ExternalLink, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/shadcn/alert';
 import { Badge } from '@/components/shadcn/badge';
@@ -98,7 +98,13 @@ function ProposalCard({ p }: { p: Proposal }) {
           {p.rule && <Badge variant={p.rule === 'check' ? 'destructive' : 'outline'}>{RULE_LABEL[p.rule]}</Badge>}
           {p.skipReason && <Badge variant="outline">Hesaplanamadı: {p.skipReason}</Badge>}
           {p.stockAction === 'close' && <Badge variant="destructive">Stok {p.stock} → 0</Badge>}
-          {p.stockAction === 'open' && <Badge>Stok 0 → 1</Badge>}
+          {p.stockAction === 'open' && (
+            <>
+              <Badge>Stok 0 → 1</Badge>
+              {p.currentProfit != null && <span className="text-xs tabular-nums text-muted-foreground">şu anki fiyatta kâr {usd(p.currentProfit, 2)}</span>}
+              {p.currentProfit != null && p.currentProfit < 0 && <Badge variant="destructive">Önce fiyatı düzelt</Badge>}
+            </>
+          )}
           {p.weightCheck && <Badge variant="outline">Ağırlığı kontrol et</Badge>}
           {p.exportCapped && <Badge variant="outline">750 € ihracat sınırına çekildi</Badge>}
         </div>
@@ -188,19 +194,29 @@ export default function FiyatOnerisiPage() {
   const [query, setQuery] = useState('');
   const [shown, setShown] = useState(PAGE_SIZE);
   const [view, setView] = useState<'proposals' | 'campaign'>('proposals');
+  // Kampanya sekmesinde fiyat yazıldı: Tedarik'teki kâr ve "Önce fiyatı düzelt" eskidi, sekmeye dönünce yeniden hesaplanır
+  const stale = useRef(false);
+  const loadSeq = useRef(0);
+  const markStale = useCallback(() => {
+    stale.current = true;
+  }, []);
 
   const load = useCallback(async () => {
+    const seq = ++loadSeq.current;
+    stale.current = false;
     setLoading(true);
     setError(null);
     try {
       const res = await fetch('/api/fiyat-onerisi');
       const json = await res.json();
+      if (seq !== loadSeq.current) return; // uçuştaki eski tur yenisini ezmesin
       if (!json.success) throw new Error(json.error_message);
       setData(json);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Öneriler alınamadı');
+      stale.current = true;
+      if (seq === loadSeq.current) setError(e instanceof Error ? e.message : 'Öneriler alınamadı');
     } finally {
-      setLoading(false);
+      if (seq === loadSeq.current) setLoading(false);
     }
   }, []);
 
@@ -242,7 +258,13 @@ export default function FiyatOnerisiPage() {
 
       <ScanStatus />
 
-      <Tabs value={view} onValueChange={(v) => setView(v as 'proposals' | 'campaign')}>
+      <Tabs
+        value={view}
+        onValueChange={(v) => {
+          setView(v as 'proposals' | 'campaign');
+          if (v === 'proposals' && stale.current) load();
+        }}
+      >
         <TabsList>
           <TabsTrigger value="proposals">Tedarik</TabsTrigger>
           <TabsTrigger value="campaign">Kampanyaya gönder</TabsTrigger>
@@ -250,7 +272,7 @@ export default function FiyatOnerisiPage() {
       </Tabs>
 
       {view === 'campaign' ? (
-        <CampaignView />
+        <CampaignView onWrote={markStale} />
       ) : (
         <>
           {error && (

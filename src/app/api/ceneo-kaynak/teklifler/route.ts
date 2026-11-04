@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { getEcbEurPln } from '@/lib/fx/ecb';
-import { ceneoPickInput, pickSupply } from '@/lib/pricing/proposals';
-import { offerSkip, pickBestOffer, rateOffers } from '@/lib/sourcing/ceneoRules';
+import { ceneoPickInput, pickCeneoOffer, pickSupply } from '@/lib/pricing/proposals';
+import { offerSkip, rateOffers } from '@/lib/sourcing/ceneoRules';
 
 /**
  * Teklif kontrolü listesi: Ceneo sayfası doğru ama seçilen teklifi şüpheli ürünler (ceneoOfferReview dolu) ve kararı
@@ -11,7 +11,8 @@ import { offerSkip, pickBestOffer, rateOffers } from '@/lib/sourcing/ceneoRules'
  *
  *   GET → { rows: [{ …ürün, offers, rejectedGone, source, channels }] }
  *
- * offers ucuzdan pahalıya; skip teklifin seçime neden girmediği, selected maliyette kullanılan teklif.
+ * offers ucuzdan pahalıya; skip teklifin seçime neden girmediği, selected maliyette kullanılan teklif (pickCeneoOffer). Doğrudan
+ * amazon.pl fiyatı olan üründe amazon.pl teklifi listede kalır ama seçilmez; skip'i 'direct-amazon-pl'.
  * rejectedGone: elenmiş ama son taramada sayfada artık olmayan teklifler.
  */
 
@@ -35,8 +36,8 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       rows: rows.map((r) => {
-        const { offers, brand, codes, rejected } = ceneoPickInput(r);
-        const best = pickBestOffer(offers, brand, codes, rejected)?.best ?? null;
+        const { offers, brand, codes, rejected, directAmazonPl } = ceneoPickInput(r);
+        const best = pickCeneoOffer(r)?.best ?? null;
         const { chosen, offers: channels, priceOf } = pickSupply(r, pln.rate);
         return {
           id: r.id,
@@ -55,7 +56,7 @@ export async function GET() {
             shop: o.shop,
             title: o.title,
             totalPln: o.totalPln,
-            skip: offerSkip(o, brand, codes, rejected),
+            skip: offerSkip(o, brand, codes, rejected, directAmazonPl),
             selected: o.offerId === best?.offerId,
           })),
           rejectedGone: rejected.filter((x) => !offers.some((o) => o.offerId === x.offerId)),

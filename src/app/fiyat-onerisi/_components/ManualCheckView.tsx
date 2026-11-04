@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { AlertCircle, CheckCircle2, ChevronDown, ChevronRight, ImageOff, RefreshCw, Undo2 } from 'lucide-react';
+import { MAX_OZON_LIST_PRICE_USD } from '@/lib/amazon/types';
 import type { ApplyResult, CampaignChange, CheckKind } from '@/lib/pricing/campaign';
 import type { SupplySource } from '@/lib/pricing/proposals';
+import { profitAt as costProfitAt } from '@/lib/pricing/rules';
 import { Alert, AlertDescription, AlertTitle } from '@/components/shadcn/alert';
 import {
   AlertDialog,
@@ -26,37 +28,90 @@ const SECTIONS: { kind: CheckKind; title: string; hint: string; dot: string; col
   {
     kind: 'loss',
     title: 'Zararına satıyor',
-    hint: 'Şu anki kampanya fiyatında zarar ediyoruz ve Ozon fiyatı kâr edecek seviyeye çıkarmaya izin vermiyor. Kampanyadan çıkarmak zararı durdurur; satış da büyük ihtimalle durur.',
+    hint: 'Stok açık ve şu anki kampanya fiyatında zarar ediyoruz. Başabaş Ozon tavanının altındaysa fiyatı yükseltmek zararı bitirir. Değilse kampanyadan çıkarmak zararı durdurur; satış da büyük ihtimalle durur.',
     dot: 'bg-destructive',
   },
   {
     kind: 'thin',
-    title: 'Ozon fiyatı yükseltmeye izin vermiyor',
-    hint: "Ozon'un bu ürün için izin verdiği en yüksek kampanya fiyatı, asgari kâr fiyatımızın altında. Kâr az; kampanyada bırakmak ya da çıkarmak senin kararın.",
+    title: 'Ozon tavanı asgari kârın altında',
+    hint: "Ozon'un bu ürün için izin verdiği en yüksek kampanya fiyatı, asgari kâr fiyatımızın altında. Kâr az; tavana kadar elle fiyat girmek, kampanyada bırakmak ya da çıkarmak senin kararın.",
     dot: 'bg-amber-500',
   },
   {
     kind: 'opportunity',
     title: 'Rakipten çok ucuzuz',
-    hint: "Ozon'daki en ucuz rakip bizden kat kat pahalı; rakip verisi yanlış ürünü gösteriyor olabilir. Hazır fiyatlardan birini seçebilir ya da elle fiyat girebilirsin; fiyat asgari kâr ile Ozon tavanı arasında olmalı.",
+    hint: "Ozon'daki en ucuz rakip bizden kat kat pahalı; rakip verisi yanlış ürünü gösteriyor olabilir. Hazır fiyatlardan birini seçebilir ya da elle fiyat girebilirsin; fiyat Ozon tavanını geçemez, zarar ettiren fiyat ayrıca onay ister.",
     dot: 'bg-sky-500',
+  },
+  {
+    kind: 'closed',
+    title: 'Stoğu kapalı, fiyatı zararda',
+    hint: 'Stok 0 olduğu için sipariş gelemez, şu an zarar yok. Stoğu açmadan önce fiyatı düzelt; stok açılır ve fiyat hâlâ zarardaysa kart "Zararına satıyor" bölümüne döner.',
+    dot: 'bg-muted-foreground',
+    collapsed: true,
   },
   {
     kind: 'blocked',
     title: 'Kampanyaya giremiyor',
-    hint: "Kampanyada değil; Ozon'un izin verdiği en yüksek fiyat asgari kâr fiyatımızın altında. Yalnız bilgi.",
+    hint: `Kampanyada değil ve giremiyor: Ozon'un izin verdiği en yüksek fiyat asgari kâr fiyatımızın altında ya da alınabilir kaynak yok. Müşteri kartın ana fiyatını görür; buradan değiştirebilirsin, ${MAX_OZON_LIST_PRICE_USD.toLocaleString('tr-TR')} $ lojistik tavanını ve 750 € ihracat sınırını geçemez.`,
     dot: 'bg-muted-foreground',
     collapsed: true,
   },
 ];
 
-const SOURCE: Record<SupplySource, string> = { 'amazon-de': 'Amazon.de', 'amazon-pl': 'amazon.pl', ceneo: 'Ceneo' };
+export const SOURCE: Record<SupplySource, string> = { 'amazon-de': 'Amazon.de', 'amazon-pl': 'amazon.pl', ceneo: 'Ceneo' };
 
-const usd = (n: number | null | undefined) => (n == null ? '—' : `${n.toLocaleString('tr-TR', { maximumFractionDigits: 0 })} $`);
+const usd = (n: number | null | undefined, digits = 0) => (n == null ? '—' : `${n.toLocaleString('tr-TR', { maximumFractionDigits: digits })} $`);
 const day = (iso: string) => new Date(iso).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
 
 type Pending =
-  { type: 'remove'; c: CampaignChange } | { type: 'price'; c: CampaignChange; price: number; label: string; profit: number | null };
+  | { type: 'remove'; c: CampaignChange }
+  | { type: 'price'; c: CampaignChange; price: number; label: string; profit: number | null }
+  | { type: 'base'; c: CampaignChange; price: number; profit: number | null };
+
+/** Onay penceresinin içeriği. Kâr ve sınırlar onaydan önce görünür; sunucu yine de yeniden kontrol eder. */
+function dialogOf(p: Pending) {
+  const { c } = p;
+  const notes = c.buyable ? [] : ['Alınabilir kaynak yok; kâr tahmini maliyetle hesaplandı.'];
+  if (p.type === 'remove') {
+    const exit = c.exitPrice;
+    const overCap = exit != null && exit > MAX_OZON_LIST_PRICE_USD;
+    if (exit == null) notes.push('Ozon kampanya tavanı okunamadı: çıkış fiyatı seçilemez, kart çıkarılamaz.');
+    if (overCap) notes.push(`Çıkış fiyatı lojistik tavanını (${usd(MAX_OZON_LIST_PRICE_USD)}) aşıyor: kart satışa kapanır, çıkarılamaz.`);
+    else if (exit != null && exit > c.exportLimitUsd) notes.push(`Bu fiyat 750 € ihracat sınırının (${usd(c.exportLimitUsd)}) üstünde.`);
+    return {
+      title: `${c.offerId} kampanyadan çıkarılsın mı?`,
+      text: `Elastik boosting kampanyasından çıkar. ${exit != null ? `Kart ${usd(exit)}'dan satacak, kâr ${usd(c.profitAtExit, 2)}. ` : ''}${c.rivalUsd != null ? `En ucuz rakip ${usd(c.rivalUsd)}. ` : ''}Şu anki kâr ${usd(c.profitNow, 2)}.`,
+      notes,
+      blocked: exit == null || overCap,
+      danger: false,
+      action: 'Kampanyadan çıkar',
+    };
+  }
+  const loss = p.profit != null && p.profit < 0;
+  if (loss) notes.unshift(`Bu fiyatta zarar: satış başına ${usd(-p.profit!, 2)} kayıp (başabaş ${usd(c.breakEvenUsd)}). Yine de uygulamak için onayla.`);
+  if (p.type === 'price' && c.maxAction == null) notes.push('Ozon kampanya tavanı okunamadı: fiyat gönderilemez.');
+  // Çıkış fiyatı gibi: ihracat sınırı uyarır, reddetmez (ana fiyat bu pencereye gelmeden baseLimit'e takılır)
+  if (p.price > c.exportLimitUsd) notes.push(`Bu fiyat 750 € ihracat sınırının (${usd(c.exportLimitUsd)}) üstünde.`);
+  const profit = `bu fiyatta kâr ${usd(p.profit, 2)}.`;
+  return p.type === 'base'
+    ? {
+        title: `${c.offerId} ana fiyatı ${usd(c.basePrice)} → ${usd(p.price)} olsun mu?`,
+        text: `Elle fiyat, ${profit} Kartın fiyatı ve asgari fiyatı bu olur; kart kampanyada olmadığı için müşteri bu fiyatı görür. Sınırlar sunucuda yeniden kontrol edilir, Ozon'daki fiyat okunup doğrulanır.`,
+        notes,
+        blocked: false,
+        danger: loss,
+        action: loss ? 'Zararına uygula' : 'Uygula',
+      }
+    : {
+        title: `${c.offerId} kampanya fiyatı ${usd(c.current)} → ${usd(p.price)} olsun mu?`,
+        text: `${p.label}, ${profit} Fiyat sunucuda Ozon tavanıyla yeniden kontrol edilir, Ozon'un kabul ettiği fiyat doğrulanır. Kart kampanyadayken ana fiyatı da bu fiyat olur.`,
+        notes,
+        blocked: c.maxAction == null,
+        danger: loss,
+        action: loss ? 'Zararına uygula' : 'Uygula',
+      };
+}
 
 function Product({ c }: { c: CampaignChange }) {
   return (
@@ -78,17 +133,84 @@ function Product({ c }: { c: CampaignChange }) {
   );
 }
 
-function Profit({ value }: { value: number | null }) {
+function Profit({ value, digits = 0 }: { value: number | null; digits?: number }) {
   if (value == null) return <span className="text-muted-foreground">—</span>;
   return (
     <span className={cn('font-medium', value < 0 ? 'text-destructive' : value < 5 ? 'text-amber-600' : 'text-emerald-600')}>
-      {usd(value)}
+      {usd(value, digits)}
     </span>
   );
 }
 
-/** "Elle kontrol" sekmesi: otomatik gönderilmeyen ürünler dört bölümde, her satırda yapılabilecek işlemle */
-export function ManualCheckView({ rows, onChanged }: { rows: CampaignChange[]; onChanged: () => Promise<void> }) {
+/** Elle fiyat kutusu: yazdıkça o fiyatta kalan kâr görünür, sunucuyla aynı hesapla (rules.ts). limit, aşılan sınırın yazısını döner. */
+function PriceBox({
+  c,
+  value,
+  disabled,
+  limit,
+  onChange,
+  onApply,
+}: {
+  c: CampaignChange;
+  value: string;
+  disabled: boolean;
+  limit: (price: number) => string | null;
+  onChange: (value: string) => void;
+  onApply: (price: number, profit: number | null) => void;
+}) {
+  const price = Number(value);
+  const valid = Number.isInteger(price) && price > 0;
+  const profit = valid && c.cost ? costProfitAt(price, c.cost).profit : null;
+  const error = !value ? null : !valid ? 'Tam dolar gir' : limit(price);
+  // Kampanya fiyatında yalnız uyarı (çıkış fiyatı gibi), reddetmez; ana fiyatta baseLimit zaten hata döner
+  const overExport = valid && !error && price > c.exportLimitUsd;
+  return (
+    <div className="flex items-center gap-1">
+      <Input
+        type="number"
+        inputMode="numeric"
+        className="h-8 w-20"
+        placeholder="$"
+        aria-label={`${c.offerId} elle fiyat`}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      <Button variant="outline" size="sm" disabled={disabled || !valid || !!error} onClick={() => onApply(price, profit)}>
+        Uygula
+      </Button>
+      {error ? (
+        <span className="text-xs text-destructive">{error}</span>
+      ) : (
+        valid && (
+          <span className="text-xs tabular-nums text-muted-foreground">
+            kâr <Profit value={profit} digits={2} />
+          </span>
+        )
+      )}
+      {overExport && <span className="text-xs text-destructive">750 € sınırı {usd(c.exportLimitUsd)} üstünde</span>}
+    </div>
+  );
+}
+
+/** Kampanya fiyatı Ozon tavanını geçemez: üstünde kart kampanyadan çıkar. Lojistik tavanını da geçemez: kampanyadaki kartta ana fiyat da bu fiyat olur. Tavan okunamadıysa sınır bilinmez, fiyat gönderilmez (sunucu da reddeder) */
+const campaignLimit = (c: CampaignChange) => (price: number) =>
+  c.maxAction == null
+    ? 'Ozon kampanya tavanı okunamadı'
+    : price > Math.floor(c.maxAction)
+      ? `Ozon tavanı ${usd(Math.floor(c.maxAction))}`
+      : price > MAX_OZON_LIST_PRICE_USD
+        ? `Lojistik tavanı ${usd(MAX_OZON_LIST_PRICE_USD)}`
+        : null;
+/** Ana fiyat lojistik tavanını ve 750 € ihracat sınırını geçemez */
+const baseLimit = (c: CampaignChange) => (price: number) =>
+  price > MAX_OZON_LIST_PRICE_USD
+    ? `Lojistik tavanı ${usd(MAX_OZON_LIST_PRICE_USD)}`
+    : price > c.exportLimitUsd
+      ? `750 € sınırı ${usd(c.exportLimitUsd)}`
+      : null;
+
+/** "Elle kontrol" sekmesi: otomatik gönderilmeyen ürünler beş bölümde, her satırda yapılabilecek işlemle */
+export function ManualCheckView({ rows, onChanged, onWrote }: { rows: CampaignChange[]; onChanged: () => Promise<void>; onWrote: () => void }) {
   const [pending, setPending] = useState<Pending | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [results, setResults] = useState<ApplyResult[] | null>(null);
@@ -99,6 +221,7 @@ export function ManualCheckView({ rows, onChanged }: { rows: CampaignChange[]; o
   const post = async (key: string, body: object) => {
     setBusy(key);
     setError(null);
+    onWrote();
     try {
       const j = await (
         await fetch('/api/kampanya-fiyat/elle', {
@@ -109,6 +232,7 @@ export function ManualCheckView({ rows, onChanged }: { rows: CampaignChange[]; o
       ).json();
       if (!j.success) throw new Error(j.error_message);
       if (j.results) setResults(j.results);
+      if (j.results?.every((r: ApplyResult) => r.ok)) setManual((m) => ({ ...m, [key]: '' }));
       await onChanged();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'İşlem yapılamadı');
@@ -121,9 +245,16 @@ export function ManualCheckView({ rows, onChanged }: { rows: CampaignChange[]; o
   const run = () => {
     if (!pending) return;
     if (pending.type === 'remove') post(pending.c.productId, { action: 'remove', productIds: [pending.c.productId] });
-    else post(pending.c.productId, { action: 'price', productId: pending.c.productId, price: pending.price });
+    else
+      post(pending.c.productId, {
+        action: pending.type === 'base' ? 'base-price' : 'price',
+        productId: pending.c.productId,
+        price: pending.price,
+        confirmLoss: pending.profit != null && pending.profit < 0,
+      });
   };
 
+  // Stok 0'da karar verilmez (keepAsIs reddeder): stok açılınca kart kararsız görünmeli
   const KeepCell = ({ c }: { c: CampaignChange }) =>
     c.keptAt ? (
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -138,7 +269,7 @@ export function ManualCheckView({ rows, onChanged }: { rows: CampaignChange[]; o
           <Undo2 /> Geri al
         </Button>
       </div>
-    ) : (
+    ) : c.stock === 0 ? null : (
       <Button
         variant="ghost"
         size="sm"
@@ -149,6 +280,19 @@ export function ManualCheckView({ rows, onChanged }: { rows: CampaignChange[]; o
         Olduğu gibi kalsın
       </Button>
     );
+
+  // Bileşen değil, düz çağrı: kutu yazarken yeniden bağlanıp odağı kaybetmesin
+  const priceBox = (c: CampaignChange, base = false) => (
+    <PriceBox
+      c={c}
+      value={manual[c.productId] ?? ''}
+      disabled={!!busy}
+      limit={base ? baseLimit(c) : campaignLimit(c)}
+      onChange={(v) => setManual((m) => ({ ...m, [c.productId]: v }))}
+      onApply={(price, profit) => setPending(base ? { type: 'base', c, price, profit } : { type: 'price', c, price, label: 'Elle fiyat', profit })}
+    />
+  );
+  const dialog = pending && dialogOf(pending);
 
   return (
     <div className="space-y-6">
@@ -168,7 +312,14 @@ export function ManualCheckView({ rows, onChanged }: { rows: CampaignChange[]; o
           <AlertDescription>
             {results.map((r) => (
               <div key={r.productId}>
-                {r.offerId}: {r.ok ? (r.to ? `kampanya fiyatı ${usd(r.to)}` : 'kampanyadan çıktı') : r.error}
+                {r.offerId}:{' '}
+                {!r.ok
+                  ? r.error
+                  : r.base
+                    ? `ana fiyat ${usd(r.to)}`
+                    : r.to
+                      ? `kampanya fiyatı ${usd(r.to)}`
+                      : `kampanyadan çıktı${r.exitPrice != null ? `, fiyatı ${usd(r.exitPrice)}` : ''}`}
               </div>
             ))}
           </AlertDescription>
@@ -201,6 +352,7 @@ export function ManualCheckView({ rows, onChanged }: { rows: CampaignChange[]; o
                     <TableHeader>
                       <TableRow>
                         <TableHead>Ürün</TableHead>
+                        {s.kind === 'blocked' && <TableHead className="text-right">Ana fiyat</TableHead>}
                         <TableHead className="text-right">{s.kind === 'blocked' ? 'Öneri' : 'Kampanyada'}</TableHead>
                         {s.kind !== 'blocked' && <TableHead className="text-right">Kâr (şimdi)</TableHead>}
                         {s.kind === 'opportunity' && <TableHead className="text-right">En ucuz rakip</TableHead>}
@@ -208,7 +360,7 @@ export function ManualCheckView({ rows, onChanged }: { rows: CampaignChange[]; o
                         <TableHead className="text-right">Asgari kâr fiyatı</TableHead>
                         <TableHead className="text-right">Alış</TableHead>
                         <TableHead className="text-right">Satış (60 g)</TableHead>
-                        {s.kind !== 'blocked' && <TableHead>İşlem</TableHead>}
+                        <TableHead>İşlem</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -221,9 +373,23 @@ export function ManualCheckView({ rows, onChanged }: { rows: CampaignChange[]; o
                       ) : (
                         list.map((c) => (
                           <TableRow key={c.productId} className={cn(c.keptAt && 'opacity-60')}>
-                            <TableCell>
+                            <TableCell className="whitespace-normal">
                               <Product c={c} />
+                              <p className="mt-1 max-w-72 text-xs text-muted-foreground">{c.reason}</p>
+                              {s.kind === 'closed' && c.buyable && c.rule && (
+                                <p className="mt-1 max-w-72 text-xs font-medium">Kaynak alınabilir: stok açılabilir, ama önce fiyatı düzelt.</p>
+                              )}
                             </TableCell>
+                            {s.kind === 'blocked' && (
+                              <TableCell className="text-right tabular-nums">
+                                {usd(c.basePrice)}
+                                {c.cost && (
+                                  <div className="text-xs">
+                                    kâr <Profit value={costProfitAt(c.basePrice, c.cost).profit} />
+                                  </div>
+                                )}
+                              </TableCell>
+                            )}
                             <TableCell className="text-right tabular-nums">{usd(s.kind === 'blocked' ? c.proposal : c.current)}</TableCell>
                             {s.kind !== 'blocked' && (
                               <TableCell className="text-right tabular-nums">
@@ -238,77 +404,64 @@ export function ManualCheckView({ rows, onChanged }: { rows: CampaignChange[]; o
                                 )}
                               </TableCell>
                             )}
-                            <TableCell className="text-right tabular-nums">{usd(c.maxAction)}</TableCell>
-                            <TableCell className="text-right tabular-nums">{usd(c.floorPrice)}</TableCell>
+                            <TableCell className="text-right tabular-nums">{usd(c.maxAction == null ? null : Math.floor(c.maxAction))}</TableCell>
+                            <TableCell className="text-right tabular-nums">
+                              {usd(c.floorPrice)}
+                              {c.breakEvenUsd != null && <div className="text-xs text-muted-foreground">başabaş {usd(c.breakEvenUsd)}</div>}
+                            </TableCell>
                             <TableCell className="text-right tabular-nums">
                               {c.purchaseEur != null ? `${c.purchaseEur.toFixed(0)} €` : '—'}
-                              {c.source && <div className="text-xs text-muted-foreground">{SOURCE[c.source]}</div>}
+                              {c.source && (
+                                <div className="text-xs text-muted-foreground">
+                                  {SOURCE[c.source]}
+                                  {!c.buyable && (
+                                    <Badge variant="destructive" className="ml-1" title="Hiçbir kanaldan şu an alınamıyor; maliyet yalnız tahmin">
+                                      alınamaz
+                                    </Badge>
+                                  )}
+                                </div>
+                              )}
                             </TableCell>
                             <TableCell className={cn('text-right tabular-nums', !c.sold && 'text-muted-foreground')}>{c.sold}</TableCell>
-                            {s.kind !== 'blocked' && (
-                              <TableCell>
-                                {s.kind === 'opportunity' ? (
-                                  <div className="flex flex-wrap items-center gap-1.5">
-                                    {c.options.map((o) => (
-                                      <Button
-                                        key={o.key}
-                                        variant="outline"
-                                        size="sm"
-                                        className="h-auto flex-col items-start gap-0 py-1"
-                                        disabled={!!busy}
-                                        onClick={() => setPending({ type: 'price', c, price: o.price, label: o.label, profit: o.profit })}
-                                      >
-                                        <span className="text-xs text-muted-foreground">{o.label}</span>
-                                        <span className="tabular-nums">
-                                          {usd(o.price)} · kâr {usd(o.profit)}
-                                        </span>
-                                      </Button>
-                                    ))}
-                                    <div className="flex items-center gap-1">
-                                      <Input
-                                        type="number"
-                                        inputMode="numeric"
-                                        className="h-8 w-20"
-                                        placeholder="$"
-                                        aria-label={`${c.offerId} elle fiyat`}
-                                        value={manual[c.productId] ?? ''}
-                                        onChange={(e) => setManual((m) => ({ ...m, [c.productId]: e.target.value }))}
-                                      />
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        disabled={!!busy || !Number(manual[c.productId])}
-                                        onClick={() =>
-                                          setPending({
-                                            type: 'price',
-                                            c,
-                                            price: Math.round(Number(manual[c.productId])),
-                                            label: 'Elle fiyat',
-                                            profit: null,
-                                          })
-                                        }
-                                      >
-                                        Uygula
-                                      </Button>
-                                    </div>
-                                    <KeepCell c={c} />
-                                  </div>
-                                ) : (
-                                  <div className="flex flex-wrap items-center gap-1.5">
+                            <TableCell>
+                              {s.kind === 'blocked' ? (
+                                priceBox(c, true)
+                              ) : s.kind === 'opportunity' ? (
+                                <div className="flex max-w-xl flex-wrap items-center gap-1.5">
+                                  {c.options.map((o) => (
                                     <Button
+                                      key={o.key}
                                       variant="outline"
                                       size="sm"
-                                      className="h-7 px-2 text-destructive"
+                                      className="h-auto flex-col items-start gap-0 py-1"
                                       disabled={!!busy}
-                                      onClick={() => setPending({ type: 'remove', c })}
+                                      onClick={() => setPending({ type: 'price', c, price: o.price, label: o.label, profit: o.profit })}
                                     >
-                                      {busy === c.productId && <RefreshCw className="animate-spin" />} Kampanyadan çıkar
+                                      <span className="text-xs text-muted-foreground">{o.label}</span>
+                                      <span className="tabular-nums">
+                                        {usd(o.price)} · kâr {usd(o.profit)}
+                                      </span>
                                     </Button>
-                                    <KeepCell c={c} />
-                                  </div>
-                                )}
-                              </TableCell>
-                            )}
+                                  ))}
+                                  {priceBox(c)}
+                                  <KeepCell c={c} />
+                                </div>
+                              ) : (
+                                <div className="flex max-w-96 flex-wrap items-center gap-1.5">
+                                  {priceBox(c)}
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-7 px-2 text-destructive"
+                                    disabled={!!busy}
+                                    onClick={() => setPending({ type: 'remove', c })}
+                                  >
+                                    {busy === c.productId && <RefreshCw className="animate-spin" />} Kampanyadan çıkar
+                                  </Button>
+                                  <KeepCell c={c} />
+                                </div>
+                              )}
+                            </TableCell>
                           </TableRow>
                         ))
                       )}
@@ -324,29 +477,26 @@ export function ManualCheckView({ rows, onChanged }: { rows: CampaignChange[]; o
       <AlertDialog open={!!pending} onOpenChange={(o) => !busy && !o && setPending(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {pending?.type === 'remove'
-                ? `${pending.c.offerId} kampanyadan çıkarılsın mı?`
-                : pending && `${pending.c.offerId} kampanya fiyatı ${usd(pending.c.current)} → ${usd(pending.price)} olsun mu?`}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {pending?.type === 'remove'
-                ? `Elastik boosting kampanyasından çıkar; müşteri ürünün ana fiyatını görür. Şu anki kâr ${usd(pending.c.profitNow)}.`
-                : pending &&
-                  `${pending.label}${pending.profit != null ? `, bu fiyatta kâr ${usd(pending.profit)}` : ''}. Fiyat sunucuda asgari kâr ve Ozon tavanıyla yeniden kontrol edilir, Ozon'un kabul ettiği fiyat doğrulanır. Ana fiyat değişmez.`}
-            </AlertDialogDescription>
+            <AlertDialogTitle>{dialog?.title}</AlertDialogTitle>
+            <AlertDialogDescription>{dialog?.text}</AlertDialogDescription>
+            {dialog?.notes.map((n) => (
+              <p key={n} className="text-sm font-medium text-destructive">
+                {n}
+              </p>
+            ))}
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={!!busy}>Vazgeç</AlertDialogCancel>
             <AlertDialogAction
+              variant={dialog?.danger ? 'destructive' : 'default'}
               onClick={(e) => {
                 e.preventDefault();
                 run();
               }}
-              disabled={!!busy}
+              disabled={!!busy || dialog?.blocked}
             >
               {busy && <RefreshCw className="animate-spin" />}
-              {pending?.type === 'remove' ? 'Kampanyadan çıkar' : 'Uygula'}
+              {dialog?.action}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

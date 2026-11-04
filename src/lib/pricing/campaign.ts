@@ -1,7 +1,8 @@
+import { MAX_OZON_LIST_PRICE_USD } from '@/lib/amazon/types';
 import { prisma } from '@/lib/db/prisma';
 import { getOzonHeaders, ozonFetch } from '@/lib/ozon/gate';
 import { buildProposals, type Proposal, type SupplySource } from './proposals';
-import { profitAt as costProfitAt } from './rules';
+import { PRICING, priceForProfit, profitAt as costProfitAt, type CostBase } from './rules';
 
 /**
  * Elastik boosting kampanyasının fiyatlarını önerilerle karşılaştırır ve seçilenleri Ozon'a yazar.
@@ -13,14 +14,29 @@ import { profitAt as costProfitAt } from './rules';
  *            below-floor  asgari kârın altındayız — fark ne olursa olsun
  *            profit-up    fark %2'den ve 2 $'dan büyük, fiyat artıyor (gereğinden ucuz satıyoruz)
  *            cheaper      fark %2'den ve 2 $'dan büyük, fiyat düşüyor (maliyet düştü)
- *   small  daha küçük fark (kur oynaması) → görünür, seçili değil
+ *   small  daha küçük fark (kur oynaması) ya da alınabilir kaynağı olmayan kartta fiyat indirimi → görünür, seçili değil
  *   add    kampanyada değil, girebilir → ayrı liste
- *   check  kural "elle kontrol" ya da Ozon tavanı aşılıyor → hiç otomatik seçilmez. Sayfada dört bölüm (checkKind,
- *          kullanıcıyla 2026-10-10): loss (şu anki fiyatta zarar), thin (Ozon tavanı kâr sınırımızın altında),
- *          opportunity (en ucuz rakip bizden çok pahalı; hazır fiyat seçenekleri), blocked (kampanyada değil, giremiyor).
- *          "Olduğu gibi kalsın" kararı CampaignReview'da; fiyat, maliyet ya da tavan değişince düşer.
+ *   check  kural "elle kontrol" ya da Ozon tavanı aşılıyor → hiç otomatik seçilmez. Sayfada beş bölüm (checkKind,
+ *          kullanıcıyla 2026-10-10, closed 2026-11-04): loss (stok açık, şu anki fiyatta zarar), thin (Ozon tavanı kâr
+ *          sınırımızın altında), opportunity (en ucuz rakip bizden çok pahalı; hazır fiyat seçenekleri), closed (stok 0, fiyat
+ *          zararda: sipariş gelemez, zarar sayılmaz; stok açılır ve fiyat hâlâ zarardaysa kendiliğinden loss olur), blocked
+ *          (kampanyada değil, giremiyor ya da alınabilir kaynağı yok). Önerisi çıkmayan kart (750 € sınırında kâr yok) da
+ *          kampanyada ve zarardaysa buraya düşer; maliyeti bilinmeyen kart (Hesaplanamadı) planda yoktur.
+ *          "Olduğu gibi kalsın" kararı CampaignReview'da; fiyat değişince ya da maliyet veya tavan %3'ten fazla oynayınca düşer,
+ *          yalnız stok varken geçerlidir: stok 0 iken plan açılırsa karar silinir (staleReviews, GET /api/kampanya-fiyat). Sınır:
+ *          stok panel dışından yazılıyor, stok geçmişi yok; kart plan açılmadan 0'a düşüp yeniden açılırsa satır kalır, değerler
+ *          aynıysa karar geçerli sayılır. Kanal saklanmıyor (şema değişmedi): maliyeti oynatan kanal değişikliğini %3 payı
+ *          yakalar, maliyet aynıysa kâr da aynıdır.
  *   other  kampanyada değil ama Ozon'un başka bir kampanyasında (ör. Max boosting 11.11) → gönderilemez; o kampanya
  *          bitince "add"e düşer (kullanıcı 2026-10-25: toplu gönderimde yanlışlıkla Elastik'e eklenmişlerdi)
+ *
+ * Alınabilir kaynağı olmayan kartta maliyet yalnız tahmindir: kampanyadaki kartın fiyat indirimi "small"a düşer (seçili gelmez,
+ * başlık kutusu da seçmez, satırından tek tek seçilir), zam olduğu gibi kalır; kampanyada olmayan kart "add"e girmez, check/blocked
+ * olur. Sunucu da korur: ekranda "alınamaz" hâliyle görülmemiş indirim gönderilmez, hata olarak döner (isUnseenEstimateCut).
+ * Fiyat yazan elle işlemler (kampanya fiyatı, ana fiyat) tam dolardır; kampanya fiyatı Ozon tavanı okunmadan yazılmaz. Toplu gönderim
+ * de tavanı okunmayan kartı göndermez. Elle fiyatta zarar varsa istek confirmLoss taşımalıdır.
+ * Kampanyadan çıkarmada gönderilen fiyat exitPriceOf'tur (plan ve gönderim aynı yardımcıyı kullanır, min_price gönderimde taze okunur):
+ * çıkış fiyatı lojistik tavanını (MAX_OZON_LIST_PRICE_USD) aşan kart reddedilir, 750 € ihracat sınırını aşan yalnız onay penceresinde uyarı alır.
  */
 
 const STORE = 'store1';
@@ -34,7 +50,7 @@ const MAX_BOOST_CUT_PCT = 0.03;
 
 export type ChangeGroup = 'send' | 'small' | 'add' | 'check' | 'other';
 export type ChangeTag = 'above-rival' | 'below-floor' | 'profit-up' | 'cheaper';
-export type CheckKind = 'loss' | 'thin' | 'opportunity' | 'blocked';
+export type CheckKind = 'loss' | 'thin' | 'opportunity' | 'closed' | 'blocked';
 
 /** "Rakipten çok ucuzuz" bölümündeki hazır fiyat: asgari kâr ile Ozon tavanı arasında */
 export interface CheckOption {
@@ -46,8 +62,11 @@ export interface CheckOption {
 
 /** Satış adedi bu kadar günden sayılır */
 const SALES_DAYS = 60;
-/** "Olduğu gibi kalsın" kararı maliyet ya da tavan bu orandan fazla değişince düşer */
+/** "Olduğu gibi kalsın" kararı maliyet ya da tavan bu orandan fazla değişince düşer; fiyatın payı yok (samePrice) */
 const REVIEW_TOLERANCE = 0.03;
+/** Ana fiyatın okunup doğrulanacağı süre (işlem başından) ve okuma aralığı: route 60 sn'de kesilir, plan ~11 sn sürüyor */
+const BASE_VERIFY_MS = 45_000;
+const BASE_VERIFY_STEP_MS = 5_000;
 
 export interface CampaignChange {
   productId: string;
@@ -86,10 +105,24 @@ export interface CampaignChange {
   checkKind: CheckKind | null;
   /** Şu anki kampanya fiyatında kalan kâr ($); kampanyada değilse null */
   profitNow: number | null;
+  /** Kârı sıfırlayan en düşük tam dolar fiyat; asgari kâr fiyatı (floorPrice) bundan farklıdır */
+  breakEvenUsd: number | null;
+  /** Kampanyadan çıkınca kartın satacağı fiyat ve orada kalan kâr (exitPriceOf); kampanyada değilse ya da tavan okunamadıysa null */
+  exitPrice: number | null;
+  profitAtExit: number | null;
+  /** 750 € ihracat sınırı ($, o günkü kurla) */
+  exportLimitUsd: number;
+  /** Kartın ana fiyatı (Ozon `price`). Kampanyadaki kartta kampanya fiyatına eşittir, kampanya fiyatı yazılınca o da değişir (canlı 667/667, 2026-11-04) ve kampanyadan çıkınca geri dönecek ayrı bir fiyat yoktur (exitPriceOf); müşterinin bu fiyatı doğrudan gördüğü kart kampanyada olmayandır */
+  basePrice: number;
+  stock: number;
+  /** Elle fiyat kutusunun canlı kâr hesabı için maliyet (rules.ts profitAt); bilinmiyorsa null */
+  cost: CostBase | null;
   purchaseEur: number | null;
   /** Alış + gelen kargo ($): "olduğu gibi kalsın" kararının geçerlilik kontrolü */
   landedUsd: number | null;
   source: SupplySource | null;
+  /** Kaynak şu an alınabilir mi; değilse maliyet yalnız tahmin */
+  buyable: boolean;
   ozonIndex: number | null;
   /** Son SALES_DAYS günde satılan adet (iptaller hariç) */
   sold: number;
@@ -149,10 +182,10 @@ function gapRub(p: Proposal, price: number) {
   return Math.round(price * p.rival.rubPerUsd * p.rival.factor - rivalRub);
 }
 
-/** Bu fiyatta kalan net kâr: öneri hesabındaki maliyetlerle (Ozon kesintileri yüzde, kargo/depo sabit). */
-function profitAt(p: Proposal, price: number) {
+/** Öneri hesabındaki maliyetler (Ozon kesintileri yüzde, kargo/depo sabit); bilinmiyorsa null */
+function costOf(p: Proposal): CostBase | null {
   if (p.landedUsd == null || p.ozonShippingUsd == null || p.depotUsd == null) return null;
-  return costProfitAt(price, {
+  return {
     landedUsd: p.landedUsd,
     ozonShippingUsd: p.ozonShippingUsd,
     depotUsd: p.depotUsd,
@@ -160,7 +193,21 @@ function profitAt(p: Proposal, price: number) {
     feePct: p.feePct,
     platformPct: p.platformPct,
     platformCapUsd: p.platformCapUsd,
-  }).profit;
+  };
+}
+
+/** Bu fiyatta kalan net kâr */
+function profitAt(p: Proposal, price: number) {
+  const cost = costOf(p);
+  return cost ? costProfitAt(price, cost).profit : null;
+}
+
+/**
+ * Kampanyadan çıkış fiyatı; plan (onay penceresi) ve removeFromCampaign (gönderim) bunu kullanır, ayrışamazlar.
+ * Kartın min_price'ı, tavanın 1 $ üstü, asgari kâr fiyatı: en büyüğü. Tavan bilinmeden seçilemez.
+ */
+function exitPriceOf(minPrice: number, maxAction: number | null, floorPrice: number | null) {
+  return maxAction == null ? null : Math.max(minPrice, Math.floor(maxAction) + 1, floorPrice ?? 0);
 }
 
 /**
@@ -209,10 +256,12 @@ async function loadSales() {
 
 const near = (a: number | null, b: number | null) =>
   a == null || b == null ? a == b : Math.abs(a - b) <= Math.max(Math.abs(b) * REVIEW_TOLERANCE, 0.01);
+/** Fiyat kararın kendisidir, payı yok: elle ya da toplu gönderimle her değişiklik kararı düşürür (0,01 yalnız okuma yuvarlaması) */
+const samePrice = (a: number | null, b: number | null) => (a == null || b == null ? a == b : Math.abs(a - b) <= 0.01);
 
 /**
- * "Elle kontrol" bölümü. Zarar ve "Ozon izin vermiyor" önce gelir: rakip verisi şüpheli olan üründe de fiyat
- * yükseltilemiyorsa orada yapılacak bir şey yoktur.
+ * "Elle kontrol" bölümü. Zarar ve "Ozon tavanı asgari kârın altında" önce gelir: rakip verisi şüpheli olan üründe de tavan
+ * asgari kâra yetmiyorsa rakibe bakmanın anlamı yoktur.
  */
 function checkKindOf(
   p: Proposal,
@@ -223,18 +272,19 @@ function checkKindOf(
   hasOptions: boolean
 ): CheckKind {
   // Kampanyada olmayan ürün ancak hazır bir fiyatla eklenebiliyorsa fırsattır (kampanyadan çıkarılan CAF-P583S-AEUR:
-  // tavan asgari kâra eşit, kâr ~0)
-  if (current == null) return overCeiling || !hasOptions ? 'blocked' : 'opportunity';
-  if (profitNow != null && profitNow < 0) return 'loss';
+  // tavan asgari kâra eşit, kâr ~0). Alınabilir kaynak yoksa maliyet tahmindir, eklenmez.
+  if (current == null) return overCeiling || !hasOptions || !p.buyable ? 'blocked' : 'opportunity';
+  // Stok 0'da sipariş gelemez: zarar değil, stok açılmadan düzeltilecek fiyat. Stok açılınca kendiliğinden 'loss' olur
+  if (profitNow != null && profitNow < 0) return p.stock === 0 ? 'closed' : 'loss';
   if (overCeiling) return 'thin';
   if (p.floorPrice != null && current < p.floorPrice && maxAction != null && maxAction < p.floorPrice) return 'thin';
   return 'opportunity';
 }
 
-/** Hazır fiyatlar: %20 marj ve rakibin 11 ₽ altı (en yüksek boost sınırını aşmadan); asgari kâr ile tavan arasında */
+/** Hazır fiyatlar: %20 marj ve rakibin 11 ₽ altı (en yüksek boost sınırını aşmadan); asgari kâr ile tavan arasında, lojistik tavanını da geçmez (kampanyadaki kartta ana fiyat da bu fiyat olur) */
 function optionsFor(p: Proposal, current: number | null, maxAction: number | null, maxElastic: number | null): CheckOption[] {
   const lo = p.floorPrice ?? 0;
-  const hi = maxAction != null ? Math.floor(maxAction) : Infinity;
+  const hi = Math.min(maxAction != null ? Math.floor(maxAction) : Infinity, MAX_OZON_LIST_PRICE_USD);
   const out: CheckOption[] = [];
   const push = (key: CheckOption['key'], label: string, price: number) => {
     if (price < lo || price > hi || price === current || out.some((o) => o.price === price)) return;
@@ -249,7 +299,7 @@ function optionsFor(p: Proposal, current: number | null, maxAction: number | nul
   return out;
 }
 
-const KIND_ORDER: CheckKind[] = ['loss', 'thin', 'opportunity', 'blocked'];
+const KIND_ORDER: CheckKind[] = ['loss', 'thin', 'opportunity', 'closed', 'blocked'];
 
 export async function buildCampaignPlan() {
   const [{ proposals, eurUsd }, inAction, candidates, otherActions, sales, reviews] = await Promise.all([
@@ -261,14 +311,29 @@ export async function buildCampaignPlan() {
     prisma.campaignReview.findMany({ where: { storeId: STORE } }),
   ]);
   const reviewOf = new Map(reviews.map((r) => [r.productId, r]));
+  const exportLimitUsd = Math.floor((PRICING.exportLimitEur - 1) * eurUsd);
 
   const changes: CampaignChange[] = [];
   for (const p of proposals) {
-    if (p.newPrice == null || p.rule == null) continue;
     const row = inAction.get(p.productId) ?? candidates.get(p.productId);
     if (!row) continue;
     const current = inAction.has(p.productId) ? amount(row.action_price) : null;
-    const { next, maxElastic, maxAction, overCeiling, lowBoost, atCeiling } = fitToAction(p, row);
+    // Önerisi çıkmayan kart (750 € sınırında kâr yok): kampanyada ve fiyatı zarardaysa görünür olur, fiyat yerinde
+    // kalır. Maliyeti bilinmeyen kart (ağırlık yok, "Hesaplanamadı") planın dışında kalır.
+    const noProposal = p.newPrice == null || p.rule == null;
+    if (noProposal && !(current != null && (profitAt(p, current) ?? 0) < 0)) continue;
+    const { next, maxElastic, maxAction, overCeiling, lowBoost, atCeiling } = noProposal
+      ? { next: current!, maxElastic: amount(row.price_max_elastic), maxAction: amount(row.max_action_price), overCeiling: false, lowBoost: false, atCeiling: false }
+      : fitToAction(p, row);
+    // Fiyat tam dolar gider: yazılarda da gönderilebilecek en yüksek fiyat görünür; hesaplar ham maxAction ile yapılır
+    const ceiling = maxAction != null ? Math.floor(maxAction) : null;
+    const cost = costOf(p);
+    const exitPrice = current != null ? exitPriceOf(p.minPrice, maxAction, p.floorPrice) : null;
+    const review = reviewOf.get(p.productId);
+    const kept =
+      review && p.stock > 0 && samePrice(review.price, current) && near(review.landedUsd, p.landedUsd) && near(review.maxAction, maxAction)
+        ? review.createdAt.toISOString()
+        : null;
     const base = {
       productId: p.productId,
       offerId: p.offerId,
@@ -276,7 +341,7 @@ export async function buildCampaignPlan() {
       image: p.image,
       current,
       next,
-      proposal: p.newPrice,
+      proposal: p.newPrice ?? next,
       rule: p.rule,
       rivalUsd: p.rivalUsd,
       rivalGapRubNext: gapRub(p, next),
@@ -291,13 +356,21 @@ export async function buildCampaignPlan() {
       tag: null,
       checkKind: null,
       profitNow: current != null ? profitAt(p, current) : null,
+      breakEvenUsd: cost ? priceForProfit(0, cost) : null,
+      exitPrice,
+      profitAtExit: exitPrice != null ? profitAt(p, exitPrice) : null,
+      exportLimitUsd,
+      basePrice: p.currentPrice,
+      stock: p.stock,
+      cost,
       purchaseEur: p.purchaseEur,
       landedUsd: p.landedUsd,
       source: p.source,
+      buyable: p.buyable,
       ozonIndex: p.ozonIndex,
       sold: sales.get(p.offerId) ?? 0,
       options: [] as CheckOption[],
-      keptAt: null as string | null,
+      keptAt: kept as string | null,
     };
 
     const other = current == null ? otherActions.get(p.productId) : undefined;
@@ -310,27 +383,28 @@ export async function buildCampaignPlan() {
       });
       continue;
     }
-    if (p.rule === 'check' || overCeiling) {
+    if (noProposal || p.rule === 'check' || overCeiling || (current == null && !p.buyable)) {
       const options = optionsFor(p, current, maxAction, maxElastic);
       const checkKind = checkKindOf(p, current, maxAction, base.profitNow, overCeiling, options.length > 0);
-      const review = reviewOf.get(p.productId);
-      const kept =
-        review && near(review.price, current) && near(review.landedUsd, p.landedUsd) && near(review.maxAction, maxAction)
-          ? review.createdAt.toISOString()
-          : null;
-      const reason = {
-        loss: `Şu anki fiyatta zarar. Ozon en fazla ${maxAction} $'a izin veriyor, kâr için en az ${p.floorPrice} $ gerekir`,
-        thin: `Ozon en fazla ${maxAction} $'a izin veriyor, asgari kâr fiyatımız ${p.floorPrice} $`,
-        opportunity: `Ozon'daki en ucuz rakip ${p.rivalUsd?.toFixed(0) ?? '—'} $. Rakibe eşitlemek fiyatı birkaç kat yükseltir, rakip verisi şüpheli olabilir`,
-        blocked: `Kampanyada değil. Ozon en fazla ${maxAction} $'a izin veriyor, asgari kâr fiyatımız ${p.floorPrice} $`,
-      }[checkKind];
+      // Asgari kâr fiyatı başabaş değildir: ikisinin arasında da kâr var, yalnız asgarinin altında
+      const limits = `Ozon tavanı ${ceiling ?? '—'} $, başabaş ${base.breakEvenUsd ?? '—'} $, asgari kâr fiyatı ${p.floorPrice ?? '—'} $`;
+      const reason = noProposal
+        ? (p.skipReason ?? 'Öneri hesaplanamadı')
+        : {
+            loss: `Şu anki fiyatta zarar. ${limits}`,
+            closed: `Stok 0, sipariş gelemez ama şu anki fiyatta zarar. ${limits}`,
+            thin: `Ozon en fazla ${ceiling ?? '—'} $'a izin veriyor, asgari kâr fiyatımız ${p.floorPrice} $`,
+            opportunity: `Ozon'daki en ucuz rakip ${p.rivalUsd?.toFixed(0) ?? '—'} $. Rakibe eşitlemek fiyatı birkaç kat yükseltir, rakip verisi şüpheli olabilir`,
+            blocked: !p.buyable
+              ? 'Kampanyada değil. Alınabilir kaynak yok, maliyet yalnız tahmin: kampanyaya eklenmez'
+              : `Kampanyada değil. Ozon en fazla ${ceiling ?? '—'} $'a izin veriyor, asgari kâr fiyatımız ${p.floorPrice} $`,
+          }[checkKind];
       changes.push({
         ...base,
         group: 'check',
         reason,
         checkKind,
-        keptAt: kept,
-        options: checkKind === 'opportunity' ? options : [],
+        options: checkKind === 'opportunity' && maxAction != null ? options : [],
       });
       continue;
     }
@@ -338,11 +412,18 @@ export async function buildCampaignPlan() {
       changes.push({
         ...base,
         group: 'add',
-        reason: atCeiling ? `Kampanyada değil · öneri ${p.newPrice} $, Ozon en fazla ${maxAction} $'a izin veriyor` : 'Kampanyada değil',
+        reason: atCeiling ? `Kampanyada değil · öneri ${p.newPrice} $, Ozon en fazla ${ceiling} $'a izin veriyor` : 'Kampanyada değil',
       });
       continue;
     }
     if (next === current) continue;
+
+    // Alınabilir kaynak yok, maliyet yalnız tahmin: indirim toplu gönderimde seçili gelmesin ("small" seçili gelmez). "cheaper" ve
+    // "above-rival"in önüne geçer; zam ("below-floor", "profit-up") olduğu gibi kalır
+    if (!p.buyable && next < current) {
+      changes.push({ ...base, group: 'small', reason: 'Alınabilir kaynak yok, maliyet yalnız tahmin: fiyat indirimi önceden seçilmedi' });
+      continue;
+    }
 
     // Rakipten pahalıysak — kararı Ozon'un kendi endeksi verir (> 1,00). Bizim "11 ₽ altı" hedefimiz ruble kuru oynadıkça
     // her gün 1-3 $ kayıyor; yalnız ona bakınca endeksi yeşil 74 ürün "rakibin üstünde" sayılmıştı (2026-10-03).
@@ -384,7 +465,9 @@ export async function buildCampaignPlan() {
           checkRank(a) - checkRank(b)
         : urgent(a) - urgent(b) || Math.abs(b.next - (b.current ?? b.next)) - Math.abs(a.next - (a.current ?? a.next)))
   );
-  return { changes, eurUsd, actionId: ELASTIC_ACTION_ID, inCampaign: inAction.size, candidates: candidates.size };
+  // Stoğu 0 olan kartın kararı geçersiz; plan salt okunur kalır, silmeyi GET ucu yapar (dropStaleReviews)
+  const staleReviews = proposals.filter((p) => p.stock === 0 && reviewOf.has(p.productId)).map((p) => p.productId);
+  return { changes, eurUsd, actionId: ELASTIC_ACTION_ID, inCampaign: inAction.size, candidates: candidates.size, staleReviews };
 }
 
 export interface ApplyResult {
@@ -393,16 +476,26 @@ export interface ApplyResult {
   from: number | null;
   to: number;
   ok: boolean;
-  /** Ozon'un kabul sonrası okunan kampanya fiyatı */
+  /** Ozon'un kabul sonrası okunan kampanya fiyatı (setBasePrice'ta ana fiyat) */
   verified: number | null;
   error: string | null;
+  /** Yalnız kampanyadan çıkarmada: gönderilen, kartın bundan sonra satacağı fiyat (to 0 kalır) */
+  exitPrice?: number | null;
+  /** setBasePrice sonucu: from/to kampanya değil ana fiyat */
+  base?: boolean;
 }
+
+/** Alınabilir kaynağı olmayan kartta indirim, ancak kullanıcı o fiyatı "alınamaz" hâliyle ekranda gördüyse gider. Sayfa açıkken tarama ya da teklif eleme kartı alınamaz yaptıysa eski seçim bu indirimi göndermez. */
+export const isUnseenEstimateCut = (c: CampaignChange, estimateCuts: Record<string, number>) =>
+  !c.buyable && c.current != null && c.next < c.current && estimateCuts[c.productId] !== c.next;
 
 /**
  * Seçilen ürünleri yazar. Fiyat istemciden alınmaz: plan sunucuda yeniden hesaplanır ve yalnızca seçilen ürünlerin
  * güncel önerisi gönderilir ("check" grubu reddedilir). Sonra kampanya yeniden okunup her ürün doğrulanır.
+ * estimateCuts: kullanıcının ekranda "alınamaz" hâliyle gördüğü indirimler; görülmemiş indirim hata olarak döner, kayda girmez.
+ * Ozon tavanı okunamayan kart gönderilmez, hata olarak döner.
  */
-export async function applyCampaignPrices(productIds: string[]): Promise<ApplyResult[]> {
+export async function applyCampaignPrices(productIds: string[], estimateCuts: Record<string, number> = {}): Promise<ApplyResult[]> {
   const { changes } = await buildCampaignPlan();
   const byId = new Map(changes.map((c) => [c.productId, c]));
   const results: ApplyResult[] = [];
@@ -421,6 +514,19 @@ export async function applyCampaignPrices(productIds: string[]): Promise<ApplyRe
       });
     else if (c.group === 'check' || c.group === 'other')
       results.push({ productId: id, offerId: c.offerId, from: c.current, to: c.next, ok: false, verified: null, error: c.reason });
+    else if (isUnseenEstimateCut(c, estimateCuts))
+      results.push({
+        productId: id,
+        offerId: c.offerId,
+        from: c.current,
+        to: c.next,
+        ok: false,
+        verified: null,
+        error: `Alınabilir kaynak yok, maliyet yalnız tahmin (öneri ${c.next} $). Gönderilmedi; "Küçük fark" grubundan görerek seç`,
+      });
+    else if (c.maxAction == null)
+      // Tavan bilinmeden sınır da bilinmez: üstündeki fiyat kartı kampanyadan çıkarıp kartın fiyatı olur (setManualPrice ve removeFromCampaign da reddeder)
+      results.push({ productId: id, offerId: c.offerId, from: c.current, to: c.next, ok: false, verified: null, error: 'Ozon kampanya tavanı okunamadı' });
     else toSend.push(c);
   }
 
@@ -497,7 +603,7 @@ const recordChanges = (rows: { c: CampaignChange; from: number | null; to: numbe
     : null;
 
 /**
- * "Zararına satıyor" / "Ozon izin vermiyor" ürünlerini Elastik boosting'den çıkarır, sonra kampanyayı yeniden okuyup
+ * "Zararına satıyor" / "Ozon tavanı asgari kârın altında" ürünlerini Elastik boosting'den çıkarır, sonra kampanyayı yeniden okuyup
  * doğrular. Doğrulama çıkmayan ürünü hata olarak gösterir.
  *
  * /v2/actions/products/deactivate artık yalnız "Promo Codes" içindir; elastikte "unified price logic" hatası veriyor
@@ -505,14 +611,15 @@ const recordChanges = (rows: { c: CampaignChange; from: number | null; to: numbe
  * ama gönderilen fiyat kartın fiyatı olur ve kart bundan sonra ondan satar (min_price her zaman güncellenmiyor: GC271810
  * 148 $ satıyor, min_price 122 $ kaldı). Bu yüzden üçünün en büyüğü gönderilir: kartın min_price'ı, tavanın 1 $ üstü, asgari
  * kâr fiyatı. Eskiden asgari kâr yoktu; min_price düşükse ürün kampanyadan çıkıp yine zararına satıyordu (FN101EUGY: 185 $ = −16 $).
+ * min_price gönderim anında taze okunur; çıkış fiyatı lojistik tavanını (MAX_OZON_LIST_PRICE_USD) aşan kart gönderilmez, satışa kapanırdı.
  */
 export async function removeFromCampaign(productIds: string[]): Promise<ApplyResult[]> {
   const rows = await checkRows([...new Set(productIds)]);
   const results: ApplyResult[] = [];
   // Tavan bilinmeden çıkarma fiyatı seçilemez: tavanın altındaki fiyat ürünü çıkarmaz, o fiyattan kampanyaya sokar
-  const ok = rows.filter((r) => r.c && r.c.current != null && r.c.checkKind !== 'opportunity' && r.c.maxAction != null);
+  const eligible = rows.filter((r) => r.c && r.c.current != null && r.c.checkKind !== 'opportunity' && r.c.maxAction != null);
   for (const r of rows)
-    if (!ok.includes(r))
+    if (!eligible.includes(r))
       results.push({
         productId: r.id,
         offerId: r.c?.offerId ?? r.id,
@@ -522,25 +629,38 @@ export async function removeFromCampaign(productIds: string[]): Promise<ApplyRes
         verified: null,
         error: r.c && r.c.maxAction == null ? 'Ozon kampanya tavanı okunamadı' : 'Elle kontrolde kampanyadaki zararlı/az kârlı ürün değil',
       });
-  if (!ok.length) return results;
+  if (!eligible.length) return results;
 
   const headers = getOzonHeaders(STORE);
   const prices = await ozonFetch<{ items: { product_id: number; price: { min_price: number } }[] }>(
     '/v5/product/info/prices',
-    { filter: { product_id: ok.map((r) => r.id), visibility: 'ALL' }, limit: 1000 },
+    { filter: { product_id: eligible.map((r) => r.id), visibility: 'ALL' }, limit: 1000 },
     headers
   );
   const minPrice = new Map(prices.items.map((i) => [String(i.product_id), Number(i.price.min_price) || 0]));
+  const exitOf = new Map(eligible.map((r) => [r.id, exitPriceOf(minPrice.get(r.id) ?? 0, r.c!.maxAction, r.c!.floorPrice)!]));
+  const ok = eligible.filter((r) => exitOf.get(r.id)! <= MAX_OZON_LIST_PRICE_USD);
+  for (const r of eligible)
+    if (!ok.includes(r))
+      results.push({
+        productId: r.id,
+        offerId: r.c!.offerId,
+        from: r.c!.current,
+        to: 0,
+        ok: false,
+        verified: null,
+        exitPrice: exitOf.get(r.id),
+        error: `Çıkış fiyatı ${exitOf.get(r.id)} $, lojistik tavanını (${MAX_OZON_LIST_PRICE_USD} $) aşıyor: kart satışa kapanırdı, çıkarılmadı`,
+      });
+  if (!ok.length) return results;
+
   const res = await ozonFetch<{ rejected?: { product_id: number; reason: string }[] }>(
     '/v1/actions/products/update',
     {
       action_id: ELASTIC_ACTION_ID,
       products: ok.map((r) => ({
         product_id: Number(r.id),
-        action_price: {
-          amount: String(Math.max(minPrice.get(r.id) ?? 0, Math.floor(r.c!.maxAction ?? 0) + 1, r.c!.floorPrice ?? 0)),
-          currency: 'USD',
-        },
+        action_price: { amount: String(exitOf.get(r.id)), currency: 'USD' },
       })),
     },
     headers
@@ -554,12 +674,18 @@ export async function removeFromCampaign(productIds: string[]): Promise<ApplyRes
   });
   await recordChanges(done);
   for (const d of done)
-    results.push({ productId: d.c.productId, offerId: d.c.offerId, from: d.from, to: 0, ok: d.ok, verified: null, error: d.error });
+    results.push({ productId: d.c.productId, offerId: d.c.offerId, from: d.from, to: 0, ok: d.ok, verified: null, error: d.error, exitPrice: exitOf.get(d.c.productId) });
   return results;
 }
 
-/** Elle kontrolden tek ürüne elle kampanya fiyatı: asgari kâr ile Ozon tavanı arasında, tam dolar */
-export async function setManualPrice(productId: string, price: number): Promise<ApplyResult> {
+/** Zararına fiyat yalnız açık onayla gider: arayüz kârı gösterip sorar, onay istekte confirmLoss olarak gelir */
+function lossRefusal(c: CampaignChange, price: number, confirmLoss: boolean) {
+  const profit = c.cost ? costProfitAt(price, c.cost).profit : null;
+  return profit != null && profit < 0 && !confirmLoss ? `${price} $'da satış başına ${Math.abs(profit).toFixed(2)} $ zarar; zararına fiyat için onay gerekli` : null;
+}
+
+/** Elle kontrolden tek ürüne elle kampanya fiyatı: tam dolar, Ozon tavanını geçemez (üstünde kart kampanyadan çıkar), lojistik tavanını geçemez (kartın ana fiyatı da bu fiyat olur), tavan okunamadıysa yazılmaz; zararına fiyat onay ister */
+export async function setManualPrice(productId: string, price: number, confirmLoss = false): Promise<ApplyResult> {
   const [{ c }] = await checkRows([productId]);
   const fail = (error: string): ApplyResult => ({
     productId,
@@ -571,9 +697,14 @@ export async function setManualPrice(productId: string, price: number): Promise<
     error,
   });
   if (!c) return fail('Ürün elle kontrol grubunda değil');
+  if (c.checkKind === 'blocked') return fail('Ürün kampanyada değil ve giremiyor; yalnız ana fiyatı değiştirilebilir');
   if (!Number.isInteger(price) || price <= 0) return fail('Fiyat tam dolar olmalı');
-  if (c.floorPrice != null && price < c.floorPrice) return fail(`Asgari kâr fiyatının (${c.floorPrice} $) altında`);
-  if (c.maxAction != null && price > Math.floor(c.maxAction)) return fail(`Ozon tavanının (${c.maxAction} $) üstünde`);
+  // Tavan bilinmeden sınır da bilinmez: üstündeki fiyat kartı kampanyadan çıkarıp kartın fiyatı olur (removeFromCampaign da reddeder)
+  if (c.maxAction == null) return fail('Ozon kampanya tavanı okunamadı');
+  if (price > Math.floor(c.maxAction)) return fail(`Ozon tavanının (${Math.floor(c.maxAction)} $) üstünde: kart kampanyadan çıkar`);
+  if (price > MAX_OZON_LIST_PRICE_USD) return fail(`Lojistik tavanının (${MAX_OZON_LIST_PRICE_USD} $) üstünde: kart satışa kapanır`);
+  const refusal = lossRefusal(c, price, confirmLoss);
+  if (refusal) return fail(refusal);
 
   const res = await ozonFetch<{ rejected?: { product_id: number; reason: string }[] }>(
     '/v1/actions/products/update',
@@ -589,10 +720,84 @@ export async function setManualPrice(productId: string, price: number): Promise<
   return { productId, offerId: c.offerId, from: c.current, to: price, ok: !error, verified, error };
 }
 
-/** "Olduğu gibi kalsın": o anki fiyat, maliyet ve tavanla saklanır; biri değişince karar düşer (buildCampaignPlan) */
+/**
+ * Kampanyada olmayan, giremeyen ("blocked") kartın ana fiyatı: kampanya olmadığı için müşteri bunu görür. Tam dolar, lojistik
+ * tavanını ve 750 € ihracat sınırını geçemez; zararına fiyat onay ister. Güncel değerler Ozon'dan okunur: üstü çizili fiyat yeni
+ * fiyatın üstündeyse kalır, değilse yeni fiyat × 1,2; min_price yeni fiyat olur. Ozon kabul etse de fiyat yeniden okunur, süresinde
+ * oturmazsa başarısız sayılır.
+ */
+export async function setBasePrice(productId: string, price: number, confirmLoss = false): Promise<ApplyResult> {
+  const started = Date.now();
+  const [{ c }] = await checkRows([productId]);
+  const fail = (error: string): ApplyResult => ({
+    productId,
+    offerId: c?.offerId ?? productId,
+    from: c?.basePrice ?? null,
+    to: price,
+    ok: false,
+    verified: null,
+    error,
+    base: true,
+  });
+  if (!c || c.checkKind !== 'blocked' || c.current != null) return fail('Ürün "Kampanyaya giremiyor" bölümünde değil');
+  if (!Number.isInteger(price) || price <= 0) return fail('Fiyat tam dolar olmalı');
+  if (price > MAX_OZON_LIST_PRICE_USD) return fail(`Lojistik tavanının (${MAX_OZON_LIST_PRICE_USD} $) üstünde: kart satışa kapanır`);
+  if (price > c.exportLimitUsd) return fail(`750 € ihracat sınırının (${c.exportLimitUsd} $) üstünde`);
+  const refusal = lossRefusal(c, price, confirmLoss);
+  if (refusal) return fail(refusal);
+
+  const headers = getOzonHeaders(STORE);
+  const read = async () =>
+    (
+      await ozonFetch<{ items: { price: { price: number | string; old_price: number | string; vat?: number | string } }[] }>(
+        '/v5/product/info/prices',
+        { filter: { product_id: [productId], visibility: 'ALL' }, limit: 1 },
+        headers
+      )
+    ).items[0]?.price;
+  const fresh = await read();
+  if (!fresh) return fail("Ozon'dan güncel fiyat okunamadı");
+  const from = Number(fresh.price) || 0;
+  const oldNow = Math.round(Number(fresh.old_price) || 0);
+  const res = await ozonFetch<{ result?: { updated: boolean; errors?: { code: string; message: string }[] }[] }>(
+    '/v1/product/import/prices',
+    {
+      prices: [
+        {
+          offer_id: c.offerId,
+          product_id: Number(productId),
+          price: String(price),
+          old_price: String(oldNow > price ? oldNow : Math.round(price * PRICING.oldPriceMultiplier)),
+          min_price: String(price),
+          currency_code: 'USD',
+          vat: String(fresh.vat ?? '0'),
+          auto_action_enabled: 'DISABLED',
+          price_strategy_enabled: 'DISABLED',
+        },
+      ],
+    },
+    headers
+  );
+  const r = res.result?.[0];
+  let error = r?.updated && !r.errors?.length ? null : `Ozon reddetti: ${r?.errors?.map((x) => x.message).join('; ') || 'güncellenmedi'}`;
+  let verified: number | null = null;
+  if (!error) {
+    for (;;) {
+      verified = Number((await read().catch(() => null))?.price) || null;
+      if (verified === price || Date.now() - started >= BASE_VERIFY_MS) break;
+      await new Promise((done) => setTimeout(done, BASE_VERIFY_STEP_MS));
+    }
+    if (verified !== price) error = `Ozon kabul etti ama fiyat doğrulanamadı (okunan ${verified ?? 'yok'}); birkaç dakika sonra kontrol et`;
+  }
+  await recordChanges([{ c, from, to: price, group: 'base', ok: !error, error }]);
+  return { productId, offerId: c.offerId, from, to: price, ok: !error, verified, error, base: true };
+}
+
+/** "Olduğu gibi kalsın": o anki fiyat, maliyet ve tavanla saklanır; fiyat değişince ya da maliyet veya tavan %3'ten fazla oynayınca karar düşer (buildCampaignPlan). Stok 0'da verilemez */
 export async function keepAsIs(productId: string) {
   const [{ c }] = await checkRows([productId]);
   if (!c) throw new Error('Ürün elle kontrol grubunda değil');
+  if (c.stock === 0) throw new Error('Stok 0: sipariş gelemez, karar stok varken verilir');
   const data = { offerId: c.offerId, price: c.current, landedUsd: c.landedUsd, maxAction: c.maxAction, createdAt: new Date() };
   await prisma.campaignReview.upsert({
     where: { storeId_productId: { storeId: STORE, productId } },
@@ -603,4 +808,9 @@ export async function keepAsIs(productId: string) {
 
 export async function undoKeep(productId: string) {
   await prisma.campaignReview.deleteMany({ where: { storeId: STORE, productId } });
+}
+
+/** Stoğu 0 olan kartların kararlarını siler (buildCampaignPlan → staleReviews). Yalnız GET /api/kampanya-fiyat çağırır: plan stok 0 iken açılmazsa satır kalır */
+export async function dropStaleReviews(productIds: string[]) {
+  if (productIds.length) await prisma.campaignReview.deleteMany({ where: { storeId: STORE, productId: { in: productIds } } });
 }
