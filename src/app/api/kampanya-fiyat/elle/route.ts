@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { keepAsIs, removeFromCampaign, setManualPrice, undoKeep } from '@/lib/pricing/campaign';
+import { keepAsIs, removeFromCampaign, setBasePrice, setManualPrice, undoKeep } from '@/lib/pricing/campaign';
 import { OzonRateLimitError } from '@/lib/ozon/gate';
 
 export const dynamic = 'force-dynamic';
@@ -8,7 +8,8 @@ export const maxDuration = 60;
 /**
  * "Elle kontrol" bölümünün işlemleri. Gövde:
  *   { action: 'remove', productIds: string[] }   kampanyadan çıkar (zararlı / az kârlı)
- *   { action: 'price', productId, price }        elle kampanya fiyatı (asgari kâr ile Ozon tavanı arasında)
+ *   { action: 'price', productId, price, confirmLoss }       elle kampanya fiyatı (Ozon tavanına ve lojistik tavanına kadar; zararınaysa confirmLoss: true)
+ *   { action: 'base-price', productId, price, confirmLoss }  kampanyaya giremeyen kartın ana fiyatı (sınırlar: setBasePrice)
  *   { action: 'keep' | 'unkeep', productId }     "olduğu gibi kalsın" kararı / geri al
  * Ürünün elle kontrol grubunda olduğu sunucuda yeniden hesaplanan planla doğrulanır (src/lib/pricing/campaign.ts).
  */
@@ -22,7 +23,9 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: true, results: await removeFromCampaign(body.productIds.map(String)) });
       }
       case 'price':
-        return NextResponse.json({ success: true, results: [await setManualPrice(String(body.productId), Number(body.price))] });
+        return NextResponse.json({ success: true, results: [await setManualPrice(String(body.productId), Number(body.price), body.confirmLoss === true)] });
+      case 'base-price':
+        return NextResponse.json({ success: true, results: [await setBasePrice(String(body.productId), Number(body.price), body.confirmLoss === true)] });
       case 'keep':
         await keepAsIs(String(body.productId));
         return NextResponse.json({ success: true });

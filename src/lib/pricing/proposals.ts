@@ -48,6 +48,8 @@ interface SupplyOffer {
   /** Banka kur farkı: Amazon.de euro ile, amazon.pl ve Ceneo zloti ile ödeniyor */
   fxPct: number;
   buyable: boolean;
+  /** Satıcı Amazon'un kendisi: alınamasa da piyasa fiyatını gösterir (üçüncü taraf ve iade fiyatı göstermez) */
+  soldByAmazon: boolean;
   /** Ceneo'da teklifi veren mağaza (allegro.pl, mediaexpert.pl …) */
   shop?: string | null;
   /** Ceneo teklifi piyasanın çok üstünde (SOURCING.outlierRatio): yanlış okuma sayılır, maliyete girmez */
@@ -64,7 +66,19 @@ export const ceneoPickInput = (src: ProductSource) => ({
   brand: src.ozonBrand,
   codes: [src.offerId, src.ceneoMatchedCode, src.ozonPartNumber],
   rejected: (Array.isArray(src.ceneoRejectedOffers) ? src.ceneoRejectedOffers : []) as unknown as RejectedOffer[],
+  /** Doğrudan amazon.pl kanalında fiyat var; supplyOffers'taki kanal koşuluyla aynı */
+  directAmazonPl: !!(src.asin && src.plPricePln),
 });
+
+/**
+ * Maliyetin kullandığı Ceneo teklifi; supplyOffers ve /ceneo-kontrol'ün "Seçilen" işareti bunu kullanır, ayrışamazlar.
+ * Doğrudan amazon.pl kanalı varsa Ceneo'daki amazon.pl teklifi sayılmaz (kural offerSkip'te), sıradaki teklif geçerli olur: tarama
+ * günlük, teslim tarihini ve satıcıyı görüyor; Ceneo haftalık ve ikisine de kör. Doğrudan fiyat yoksa teklif kalır. Tarama yine hepsini saklar.
+ */
+export function pickCeneoOffer(src: ProductSource) {
+  const { offers, brand, codes, rejected, directAmazonPl } = ceneoPickInput(src);
+  return pickBestOffer(offers, brand, codes, rejected, directAmazonPl);
+}
 
 /** Ürünün Amazon.de ve amazon.pl teklifleri (fiyatı olanlar) */
 function supplyOffers(src: ProductSource | undefined, eurPln: number): SupplyOffer[] {
@@ -81,6 +95,7 @@ function supplyOffers(src: ProductSource | undefined, eurPln: number): SupplyOff
       shippingEur: PRICING.amazonShippingEur,
       fxPct: PRICING.bankFxPct.EUR,
       buyable: !!(src.inStock && src.soldByAmazon) && !deliversLate(src.deliveryText, src.checkedAt),
+      soldByAmazon: !!src.soldByAmazon,
     });
   }
   if (src.asin && src.plPricePln) {
@@ -97,20 +112,18 @@ function supplyOffers(src: ProductSource | undefined, eurPln: number): SupplyOff
       shippingEur: freeShipping ? 0 : PRICING.amazonShippingEur,
       fxPct: PRICING.bankFxPct.PLN,
       buyable: (!!(src.plInStock && src.plSoldByAmazon) && !deliversLate(src.plDeliveryText, src.plCheckedAt)) || cartHidden,
+      soldByAmazon: !!src.plSoldByAmazon,
     });
   }
   // Ceneo: yalnız eşleşmesi kesin ya da onaylı ürün; teklifler Polonya'daki depoya kargo dahil (Allegro 0, Smart)
-  const pickInput = ceneoPickInput(src);
-  const ceneo = src.ceneoStatus === 'EXACT' || src.ceneoStatus === 'MANUAL'
-    ? pickBestOffer(pickInput.offers, pickInput.brand, pickInput.codes, pickInput.rejected)
-    : null;
+  const ceneo = src.ceneoStatus === 'EXACT' || src.ceneoStatus === 'MANUAL' ? pickCeneoOffer(src) : null;
   if (ceneo) {
     const grossEur = ceneo.best.pricePln / eurPln;
     const shippingEur = (ceneo.best.totalPln - ceneo.best.pricePln) / eurPln;
     // Tarama okuduğunu yazar (kullanıcı kararı, 2026-10-26), sağlama burada. Kıyas Amazon'un kendi sattığı fiyat: geç teslim
     // yüzünden alınamasa da piyasayı gösterir, iade ve üçüncü taraf fiyatı göstermez (KI150D10: iade 20 €, yeni 47 €)
     // Amazon'un sattığı fiyat yoksa kıyas yok: sayfadaki öteki teklifler güvenilir kıyas değil (IT3480E1: 1,5 yıldızlı başka ilan)
-    const amazon = out.filter((o) => (o.source === 'amazon-de' ? src.soldByAmazon : src.plSoldByAmazon)).map((o) => o.grossEur + o.shippingEur);
+    const amazon = out.filter((o) => o.soldByAmazon).map((o) => o.grossEur + o.shippingEur);
     const outlier = grossEur + shippingEur > Math.min(...amazon) * SOURCING.outlierRatio;
     out.push({
       source: 'ceneo',
@@ -119,6 +132,7 @@ function supplyOffers(src: ProductSource | undefined, eurPln: number): SupplyOff
       shippingEur,
       fxPct: PRICING.bankFxPct.PLN,
       buyable: !outlier,
+      soldByAmazon: false,
       shop: ceneo.best.shop,
       outlier,
     });
@@ -126,12 +140,17 @@ function supplyOffers(src: ProductSource | undefined, eurPln: number): SupplyOff
   return out;
 }
 
-/** Depoya en ucuz gelen alınabilir kanal (banka kur farkı dahil); hiçbiri alınamıyorsa fiyatı olan ilk kanal (buyable false). */
+/**
+ * Depoya en ucuz gelen alınabilir kanal (banka kur farkı dahil). Hiçbiri alınamıyorsa maliyet yalnız tahmindir (buyable false):
+ * piyasa dışı kanal çıkar, kalanlardan Amazon'un kendi sattığı en ucuz kanal, o da yoksa en ucuz kanal (KI150D10: iade 20 €, yeni 47 €).
+ */
 export function pickSupply(src: ProductSource | undefined, eurPln: number, vatMode: 'gross' | 'net' = PRICING.vatMode) {
   const priceOf = (o: SupplyOffer) => (vatMode === 'net' ? o.netEur : o.grossEur);
   const offers = supplyOffers(src, eurPln);
   const landed = (o: SupplyOffer) => (priceOf(o) + o.shippingEur) * (1 + o.fxPct);
-  const chosen = offers.filter((o) => o.buyable).sort((a, b) => landed(a) - landed(b))[0] ?? offers[0] ?? null;
+  const cheapest = (list: SupplyOffer[]) => list.sort((a, b) => landed(a) - landed(b))[0];
+  const usable = offers.filter((o) => !o.outlier);
+  const chosen = cheapest(offers.filter((o) => o.buyable)) ?? cheapest(usable.filter((o) => o.soldByAmazon)) ?? cheapest(usable) ?? null;
   return { offers, chosen, priceOf, purchaseEur: chosen ? priceOf(chosen) : null };
 }
 
@@ -147,7 +166,7 @@ export interface Proposal {
   asinStatus: string;
   /** Herhangi bir kanaldan şu an alınabilir mi (stokta, satıcı Amazon, fiyat var, teslimi geç değil) */
   buyable: boolean;
-  /** Maliyetin dayandığı kanal: alınabilenlerden en ucuzu; hiçbiri alınamıyorsa fiyatı olan ilk kanal */
+  /** Maliyetin dayandığı kanal: alınabilenlerden en ucuzu; hiçbiri alınamıyorsa piyasa dışı olmayanlardan Amazon'un sattığı en ucuz kanal, o da yoksa en ucuz kanal */
   source: SupplySource | null;
   /** Seçilen kanaldaki alış fiyatı (vatMode'a göre KDV dahil/hariç, €) */
   purchaseEur: number | null;
@@ -168,6 +187,8 @@ export interface Proposal {
   platformCapUsd: number | null;
   currentPrice: number;
   currentOldPrice: number;
+  /** Kartın Ozon'daki min_price'ı; kampanyadan çıkış fiyatının alt sınırı (exitPriceOf, campaign.ts) */
+  minPrice: number;
   /** Müşterinin gördüğü fiyat (kampanya/indirim sonrası) */
   customerPrice: number;
   currentProfit: number | null;
@@ -199,7 +220,7 @@ interface V5Item {
   product_id: number;
   offer_id: string;
   commissions: { sales_percent_rfbs: number };
-  price: { price: string | number; old_price: string | number; marketing_seller_price: string | number };
+  price: { price: string | number; old_price: string | number; marketing_seller_price: string | number; min_price: string | number };
   price_indexes?: { ozon_index_data?: { min_price: number; min_price_in_seller: number; price_index_value?: number } };
 }
 
@@ -322,7 +343,7 @@ export async function buildProposals(
     const { offers, chosen, priceOf, purchaseEur } = pickSupply(src, pln.rate, vatMode);
     const buyable = !!chosen?.buyable;
     // Ceneo fiyatı piyasa dışı ve başka alınabilir kanal yok: gerçek maliyet bilinmiyor. Fiyat ve stok önerilmez, kart olduğu
-    // gibi kalır; sonraki taramada kendiliğinden düzelir
+    // gibi kalır. Yanlış okuma sonraki taramada düzelir; gerçek pahalı teklifte Amazon kanalı dönene ya da 2 katın altında teklif çıkana kadar sürer
     const outlierOnly = !buyable && offers.some((o) => o.outlier);
     const stock = stocks.get(String(item.product_id)) ?? 0;
     const stockAction: StockAction = outlierOnly ? 'keep' : !buyable && stock > 0 ? 'close' : buyable && stock === 0 ? 'open' : 'keep';
@@ -360,6 +381,7 @@ export async function buildProposals(
       platformCapUsd,
       currentPrice,
       currentOldPrice: Number(item.price.old_price) || 0,
+      minPrice: Number(item.price.min_price) || 0,
       customerPrice,
       currentProfit: null,
       currentMargin: null,

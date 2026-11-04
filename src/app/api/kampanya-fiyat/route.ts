@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { applyCampaignPrices, buildCampaignPlan } from '@/lib/pricing/campaign';
+import { applyCampaignPrices, buildCampaignPlan, dropStaleReviews } from '@/lib/pricing/campaign';
 import { OzonRateLimitError } from '@/lib/ozon/gate';
 
 export const dynamic = 'force-dynamic';
@@ -11,23 +11,31 @@ const fail = (error: unknown, fallback: string) =>
     { status: error instanceof OzonRateLimitError ? 429 : 500 }
   );
 
-/** Elastik boosting kampanyası için gönderim planı (salt okuma). Kurallar: src/lib/pricing/campaign.ts */
+/**
+ * Elastik boosting kampanyası için gönderim planı. Kurallar: src/lib/pricing/campaign.ts
+ * Ozon'a yazmaz; tek yazdığı, stoğu 0'a düşen kartların "olduğu gibi kalsın" kararlarını silmek.
+ */
 export async function GET() {
   try {
-    return NextResponse.json({ success: true, ...(await buildCampaignPlan()) });
+    const { staleReviews, ...plan } = await buildCampaignPlan();
+    await dropStaleReviews(staleReviews);
+    return NextResponse.json({ success: true, ...plan });
   } catch (error) {
     return fail(error, 'Kampanya planı hesaplanamadı.');
   }
 }
 
-/** Seçilen ürünlerin kampanya fiyatını Ozon'a yazar. Gövde: { productIds: string[] }. Fiyat sunucuda yeniden hesaplanır. */
+/**
+ * Seçilen ürünlerin kampanya fiyatını Ozon'a yazar. Gövde: { productIds: string[], estimateCuts?: { [productId]: fiyat } }. Fiyat
+ * sunucuda yeniden hesaplanır; estimateCuts kullanıcının ekranda "alınamaz" hâliyle gördüğü indirimlerdir (isUnseenEstimateCut).
+ */
 export async function POST(request: NextRequest) {
   try {
-    const { productIds } = await request.json();
+    const { productIds, estimateCuts } = await request.json();
     if (!Array.isArray(productIds) || !productIds.length || productIds.length > 500) {
       return NextResponse.json({ success: false, error_message: 'productIds (1–500) gerekli.' }, { status: 400 });
     }
-    const results = await applyCampaignPrices(productIds.map(String));
+    const results = await applyCampaignPrices(productIds.map(String), estimateCuts && typeof estimateCuts === 'object' ? estimateCuts : {});
     return NextResponse.json({ success: true, results });
   } catch (error) {
     return fail(error, 'Kampanya fiyatları gönderilemedi.');

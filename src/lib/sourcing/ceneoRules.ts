@@ -13,7 +13,8 @@
  */
 
 export const SOURCING = {
-  bigShops: ['amazon.pl', 'mediaexpert.pl', 'euro.com.pl', 'x-kom.pl', 'morele.net', 'neonet.pl', 'empik.com', 'mediamarkt.pl'],
+  /** oleole.pl: euro.com.pl ile aynı grup, 3 gerçek alış (kullanıcı, 2026-11-03) */
+  bigShops: ['amazon.pl', 'mediaexpert.pl', 'euro.com.pl', 'oleole.pl', 'x-kom.pl', 'morele.net', 'neonet.pl', 'empik.com', 'mediamarkt.pl'],
   /** Pazar yerleri: satıcı Ceneo'da görünmez */
   marketplaces: ['allegro.pl', 'amazon.pl'],
   minRating: 4.7,
@@ -67,6 +68,9 @@ export function shopKind(o: CeneoOffer, brand?: string | null): ShopKind {
   return 'untrusted';
 }
 
+/** Ceneo'daki amazon.pl teklifi: doğrudan amazon.pl taraması fiyat bulduysa seçime girmez (offerSkip) */
+export const isAmazonPlOffer = (o: CeneoOffer) => host(o.shop) === 'amazon.pl';
+
 export function rateOffers(offers: CeneoOffer[], brand?: string | null): RatedOffer[] {
   return offers
     .map((o) => {
@@ -116,11 +120,21 @@ export interface RejectedOffer {
   at: string;
 }
 
-export type OfferSkip = 'rejected' | 'untrusted' | 'compatible' | 'other-model';
+export type OfferSkip = 'rejected' | 'direct-amazon-pl' | 'untrusted' | 'compatible' | 'other-model';
 
-/** Teklif seçime neden girmiyor; null = giriyor */
-export function offerSkip(o: RatedOffer, brand?: string | null, codes: (string | null)[] = [], rejected: RejectedOffer[] = []): OfferSkip | null {
+/**
+ * Teklif seçime neden girmiyor; null = giriyor. Maliyet (pickBestOffer) ve /ceneo-kontrol listesi buradan geçer, ayrışamazlar.
+ * @param directAmazonPl doğrudan amazon.pl kanalında fiyat var: Ceneo'daki amazon.pl teklifi sayılmaz (ceneoPickInput, proposals.ts)
+ */
+export function offerSkip(
+  o: RatedOffer,
+  brand?: string | null,
+  codes: (string | null)[] = [],
+  rejected: RejectedOffer[] = [],
+  directAmazonPl = false
+): OfferSkip | null {
   if (rejected.some((r) => r.offerId === o.offerId)) return 'rejected';
+  if (directAmazonPl && isAmazonPlOffer(o)) return 'direct-amazon-pl';
   if (o.kind === 'untrusted') return 'untrusted';
   if (SOURCING.compatibleTitle.test(o.title ?? '')) return 'compatible';
   if (isOtherModelTitle(o.title, codes, brand)) return 'other-model';
@@ -130,14 +144,16 @@ export function offerSkip(o: RatedOffer, brand?: string | null, codes: (string |
 /**
  * @param codes ürünün kendi model kodları (offer_id, Ceneo'da eşleşen, Ozon parça no.); boşsa kod kontrolü yapılmaz
  * @param rejected kullanıcının elediği teklifler
+ * @param directAmazonPl doğrudan amazon.pl kanalında fiyat var (offerSkip)
  */
 export function pickBestOffer(
   offers: CeneoOffer[],
   brand?: string | null,
   codes: (string | null)[] = [],
-  rejected: RejectedOffer[] = []
+  rejected: RejectedOffer[] = [],
+  directAmazonPl = false
 ): CeneoPick | null {
-  const trusted = rateOffers(offers, brand).filter((o) => !offerSkip(o, brand, codes, rejected));
+  const trusted = rateOffers(offers, brand).filter((o) => !offerSkip(o, brand, codes, rejected, directAmazonPl));
   if (!trusted.length) return null;
   const cheapest = trusted[0];
   const big = trusted.find((o) => o.kind === 'big' || o.kind === 'official');
