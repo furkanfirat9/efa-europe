@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { getEcbEurUsd } from '@/lib/fx/ecb';
 import { extractProductMeta } from '@/lib/orders/productMeta';
-import { getOzonHeaders, ozonFetch, ozonFetchBuffer, OzonRateLimitError } from '@/lib/ozon/gate';
+import { getOzonHeaders, ozonFetch, OzonRateLimitError } from '@/lib/ozon/gate';
+import { fetchPackageLabelPdf, OzonLabelPendingError } from '@/lib/ozon/packageLabel';
 
 export const dynamic = 'force-dynamic';
 
 /** LS formunun boş bırakılınca gönderdiği varsayılan koli; bu ölçülerle açılmış kayıt örnek alınmaz. */
 const DEFAULT_PARCEL = { lengthMm: 300, widthMm: 200, heightMm: 150, weightGr: 1200 };
 
-/** Sınırda etiket için en çok ~4 sn beklenir (5 denemede ~40 sn dönüyordu). */
+/** Hız sınırında her etiket çağrısı en çok 2 kez yeniden denenir (5 denemede ~40 sn dönüyordu). */
 const LABEL_MAX_RETRIES = 2;
 
 interface Parcel {
@@ -74,15 +75,10 @@ async function parcelFromOzonCard(offerId: string): Promise<Parcel | null> {
   return { lengthMm: mm(card.depth), widthMm: mm(card.width), heightMm: mm(card.height), weightGr: grams, source: 'Ozon kartından' };
 }
 
-/** Ozon kargo etiketi. Form beklediği için kısa denenir; sınır sürerse kullanıcı PDF'i elle seçer. */
+/** Ozon kargo etiketi. Form beklediği için kısa denenir; alınamazsa kullanıcı PDF'i elle seçer. */
 async function fetchLabel(postingNumber: string, status: string | null): Promise<{ name: string; base64: string } | null> {
   if (status !== 'awaiting_deliver') return null;
-  const pdf = await ozonFetchBuffer(
-    '/v2/posting/fbs/package-label',
-    { posting_number: [postingNumber] },
-    getOzonHeaders('store1'),
-    LABEL_MAX_RETRIES
-  );
+  const pdf = await fetchPackageLabelPdf(postingNumber, 'store1', LABEL_MAX_RETRIES);
   return { name: `posting-label-${postingNumber}.pdf`, base64: pdf.toString('base64') };
 }
 
@@ -135,7 +131,9 @@ export async function GET(request: NextRequest) {
       notes.push(
         labelResult.reason instanceof OzonRateLimitError
           ? "Ozon etiket servisi şu an yanıt vermiyor; PDF'i elle seçin ya da birazdan siparişi yeniden seçin."
-          : "Ozon etiketi alınamadı; PDF'i elle seçin."
+          : labelResult.reason instanceof OzonLabelPendingError
+            ? "Ozon etiketi henüz hazırlamadı; birazdan siparişi yeniden seçin ya da PDF'i elle seçin."
+            : "Ozon etiketi alınamadı; PDF'i elle seçin."
       );
     }
 
