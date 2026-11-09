@@ -41,16 +41,20 @@ export async function lsRequest<T = any>(
   // Depo API'si yanıt vermezse istek sonsuza kadar asılı kalmasın
   options.signal = AbortSignal.timeout(LS_TIMEOUT_MS);
 
+  // Depo sunucusu Vercel'in ABD bölgesinden (iad1) gelen bağlantıya yanıt vermiyor; depo API'sini çağıran uçlar
+  // vercel.json'da Frankfurt'a (fra1) alındı. Hata, isteğin hangi bölgeden gittiğini söyler.
+  const from = process.env.VERCEL_REGION ? `, sunucu bölgesi ${process.env.VERCEL_REGION}` : '';
+
   let response: Response;
   try {
     response = await fetch(url, options);
   } catch (err: any) {
     if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
       throw new Error(
-        `Depo API'sine ${LS_TIMEOUT_MS / 1000} sn içinde ulaşılamadı (${BASE_URL}). Sunucu bu ortamdan gelen bağlantıyı engelliyor olabilir.`
+        `Depo API'sine ${LS_TIMEOUT_MS / 1000} sn içinde ulaşılamadı (${BASE_URL}${from}). Sunucu bu ortamdan gelen bağlantıyı engelliyor olabilir.`
       );
     }
-    throw new Error(`Depo API'sine bağlanılamadı (${BASE_URL}): ${err?.cause?.code || err?.message || err}`);
+    throw new Error(`Depo API'sine bağlanılamadı (${BASE_URL}${from}): ${err?.cause?.code || err?.message || err}`);
   }
 
   if (!response.ok) {
