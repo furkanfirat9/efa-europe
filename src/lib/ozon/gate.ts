@@ -122,19 +122,10 @@ export async function ozonFetch<T = any>(
   path: string,
   body: unknown,
   headers: Record<string, string>,
-  method: 'POST' | 'GET' = 'POST'
-): Promise<T> {
-  return (await (await ozonRequest(path, body, headers, method)).json()) as T;
-}
-
-/** JSON yerine dosya dönen uçlar için (ör. `/v2/posting/fbs/package-label` PDF verir). Aynı kuyruktan geçer. */
-export async function ozonFetchBuffer(
-  path: string,
-  body: unknown,
-  headers: Record<string, string>,
+  method: 'POST' | 'GET' = 'POST',
   maxRetries: number = MAX_RATE_LIMIT_RETRIES
-): Promise<Buffer> {
-  return Buffer.from(await (await ozonRequest(path, body, headers, 'POST', maxRetries)).arrayBuffer());
+): Promise<T> {
+  return (await (await ozonRequest(path, body, headers, method, maxRetries)).json()) as T;
 }
 
 async function ozonRequest(
