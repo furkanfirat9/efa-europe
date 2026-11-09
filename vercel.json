@@ -1,5 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "src/app/api/fulfillment/orders/route.ts": { "regions": ["fra1"] },
+    "src/app/api/fulfillment/reports/route.ts": { "regions": ["fra1"] },
+    "src/app/api/fulfillment/settings/route.ts": { "regions": ["fra1"] },
+    "src/app/api/fulfillment/stocks/route.ts": { "regions": ["fra1"] }
+  },
   "crons": [
     { "path": "/api/cron/price-index", "schedule": "0 */3 * * *" },
     { "path": "/api/cron/order-status", "schedule": "15 * * * *" }
