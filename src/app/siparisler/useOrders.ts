@@ -224,6 +224,9 @@ export function useOrders() {
   );
 
   const [allOrders, setAllOrders] = useState<OrderItem[]>([]);
+  // Kayıt başarısız olursa ekrandaki değeri geri almak için güncel liste (useCallback içinden okunur).
+  const allOrdersRef = useRef(allOrders);
+  allOrdersRef.current = allOrders;
   const [stats, setStats] = useState<OrderStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -528,13 +531,39 @@ export function useOrders() {
     };
   }, [selectedYear, selectedMonth, fetchOrders, ensurePeriodSynced]);
 
-  // İyimser Güncelleme & PATCH
+  // İyimser güncelleme & PATCH. Değer önce ekrana yazılır; sunucu kaydetmezse geri alınır ve hata
+  // gösterilir. Eskiden ret (ör. oturum düşmüşken 401) sessiz geçiyor, tutar ekranda kayıtlı gibi
+  // kalıyor ve sayfa yenilenince kayboluyordu (46848727-0892-1, Kasım 2026).
   const handleInlineUpdate = useCallback(
-    async (postingNumber: string, payload: Record<string, any>) => {
+    async (postingNumber: string, payload: Record<string, any>): Promise<boolean> => {
+      const before = allOrdersRef.current.find((o) => o.postingNumber === postingNumber) as
+        | Record<string, any>
+        | undefined;
+      const previous: Record<string, any> = {};
+      if (before) for (const key of Object.keys(payload)) previous[key] = before[key];
+
       // 1. İyimser UI güncellemesi
       setAllOrders((prev) =>
         prev.map((o) => (o.postingNumber === postingNumber ? { ...o, ...payload } : o))
       );
+
+      const rollback = (message: string) => {
+        if (before) {
+          // Yalnız hâlâ bu isteğin yazdığı değeri taşıyan alanlar geri alınır; arada girilen yeni değer ezilmez.
+          setAllOrders((prev) =>
+            prev.map((o) => {
+              if (o.postingNumber !== postingNumber) return o;
+              const restored: Record<string, any> = {};
+              for (const key of Object.keys(payload)) {
+                if ((o as Record<string, any>)[key] === payload[key]) restored[key] = previous[key];
+              }
+              return { ...o, ...restored };
+            })
+          );
+        }
+        setError(message);
+        toast.error(message, { id: 'orders-save', duration: 10000 });
+      };
 
       try {
         const res = await fetch('/api/siparisler', {
@@ -547,27 +576,33 @@ export function useOrders() {
             ...payload,
           }),
         });
-        const data = await res.json();
-        if (data.success && data.item) {
-          const updatedItem = {
-            ...data.item,
-            productOfferId: data.item.productOfferId || data.item.productOfferId,
-            productTitle: data.item.productTitle || data.item.productTitle,
-            productImage: data.item.productImage || data.item.productImage,
-            salePrice: data.item.salePrice ?? data.item.totalPrice,
-          };
-
-          setAllOrders((prev) =>
-            prev.map((o) => (o.postingNumber === postingNumber ? { ...o, ...updatedItem } : o))
-          );
-
-          if (data.stats) {
-            setStats(data.stats);
-          }
-          showToast('Kaydedildi');
+        const data = await res.json().catch(() => null);
+        if (!res.ok || !data?.success || !data.item) {
+          const reason =
+            res.status === 401
+              ? 'Oturum kapanmış, lütfen tekrar giriş yapın.'
+              : data?.error_message || `Sunucu yanıtı ${res.status}.`;
+          rollback(`${postingNumber} kaydedilmedi: ${reason}`);
+          return false;
         }
+
+        const updatedItem = {
+          ...data.item,
+          salePrice: data.item.salePrice ?? data.item.totalPrice,
+        };
+
+        setAllOrders((prev) =>
+          prev.map((o) => (o.postingNumber === postingNumber ? { ...o, ...updatedItem } : o))
+        );
+
+        if (data.stats) {
+          setStats(data.stats);
+        }
+        showToast('Kaydedildi');
+        return true;
       } catch (err: any) {
-        setError('Kaydedilemedi: ' + err.message);
+        rollback(`${postingNumber} kaydedilmedi: ${err?.message || 'bağlantı hatası.'}`);
+        return false;
       }
     },
     [showToast, selectedYear, selectedMonth]
@@ -579,20 +614,31 @@ export function useOrders() {
     setSelectedOrder((prev) => (prev && prev.postingNumber === postingNumber ? { ...prev, ...fields } : prev));
   }, []);
 
+  // Panel açıldığındaki not ve tutar: kaydederken yalnız panelde değiştirilen alan gönderilir.
+  // Panel açıkken tablodan girilen tutar, paneldeki eski değerle ezilmesin.
+  const detailInitialRef = useRef<{ notes: string; source: SourceDraft }>({
+    notes: '',
+    source: { price: '', currency: 'EUR' },
+  });
+
   // Detay Panelini Aç
   const handleOpenDetail = useCallback((order: OrderItem) => {
-    setSelectedOrder(order);
-    setDetailNotes(order.notes || '');
-    setDetailSource({
+    const notes = order.notes || '';
+    const source = {
       price: order.sourcePrice != null ? formatTrNumber(order.sourcePrice) : '',
       currency: order.sourceCurrency || 'EUR',
-    });
+    };
+    detailInitialRef.current = { notes, source };
+    setSelectedOrder(order);
+    setDetailNotes(notes);
+    setDetailSource(source);
     setDetailModalOpen(true);
   }, []);
 
   // Detay Notlarını ve sitedeki alış tutarını kaydet
   const handleSaveDetailNotes = async () => {
     if (!selectedOrder) return;
+    const initial = detailInitialRef.current;
     const priceText = detailSource.price.trim();
     const sourcePrice = priceText ? parseTrNumber(priceText) : null;
     if (priceText && (sourcePrice === null || sourcePrice <= 0)) {
@@ -600,15 +646,24 @@ export function useOrders() {
       return;
     }
 
+    const payload: Record<string, any> = {};
+    if (detailNotes.trim() !== initial.notes.trim()) payload.notes = detailNotes.trim();
+    if (priceText !== initial.source.price.trim() || detailSource.currency !== initial.source.currency) {
+      payload.sourcePrice = sourcePrice;
+      payload.sourceCurrency = sourcePrice !== null ? detailSource.currency : null;
+    }
+    if (Object.keys(payload).length === 0) {
+      setDetailModalOpen(false);
+      return;
+    }
+
     setSavingDetail(true);
     try {
-      await handleInlineUpdate(selectedOrder.postingNumber, {
-        notes: detailNotes.trim(),
-        sourcePrice,
-        sourceCurrency: sourcePrice !== null ? detailSource.currency : null,
-      });
-      setDetailModalOpen(false);
-      showToast('Sipariş detayları kaydedildi.');
+      const saved = await handleInlineUpdate(selectedOrder.postingNumber, payload);
+      if (saved) {
+        setDetailModalOpen(false);
+        showToast('Sipariş detayları kaydedildi.');
+      }
     } finally {
       setSavingDetail(false);
     }
