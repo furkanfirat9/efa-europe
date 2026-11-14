@@ -23,7 +23,8 @@ import {
 } from '../utils';
 import { useOrderDocument, type OnDocumentChange } from '../useOrderDocument';
 
-export type UpdateOrder = (postingNumber: string, payload: Record<string, any>) => Promise<void>;
+/** Kaydedildiyse true; başarısızsa ekrandaki değer geri alınmış ve hata gösterilmiştir. */
+export type UpdateOrder = (postingNumber: string, payload: Record<string, any>) => Promise<boolean>;
 
 /**
  * Tablo içi düzenleme kutusu: kenarlığı yalnızca üzerine gelince veya odakta görünür.
